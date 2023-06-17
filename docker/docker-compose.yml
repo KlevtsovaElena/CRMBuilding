@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile-nginx
     volumes:
       - ./../site/:/var/www
+    depends_on:
+      - php
     ports: 
       - 80:80
 
@@ -16,6 +18,12 @@ services:
       dockerfile: Dockerfile-php
     volumes:
       - ./../site/:/var/www
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "admin"
+      MYSQL_DB: "crm-building"
+      MYSQL_CHARSET: "utf8"
     ports:
       - 9010:9000
 
