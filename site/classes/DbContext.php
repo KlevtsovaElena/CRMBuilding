@@ -3,15 +3,15 @@
     {
         private static $connection;
 
-        public static function GetConnection() : PDO
+        public static function getConnection() : PDO
         {
             if (static::$connection == null)
-                static::$connection = static::CreateConnection();
+                static::$connection = static::createConnection();
 
             return static::$connection;
         }
 
-        private static function CreateConnection() : PDO 
+        private static function createConnection() : PDO 
         {
             $host = $_ENV['MYSQL_HOST'];
             $database = $_ENV['MYSQL_DB'];

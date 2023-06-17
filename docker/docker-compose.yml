@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile-nginx
     volumes:
       - ./../site/:/var/www
+    depends_on:
+      - php
     ports: 
       - 80:80
 
