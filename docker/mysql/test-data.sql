@@ -30,19 +30,21 @@ CREATE TABLE `categories` (
 INSERT INTO `categories` (`id`, `category_name`) VALUES
 (1,	'потолочный'),
 (2,	'стеновой'),
-(3,	'обычный'),
-(4,	'категория 4');
+(3,	'обычный');
 
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `last_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `phone` smallint DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `city` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city`) VALUES
+(1,	'',	'',	'79167625303',	'city'),
+(892205925,	'Лол',	'',	'79167625303',	'city');
 
 DROP TABLE IF EXISTS `ordered_product`;
 CREATE TABLE `ordered_product` (
@@ -81,9 +83,9 @@ CREATE TABLE `price_changes` (
 DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) CHARACTER SET utf8mb3 NOT NULL,
-  `description` text CHARACTER SET utf8mb3 NOT NULL,
-  `photo` varchar(300) CHARACTER SET utf8mb3 NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `category_id` int unsigned NOT NULL,
   `type_id` int unsigned DEFAULT NULL,
   `brand_id` int unsigned NOT NULL,
@@ -116,11 +118,11 @@ INSERT INTO `test` (`id`, `name`) VALUES
 DROP TABLE IF EXISTS `types`;
 CREATE TABLE `types` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `type_name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `type_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `types` (`id`, `type_name`) VALUES
 (1,	'влагостойкий');
 
--- 2023-06-16 14:41:53
+-- 2023-06-18 22:35:25

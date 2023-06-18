@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,6 +15,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type ResponseT struct {
@@ -90,19 +93,26 @@ type InlineButton struct {
 }
 
 type UserT struct {
-	ID          string
+	ID          int
 	FirstName   string
 	LastName    string
-	RegDate     int
 	PhoneNumber string
+	City        string
 }
 
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
 
-var tel string
+var step int
 
-var capacity int = 1
+var capacity int
+
+var tel string
+var FirstName string
+var LastName string
+
+// создаем соединение с БД
+var Db, Err = sql.Open("mysql", "root:admin@tcp(mysql:3306)/crm-building")
 
 func main() {
 
@@ -145,6 +155,7 @@ func main() {
 			chatId := responseObj.Result[i].Message.From.ID
 			messageTime := responseObj.Result[i].Message.Date
 			firstName := responseObj.Result[i].Message.From.FirstName
+			lastName := responseObj.Result[i].Message.From.LastName
 			mesIdRepl := responseObj.Result[i].Message.MessageID
 			phone := responseObj.Result[i].Message.Contact.PhoneNumber
 			button := need.Result[i].CallbackQuery.Data
@@ -154,7 +165,7 @@ func main() {
 			//пишем бизнес логику ----------- мозги
 
 			//отвечаем пользователю на его сообщение
-			go sendMessage(chatId, id, mesIdInline, mesIdRepl, messageTime, text, firstName, button, phone)
+			go sendMessage(chatId, id, mesIdInline, mesIdRepl, messageTime, text, button, phone, firstName, lastName)
 
 		}
 
@@ -164,16 +175,21 @@ func main() {
 	}
 }
 
-func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, firstName string, button string, phone string) {
+func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string) {
 
 	fmt.Println(text)
 
 	if text == "/start" {
 
+		FirstName = firstName
+		LastName = lastName
+
+		step += 1
+
 		buttons := [][]map[string]interface{}{
 			{{"text": "Русский 🇷🇺", "callback_data": "russian"}},
 			{{"text": "Узбекский 🇺🇿", "callback_data": "uzbekistan"}},
-			{{"text": "English 🇬🇧", "callback_data": "english"}},
+			{{"text": "Ўзбекча 🇺🇿", "callback_data": "usbecha"}},
 		}
 
 		inlineKeyboard := map[string]interface{}{
@@ -188,6 +204,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	}
 
 	if button == "russian" {
+
+		step += 1
+
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
@@ -214,6 +233,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	}
 
 	if button == "backToPhone" {
+
+		step -= 1
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
@@ -241,6 +262,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	}
 
 	if phone != "" {
+
+		step += 1
+		fmt.Println(step)
+
 		tel = phone
 		fmt.Println(tel)
 		buttons := [][]map[string]interface{}{
@@ -262,9 +287,13 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(chatId) + "&message_id=" + strconv.Itoa(mesIdRepl-1))
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
+
 	}
 
 	if text == "Нет" {
+
+		step -= 1
+
 		buttons := [][]map[string]interface{}{
 			{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
 		}
@@ -282,6 +311,43 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	if button == "city" || button == "backToMenu" {
 
+		fmt.Println(FirstName)
+		fmt.Println(LastName)
+
+		//создали "бд юзеров"
+		usersDB := make(map[int]UserT)
+
+		//считываем из бд при включении
+		dataFile, _ := ioutil.ReadFile("db.json")
+		json.Unmarshal(dataFile, &usersDB)
+
+		//определяем зарегистрирован ли пользователь
+		_, exist := usersDB[id]
+		if !exist {
+			user := UserT{}
+			user.ID = id
+			user.FirstName = FirstName
+			user.LastName = LastName
+			user.PhoneNumber = tel
+			user.City = button
+			//если не зарегистрирован - добавляем в БД и сохраняем в ОП
+			_, err := Db.Query("INSERT INTO `customers`(`id`, `first_name`,`last_name`, `phone`, `city`) VALUES(?,?, ?, ?,?)", id, FirstName, LastName, tel, button)
+			if err != nil {
+				fmt.Println("Ошибка сохранения пользователя ", err)
+			} else {
+				fmt.Println("пользователь добавлен")
+			}
+
+			usersDB[chatId] = user
+
+			file, _ := os.Create("db.json")
+			jsonString, _ := json.Marshal(usersDB)
+			file.Write(jsonString)
+
+		}
+
+		step = 4
+
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
@@ -292,17 +358,37 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				},
 				{
 					{
+						"text": "Актуальные цены на рынке 📈",
+					},
+				},
+				{
+					{
+						"text": "Актуальный курс 💹",
+					},
+				},
+				{
+					{
+						"text": "Настройки ⚙️",
+					},
+				},
+				{
+					{
+						"text": "Мои заказы 📕",
+					},
+				},
+				{
+					{
+						"text": "Информация ℹ️",
+					},
+				},
+				{
+					{
+						"text": "Связаться 📞",
+					},
+				},
+				{
+					{
 						"text": "Корзина 🗑",
-					},
-				},
-				{
-					{
-						"text": "Выбрать язык 🇷🇺 🇺🇿 🇬🇧",
-					},
-				},
-				{
-					{
-						"text": "Назад 🔙",
 					},
 				},
 			},
