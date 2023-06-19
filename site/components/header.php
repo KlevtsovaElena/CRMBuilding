@@ -2,12 +2,14 @@
         <div class="menu-top">
             Менюшка верхняя
         </div>
-        <nav class="menu" >ЛЕВАЯ МЕНЮШКА
+        <nav class="menu-left" >ЛЕВАЯ МЕНЮШКА
             <ul>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+
             </ul>
         </nav>
     </header>

@@ -1,22 +1,27 @@
 /* Переменные */
+
 :root {
     --primary-color: #0088cc;
     --primary-color-hover: #00a1f2;
     --shadow-primary-active: 0 0 0 2px rgba(0, 136, 204, 0.5);
     --secondary-color: #d2323d;
     --secondary-color-hover: #e36159;
-    --shadow-secondary-active: 0  0 0 2px rgba(210, 50, 45, 0.5);
-    --dark-color: #000000;
+    --shadow-secondary-active: 0 0 0 2px rgba(210, 50, 45, 0.5);
+    --dark-color: #444444;
     --light-color: #ffffff;
-    --btn-cancel-color-hover: #f7f7f7;
-    --shadow-cancel-active: 0  0 0 2px rgb(255, 255, 255);
-    --left-menu-bgColor: #242e42;
-    --page-content-bgColor: #f5f5f8;
+    --neutral-color-hover: #f9f9f9;
+    --shadow-neutral-color-active: 0 0 0 2px rgb(255, 255, 255);
+    --left-menu-bgColor: #1D2127;
+    --page-content-bgColor: #f5f5f5;
+    --border-form-elem: #ced4da;
+    --border-form-elem-focus: #33bbff;
+    --shadow-form-elem-focus: rgba(0, 136, 204, 0.3);
+
     --border-radius: 4px;
 
     --speed-transition: 0.3s;
-    --menu-top-height: 50px;
-    --menu-left-width: 200px;
+    --menu-top-height: 60px;
+    --menu-left-width: 250px;
 
   /* --page-header-bgColor: #242e42;
   --page-header-bgColor-hover: #1d2636;
@@ -114,8 +119,8 @@ ol, ul, li {
     list-style: none;
 }
 
-input,
-textarea {
+input, textarea,
+select, option {
     border-radius: 0;
     box-sizing: border-box;
     font-family: inherit;
@@ -138,7 +143,7 @@ input::-ms-input-placeholder, textarea::-ms-input-placeholder {
     color: green;
 }
 
-input:focus, textarea:focus {
+input:focus, textarea:focus, select:focus, option:focus {
     outline: none;
 }
 input:focus::placeholder, textarea:focus::placeholder {
@@ -169,12 +174,130 @@ button {
 }
 
 /* Стилизация основных элементов */
+
 body {
     font-family: 'Montserrat', sans-serif;
     /* font-family: 'Open Sans', sans-serif;
     font-family: 'Raleway', sans-serif;
     font-family: 'Roboto', sans-serif; */
-
+    color: var(--dark-color);
     background-color: var(--page-content-bgColor);
 }
+
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    padding: 15px;
+    min-width: 100px;
+    transition: all var(--speed-transition); 
+}
+
+input, textarea, select {
+    padding: 10px;
+    margin: 8px;
+    min-width: 200px;
+    border: 1px solid var(--border-form-elem);
+    border-radius: var(--border-radius);
+}
+
+option {
+    padding-top: 10px;
+}
+textarea {
+    min-width: 300px;
+    min-height: 100px;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--border-form-elem-focus);
+    box-shadow: 0 0 0 0.8px var(--shadow-form-elem-focus);
+}
+
+.d-block {
+    display: block;
+}
+/* ---BUTTON---- */
+
+.btn-ok {
+    background: var(--primary-color);
+    color: var(--light-color);
+}
+
+.btn-ok:hover {
+    background: var(--primary-color-hover);
+}
+
+.btn-ok:active {
+    box-shadow: var(--shadow-primary-active);
+}
+
+.btn-delete {
+    background: var(--secondary-color);
+    color: var(--light-color);
+}
+
+.btn-delete:hover {
+    background: var(--secondary-color-hover);
+}
+
+.btn-delete:active {
+    box-shadow: var(--shadow-secondary-active);
+}
+
+.btn-neutral {
+    background: var(--light-color);
+    color: var(--dark-color);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.btn-neutral:hover {
+    background: var(--neutral-color-hover); 
+}
+
+.btn-neutral:active {
+    box-shadow: var(--shadow-neutral-color-active);
+    border:none;
+}
+
+.form-elements-container {
+    padding: 30px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+}
+/* MENU */
+
+.menu-top {
+    background: var(--light-color);
+    height: 50px;
+    width: calc(100% - var(--menu-left-width));
+    position: fixed;
+    left: var(--menu-left-width);
+    top: 0;
+}
+            
+.menu-left {
+    background: var(--left-menu-bgColor); 
+    /* background: var(--left-menu-bgColor);  */
+    /* background: var(--color_secondary_200);  */
+    height: 100%; 
+    width: var(--menu-left-width);
+    color: var(--light-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+
+}
+
+.main-content {
+    margin-left: var(--menu-left-width);;
+    margin-top:  var(--menu-top-height);
+    padding: 20px;
+}
+
+.menu-left__item-link {
+    transition: all var(--speed-transition);
+}
+
+.menu-left__item-link:hover {
+    color: var(--primary-color-hover);
+}           
 

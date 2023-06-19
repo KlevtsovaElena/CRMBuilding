@@ -20,128 +20,78 @@
         <div class="menu-top">
             Менюшка верхняя
         </div>
-        <nav class="menu" >ЛЕВАЯ МЕНЮШКА
+        <nav class="menu-left" >ЛЕВАЯ МЕНЮШКА
             <ul>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
-                <li><a href="#">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+                <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
+
             </ul>
         </nav>
     </header>
         <section class="main-content">
-            <input type="text" placeholder="test" class="input-style">
-            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
-            <button class="blue">Сохранить товар</button>
-            <button class="cancel">Сбросить</button>
-            <button class="red">Удалить товар</button>
+            <input type="text" placeholder="test">
+            <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
+            <button class="btn btn-ok">Сохранить товар</button>
+            <button class="btn btn-neutral">Сбросить</button>
+            <button class="btn btn-delete">Удалить товар</button>
     
-            <input type="text" placeholder="test" class="input-style">
-            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
-            <button class="blue">Сохранить товар</button>
-            <button class="cancel">Сбросить</button>
-            <button class="red">Удалить товар</button>
-    
-            <input type="text" placeholder="test" class="input-style">
-            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
-            <button class="blue">Сохранить товар</button>
-            <button class="cancel">Сбросить</button>
-            <button class="red">Удалить товар</button>
+
+            <div><h1>Добавить товар</h1></div>
+
+                
+        <form action="#" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="vendorId" value="111">
+            <div class="form-elements-container">
+            <p>Наименование</p><input type="text" id="name" name="name" value="" required>
+            <!-- фото -->
+            <p>
+                <div class="img-title-form">Изображениe для карточки 
+                    <div>(Рекомендованные параметры такие НА такие)</div>
+                    <div class="img-title-prew img-guide"><img></div>
+                    <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required>                               
+                </div> 
+            </p>
+
+            <!-- список -->
+            <p>Бренд</p>
+            <select id="brandId" name="brandId" value="" required>
+                <option value="Бренд1">Бренд1</option>
+                <option value="Бренд1">Бренд2</option>
+                <option value="Бренд1">Бренд3</option>
+                <option value="Бренд1">Бренд4</option>
+            </select>
+
+            <!-- список -->
+            <p>Категория</p>
+            <select id="categoryId" name="categoryId" value="" required>
+                <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                <option value="Категория1">Категория1</option>
+                <option value="Категори1">Категория2</option>
+                <option value="Категория1">Категория3</option>
+                <option value="Категория1">Категория4</option>
+            </select>
+
+
+            <p>Описание</p><textarea id="description" name="description" required></textarea>
+            <p>Артикул</p><input type="text" id="noname" name="" value="" required>
+            <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" value="" required>
+            <p>Цена (руб.)</p><input type="number" id="price" name="price" value="" required>
+            <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" value="" required>
+
+        </div>
+            <div>
+                <button class="btn btn-ok" type="submit">Сохранить</button>
+                <a href="card-guide.php" class="btn btn-neutral">Сбросить изменения</a> 
+            </div>
+        </form>
         </section>
         
 
-        <style>
-            .menu-top {
-                background: var(--light-color);
-                height: 50px;
-                width: calc(100% - var(--menu-left-width));
-                position: fixed;
-                left: var(--menu-left-width);
-                top: 0;
-
-            }
-            .menu {
-                background: var(--color_secondary_3300); 
-                /* background: var(--left-menu-bgColor);  */
-                /* background: var(--color_secondary_200);  */
-                height: 100%; 
-                width: var(--menu-left-width);
-                color: var(--light-color);
-                position: fixed;
-                top: 0;
-                left: 0;
-
-            }
-            .main-content {
-                margin-left: var(--menu-left-width);;
-                margin-top:  var(--menu-top-height);
-                padding: 20px;
-            }
-            .menu a {
-                transition: all var(--speed-transition);
-            }
-            .menu a:hover {
-                color: var(--primary-color-hover);
-            }
-            .input-style {
-                border: 1px solid #ced4da;
-                border-radius: var(--border-radius);
-            }
-            .input-style:focus {
-                border-color: #33bbff;
-                box-shadow: 0 0 8px rgba(0, 136, 204, 0.3);
-            }
-            .blue:active {
-                box-shadow: var(--shadow-primary-active);
-            }
-            .blue{
-                border-radius: var(--border-radius);
-                background: var(--primary-color);
-                color: var(--light-color);
-                font-weight: 600;
-                padding: 15px;
-                min-width: 100px;
-                transition: all var(--speed-transition);
-            }
-            .blue:hover {
-                background: var(--primary-color-hover);
-            }
-            .red{
-                border-radius: var(--border-radius);
-                background: var(--secondary-color);
-                color: var(--light-color);
-                font-weight: 600;
-                padding: 15px;
-                min-width: 100px;
-                transition: all var(--speed-transition);
-            }
-            .red:hover {
-                background: var(--secondary-color-hover);
-            }
-            .red:active {
-                box-shadow: var(--shadow-secondary-active);
-            }
-            .cancel{
-                border-radius: var(--border-radius);
-                background: var(--light-color);
-                color: var(--dark-color);
-                font-weight: 600;
-                padding: 15px;
-                min-width: 100px;
-                transition: all var(--speed-transition);
-
-                box-shadow: 0  0 0 0.5px rgba(255, 255, 255, 0.5);
-                
-            }
-            .cancel:hover{
-                background: var(--btn-cancel-color-hover);
-                
-            }
-            .cancel:active {
-                box-shadow: var(--shadow-cancel-active);
-                border:none;
-            }
-        </style>
+        
 
 </body>
 </html>
