@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRMBuilding</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./../assets/css/base.css">
+
+
+</head>
+<body>
+    <header style="background: red; height: 80px;">
+        <h1>ЭТО ХЭДЕР</h1>
+        <input type="text" placeholder="test" class="input-style">
+        <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
+        <button class="blue">Сохранить товар</button>
+        <button class="cancel">Сбросить</button>
+        <button class="red">Удалить товар</button>
+
+        <style>
+            .input-style {
+                border: 1px solid #ced4da;
+                border-radius: var(--border-radius);
+            }
+            .input-style:focus {
+                border-color: #33bbff;
+                box-shadow: 0 0 8px rgba(0, 136, 204, 0.3);
+            }
+            .blue:active {
+                box-shadow: var(--shadow-primary-active);
+            }
+            .blue{
+                border-radius: var(--border-radius);
+                background: var(--primary-color);
+                color: var(--light-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+            }
+            .blue:hover {
+                background: var(--primary-color-hover);
+            }
+            .red{
+                border-radius: var(--border-radius);
+                background: var(--secondary-color);
+                color: var(--light-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+            }
+            .red:hover {
+                background: var(--secondary-color-hover);
+            }
+            .red:active {
+                box-shadow: var(--shadow-secondary-active);
+            }
+            .cancel{
+                border-radius: var(--border-radius);
+                background: var(--btn-cancel-color);
+                color: var(--dark-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+
+                box-shadow: 0  0 0 0.5px rgba(255, 255, 255, 0.5);
+                
+            }
+            .cancel:hover{
+                background: var(--btn-cancel-color-hover);
+                
+            }
+            .cancel:active {
+                box-shadow: var(--shadow-cancel-active);
+                border:none;
+            }
+        </style>
+    </header>
+</body>
+</html>
