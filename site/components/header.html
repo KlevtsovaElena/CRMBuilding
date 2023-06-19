@@ -14,15 +14,75 @@
 
 </head>
 <body>
-    <header style="background: red; height: 80px;">
-        <h1>ЭТО ХЭДЕР</h1>
-        <input type="text" placeholder="test" class="input-style">
-        <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
-        <button class="blue">Сохранить товар</button>
-        <button class="cancel">Сбросить</button>
-        <button class="red">Удалить товар</button>
+
+
+    <header>
+        <div class="menu-top">
+            Менюшка верхняя
+        </div>
+        <nav class="menu" >ЛЕВАЯ МЕНЮШКА
+            <ul>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+            </ul>
+        </nav>
+    </header>
+        <section class="main-content">
+            <input type="text" placeholder="test" class="input-style">
+            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
+            <button class="blue">Сохранить товар</button>
+            <button class="cancel">Сбросить</button>
+            <button class="red">Удалить товар</button>
+    
+            <input type="text" placeholder="test" class="input-style">
+            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
+            <button class="blue">Сохранить товар</button>
+            <button class="cancel">Сбросить</button>
+            <button class="red">Удалить товар</button>
+    
+            <input type="text" placeholder="test" class="input-style">
+            <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
+            <button class="blue">Сохранить товар</button>
+            <button class="cancel">Сбросить</button>
+            <button class="red">Удалить товар</button>
+        </section>
+        
 
         <style>
+            .menu-top {
+                background: var(--light-color);
+                height: 50px;
+                width: calc(100% - var(--menu-left-width));
+                position: fixed;
+                left: var(--menu-left-width);
+                top: 0;
+
+            }
+            .menu {
+                background: var(--color_secondary_3300); 
+                /* background: var(--left-menu-bgColor);  */
+                /* background: var(--color_secondary_200);  */
+                height: 100%; 
+                width: var(--menu-left-width);
+                color: var(--light-color);
+                position: fixed;
+                top: 0;
+                left: 0;
+
+            }
+            .main-content {
+                margin-left: var(--menu-left-width);;
+                margin-top:  var(--menu-top-height);
+                padding: 20px;
+            }
+            .menu a {
+                transition: all var(--speed-transition);
+            }
+            .menu a:hover {
+                color: var(--primary-color-hover);
+            }
             .input-style {
                 border: 1px solid #ced4da;
                 border-radius: var(--border-radius);
@@ -37,7 +97,7 @@
             .blue{
                 border-radius: var(--border-radius);
                 background: var(--primary-color);
-                color: var(--light-font-color);
+                color: var(--light-color);
                 font-weight: 600;
                 padding: 15px;
                 min-width: 100px;
@@ -49,7 +109,7 @@
             .red{
                 border-radius: var(--border-radius);
                 background: var(--secondary-color);
-                color: var(--light-font-color);
+                color: var(--light-color);
                 font-weight: 600;
                 padding: 15px;
                 min-width: 100px;
@@ -63,8 +123,8 @@
             }
             .cancel{
                 border-radius: var(--border-radius);
-                background: var(--btn-cancel-color);
-                color: var(--dark-font-color);
+                background: var(--light-color);
+                color: var(--dark-color);
                 font-weight: 600;
                 padding: 15px;
                 min-width: 100px;
@@ -82,6 +142,6 @@
                 border:none;
             }
         </style>
-    </header>
+
 </body>
 </html>

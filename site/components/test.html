@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRMBuilding</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./../assets/css/base.css">
+<link rel="stylesheet" href="test.css">
+
+
+</head>
+<body>
+
+        <header class="header header-nav-menu header-nav-links">
+            <div class="logo-container">
+                <a href="#" class="logo">
+                    LOGO
+                </a>
+                <button class="">
+                    <i>Стрелка</i>
+                </button>
+            </div>
+
+
+            <div class="header-right">
+                <div id="userbox" class="userbox">
+                    <a href="#">
+                        <span class="profile-picture profile-picture-as-text">JD</span>
+                        <div class="profile-info profile-info-no-role" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
+                            <span class="name">Hi, <strong class="font-weight-semibold">John Doe</strong></span>
+                        </div>
+                        <i class="fas fa-chevron-down text-color-dark"></i>
+                    </a>
+                </div>
+            </div>
+
+
+        </header>
+
+
+
+
+
+
+        <!-- end: header -->
+
+        <div class="inner-wrapper">
+            <!-- start: sidebar -->
+            <aside id="sidebar-left" class="sidebar-left">
+
+                
+
+                <div class="nano has-scrollbar">
+                    <div class="nano-content" tabindex="0" style="right: -11px;">
+                        <nav id="menu" class="nav-main" role="navigation">
+
+                            <ul class="nav nav-main">
+                                <li>
+                                    <a class="nav-link" href="layouts-default.html">
+                                        <i class="bx bx-home-alt" aria-hidden="true"></i>
+                                        <span>Dashboard</span>
+                                    </a>                        
+                                </li>
+                                <li class="nav-group-label">APPs</li>
+                                
+                                <li>
+                                    <a class="nav-link" href="mailbox-folder.html">
+                                        <i class="bx bx-envelope" aria-hidden="true"></i>
+                                        <span>Mailbox</span>
+                                    </a>                        
+                                </li>
+                                
+                                
+                                <li class="nav-group-label">Content</li>
+                                <li class="nav-parent">
+                                    <a class="nav-link" href="#">
+                                        <i class="bx bx-file" aria-hidden="true"></i>
+                                        <span>Pages</span>
+                                    </a>
+                                    
+                                </li>
+                                <li class="nav-parent">
+                                    <a class="nav-link" href="#">
+                                        <i class="bx bx-cube" aria-hidden="true"></i>
+                                        <span>UI Elements</span>
+                                    </a>
+                                    
+                                </li>
+                                <li class="nav-parent">
+                                    <a class="nav-link" href="#">
+                                        <i class="bx bx-map" aria-hidden="true"></i>
+                                        <span>Maps</span>
+                                    </a>
+                                    
+                                </li>
+                                <li>
+                                    <a class="nav-link" href="extra-ajax-made-easy.html">
+                                        <i class="bx bx-loader-circle" aria-hidden="true"></i>
+                                        <span>Ajax</span>
+                                    </a>                        
+                                </li>
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+
+                            </ul>
+                        </nav>
+
+                        
+
+                        
+
+                    </div>
+
+                    <script>
+                        // Maintain Scroll Position
+                        if (typeof localStorage !== 'undefined') {
+                            if (localStorage.getItem('sidebar-left-position') !== null) {
+                                var initialPosition = localStorage.getItem('sidebar-left-position'),
+                                    sidebarLeft = document.querySelector('#sidebar-left .nano-content');
+
+                                sidebarLeft.scrollTop = initialPosition;
+                            }
+                        }
+                    </script>
+
+                <div class="nano-pane" style="opacity: 1; visibility: visible;"><div class="nano-slider" style="height: 398px; transform: translate(0px, 0px);"></div></div></div>
+
+            </aside>
+            <!-- end: sidebar -->
+
+            <section role="main" class="content-body content-body-modern mt-0">
+                <header class="page-header page-header-left-inline-breadcrumb">
+                    <h2 class="font-weight-bold text-6">Categories</h2>
+                    <div class="right-wrapper">
+                        <ol class="breadcrumbs">
+
+                            <li><span>Home</span></li>
+
+                            <li><span>eCommerce</span></li>
+
+                            <li><span>Categories</span></li>
+
+                        </ol>
+
+                        <a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>
+                    </div>
+                </header>
+
+                <!-- start: page -->
+                </section>
+        </div>
+
+        <aside id="sidebar-right" class="sidebar-right">
+            <div class="nano has-scrollbar">
+                <div class="nano-content" tabindex="0" style="right: -11px;">
+                    <a href="#" class="mobile-close d-md-none">
+                        Collapse <i class="fas fa-chevron-right"></i>
+                    </a>
+
+                    <div class="sidebar-right-wrapper">
+
+                        <div class="sidebar-widget widget-calendar">
+                            <h6>Upcoming Tasks</h6>
+                            <div data-plugin-datepicker="" data-plugin-skin="dark"><div class="datepicker datepicker-inline datepicker-dark"><div class="datepicker-days" style=""><table class="table-condensed"><thead><tr><th colspan="7" class="datepicker-title" style="display: none;"></th></tr><tr><th class="prev">«</th><th colspan="5" class="datepicker-switch">June 2023</th><th class="next">»</th></tr><tr><th class="dow">Su</th><th class="dow">Mo</th><th class="dow">Tu</th><th class="dow">We</th><th class="dow">Th</th><th class="dow">Fr</th><th class="dow">Sa</th></tr></thead><tbody><tr><td class="old day" data-date="1685232000000">28</td><td class="old day" data-date="1685318400000">29</td><td class="old day" data-date="1685404800000">30</td><td class="old day" data-date="1685491200000">31</td><td class="day" data-date="1685577600000">1</td><td class="day" data-date="1685664000000">2</td><td class="day" data-date="1685750400000">3</td></tr><tr><td class="day" data-date="1685836800000">4</td><td class="day" data-date="1685923200000">5</td><td class="day" data-date="1686009600000">6</td><td class="day" data-date="1686096000000">7</td><td class="day" data-date="1686182400000">8</td><td class="day" data-date="1686268800000">9</td><td class="day" data-date="1686355200000">10</td></tr><tr><td class="day" data-date="1686441600000">11</td><td class="day" data-date="1686528000000">12</td><td class="day" data-date="1686614400000">13</td><td class="day" data-date="1686700800000">14</td><td class="day" data-date="1686787200000">15</td><td class="day" data-date="1686873600000">16</td><td class="day" data-date="1686960000000">17</td></tr><tr><td class="day" data-date="1687046400000">18</td><td class="day" data-date="1687132800000">19</td><td class="day" data-date="1687219200000">20</td><td class="day" data-date="1687305600000">21</td><td class="day" data-date="1687392000000">22</td><td class="day" data-date="1687478400000">23</td><td class="day" data-date="1687564800000">24</td></tr><tr><td class="day" data-date="1687651200000">25</td><td class="day" data-date="1687737600000">26</td><td class="day" data-date="1687824000000">27</td><td class="day" data-date="1687910400000">28</td><td class="day" data-date="1687996800000">29</td><td class="day" data-date="1688083200000">30</td><td class="new day" data-date="1688169600000">1</td></tr><tr><td class="new day" data-date="1688256000000">2</td><td class="new day" data-date="1688342400000">3</td><td class="new day" data-date="1688428800000">4</td><td class="new day" data-date="1688515200000">5</td><td class="new day" data-date="1688601600000">6</td><td class="new day" data-date="1688688000000">7</td><td class="new day" data-date="1688774400000">8</td></tr></tbody><tfoot><tr><th colspan="7" class="today" style="display: none;">Today</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datepicker-months" style="display: none;"><table class="table-condensed"><thead><tr><th colspan="7" class="datepicker-title" style="display: none;"></th></tr><tr><th class="prev">«</th><th colspan="5" class="datepicker-switch">2023</th><th class="next">»</th></tr></thead><tbody><tr><td colspan="7"><span class="month">Jan</span><span class="month">Feb</span><span class="month">Mar</span><span class="month">Apr</span><span class="month">May</span><span class="month focused">Jun</span><span class="month">Jul</span><span class="month">Aug</span><span class="month">Sep</span><span class="month">Oct</span><span class="month">Nov</span><span class="month">Dec</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today" style="display: none;">Today</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datepicker-years" style="display: none;"><table class="table-condensed"><thead><tr><th colspan="7" class="datepicker-title" style="display: none;"></th></tr><tr><th class="prev">«</th><th colspan="5" class="datepicker-switch">2020-2029</th><th class="next">»</th></tr></thead><tbody><tr><td colspan="7"><span class="year old">2019</span><span class="year">2020</span><span class="year">2021</span><span class="year">2022</span><span class="year focused">2023</span><span class="year">2024</span><span class="year">2025</span><span class="year">2026</span><span class="year">2027</span><span class="year">2028</span><span class="year">2029</span><span class="year new">2030</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today" style="display: none;">Today</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datepicker-decades" style="display: none;"><table class="table-condensed"><thead><tr><th colspan="7" class="datepicker-title" style="display: none;"></th></tr><tr><th class="prev">«</th><th colspan="5" class="datepicker-switch">2000-2090</th><th class="next">»</th></tr></thead><tbody><tr><td colspan="7"><span class="decade old">1990</span><span class="decade">2000</span><span class="decade">2010</span><span class="decade focused">2020</span><span class="decade">2030</span><span class="decade">2040</span><span class="decade">2050</span><span class="decade">2060</span><span class="decade">2070</span><span class="decade">2080</span><span class="decade">2090</span><span class="decade new">2100</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today" style="display: none;">Today</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datepicker-centuries" style="display: none;"><table class="table-condensed"><thead><tr><th colspan="7" class="datepicker-title" style="display: none;"></th></tr><tr><th class="prev">«</th><th colspan="5" class="datepicker-switch">2000-2900</th><th class="next">»</th></tr></thead><tbody><tr><td colspan="7"><span class="century old">1900</span><span class="century focused">2000</span><span class="century">2100</span><span class="century">2200</span><span class="century">2300</span><span class="century">2400</span><span class="century">2500</span><span class="century">2600</span><span class="century">2700</span><span class="century">2800</span><span class="century">2900</span><span class="century new">3000</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today" style="display: none;">Today</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div></div></div>
+
+                            <ul>
+                                <li>
+                                    <time datetime="2021-04-19T00:00+00:00">04/19/2021</time>
+                                    <span>Company Meeting</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="sidebar-widget widget-friends">
+                            <h6>Friends</h6>
+                            <ul>
+                                <li class="status-online">
+                                    <figure class="profile-picture">
+                                        <img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+                                    </figure>
+                                    <div class="profile-info">
+                                        <span class="name">Joseph Doe Junior</span>
+                                        <span class="title">Hey, how are you?</span>
+                                    </div>
+                                </li>
+                                <li class="status-online">
+                                    <figure class="profile-picture">
+                                        <img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+                                    </figure>
+                                    <div class="profile-info">
+                                        <span class="name">Joseph Doe Junior</span>
+                                        <span class="title">Hey, how are you?</span>
+                                    </div>
+                                </li>
+                                <li class="status-offline">
+                                    <figure class="profile-picture">
+                                        <img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+                                    </figure>
+                                    <div class="profile-info">
+                                        <span class="name">Joseph Doe Junior</span>
+                                        <span class="title">Hey, how are you?</span>
+                                    </div>
+                                </li>
+                                <li class="status-offline">
+                                    <figure class="profile-picture">
+                                        <img src="img/!sample-user.jpg" alt="Joseph Doe" class="rounded-circle">
+                                    </figure>
+                                    <div class="profile-info">
+                                        <span class="name">Joseph Doe Junior</span>
+                                        <span class="title">Hey, how are you?</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            <div class="nano-pane" style="opacity: 1; visibility: visible;"><div class="nano-slider" style="height: 359px; transform: translate(0px, 0px);"></div></div></div>
+        </aside>
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <header>
+        <nav class="menu" >ЭТО ХЭДЕР
+            <ul>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+                <li><a href="#">item</a></li>
+            </ul>
+        </nav>
+        <input type="text" placeholder="test" class="input-style">
+        <textarea name="" id="" cols="30" rows="10" placeholder="test" class="input-style"></textarea>
+        <button class="blue">Сохранить товар</button>
+        <button class="cancel">Сбросить</button>
+        <button class="red">Удалить товар</button>
+
+        <style>
+            .menu {
+                background: var(--color_secondary_3300); 
+                /* background: var(--left-menu-bgColor);  */
+                /* background: var(--color_secondary_200);  */
+                height: 100vh; 
+                width: 200px;
+                color: var(--light-font-color);
+
+            }
+            .menu a {
+                transition: all var(--speed-transition);
+            }
+            .menu a:hover {
+                color: var(--primary-color);
+            }
+            .input-style {
+                border: 1px solid #ced4da;
+                border-radius: var(--border-radius);
+            }
+            .input-style:focus {
+                border-color: #33bbff;
+                box-shadow: 0 0 8px rgba(0, 136, 204, 0.3);
+            }
+            .blue:active {
+                box-shadow: var(--shadow-primary-active);
+            }
+            .blue{
+                border-radius: var(--border-radius);
+                background: var(--primary-color);
+                color: var(--light-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+            }
+            .blue:hover {
+                background: var(--primary-color-hover);
+            }
+            .red{
+                border-radius: var(--border-radius);
+                background: var(--secondary-color);
+                color: var(--light-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+            }
+            .red:hover {
+                background: var(--secondary-color-hover);
+            }
+            .red:active {
+                box-shadow: var(--shadow-secondary-active);
+            }
+            .cancel{
+                border-radius: var(--border-radius);
+                background: var(--btn-cancel-color);
+                color: var(--dark-font-color);
+                font-weight: 600;
+                padding: 15px;
+                min-width: 100px;
+                transition: all var(--speed-transition);
+
+                box-shadow: 0  0 0 0.5px rgba(255, 255, 255, 0.5);
+                
+            }
+            .cancel:hover{
+                background: var(--btn-cancel-color-hover);
+                
+            }
+            .cancel:active {
+                box-shadow: var(--shadow-cancel-active);
+                border:none;
+            }
+        </style>
+    </header>
+</body>
+</html>

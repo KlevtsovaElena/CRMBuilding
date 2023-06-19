@@ -6,15 +6,17 @@
     --secondary-color: #d2323d;
     --secondary-color-hover: #e36159;
     --shadow-secondary-active: 0  0 0 2px rgba(210, 50, 45, 0.5);
-    --btn-cancel-color: #ffffff; 
+    --dark-color: #000000;
+    --light-color: #ffffff;
     --btn-cancel-color-hover: #f7f7f7;
     --shadow-cancel-active: 0  0 0 2px rgb(255, 255, 255);
     --left-menu-bgColor: #242e42;
     --page-content-bgColor: #f5f5f8;
     --border-radius: 4px;
-    --dark-font-color: #000000;
-    --light-font-color: #ffffff;
+
     --speed-transition: 0.3s;
+    --menu-top-height: 50px;
+    --menu-left-width: 200px;
 
   /* --page-header-bgColor: #242e42;
   --page-header-bgColor-hover: #1d2636;
@@ -30,6 +32,52 @@
   --red: #ec1848;
   --border-radius: 4px;
   --box-shadow: 0 0 10px -2px rgba(0, 0, 0, 0.075); */
+  --color_primary_10: #F5FBF3;
+--color_primary_20: #EBF6E6;
+--color_primary_40: #D0EBC7;
+--color_primary_60: #9CD388;
+--color_primary_80: #5AB639;
+--color_primary_100: #4DB02A;
+
+
+--color_secondary_10: #F5FCFF;
+--color_secondary_20: #DEF3FE;
+--color_secondary_40: #ADE0FC;
+--color_secondary_60: #81CFFB;
+--color_secondary_80: #5FC2FA;
+--color_secondary_100: #3AB4F8;
+--color_secondary_200: #073954;
+--color_secondary_3300: #1D2127;
+
+
+--color_neutral_0: #FFFFFF;
+--color_neutral_10: #F7F7F7;
+--color_neutral_20: #F0F0F0;
+--color_neutral_40: #BFBFBF;
+--color_neutral_60: #888888;
+--color_neutral_80: #5A5A5A;
+--color_neutral_100: #000000;
+
+
+--color_error_20: #F6D3D3;
+--color_error_40: #EDAAAA;
+--color_error_60: #E17474;
+--color_error_80: #D64242;
+--color_error_100: #CC1414;
+
+
+--color_success_20: #D8F4CF;
+--color_success_40: #AEE799;
+--color_success_60: #82DB62;
+--color_success_80: #59CE2F;
+--color_success_100: #33C300;
+
+
+--color_warning_20: #FFFACE;
+--color_warning_40: #FEF49E;
+--color_warning_60: #FCED63;
+--color_warning_80: #FCE83C;
+--color_warning_100: #FAE105;
 }
 
 /* Сброс дефолтных стилей элементов */
@@ -129,3 +177,4 @@ body {
 
     background-color: var(--page-content-bgColor);
 }
+
