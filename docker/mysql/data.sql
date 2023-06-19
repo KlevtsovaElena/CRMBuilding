@@ -27,32 +27,51 @@ CREATE TABLE `categories` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `categories` (`id`, `category_name`) VALUES
-(1,	'потолочный'),
-(2,	'стеновой'),
-(3,	'обычный');
+
+DROP TABLE IF EXISTS `cities`;
+CREATE TABLE `cities` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+DROP TABLE IF EXISTS `commissioners`;
+CREATE TABLE `commissioners` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `phone` smallint unsigned DEFAULT NULL,
+  `email` varchar(200) DEFAULT NULL,
+  `tg_username` varchar(300) DEFAULT NULL,
+  `tg_id` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
 
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `last_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `phone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `city` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `tg_id` bigint unsigned DEFAULT NULL,
+  `phone` smallint NOT NULL,
+  `city_id` int unsigned NOT NULL,
+  `coordinates` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city`) VALUES
-(1,	'',	'',	'79167625303',	'city'),
-(892205925,	'Лол',	'',	'79167625303',	'city');
 
 DROP TABLE IF EXISTS `ordered_product`;
 CREATE TABLE `ordered_product` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `order_id` int unsigned NOT NULL,
   `product_id` int unsigned NOT NULL,
-  `size_id` int unsigned NOT NULL,
+  `brand_id` int unsigned NOT NULL,
+  `vendor_id` int unsigned NOT NULL,
   `quantity` int unsigned NOT NULL,
+  `price_per_unit` int unsigned DEFAULT NULL,
+  `total_price` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -62,11 +81,8 @@ CREATE TABLE `orders` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `customer_id` int unsigned NOT NULL,
   `order_date` timestamp NOT NULL,
-  `brand_id` int unsigned NOT NULL,
   `ordered_products` json NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `brand_id` (`brand_id`),
-  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -84,26 +100,19 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `category_id` int unsigned NOT NULL,
-  `type_id` int unsigned DEFAULT NULL,
   `brand_id` int unsigned NOT NULL,
+  `vendor_id` int unsigned DEFAULT NULL,
   `quantity_available` int unsigned DEFAULT NULL,
-  `price` int unsigned NOT NULL,
-  `market_price` int unsigned NOT NULL,
+  `price` int unsigned DEFAULT NULL,
+  `market_price` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `products` (`id`, `name`, `description`, `photo`, `category_id`, `type_id`, `brand_id`, `quantity_available`, `price`, `market_price`) VALUES
-(1,	'Гипсокартон',	'Описание',	'ссылка',	1,	NULL,	3,	NULL,	45000,	50000);
-
-DROP TABLE IF EXISTS `sizes`;
-CREATE TABLE `sizes` (
-  `id` int unsigned NOT NULL,
-  `size_value` int unsigned NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+INSERT INTO `products` (`id`, `name`, `description`, `photo`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `market_price`) VALUES
+(1,	'Гипсокартон',	'Описание',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1613641220/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/T8QNN_Bj2Uq3Zvaw8pHo6Q/10072681.jpg',	1,	0,	NULL,	NULL,	45000,	50000);
 
 DROP TABLE IF EXISTS `test`;
 CREATE TABLE `test` (
@@ -115,14 +124,18 @@ CREATE TABLE `test` (
 INSERT INTO `test` (`id`, `name`) VALUES
 (1,	'test row');
 
-DROP TABLE IF EXISTS `types`;
-CREATE TABLE `types` (
+DROP TABLE IF EXISTS `vendors`;
+CREATE TABLE `vendors` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `type_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `city_id` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` smallint unsigned DEFAULT NULL,
+  `email` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tg_id` bigint unsigned DEFAULT NULL,
+  `coordinates` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `types` (`id`, `type_name`) VALUES
-(1,	'влагостойкий');
 
--- 2023-06-18 22:35:25
+-- 2023-06-19 07:13:48
