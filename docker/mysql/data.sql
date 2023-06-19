@@ -114,16 +114,6 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `description`, `photo`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `market_price`) VALUES
 (1,	'Гипсокартон',	'Описание',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1613641220/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/T8QNN_Bj2Uq3Zvaw8pHo6Q/10072681.jpg',	1,	0,	NULL,	NULL,	45000,	50000);
 
-DROP TABLE IF EXISTS `test`;
-CREATE TABLE `test` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `test` (`id`, `name`) VALUES
-(1,	'test row');
-
 DROP TABLE IF EXISTS `vendors`;
 CREATE TABLE `vendors` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -138,4 +128,4 @@ CREATE TABLE `vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
--- 2023-06-19 07:13:48
+-- 2023-06-19 07:32:08
