@@ -103,7 +103,7 @@ type UserT struct {
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
 
-var step int
+var step int = 1
 
 var capacity int
 
@@ -179,12 +179,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	fmt.Println(text)
 
-	if text == "/start" {
+	switch {
+	case text == "/start":
 
+		step = 1
 		FirstName = firstName
 		LastName = lastName
-
-		step += 1
 
 		buttons := [][]map[string]interface{}{
 			{{"text": "Русский 🇷🇺", "callback_data": "russian"}},
@@ -201,67 +201,56 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesId))
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, добро пожаловать в Стройбот. Выберите язык&reply_markup=" + string(inlineKeyboardJSON))
 
-	}
+		step += 1
+		break
 
-	if button == "russian" {
+	case step == 2:
+
+		// Создаем объект клавиатуры
+		keyboard := map[string]interface{}{
+			"keyboard": [][]map[string]interface{}{
+				{
+					{
+						"text":            "Да",
+						"request_contact": true,
+					},
+				},
+				{
+					{
+						"text": "Нет",
+					},
+				},
+			},
+			"resize_keyboard":   true,
+			"one_time_keyboard": true,
+		}
+
+		// Преобразуем клавиатуру в JSON
+		keyboardJSON, _ := json.Marshal(keyboard)
+		// Отправляем сообщение с клавиатурой
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
 
 		step += 1
+		break
 
-		// Создаем объект клавиатуры
-		keyboard := map[string]interface{}{
-			"keyboard": [][]map[string]interface{}{
-				{
-					{
-						"text":            "Да",
-						"request_contact": true,
-					},
-				},
-				{
-					{
-						"text": "Нет",
-					},
-				},
-			},
-			"resize_keyboard":   true,
-			"one_time_keyboard": true,
+	case text == "Нет":
+
+		buttons := [][]map[string]interface{}{
+			{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
 		}
 
-		// Преобразуем клавиатуру в JSON
-		keyboardJSON, _ := json.Marshal(keyboard)
-		// Отправляем сообщение с клавиатурой
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
-	}
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
+		}
 
-	if button == "backToPhone" {
+		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=К сожалению вы не сможете пройти дальше, если не укажите номер телефона&reply_markup=" + string(inlineKeyboardJSON))
 
 		step -= 1
-		// Создаем объект клавиатуры
-		keyboard := map[string]interface{}{
-			"keyboard": [][]map[string]interface{}{
-				{
-					{
-						"text":            "Да",
-						"request_contact": true,
-					},
-				},
-				{
-					{
-						"text": "Нет",
-					},
-				},
-			},
-			"resize_keyboard":   true,
-			"one_time_keyboard": true,
-		}
+		break
 
-		// Преобразуем клавиатуру в JSON
-		keyboardJSON, _ := json.Marshal(keyboard)
-		// Отправляем сообщение с клавиатурой
-		http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline))
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
-	}
-
-	if phone != "" {
+	case step == 3:
 
 		step += 1
 		fmt.Println(step)
@@ -285,31 +274,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-		http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(chatId) + "&message_id=" + strconv.Itoa(mesIdRepl-1))
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
 
-	}
-
-	if text == "Нет" {
-
-		step -= 1
-
-		buttons := [][]map[string]interface{}{
-			{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
-		}
-
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(chatId) + "&message_id=" + strconv.Itoa(mesIdRepl))
-		http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(chatId) + "&message_id=" + strconv.Itoa(mesIdRepl-1))
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=К сожалению вы не сможете пройти дальше, если не укажите номер телефона&reply_markup=" + string(inlineKeyboardJSON))
-	}
-
-	if button == "city" || button == "backToMenu" {
+	case step == 4 || button == "backToMenu":
 
 		fmt.Println(FirstName)
 		fmt.Println(LastName)
@@ -345,8 +312,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			file.Write(jsonString)
 
 		}
-
-		step = 4
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
@@ -400,9 +365,11 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		keyboardJSON, _ := json.Marshal(keyboard)
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
-	}
 
-	if text == "Заказать 🛍" {
+		step += 1
+		break
+
+	case step == 5 && text == "Заказать 🛍":
 		buttons := [][]map[string]interface{}{
 			{{"text": "Гипсокартон", "callback_data": "gips"}},
 			{{"text": "Штукатурка", "callback_data": "shtuk"}},
@@ -418,9 +385,54 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
-	}
 
-	if button == "backToOffer" {
+		step += 1
+		break
+
+	case step == 6 || button == "backToGips":
+
+		buttons := [][]map[string]interface{}{}
+		//запрос
+		rows, err := Db.Query("SELECT category_name FROM categories")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var category_name string
+			if err := rows.Scan(&category_name); err != nil {
+				fmt.Println("Ошибка чтения данных:", err.Error())
+				return
+			}
+			button := []map[string]interface{}{
+				{
+					"text":          category_name,
+					"callback_data": category_name,
+				},
+			}
+			buttons = append(buttons, button)
+		}
+
+		buttons = append(buttons, []map[string]interface{}{
+			{
+				"text":          "Назад",
+				"callback_data": "backToOffer",
+			},
+		})
+
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
+		}
+
+		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Тип гипсокартона&reply_markup=" + string(inlineKeyboardJSON))
+
+		step += 1
+		break
+
+	case button == "backToOffer":
 		buttons := [][]map[string]interface{}{
 			{{"text": "Гипсокартон", "callback_data": "gips"}},
 			{{"text": "Штукатурка", "callback_data": "shtuk"}},
@@ -436,33 +448,41 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
-	}
 
-	if button == "gips" || button == "backToGips" {
-		buttons := [][]map[string]interface{}{
-			{{"text": "Потолочный", "callback_data": "gipsPotol"}},
-			{{"text": "Стеновый", "callback_data": "gipsSten"}},
-			{{"text": "Обычный", "callback_data": "gipsDef"}},
-			{{"text": "Назад 🔙", "callback_data": "backToOffer"}},
+		step = 5
+		break
+
+	case step == 7 && button == "потолочный":
+
+		buttons := [][]map[string]interface{}{}
+		//запрос
+		rows, err := Db.Query("SELECT brand_name FROM brands")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var brand_name string
+			if err := rows.Scan(&brand_name); err != nil {
+				fmt.Println("Ошибка чтения данных:", err.Error())
+				return
+			}
+			button := []map[string]interface{}{
+				{
+					"text":          brand_name,
+					"callback_data": brand_name,
+				},
+			}
+			buttons = append(buttons, button)
 		}
 
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Тип гипсокартона&reply_markup=" + string(inlineKeyboardJSON))
-	}
-
-	if button == "gipsPotol" {
-		buttons := [][]map[string]interface{}{
-			{{"text": "Форус", "callback_data": "gipsForus"}},
-			{{"text": "AZIA", "callback_data": "gipsAzia"}},
-			{{"text": "КНАУФ", "callback_data": "gipsKnauf"}},
-			{{"text": "VERO", "callback_data": "gipsVero"}},
-			{{"text": "Назад 🔙", "callback_data": "backToGips"}},
-		}
+		buttons = append(buttons, []map[string]interface{}{
+			{
+				"text":          "Назад",
+				"callback_data": "backToGips",
+			},
+		})
 
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
@@ -471,9 +491,11 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
+		step += 1
+		break
 	}
 
-	if button == "gipsKnauf" {
+	if button == "КНАУФ" {
 
 		// Создаем объект инлайн клавиатуры
 		buttons := [][]map[string]interface{}{
@@ -482,8 +504,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				{"text": "1", "callback_data": "capacity"},
 				{"text": "➕", "callback_data": "plus"},
 			},
-			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+			{{"text": "Добавить в корзину 🛒", "callback_data": "add"}},
+			{{"text": "Перейти в корзину 🗑", "callback_data": "goToTrash"}},
 		}
 
 		inlineKeyboard := map[string]interface{}{
@@ -494,7 +516,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		fmt.Println(inlineKeyboard)
 
-		imagePath := "bot/img/knauf.jpg"
+		imagePath := "img/knauf.jpg"
 		// Создание буфера для запроса с изображением
 		bodyBuf := &bytes.Buffer{}
 		bodyWriter := multipart.NewWriter(bodyBuf)
