@@ -64,6 +64,8 @@ async function addProduct() {
     let json = sendRequestPOST(url, params);
     let data = JSON.parse(json);
 
+
+    
     console.log(response);
     console.log(data);
 

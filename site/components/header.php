@@ -68,7 +68,7 @@
                     </a>
                 </li>
                 <li class="menu-left__item">
-                    <a href="./../components/test2.html" class="menu-left__item-link">
+                    <a href="./../pages/vendor-list-products.php" class="menu-left__item-link">
                         <svg fill="#ced4da" viewBox="0 0 37 37" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
