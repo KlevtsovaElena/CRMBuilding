@@ -17,10 +17,38 @@
 
 
     <header>
+
         <div class="menu-top">
-            Менюшка верхняя
+            <div class="menu-top__container">
+                <div class="menu-top__profile">
+                    <div class="menu-top__profile-name">        
+                        Поставщик
+                    </div>
+                    <div class="menu-top__profile-avatar">П</div>
+                    <div class="logout">
+                        
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            
+                            <g id="SVGRepo_iconCarrier"> <path d="M15 16.5V19C15 20.1046 14.1046 21 13 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3H13C14.1046 3 15 3.89543 15 5V8.0625M11 12H21M21 12L18.5 9.5M21 12L18.5 14.5"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g>
+                            
+                        </svg>
+                    </div>
+                    
+                </div>
+            </div>
         </div>
-        <nav class="menu-left" >ЛЕВАЯ МЕНЮШКА
+
+        <nav class="menu-left" >
+            
+            <div class="menu-left__logo">LOGO</div>
+            
+            <button class="menu-left__collapse">
+               <span>&#10094 </span><span>Свернуть меню</span> 
+            </button>
             <ul>
                 <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
                 <li class="menu-left__item"><a href="#" class="menu-left__item-link">item</a></li>
@@ -32,64 +60,68 @@
         </nav>
     </header>
         <section class="main-content">
-            <input type="text" placeholder="test">
-            <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
-            <button class="btn btn-ok">Сохранить товар</button>
-            <button class="btn btn-neutral">Сбросить</button>
-            <button class="btn btn-delete">Удалить товар</button>
-    
-
-            <div><h1>Добавить товар</h1></div>
+            <div class="container">
+                <div>ПРИМЕР ЭЛЕМЕНТОВ
+                    <input type="text" placeholder="test">
+                    <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
+                    <button class="btn btn-ok">Сохранить товар</button>
+                    <button class="btn btn-neutral">Сбросить</button>
+                    <button class="btn btn-delete">Удалить товар</button>
+                </div>
 
                 
-        <form action="#" method="post" enctype="multipart/form-data">
+                <div><h1>Добавить товар</h1></div>
 
-            <input type="hidden" name="vendorId" value="111">
-            <div class="form-elements-container">
-            <p>Наименование</p><input type="text" id="name" name="name" value="" required>
-            <!-- фото -->
-            <p>
-                <div class="img-title-form">Изображениe для карточки 
-                    <div>(Рекомендованные параметры такие НА такие)</div>
-                    <div class="img-title-prew img-guide"><img></div>
-                    <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required>                               
-                </div> 
-            </p>
+                        
+                <form action="#" method="post" enctype="multipart/form-data">
 
-            <!-- список -->
-            <p>Бренд</p>
-            <select id="brandId" name="brandId" value="" required>
-                <option value="Бренд1">Бренд1</option>
-                <option value="Бренд1">Бренд2</option>
-                <option value="Бренд1">Бренд3</option>
-                <option value="Бренд1">Бренд4</option>
-            </select>
+                    <input type="hidden" name="vendorId" value="111">
+                    <div class="form-elements-container">
+                        <p>Наименование</p><input type="text" id="name" name="name" value="" required placeholder="jdhvjshdjh" class="error">
+                        <!-- фото -->
+                        <p>
+                            <div class="img-title-form">Изображениe для карточки 
+                                <div>(Рекомендованные параметры такие НА такие)</div>
+                                <div class="img-title-prew img-guide"><img></div>
+                                <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required>                               
+                            </div> 
+                        </p>
 
-            <!-- список -->
-            <p>Категория</p>
-            <select id="categoryId" name="categoryId" value="" required>
-                <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                <option value="Категория1">Категория1</option>
-                <option value="Категори1">Категория2</option>
-                <option value="Категория1">Категория3</option>
-                <option value="Категория1">Категория4</option>
-            </select>
+                        <!-- список -->
+                        <p>Бренд</p>
+                        <select id="brandId" name="brandId" value="" required class="error">
+                            <option value="Бренд1">Бренд1</option>
+                            <option value="Бренд1">Бренд2</option>
+                            <option value="Бренд1">Бренд3</option>
+                            <option value="Бренд1">Бренд4</option>
+                        </select>
+
+                        <!-- список -->
+                        <p>Категория</p>
+                        <select id="categoryId" name="categoryId" value="" required>
+                            <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                            <option value="Категория1">Категория1</option>
+                            <option value="Категори1">Категория2</option>
+                            <option value="Категория1">Категория3</option>
+                            <option value="Категория1">Категория4</option>
+                        </select>
 
 
-            <p>Описание</p><textarea id="description" name="description" required></textarea>
-            <p>Артикул</p><input type="text" id="noname" name="" value="" required>
-            <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" value="" required>
-            <p>Цена (руб.)</p><input type="number" id="price" name="price" value="" required>
-            <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" value="" required>
+                        <p>Описание</p><textarea id="description" name="description" required class="error"></textarea>
+                        <p>Артикул</p><input type="text" id="noname" name="" value="" required>
+                        <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" min="0" value="" required>
+                        <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required>
+                        <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" min="0" value="" required>
+
+                    </div>
+                    <div>
+                        <button class="btn btn-ok" type="submit">Сохранить</button>
+                        <a href="card-guide.php" class="btn btn-neutral">Сбросить изменения</a> 
+                    </div>
+                </form>
 
         </div>
-            <div>
-                <button class="btn btn-ok" type="submit">Сохранить</button>
-                <a href="card-guide.php" class="btn btn-neutral">Сбросить изменения</a> 
-            </div>
-        </form>
-        </section>
-        
+    </section>       
 
         
 

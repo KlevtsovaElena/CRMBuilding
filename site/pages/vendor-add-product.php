@@ -56,9 +56,9 @@
 
                 <p>Описание</p><textarea id="description" name="description" required></textarea>
                 <p>Артикул</p><input type="text" id="noname" name="" value="" required>
-                <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" value="" required>
-                <p>Цена (руб.)</p><input type="number" id="price" name="price" value="" required>
-                <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" value="" required>
+                <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" min="0" value="" required>
+                <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required>
+                <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" min="0" value="" required>
 
             </div>
             <div>
