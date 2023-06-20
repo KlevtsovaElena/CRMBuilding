@@ -84,36 +84,42 @@ CREATE TABLE `customers` (
   `last_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `tg_id` bigint unsigned NOT NULL,
-  `phone` smallint NOT NULL,
+  `phone` int unsigned NOT NULL,
   `city_id` int unsigned NOT NULL,
   `coordinates` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `customers` (`id`, `first_name`, `last_name`, `tg_username`, `tg_id`, `phone`, `city_id`, `coordinates`) VALUES
+(5,	'Uchken',	NULL,	'uch',	32432533464,	1007545645,	5,	NULL);
 
-DROP TABLE IF EXISTS `ordered_product`;
-CREATE TABLE `ordered_product` (
+DROP TABLE IF EXISTS `ordered_products`;
+CREATE TABLE `ordered_products` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `order_id` int unsigned NOT NULL,
+  `order_id` int unsigned DEFAULT NULL,
   `product_id` int unsigned NOT NULL,
-  `brand_id` int unsigned NOT NULL,
-  `vendor_id` int unsigned NOT NULL,
+  `vendor_id` int unsigned DEFAULT NULL,
   `quantity` int unsigned NOT NULL,
   `price_per_unit` int unsigned DEFAULT NULL,
   `total_price` int unsigned DEFAULT NULL,
+  `status` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `ordered_products` (`id`, `order_id`, `product_id`, `vendor_id`, `quantity`, `price_per_unit`, `total_price`, `status`) VALUES
+(1,	123,	3,	1,	2,	NULL,	NULL,	NULL),
+(2,	123,	6,	1,	8,	NULL,	NULL,	NULL);
 
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `customer_id` int unsigned NOT NULL,
   `order_date` timestamp NOT NULL,
-  `ordered_products` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+INSERT INTO `orders` (`id`, `customer_id`, `order_date`) VALUES
+(123,	5,	'2023-06-19 22:23:27');
 
 DROP TABLE IF EXISTS `price_changes`;
 CREATE TABLE `price_changes` (
@@ -200,5 +206,7 @@ CREATE TABLE `vendors` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`) VALUES
+(1,	'Поставщик',	4,	NULL,	NULL,	NULL,	NULL,	NULL);
 
--- 2023-06-19 17:28:58
+-- 2023-06-20 00:54:53
