@@ -1,19 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -110,6 +107,8 @@ var capacity int
 var tel string
 var FirstName string
 var LastName string
+
+var products = []string{}
 
 // создаем соединение с БД
 var Db, Err = sql.Open("mysql", "root:admin@tcp(mysql:3306)/crm-building")
@@ -452,7 +451,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step = 5
 		break
 
-	case step == 7 && button == "потолочный":
+	case step == 7 && button == "Потолочный":
 
 		buttons := [][]map[string]interface{}{}
 		//запрос
@@ -493,132 +492,37 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
 		step += 1
 		break
-	}
 
-	if button == "КНАУФ" {
+	case step == 8 && button == "КНАУФ":
 
-		// Создаем объект инлайн клавиатуры
-		buttons := [][]map[string]interface{}{
-			{
-				{"text": "➖", "callback_data": "minus"},
-				{"text": "1", "callback_data": "capacity"},
-				{"text": "➕", "callback_data": "plus"},
-			},
-			{{"text": "Добавить в корзину 🛒", "callback_data": "add"}},
-			{{"text": "Перейти в корзину 🗑", "callback_data": "goToTrash"}},
-		}
-
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		fmt.Println(inlineKeyboard)
-
-		imagePath := "img/knauf.jpg"
-		// Создание буфера для запроса с изображением
-		bodyBuf := &bytes.Buffer{}
-		bodyWriter := multipart.NewWriter(bodyBuf)
-
-		// Открытие файла изображения
-		file, err := os.Open(imagePath)
+		//запрос
+		rows, err := Db.Query("SELECT id, name, description, photo, price, market_price FROM products WHERE brand_id = 3")
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer file.Close()
+		defer rows.Close()
 
-		// Создание формы для файла
-		fileWriter, err := bodyWriter.CreateFormFile("photo", filepath.Base(imagePath))
-		if err != nil {
-			log.Fatal(err)
-		}
+		for rows.Next() {
+			var productId int
+			var name string
+			var description string
+			var photo string
+			var price int
+			var market_price int
+			if err := rows.Scan(&productId, &name, &description, &photo, &price, &market_price); err != nil {
+				fmt.Println("Ошибка чтения данных:", err.Error())
+				return
+			}
 
-		// Копирование содержимого файла в форму
-		_, err = io.Copy(fileWriter, file)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Закрытие формы
-		contentType := bodyWriter.FormDataContentType()
-		bodyWriter.Close()
-
-		// Создание URL запроса
-		apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&caption=Гипсокартон кнауф потолочный влагостойкий (9.5) Среднерыночная цена в городе Ташкент 50 000 сум Цена Стройбота 45 000 сум &reply_markup="+string(inlineKeyboardJSON), token, strconv.Itoa(id))
-		requestURL, err := url.Parse(apiURL)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Создание HTTP POST-запроса с изображением
-		request, err := http.NewRequest("POST", requestURL.String(), bodyBuf)
-		if err != nil {
-			log.Fatal(err)
-		}
-		request.Header.Set("Content-Type", contentType)
-
-		// Отправка запроса
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer response.Body.Close()
-
-		// Чтение ответа
-		responseData, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Вывод конечной ссылки запроса
-		finalURL := request.URL.String()
-		fmt.Println("Final URL:", finalURL)
-
-		// Вывод ответа от сервера
-		fmt.Println("Response:", string(responseData))
-	}
-
-	if button == "plus" {
-
-		capacity += 1
-
-		// Создаем новую инлайн клавиатуру с обновленным числом
-		buttons := [][]map[string]interface{}{
-			{
-				{"text": "➖", "callback_data": "minus"},
-				{"text": capacity, "callback_data": "capacity"},
-				{"text": "➕", "callback_data": "plus"},
-			},
-			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
-		}
-
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-	}
-
-	if button == "minus" {
-		capacity -= 1
-
-		if capacity < 1 {
-
-			capacity += 1
-			// Создаем новую инлайн клавиатуру с обновленным числом
+			// Создаем объект инлайн клавиатуры
 			buttons := [][]map[string]interface{}{
 				{
 					{"text": "➖", "callback_data": "minus"},
-					{"text": capacity, "callback_data": "capacity"},
+					{"text": "1", "callback_data": "capacity"},
 					{"text": "➕", "callback_data": "plus"},
 				},
-				{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-				{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+				{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(productId)}},
+				{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -627,26 +531,122 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-			http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-		} else {
-			// Создаем новую инлайн клавиатуру с обновленным числом
-			buttons := [][]map[string]interface{}{
-				{
-					{"text": "➖", "callback_data": "minus"},
-					{"text": capacity, "callback_data": "capacity"},
-					{"text": "➕", "callback_data": "plus"},
-				},
-				{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-				{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+			fmt.Println(photo)
+
+			// Создание URL запроса
+			apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&caption="+name+" кнауф "+description+" Среднерыночная цена в городе Ташкент "+strconv.Itoa(market_price)+" сум Цена Стройбота "+strconv.Itoa(price)+" сум &photo="+photo+"&reply_markup="+string(inlineKeyboardJSON), token, strconv.Itoa(id))
+			requestURL, err := url.Parse(apiURL)
+			if err != nil {
+				log.Fatal(err)
 			}
 
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
+			// Создание HTTP GET-запроса с параметрами
+			request, err := http.NewRequest("GET", requestURL.String(), nil)
+			if err != nil {
+				log.Fatal(err)
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+			// Отправка запроса
+			client := &http.Client{}
+			response, err := client.Do(request)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer response.Body.Close()
 
-			http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+			// Чтение ответа
+			responseData, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Вывод конечной ссылки запроса
+			finalURL := request.URL.String()
+			fmt.Println("Final URL:", finalURL)
+
+			// Вывод ответа от сервера
+			fmt.Println("Response:", string(responseData))
 		}
+
+		step += 1
+		break
+
+	case step == 9 && button == "goToCart":
+
 	}
+
+	if strings.SplitN(button, ":", 2)[0] == "add" {
+		products = append(products, strings.Split(button, ":")[1])
+		fmt.Println(products)
+	}
+
+	// if button == "plus" {
+
+	// 	capacity += 1
+
+	// 	// Создаем новую инлайн клавиатуру с обновленным числом
+	// 	buttons := [][]map[string]interface{}{
+	// 		{
+	// 			{"text": "➖", "callback_data": "minus"},
+	// 			{"text": capacity, "callback_data": "capacity"},
+	// 			{"text": "➕", "callback_data": "plus"},
+	// 		},
+	// 		{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
+	// 		{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+	// 	}
+
+	// 	inlineKeyboard := map[string]interface{}{
+	// 		"inline_keyboard": buttons,
+	// 	}
+
+	// 	inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+	// 	http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+	// }
+
+	// if button == "minus" {
+	// 	capacity -= 1
+
+	// 	if capacity < 1 {
+
+	// 		capacity += 1
+	// 		// Создаем новую инлайн клавиатуру с обновленным числом
+	// 		buttons := [][]map[string]interface{}{
+	// 			{
+	// 				{"text": "➖", "callback_data": "minus"},
+	// 				{"text": capacity, "callback_data": "capacity"},
+	// 				{"text": "➕", "callback_data": "plus"},
+	// 			},
+	// 			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
+	// 			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+	// 		}
+
+	// 		inlineKeyboard := map[string]interface{}{
+	// 			"inline_keyboard": buttons,
+	// 		}
+
+	// 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+	// 		http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+	// 	} else {
+	// 		// Создаем новую инлайн клавиатуру с обновленным числом
+	// 		buttons := [][]map[string]interface{}{
+	// 			{
+	// 				{"text": "➖", "callback_data": "minus"},
+	// 				{"text": capacity, "callback_data": "capacity"},
+	// 				{"text": "➕", "callback_data": "plus"},
+	// 			},
+	// 			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
+	// 			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
+	// 		}
+
+	// 		inlineKeyboard := map[string]interface{}{
+	// 			"inline_keyboard": buttons,
+	// 		}
+
+	// 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+	// 		http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+	// 	}
+	// }
 }
