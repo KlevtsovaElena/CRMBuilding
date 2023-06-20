@@ -1,0 +1,399 @@
+/* Переменные */
+
+:root {
+    --primary-color: #0088cc;
+    --primary-color-hover: #00a1f2;
+    --shadow-primary-active: 0 0 0 2px rgba(0, 136, 204, 0.5);
+    --secondary-color: #d2323d;
+    --secondary-color-hover: #e36159;
+    --shadow-secondary-active: 0 0 0 2px rgba(210, 50, 45, 0.5);
+    --dark-color: #444444;
+    --light-color: #ffffff;
+    --neutral-color-hover: #F3F3F3;
+    --shadow-neutral-color-active: 0 0 0 2px rgb(255, 255, 255);
+    --left-menu-bgColor: #1D2127;
+    --left-menu-bgColor-hover: #21262d;
+    --page-content-bgColor: #f5f5f5;
+    --border-form-elem: #ced4da;
+    --border-form-elem-focus: #33bbff;
+    --shadow-form-elem-focus: rgba(0, 136, 204, 0.3);
+    --shadow-form-elem-error: #D64242;
+    --menu-left-title-color: #888888;
+
+    --border-radius: 4px;
+
+    --speed-transition: 0.3s;
+    --menu-top-height: 60px;
+    --menu-left-width: 250px;
+    --menu-left-width-collapse: 50px;
+
+}
+
+/* Сброс дефолтных стилей элементов */
+html, body, div, span,
+h1, h2, h3, h4, h5, h6, p, img, b, i,
+ol, ul, li,
+form, label, article, aside,
+footer, header, nav, section, button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    box-sizing: border-box;
+}
+
+a {
+    color: inherit;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    background: transparent;
+}
+
+ol, ul, li {
+    list-style: none;
+}
+
+input, textarea,
+select, option {
+    border-radius: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+input {
+    appearance: none;
+}
+
+input::placeholder, textarea::placeholder {
+    opacity: 0.5;
+}
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    opacity: 0.5;
+}
+input::-moz-placeholder, textarea::-moz-placeholder {
+    opacity: 0.5;
+}
+input::-ms-input-placeholder, textarea::-ms-input-placeholder {
+    opacity: 0.5;
+}
+
+input:focus, textarea:focus, select:focus, option:focus {
+    outline: none;
+}
+input:focus::placeholder, textarea:focus::placeholder {
+    color: transparent;
+}
+input:focus::-webkit-input-placeholder, textarea:focus::-webkit-input-placeholder {
+    color: transparent;
+}
+input:focus::-moz-placeholder, textarea:focus::-moz-placeholder {
+    color: transparent;
+}
+input:focus::-ms-input-placeholder, textarea:focus::-ms-input-placeholder {
+    color: transparent;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    appearance: none;
+}
+
+textarea {
+    resize: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    background-color: transparent;
+    color: inherit;
+}
+
+/* Стилизация основных элементов */
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    /* font-family: 'Open Sans', sans-serif;
+    font-family: 'Raleway', sans-serif;
+    font-family: 'Roboto', sans-serif; */
+    color: var(--dark-color);
+    background-color: var(--page-content-bgColor);
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    padding: 15px;
+    min-width: 100px;
+    transition: all var(--speed-transition); 
+}
+
+input, textarea, select {
+    padding: 10px;
+    margin: 8px;
+    min-width: 200px;
+    border: 1px solid var(--border-form-elem);
+    border-radius: var(--border-radius);
+}
+
+option {
+    padding-top: 10px;
+}
+textarea {
+    min-width: 300px;
+    min-height: 100px;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--border-form-elem-focus);
+    box-shadow: 0 0 0 0.8px var(--shadow-form-elem-focus);
+}
+
+.error {
+    border-color: var(--secondary-color-hover);
+    box-shadow: 0 0 0 0.8px var(--shadow-form-elem-error);
+
+}
+.d-block {
+    display: block;
+}
+
+.d-iblock {
+    display: inline-block;
+}
+
+.d-flex {
+    display: flex;
+}
+/* ---BUTTON---- */
+
+.btn-ok {
+    background: var(--primary-color);
+    color: var(--light-color);
+}
+
+.btn-ok:hover {
+    background: var(--primary-color-hover);
+}
+
+.btn-ok:active {
+    box-shadow: var(--shadow-primary-active);
+}
+
+.btn-delete {
+    background: var(--secondary-color);
+    color: var(--light-color);
+}
+
+.btn-delete:hover {
+    background: var(--secondary-color-hover);
+}
+
+.btn-delete:active {
+    box-shadow: var(--shadow-secondary-active);
+}
+
+.btn-neutral {
+    background: var(--light-color);
+    color: var(--dark-color);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.btn-neutral:hover {
+    background: var(--neutral-color-hover); 
+}
+
+.btn-neutral:active {
+    box-shadow: var(--shadow-neutral-color-active);
+    border:none;
+}
+
+.form-elements-container {
+    padding: 30px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+}
+/* MENU */
+
+.menu-top {
+    background: var(--light-color);
+    height: var(--menu-top-height);
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-bottom: 1px solid var(--border-form-elem);
+}
+   
+.menu-top__container {
+    max-width: 1900px;
+    height: 100%;
+    padding: 8px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-top__logo {
+    height: var(--menu-top-height);
+    padding: 8px 15px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.menu-top__profile {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-top__profile-name {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    font-weight: 600;
+
+}
+
+.menu-top__profile-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: var(--light-color);
+    font-weight: 700;
+
+}
+
+.logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-color: red;
+    
+}
+
+.logout svg {
+    width: 80%;
+    stroke: var(--border-form-elem);
+    transition: all var(--speed-transition);
+}
+
+.logout svg:hover {
+    stroke: var(--primary-color-hover);
+}
+
+.menu-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--left-menu-bgColor); 
+    /* background: var(--left-menu-bgColor);  */
+    /* background: var(--color_secondary_200);  */
+    height: 100%; 
+    width: var(--menu-left-width);
+    color: var(--light-color);
+    margin-top: var(--menu-top-height);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.menu-left.collapse {
+    width: var(--menu-left-width-collapse);
+    z-index: -2;
+}
+
+.menu-left__logo {
+    height: var(--menu-top-height);
+    padding: 8px 15px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.menu-left__collapse {
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    font-size: 0.8rem;
+    color: var(--menu-left-title-color);
+    margin-bottom: 20px;
+    transition: all var(--speed-transition);
+}
+
+.menu-left__collapse:hover {
+    color: var(--primary-color-hover);
+}
+
+.menu-left__items {
+    width: 100%;
+    cursor: pointer;
+}
+
+.menu-left__item {
+    padding: 20px 15px;
+    transition: all var(--speed-transition);
+}
+
+.menu-left__item svg {
+    width: 30px;
+    margin-right: 10px;
+    transition: all var(--speed-transition);
+}  
+
+.menu-left__item:hover {
+    color: var(--primary-color-hover);
+    background-color:var(--left-menu-bgColor-hover);
+    stroke: var(--primary-color-hover);
+}  
+
+.menu-left__item-link {
+    display: flex;
+    align-items: center;
+    transition: all var(--speed-transition);
+}
+
+.main-content {
+    margin-left: var(--menu-left-width);;
+    margin-top:  var(--menu-top-height);
+    padding: 30px;
+}
+
+.main-content.collapse {
+    margin-left: var(--menu-left-width-collapse);;
+}
+
+.odd {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #000000;
+}
+
+.even {
+
+}
+
