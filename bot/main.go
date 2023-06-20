@@ -41,6 +41,10 @@ type ResponseT struct {
 			Contact struct {
 				PhoneNumber string `json:"phone_number"`
 			} `json:"contact"`
+			Location struct {
+				Latitude  float64 `json:"latitude"`
+				Longitude float64 `json:"longitude"`
+			} `json:"location"`
 			Text string `json:"text"`
 			Data string `json:"data"`
 		} `json:"message"`
@@ -97,6 +101,11 @@ type UserT struct {
 	tg_id       int
 	PhoneNumber string
 	City        string
+}
+
+type Location struct {
+	Latitude  float64
+	Longitude float64
 }
 
 var host string = "https://api.telegram.org/bot"
@@ -159,6 +168,8 @@ func main() {
 			lastName := responseObj.Result[i].Message.From.LastName
 			mesIdRepl := responseObj.Result[i].Message.MessageID
 			phone := responseObj.Result[i].Message.Contact.PhoneNumber
+			latitude := responseObj.Result[i].Message.Location.Latitude
+			longitude := responseObj.Result[i].Message.Location.Longitude
 			button := need.Result[i].CallbackQuery.Data
 			id := need.Result[i].CallbackQuery.From.ID
 			mesIdInline := need.Result[i].CallbackQuery.Message.MessageID
@@ -167,7 +178,7 @@ func main() {
 			//пишем бизнес логику ----------- мозги
 
 			//отвечаем пользователю на его сообщение
-			go sendMessage(chatId, id, mesIdInline, mesIdRepl, messageTime, text, button, phone, firstName, lastName, username)
+			go sendMessage(chatId, id, mesIdInline, mesIdRepl, messageTime, text, button, phone, firstName, lastName, username, latitude, longitude)
 
 		}
 
@@ -177,7 +188,7 @@ func main() {
 	}
 }
 
-func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string) {
+func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string, latitude float64, longitude float64) {
 
 	fmt.Println(text)
 
@@ -235,7 +246,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case text == "Нет":
+	case step == 3 && text == "Нет":
 
 		buttons := [][]map[string]interface{}{
 			{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
@@ -447,7 +458,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 5 && text == "Заказать 🛍" || button == "backToGoods":
+	case step == 5 && text == "Заказать 🛍":
 		step = 5
 		buttons := [][]map[string]interface{}{}
 		//запрос
@@ -471,6 +482,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			}
 			buttons = append(buttons, button)
 		}
+		buttons = append(buttons, []map[string]interface{}{
+			{
+				"text":          "Назад",
+				"callback_data": "backToMenu",
+			},
+		})
 
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
@@ -526,6 +543,13 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			buttons = append(buttons, button)
 		}
 
+		buttons = append(buttons, []map[string]interface{}{
+			{
+				"text":          "Назад",
+				"callback_data": "backToMenu",
+			},
+		})
+
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
@@ -534,7 +558,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
-		step = 5
+		step = 6
 		break
 
 	case step == 7 && button == "Потолочный":
@@ -776,14 +800,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		break
 
 	case step == 10 && button == "buy":
-		time := time.Now().Unix()
-		//если не зарегистрирован - добавляем в БД и сохраняем в ОП
-		_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`) VALUES(?,?)", id, time)
-		if err != nil {
-			fmt.Println("Ошибка сохранения заказа ", err)
-		} else {
-			fmt.Println("заказ добавлен")
-		}
+
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
@@ -811,13 +828,21 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		break
 
 	case step == 11:
-		// //если не зарегистрирован - добавляем в БД и сохраняем в ОП
-		// _, err := Db.Query("INSERT INTO `ordered_products`(`first_name`,`last_name`, `phone`, `city`) VALUES(?,?, ?, ?,?)", FirstName, LastName, tel, button)
-		// if err != nil {
-		// 	fmt.Println("Ошибка сохранения пользователя ", err)
-		// } else {
-		// 	fmt.Println("пользователь добавлен")
-		// }
+
+		time := time.Now().Unix()
+		location := Location{
+			Latitude:  latitude,
+			Longitude: longitude,
+		}
+		jsonData, _ := json.Marshal(location)
+		for _, num := range products {
+			_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `product_id`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, num, jsonData)
+			if err != nil {
+				fmt.Println("Ошибка сохранения заказа ", err)
+			} else {
+				fmt.Println("заказ добавлен")
+			}
+		}
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
@@ -872,7 +897,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа&reply_markup=" + string(keyboardJSON))
 
-		step += 1
+		products = products[:0]
+		fmt.Println(products)
+		step = 5
 		break
 	}
 
