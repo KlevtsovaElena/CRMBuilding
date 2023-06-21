@@ -500,25 +500,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 6 || button == "backToGips":
-
-		step = 6
-		buttons := [][]map[string]interface{}{
-			{{"text": "Потолочный", "callback_data": "Потолочный"}},
-			{{"text": "Назад 🔙", "callback_data": "backToGoods"}},
-		}
-
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
-
-		step += 1
-		break
-
 	case button == "backToGoods":
 		buttons := [][]map[string]interface{}{}
 		//запрос
@@ -561,9 +542,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step = 6
 		break
 
-	case step == 7 && button == "Потолочный":
+	case step == 6:
 
-		step = 7
+		step = 6
 		buttons := [][]map[string]interface{}{}
 		//запрос
 		rows, err := Db.Query("SELECT * FROM brands")
@@ -591,7 +572,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		buttons = append(buttons, []map[string]interface{}{
 			{
 				"text":          "Назад",
-				"callback_data": "backToGips",
+				"callback_data": "backToGoods",
 			},
 		})
 
@@ -605,7 +586,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 8:
+	case step == 7:
 
 		//запрос
 		rows, err := Db.Query("SELECT id, name, description, photo, price, max_price FROM products WHERE brand_id = ?", button)
@@ -683,7 +664,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 9 && button == "goToCart":
+	case step == 8 && button == "goToCart":
 		// Проверка на наличие повторяющихся элементов
 		hasDuplicates := false
 		counts := make(map[int]int)
@@ -799,7 +780,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 10 && button == "buy":
+	case step == 9 && button == "buy":
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
@@ -827,7 +808,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		step += 1
 		break
 
-	case step == 11:
+	case step == 10:
 
 		time := time.Now().Unix()
 		location := Location{
