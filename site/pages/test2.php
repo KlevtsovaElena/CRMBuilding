@@ -7,5 +7,5 @@ header('Access-Control-Allow-Origin: *');
 // $dataObj = (object)$dataJson;
 // var_dump($dataObj->name);
 
-var_dump($_POST['field']);
+var_dump($_POST);
 ?>

@@ -51,12 +51,28 @@ async function addProduct() {
     let  price = formAddProduct.querySelector('#price');
     let  maxPprice = formAddProduct.querySelector('#maxPprice');
 
+    
+    
+    
+    
+
 [vendorId, nameProduct, photo, brandId, categoryId, description, article, 
 quantityAvailable, price, maxPprice].forEach(item => {
     console.log(item.getAttribute('name') + "    " + item.value);
-
-    if (!item.value) {
+    
+    if (!(item.value.trim())) {
+        
         item.classList.add('error');
+        item.closest('.form-add-product__elements__item').querySelector('.error-info').innerText = "Заполните данные!";
+        item.closest('.form-add-product__elements__item').querySelector('.error-info').classList.remove('d-none');
+
+
+    } else {
+        
+        item.classList.remove('error');
+        // не работает
+        // item.closest('.form-add-product__elements__item').querySelector('.error-info').innerText="";
+
     }
 })
 
