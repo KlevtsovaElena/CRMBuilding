@@ -108,18 +108,23 @@ type Location struct {
 	Longitude float64
 }
 
+type Product struct {
+	ID       int
+	Quantity int
+}
+
+var products = []Product{}
+
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
 
 var step int = 1
 
-var capacity int
-
 var tel string
 var FirstName string
 var LastName string
 
-var products = []int{}
+// var products = []int{}
 
 // создаем соединение с БД
 var Db, Err = sql.Open("mysql", "root:admin@tcp(mysql:3306)/crm-building")
@@ -610,9 +615,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			// Создаем объект инлайн клавиатуры
 			buttons := [][]map[string]interface{}{
 				{
-					{"text": "➖", "callback_data": "minus"},
-					{"text": "1", "callback_data": "capacity"},
-					{"text": "➕", "callback_data": "plus"},
+					{"text": "➖", "callback_data": "minus:" + strconv.Itoa(productId)},
+					{"text": "0", "callback_data": "quantity"},
+					{"text": "➕", "callback_data": "add:" + strconv.Itoa(productId)},
 				},
 				{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(productId)}},
 				{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -665,118 +670,45 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		break
 
 	case step == 8 && button == "goToCart":
-		// Проверка на наличие повторяющихся элементов
-		hasDuplicates := false
-		counts := make(map[int]int)
-		quantity := make(map[int]int)
 		finalPrice := 0
 		cartText := ""
 
-		for _, num := range products {
-			counts[num]++
-			if counts[num] > 1 {
-				hasDuplicates = true
+		for _, p := range products {
+
+			//запрос
+			rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", p.ID)
+			if err != nil {
+				log.Fatal(err)
 			}
+			defer rows.Close()
+
+			for rows.Next() {
+				var name string
+				var price int
+				if err := rows.Scan(&name, &price); err != nil {
+					fmt.Println("Ошибка чтения данных:", err.Error())
+					return
+				}
+
+				cartText += name + " " + strconv.Itoa(p.Quantity) + " ✖️ " + strconv.Itoa(price)
+				finalPrice += price * p.Quantity
+			}
+
+		}
+		// Создаем объект инлайн клавиатуры
+		buttons := [][]map[string]interface{}{
+			{{"text": "Оформить заказ", "callback_data": "buy"}},
+			{{"text": "Назад", "callback_data": "backToGoods"}},
 		}
 
-		if hasDuplicates {
-			// Подсчет количества повторяющихся элементов и удаление повторений кроме одного
-			for num, count := range counts {
-				if count > 1 {
-					fmt.Printf("Число %d повторяется %d раз(а)\n", num, count)
-					counts[num] = 1
-					quantity[num] = count
-				}
-			}
-
-			// Формирование нового массива без повторений
-			newArray := make([]int, 0, len(products))
-			for _, num := range products {
-				if counts[num] > 0 {
-					newArray = append(newArray, num)
-					counts[num] = 0
-				}
-			}
-
-			fmt.Println("Массив после удаления повторений:", newArray)
-			for _, num := range newArray {
-				count := quantity[num]
-				//запрос
-				rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", num)
-				if err != nil {
-					log.Fatal(err)
-				}
-				defer rows.Close()
-
-				for rows.Next() {
-					var name string
-					var price int
-					if err := rows.Scan(&name, &price); err != nil {
-						fmt.Println("Ошибка чтения данных:", err.Error())
-						return
-					}
-
-					if count == 0 {
-						cartText += name + " 1 ✖️ " + strconv.Itoa(price)
-						finalPrice += price
-					} else {
-						cartText += name + " " + strconv.Itoa(count) + " ✖️ " + strconv.Itoa(price)
-						finalPrice += price * count
-					}
-
-				}
-
-			}
-			// Создаем объект инлайн клавиатуры
-			buttons := [][]map[string]interface{}{
-				{{"text": "Оформить заказ", "callback_data": "buy"}},
-				{{"text": "Назад", "callback_data": "backToGoods"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + cartText + " Итого: " + strconv.Itoa(finalPrice) + "&reply_markup=" + string(inlineKeyboardJSON))
-
-		} else {
-			for _, num := range products {
-				rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", num)
-				if err != nil {
-					log.Fatal(err)
-				}
-				defer rows.Close()
-
-				for rows.Next() {
-					var name string
-					var price int
-					if err := rows.Scan(&name, &price); err != nil {
-						fmt.Println("Ошибка чтения данных:", err.Error())
-						return
-					}
-
-					cartText += name + " 1 ✖️ " + strconv.Itoa(price)
-					finalPrice += price
-
-				}
-			}
-
-			// Создаем объект инлайн клавиатуры
-			buttons := [][]map[string]interface{}{
-				{{"text": "Оформить заказ", "callback_data": "buy"}},
-				{{"text": "Назад", "callback_data": "backToGoods"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + cartText + " Итого: " + strconv.Itoa(finalPrice) + "&reply_markup=" + string(inlineKeyboardJSON))
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
 		}
+
+		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + cartText + " Итого: " + strconv.Itoa(finalPrice) + "&reply_markup=" + string(inlineKeyboardJSON))
+
 		step += 1
 		break
 
@@ -815,14 +747,14 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			Latitude:  latitude,
 			Longitude: longitude,
 		}
+		jsonOrder, _ := json.Marshal(products)
 		jsonData, _ := json.Marshal(location)
-		for _, num := range products {
-			_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `product_id`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, num, jsonData)
-			if err != nil {
-				fmt.Println("Ошибка сохранения заказа ", err)
-			} else {
-				fmt.Println("заказ добавлен")
-			}
+
+		_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
+		if err != nil {
+			fmt.Println("Ошибка сохранения заказа ", err)
+		} else {
+			fmt.Println("заказ добавлен")
 		}
 
 		// Создаем объект клавиатуры
@@ -878,8 +810,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа&reply_markup=" + string(keyboardJSON))
 
-		products = products[:0]
-		fmt.Println(products)
 		step = 5
 		break
 	}
@@ -887,79 +817,116 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	if strings.SplitN(button, ":", 2)[0] == "add" {
 		productStr := strings.Split(button, ":")[1]
 		productID, _ := strconv.Atoi(productStr)
-		products = append(products, productID)
+		// products = append(products, productID)
+		// fmt.Println(products)
+		// Пример добавления товара с id=3 и количеством 2
+		quantity := 1
+
+		// Проверяем, есть ли товар с таким id в массиве
+		found := false
+		for i, p := range products {
+			if p.ID == productID {
+				// Если товар найден, увеличиваем его количество
+				products[i].Quantity += quantity
+				found = true
+				// Создаем новую инлайн клавиатуру с обновленным числом
+				buttons := [][]map[string]interface{}{
+					{
+						{"text": "➖", "callback_data": "minus:" + productStr},
+						{"text": products[i].Quantity, "callback_data": "quantity"},
+						{"text": "➕", "callback_data": "add:" + productStr},
+					},
+					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
+					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+				}
+
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
+
+				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+				break
+			}
+		}
+
+		// Если товара с таким id нет в массиве, добавляем его
+		if !found {
+			products = append(products, Product{ID: productID, Quantity: quantity})
+			// Создаем новую инлайн клавиатуру с обновленным числом
+			buttons := [][]map[string]interface{}{
+				{
+					{"text": "➖", "callback_data": "minus:" + productStr},
+					{"text": "1", "callback_data": "quantity"},
+					{"text": "➕", "callback_data": "add:" + productStr},
+				},
+				{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
+				{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+			}
+
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+			http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+		}
 		fmt.Println(products)
 	}
 
-	// if button == "plus" {
+	if strings.SplitN(button, ":", 2)[0] == "minus" {
+		productStr := strings.Split(button, ":")[1]
+		productID, _ := strconv.Atoi(productStr)
+		// products = append(products, productID)
+		// fmt.Println(products)
+		// Пример добавления товара с id=3 и количеством 2
+		quantity := 1
 
-	// 	capacity += 1
+		for i, p := range products {
+			if p.ID == productID {
+				// Если товар найден, уменьшаем его количество
+				products[i].Quantity -= quantity
+				// Создаем новую инлайн клавиатуру с обновленным числом
+				buttons := [][]map[string]interface{}{
+					{
+						{"text": "➖", "callback_data": "minus:" + productStr},
+						{"text": products[i].Quantity, "callback_data": quantity},
+						{"text": "➕", "callback_data": "add:" + productStr},
+					},
+					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
+					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+				}
 
-	// 	// Создаем новую инлайн клавиатуру с обновленным числом
-	// 	buttons := [][]map[string]interface{}{
-	// 		{
-	// 			{"text": "➖", "callback_data": "minus"},
-	// 			{"text": capacity, "callback_data": "capacity"},
-	// 			{"text": "➕", "callback_data": "plus"},
-	// 		},
-	// 		{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-	// 		{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
-	// 	}
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
 
-	// 	inlineKeyboard := map[string]interface{}{
-	// 		"inline_keyboard": buttons,
-	// 	}
+				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-	// 	inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+				if products[i].Quantity == 0 {
+					// Находим индекс элемента с заданным ID
+					indexToRemove := -1
+					for i, product := range products {
+						if product.ID == productID {
+							indexToRemove = i
+							break
+						}
+					}
+					products = append(products[:indexToRemove], products[indexToRemove+1:]...)
+				}
+				break
+			}
+		}
 
-	// 	http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-	// }
-
-	// if button == "minus" {
-	// 	capacity -= 1
-
-	// 	if capacity < 1 {
-
-	// 		capacity += 1
-	// 		// Создаем новую инлайн клавиатуру с обновленным числом
-	// 		buttons := [][]map[string]interface{}{
-	// 			{
-	// 				{"text": "➖", "callback_data": "minus"},
-	// 				{"text": capacity, "callback_data": "capacity"},
-	// 				{"text": "➕", "callback_data": "plus"},
-	// 			},
-	// 			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-	// 			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
-	// 		}
-
-	// 		inlineKeyboard := map[string]interface{}{
-	// 			"inline_keyboard": buttons,
-	// 		}
-
-	// 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-	// 		http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-	// 	} else {
-	// 		// Создаем новую инлайн клавиатуру с обновленным числом
-	// 		buttons := [][]map[string]interface{}{
-	// 			{
-	// 				{"text": "➖", "callback_data": "minus"},
-	// 				{"text": capacity, "callback_data": "capacity"},
-	// 				{"text": "➕", "callback_data": "plus"},
-	// 			},
-	// 			{{"text": "Добавить в корзину 🛒", "callback_data": "button4"}},
-	// 			{{"text": "Перейти в корзину 🗑", "callback_data": "button5"}},
-	// 		}
-
-	// 		inlineKeyboard := map[string]interface{}{
-	// 			"inline_keyboard": buttons,
-	// 		}
-
-	// 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-	// 		http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-	// 	}
-	// }
+		// // Если товара с таким id нет в массиве, добавляем его
+		// if !found {
+		// 	products = append(products, Product{ID: productID, Quantity: quantity})
+		// }
+		fmt.Println(products)
+	}
 
 	if text == "Актуальные цены на рынке 📈" {
 
