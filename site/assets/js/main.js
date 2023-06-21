@@ -39,6 +39,26 @@ async function addProduct() {
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
+    // запишем значения полей формы в переменные
+    let  vendorId = formAddProduct.querySelector('#vendorId');
+    let  nameProduct = formAddProduct.querySelector('#name');
+    let  photo = formAddProduct.querySelector('#photo');
+    let  brandId = formAddProduct.querySelector('#brandId');
+    let  categoryId = formAddProduct.querySelector('#categoryId');
+    let  description = formAddProduct.querySelector('#description');
+    let  article = formAddProduct.querySelector('#article');
+    let  quantityAvailable = formAddProduct.querySelector('#quantityAvailable');
+    let  price = formAddProduct.querySelector('#price');
+    let  maxPprice = formAddProduct.querySelector('#maxPprice');
+
+[vendorId, nameProduct, photo, brandId, categoryId, description, article, 
+quantityAvailable, price, maxPprice].forEach(item => {
+    console.log(item.getAttribute('name') + "    " + item.value);
+
+    if (!item.value) {
+        item.classList.add('error');
+    }
+})
 
     
     //валидация

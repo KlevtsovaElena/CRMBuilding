@@ -130,7 +130,7 @@
                 <svg  viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
                 <span>Свернуть меню</span> 
              </button>
-             
+
             <ul class="menu-left__items">
 
 
@@ -221,9 +221,9 @@
                 <div><h1>Добавить товар</h1></div>
 
                         
-                <form action="#" method="post" enctype="multipart/form-data">
+                <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">
 
-                    <input type="hidden" name="vendorId" value="111">
+                    <input type="hidden" id="vendorId" name="vendorId" value="111">
                     <div class="form-elements-container">
                         <p>Наименование</p><input type="text" id="name" name="name" value="" required placeholder="jdhvjshdjh">
                         <!-- фото -->
@@ -256,7 +256,7 @@
 
 
                         <p>Описание</p><textarea id="description" name="description" required></textarea>
-                        <p>Артикул</p><input type="text" id="noname" name="" value="" required>
+                        <p>Артикул</p><input type="text" id="article" name="article" value="" required>
                         <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" min="0" value="" required>
                         <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required>
                         <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" min="0" value="" required>
