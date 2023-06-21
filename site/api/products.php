@@ -66,7 +66,7 @@ class ProductsController extends BaseController
         $this->productRepository->removeById($_GET['id']);
     }
 
-    private function uploadFile($file): string
+    private function uploadFile($file): ?string
     {
         $path = '/upload/';
         $fsPath = $_SERVER['DOCUMENT_ROOT'] . $path;
