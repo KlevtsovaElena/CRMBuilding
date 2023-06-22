@@ -16,37 +16,27 @@ use models\Category;
 
         protected function onGet()
         {
-            $result = isset($_GET['id']) ? $this->categoryRepository->getById($_GET['id']) :
-                $this->categoryRepository->getAll();
-
-            if ($result)
-                echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            $result = $this->categoryRepository->get($_GET);
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
         }
 
         protected function onPost()
         {
-            if (!isset($_POST['categoryName']))
-                return;
+            $post = json_decode(file_get_contents('php://input'), true);
 
-            $category = new Category();
-            $category->categoryName = $_POST['categoryName'];
-
-            if (isset($_POST['id']))
+            if (isset($post['id']))
             {
-                $category->id = $_POST['id'];
-                $this->categoryRepository->update($category);
+                $this->categoryRepository->update($post);
                 return;
             }
 
-            $this->categoryRepository->add($category);
+            $this->categoryRepository->add($post);
         }
 
         protected function onDelete()
         {
-            if (!isset($_GET['id']))
-                return;
-
-            $this->categoryRepository->removeById($_GET['id']);
+            if (isset($_GET['id']))
+                $this->categoryRepository->removeById($_GET);
         }
     }
 

@@ -8,11 +8,11 @@
         public string $description;
         public ?string $photo;
         public ?int $article;
-        public int $categoryId;
-        public ?int $brandId;
-        public ?int $vendorId;
-        public ?int $quantityAvailable;
+        public int $category_id;
+        public ?int $brand_id;
+        public ?int $vendor_id;
+        public ?int $quantity_available;
         public ?int $price;
-        public ?int $maxPrice;
+        public ?int $max_price;
     }
 ?>

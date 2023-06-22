@@ -3,7 +3,6 @@
 
     use abstraction\BaseController as BaseController;
     use repositories\BrandRepository as BrandRepository;
-    use models\Brand as Brand;
 
     class BrandsController extends BaseController
     {
@@ -16,37 +15,27 @@
 
         protected function onGet()
         {
-            $result = isset($_GET['id']) ? $this->brandsRepository->getById($_GET['id']) :
-                $this->brandsRepository->getAll();
-
-            if ($result)
-                echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            $result = $this->brandsRepository->get($_GET);
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
         }   
 
         protected function onPost()
         {
-            if (!isset($_POST['brandName']))
-                return;
+            $post = json_decode(file_get_contents('php://input'), true);
 
-            $brand = new Brand();
-            $brand->brandName = $_POST['brandName'];
-
-            if (isset($_POST['id']))
+            if (isset($post['id']))
             {
-                $brand->id = $_POST['id'];
-                $this->brandsRepository->update($brand);
+                $this->brandsRepository->update($post);
                 return;
             }
 
-            $this->brandsRepository->add($brand);
+            $this->brandsRepository->add($post);
         }
 
         protected function onDelete()
         {
-            if (!isset($_GET['id']))
-                return;
-
-            $this->brandsRepository->removeById($_GET['id']);
+            if (isset($_GET['id']))
+                $this->brandsRepository->removeById($_GET);
         }
     }
 
