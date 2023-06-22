@@ -4,6 +4,6 @@
     class Brand
     {
         public int $id;
-        public string $brandName;
+        public string $brand_name;
     }
 ?>
