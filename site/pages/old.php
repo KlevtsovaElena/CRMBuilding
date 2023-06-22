@@ -22,7 +22,7 @@
     <!-- Форма добавления товаров -->
     <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">
 
-        <input type="hidden" id="vendor_id" name="vendor_id" value="111">
+        <input type="hidden" id="vendorId" name="vendorId" value="111">
         
         <div class="form-add-product__elements form-elements-container">
             <div class="form-add-product__elements__item">
@@ -39,7 +39,7 @@
                 
                 <div class="img-title-prew img-guide"><img></div>
                 <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
-                <div><progress id="progress" max="100" value="0" class="d-none"></progress></div>
+                <div><progress id="progress" max="100" value="0"></progress></div>
                           
             </div>
             <div class="error-info d-none"></div> 
@@ -48,11 +48,11 @@
             <!-- список -->
             <div class="form-add-product__elements__item">
                 <p>Бренд</p>
-                <select id="brand_id" name="brand_id" value="" required>
+                <select id="brandId" name="brandId" value="" required>
                     <option value="" selected hidden>Выберите бренд...</option>
 
                     <?php foreach($brands as $brand) { ?>
-                        <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <option value="<?= $brand['id']; ?>"><?= $brand['brandName']; ?></option>
                     <?php }; ?>
 
                 </select>
@@ -62,11 +62,11 @@
             <!-- список -->
             <div class="form-add-product__elements__item">
                 <p>Категория</p>
-                <select id="category_id" name="category_id" value="" required>
+                <select id="categoryId" name="categoryId" value="" required>
                     <option value="" selected hidden>Выберите категорию...</option>
 
                     <?php foreach($categories as $category) { ?>
-                        <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                        <option value="<?= $category['id']; ?>"><?= $category['categoryName']; ?></option>
                     <?php }; ?>
 
                 </select>
@@ -79,29 +79,29 @@
             </div>
 
             <div class="form-add-product__elements__item">
-                <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="" required placeholder="0">
+                <p>Артикул</p><input type="text" id="article" name="article" value="" required>
                 <div class="error-info d-none"></div>
             </div> 
 
             <div class="form-add-product__elements__item">
-                <p>Количество</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="" required placeholder="0">
+                <p>Количество</p><input type="number" id="quantityAvailable" name="quantityAvailable" min="0" value="" required>
                 <div class="error-info d-none"></div> 
             </div>
 
             <div class="form-add-product__elements__item">
-                <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required placeholder="0">
+                <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required>
                 <div class="error-info d-none"></div> 
             </div>
 
             <div class="form-add-product__elements__item">
-                <p>Цена рыночная (руб.)</p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
+                <p>Цена рыночная (руб.)</p><input type="number" id="maxPrice" name="maxPrice" min="0" value="" required>
                 <div class="error-info d-none"></div> 
             </div>
             
         </div>
         <div>
             <button class="btn btn-ok" onclick="addProduct()">Сохранить</button>
-            <a href="vendor-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
+            <a href="#" class="btn btn-neutral">Сбросить изменения</a> 
         </div>
     </form>
 
