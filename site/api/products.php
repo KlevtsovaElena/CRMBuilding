@@ -20,67 +20,49 @@ class ProductsController extends BaseController
 
     protected function onGet()
     {
-        $result = isset($_GET['id']) ? $this->productRepository->getById($_GET['id']) :
-            $this->productRepository->getAll();
-
-        if ($result)
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        $result = $this->productRepository->get($_GET);
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 
     protected function onPost()
     {        
-        if (!isset($_POST['name']) || !isset($_POST['description']) || !isset($_POST['categoryId']))
-            return;
+        $post = json_decode(file_get_contents('php://input'), true);
+        if (isset($post['photoFileName']) && isset($post['photoFileData']))
+            $post['photo'] = $this->uploadBase64File($post['photoFileName'], $post['photoFileData']);
 
-        $photoUrl = null;
-        if ($_FILES != null && $_FILES['photo'] != null)
-            $photoUrl = $this->uploadFile($_FILES['photo']);
-
-        $product = new Product();
-        $product->name = $_POST['name'];
-        $product->description = $_POST['description'];
-        $product->categoryId = $_POST['categoryId'];
-        $product->photo = $photoUrl;
-        $product->article = $_POST['articleId'];
-        $product->brandId = $_POST['brandId'];
-        $product->vendorId = $_POST['vendorId'];
-        $product->quantityAvailable = $_POST['quantityAvailable'];
-        $product->price = $_POST['price'];
-        $product->maxPrice = $_POST['maxPrice'];
-
-        if (isset($_POST['id']))
+        if (isset($post['id']))
         {
-            $product->id = $_POST['id'];
-            $this->productRepository->update($product);
+            $this->productRepository->update($post);
             return;
         }
 
-        $this->productRepository->add($product);
+        $this->productRepository->add($post);
     }
 
     protected function onDelete()
     {
-        if (!isset($_GET['id']))
-            return;
-
-        $this->productRepository->removeById($_GET['id']);
+        if (isset($_GET['id']))
+            $this->productRepository->removeById($_GET);
     }
 
-    private function uploadFile($file): ?string
-    {
+    private function uploadBase64File($fileName, $fileContent): ?string
+    {           
         $path = '/upload/';
         $fsPath = $_SERVER['DOCUMENT_ROOT'] . $path;
         if (!is_dir($fsPath))
             mkdir($fsPath);
 
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
         if ($ext != 'jpg' && $ext != 'jpeg' && $ext != 'png')
             return null;
 
         $fileName = md5(time()) . '.' . $ext;
+        $fileContent = preg_replace('/^data:image\/\w+;base64,/', '', $fileContent); 
+        
+        $decodedContent = base64_decode(rawurldecode($fileContent));
 
-        move_uploaded_file($file['tmp_name'], $fsPath . $fileName);
+        file_put_contents($fsPath . $fileName, $decodedContent);
 
         return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['HTTP_HOST'] . $path . $fileName;
     }
