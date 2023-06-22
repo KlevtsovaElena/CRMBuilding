@@ -4,12 +4,12 @@
     class Customer
     {
         public int $id;
-        public string $firstName;
-        public ?string $lastName;
-        public string $tgUsername;
-        public int $tgId;
+        public string $first_name;
+        public ?string $last_name;
         public ?string $phone;
-        public int $cityId;
-        public $coordinates;  // JSON
+        public int $city_id;
+        public int $tg_id;
+        public string $tg_username;
+        public ?Coordinate $coordinates;  // JSON
     }
 ?>
