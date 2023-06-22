@@ -17,7 +17,7 @@
     --border-form-elem: #ced4da;
     --border-form-elem-focus: #33bbff;
     --shadow-form-elem-focus: rgba(0, 136, 204, 0.3);
-    --shadow-form-elem-error: #D64242;
+    --shadow-form-elem-error: rgba(214, 66, 66, 1);
     --menu-left-title-color: #888888;
 
     --border-radius: 4px;
@@ -149,9 +149,10 @@ body {
 }
 
 input, textarea, select {
-    padding: 10px;
-    margin: 8px;
+    padding: 8px;
     min-width: 200px;
+    max-width: 700px;
+    width: 100%;
     border: 1px solid var(--border-form-elem);
     border-radius: var(--border-radius);
 }
@@ -172,16 +173,11 @@ input:focus, textarea:focus, select:focus {
 .error {
     border-color: var(--secondary-color-hover);
     box-shadow: 0 0 0 0.8px var(--shadow-form-elem-error);
-
 }
 
 .error-info {
     color: var(--secondary-color);
     font-size: 0.8rem;
-}
-
-.test {
-    background-color: yellow;
 }
 
 .d-block {
@@ -198,6 +194,10 @@ input:focus, textarea:focus, select:focus {
 
 .d-none {
     display: none;
+}
+
+.ghost {
+    opacity: 0.5;
 }
 /* ---BUTTON---- */
 
@@ -241,14 +241,22 @@ input:focus, textarea:focus, select:focus {
     border:none;
 }
 
-.form-add-product__elements {
+.page-title {
+    margin: 20px 0;
+    font-weight: 600;
+    font-size: 1.75rem;
+    
+}
+
+.form-elements-container {
     padding: 30px;
     background: var(--light-color);
     border-radius: var(--border-radius);
+    margin-bottom: 20px;
 }
 
 .form-add-product__elements__item {
-    margin-bottom: 8px;
+    margin-bottom: 15px;
 }
 
 input, textarea, select {
@@ -427,7 +435,6 @@ input, textarea, select {
 /* collapsed */
 .main-content.collapsed {
     margin-left: var(--menu-left-width-collapse);
-    padding: 50px;
 }
 
 .menu-left.collapsed {

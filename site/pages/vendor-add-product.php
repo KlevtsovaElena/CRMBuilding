@@ -1,14 +1,14 @@
 <?php include('./../components/header.php'); ?>
-    <div>ПРИМЕР ЭЛЕМЕНТОВ
+    <!-- <div>ПРИМЕР ЭЛЕМЕНТОВ
         <input type="text" placeholder="test">
         <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
         <button class="btn btn-ok">Сохранить товар</button>
         <button class="btn btn-neutral">Сбросить</button>
         <button class="btn btn-delete">Удалить товар</button>
-    </div>
+    </div> -->
 
                 
-    <div><h1>Добавить товар</h1></div>
+    <p class="page-title">Добавить товар</p>
 
     <!-- соберём данные для отображения в форме -->
 
@@ -24,23 +24,26 @@
 
         <input type="hidden" id="vendorId" name="vendorId" value="111">
         
-        <div class="form-add-product__elements">
+        <div class="form-add-product__elements form-elements-container">
             <div class="form-add-product__elements__item">
-                <p>Наименование</p><input type="text" id="name" name="name" value="" required placeholder="jdhvjshdjh">
+                <p>Наименование</p><input type="text" id="name" name="name" value="" required>
                 <div class="error-info d-none"></div>
             </div>
 
-            <!-- фото -->
-            <div class="form-add-product__elements__item">
-                <p>
-                    <div class="img-title-form">Изображениe для карточки 
-                        <div>(Рекомендованные параметры такие НА такие)</div>
-                        <div class="img-title-prew img-guide"><img></div>
-                        <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required>                               
-                    </div>
-                </p>
-                <div class="error-info d-none"></div> 
+        <!-- фото -->
+        <div class="form-add-product__elements__item">
+            <p>Изображениe для карточки</p> 
+            <p>(Рекомендованные параметры такие НА такие)</p>
+            <p>(Допустимые форматы: .jpg, .jpeg, .png)</p>
+            <div class="img-title-form">
+                
+                <div class="img-title-prew img-guide"><img></div>
+                <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
+                <div><progress id="progress" max="100" value="0"></progress></div>
+                          
             </div>
+            <div class="error-info d-none"></div> 
+        </div>
 
             <!-- список -->
             <div class="form-add-product__elements__item">
@@ -91,8 +94,8 @@
             </div>
 
             <div class="form-add-product__elements__item">
-                <p>Цена рыночная (руб.)</p><input type="number" id="maxPprice" name="maxPrice" min="0" value="" required>
-                <div class="test error-info d-none"></div> 
+                <p>Цена рыночная (руб.)</p><input type="number" id="maxPrice" name="maxPrice" min="0" value="" required>
+                <div class="error-info d-none"></div> 
             </div>
             
         </div>
