@@ -426,7 +426,8 @@ input, textarea, select {
 
 /* collapsed */
 .main-content.collapsed {
-    margin-left: var(--menu-left-width-collapse);;
+    margin-left: var(--menu-left-width-collapse);
+    padding: 50px;
 }
 
 .menu-left.collapsed {
@@ -455,9 +456,16 @@ input, textarea, select {
     transform: rotate(270deg);
  }
 
+ .menu-left.collapsed .menu-left__item:hover svg.fill,
+ .menu-left.collapsed .menu-left__collapse:hover svg.fill  {
+    fill: var(--primary-color-hover);
+    stroke: var(--primary-color-hover);
+}
+
  .menu-left.collapsed .menu-left__item:hover svg,
  .menu-left.collapsed .menu-left__collapse:hover svg {
     stroke: var(--primary-color-hover);
-    fill: var(--primary-color-hover);
-}
+ }
+
+
 

@@ -74,7 +74,20 @@ quantityAvailable, price, maxPprice].forEach(item => {
         // item.closest('.form-add-product__elements__item').querySelector('.error-info').innerText="";
 
     }
+
+    if ((item.id === "price") || (item.id === "price") || (item.id === "price")) {
+
+       if (item.value < 0) {
+            item.classList.add('error');
+       }
+    }
 })
+
+if (price.value > maxPprice.value) {
+    price.classList.add('error');
+    maxPprice.classList.add('error');
+
+}
 
     
     //валидация
