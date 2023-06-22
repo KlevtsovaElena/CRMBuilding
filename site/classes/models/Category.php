@@ -4,6 +4,6 @@
     class Category
     {
         public int $id;
-        public string $categoryName;
+        public string $category_name;
     }
 ?>

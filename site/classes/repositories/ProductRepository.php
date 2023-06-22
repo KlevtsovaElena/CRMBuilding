@@ -6,107 +6,102 @@
 
     class ProductRepository
     {
-        const ADD_QUERY = 'INSERT INTO products(`name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price`) VALUES '.
-                            '(:name, :description, :photo, :article, :category_id, :brand_id, :vendor_id, :quantity_available, :price, :max_price)';
-        const GET_BY_ID_QUERY = 'SELECT `id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`,
-                                 `vendor_id`, `quantity_available`, `price`, `max_price`
-                                 FROM `products` WHERE `id`=:id';
-        const REMOVE_BY_ID = 'DELETE FROM `products` WHERE `id`=:id';
-        const GET_ALL_QUERY = 'SELECT `id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price` FROM `products`';
-        const UPDATE_QUERY = 'UPDATE `products` 
-                                SET `name`=:name,
-                                    `description`=:description,
-                                    `photo`=:photo,
-                                    `article`=:article,
-                                    `category_id`=:category_id,
-                                    `brand_id`=:brand_id,
-                                    `vendor_id`=:vendor_id,
-                                    `quantity_available`=:quantity_available,
-                                    `price`=:price,
-                                    `max_price`=:max_price 
-                              WHERE `id`=:id';
-
-        public function map(array $row) : Product
+        const TABLE_NAME = 'products';
+        const CLASS_NAME = 'models\Product';
+        const GET_BY_PREDICATE_QUERY = 'SELECT * FROM `%s` WHERE %s';
+        const ADD_QUERY = 'INSERT INTO `%s`(%s) VALUES (%s)';
+        const REMOVE_BY_ID = 'DELETE FROM `%s` WHERE `id`=:id';
+        const UPDATE_QUERY = 'UPDATE `%s` SET %s WHERE `id`=:id';
+    
+        private function getParams($inputArray)
         {
-            $newProduct = new Product();
-            $newProduct->id = $row['id'];
-            $newProduct->name = $row['name'];
-            $newProduct->description = $row['description'];
-            $newProduct->photo = $row['photo'];
-            $newProduct->article = $row['article'];
-            $newProduct->categoryId = $row['category_id'];
-            $newProduct->brandId = $row['brand_id'];
-            $newProduct->vendorId = $row['vendor_id'];
-            $newProduct->quantityAvailable = $row['quantity_available'];
-            $newProduct->price = $row['price'];
-            $newProduct->maxPrice = $row['max_price'];
-
-            return $newProduct;
+            $items = get_class_vars(static::CLASS_NAME);
+    
+            $result = [];
+            foreach ($items as $key => $value) {
+                if (array_key_exists($key, $inputArray))
+                    $result[$key] = $inputArray[$key];
+            }
+            return $result;
         }
-
-        public function add(Product $product)
+    
+        public function get(array $inputParams): array|Product
         {
-            $statement = \DbContext::getConnection()->prepare(static::ADD_QUERY);
-            $params = [
-                ':name' => $product->name,
-                ':description' => $product->description,
-                ':photo' => $product->photo,
-                ':article' => $product->article,                
-                ':category_id' => $product->categoryId,
-                ':brand_id' => $product->brandId, 
-                ':vendor_id' => $product->vendorId,
-                ':quantity_available' => $product->quantityAvailable,
-                ':price' => $product->price, 
-                ':max_price' => $product->maxPrice
+            $params = $this->getParams($inputParams);
+            $queryColmParams = [];
+            $queryValueParams = [];
+    
+            foreach ($params as $key => $value) {
+                $queryColmParams[] = $key . '=:' . $key;
+                $queryValueParams[':' . $key] = $value;
+            }
+    
+            $stringParams = count($queryColmParams) > 0 ? implode(' AND ', $queryColmParams) : '1';
+            $query = sprintf(static::GET_BY_PREDICATE_QUERY, static::TABLE_NAME, $stringParams);
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($queryValueParams);
+    
+            if (!array_key_exists('id', $params))
+                return array_map([$this, 'map'], $statement->fetchAll());
+    
+            if (!$data = $statement->fetch())
+                return new Product();
+    
+            return $this->map($data);
+        }
+    
+        public function add(array $inputParams)
+        {
+            $params = $this->getParams($inputParams);
+            $queryValueParams = [];
+    
+            foreach ($params as $key => $value)
+                $queryValueParams[':' . $key] = $value;
+    
+            $columns = implode(', ', array_keys($params));
+            $parameters = implode(', ', array_keys($queryValueParams));
+            $query = sprintf(static::ADD_QUERY, static::TABLE_NAME, $columns, $parameters);
+    
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($queryValueParams);
+        }
+    
+        public function update(array $inputParams)
+        {
+            $params = $this->getParams($inputParams);
+            $queryColmParams = [];
+            $queryValueParams = [];
+    
+            foreach ($params as $key => $value) {
+                if ($key != 'id')
+                    $queryColmParams[] = $key . '=:' . $key;
+    
+                $queryValueParams[':' . $key] = $value;
+            }
+    
+            $stringParams = implode(', ', $queryColmParams);
+            $query = sprintf(static::UPDATE_QUERY, static::TABLE_NAME, $stringParams);
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($queryValueParams);
+        }
+    
+        public function removeById(array $inputParams)
+        {
+            $query = sprintf(static::REMOVE_BY_ID, static::TABLE_NAME);
+            $statement = \DbContext::getConnection()->prepare($query);
+            $queryValueParams = [
+                'id' => $inputParams['id']
             ];
-            $statement->execute($params);
+            $statement->execute($queryValueParams);
         }
-
-        public function getById(int $id) : ?Product
+    
+        public function map(array $row): Product
         {
-            $statement = \DbContext::getConnection()->prepare(static::GET_BY_ID_QUERY);
-            $statement->execute(array(':id' => $id));
-            
-            $result = null;
-            if ($data = $statement->fetch())
-                $result = $this->map($data);
-
-            return $result;        
-        }
-
-        public function getAll() : Array
-        {
-            $statement = \DbContext::getConnection()->prepare(static::GET_ALL_QUERY);
-            $statement->execute();
-
-            $result = array_map([$this, 'map'], $statement->fetchAll());
-
-            return $result;        
-        }
-
-        public function removeById(int $id)
-        {
-            $statement = \DbContext::getConnection()->prepare(static::REMOVE_BY_ID);
-            $statement->execute(array(':id' => $id));
-        }
-
-        public function update(Product $product)
-        {
-            $statement = \DbContext::getConnection()->prepare(static::UPDATE_QUERY);
-            $params = [
-                ':name' => $product->name,
-                ':description' => $product->description,
-                ':photo' => $product->photo,
-                ':article' => $product->article,
-                ':category_id' => $product->categoryId,
-                ':brand_id' => $product->brandId,
-                ':vendor_id' => $product->vendorId,
-                ':quantity_available' => $product->quantityAvailable,
-                ':price' => $product->price,
-                ':max_price' => $product->maxPrice,
-                ':id' => $product->id,
-            ];
-            $statement->execute($params);
+            $item = new Product();
+            foreach ($this->getParams($row) as $key => $value)
+                $item->$key = $value;
+    
+            return $item;
         }
     }
 ?>
