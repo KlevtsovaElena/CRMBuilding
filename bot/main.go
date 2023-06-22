@@ -103,17 +103,32 @@ type UserT struct {
 	City        string
 }
 
+type Order struct {
+	CustomerID int                    `json:"customer_id"`
+	OrderDate  int64                  `json:"order_date"`
+	Products   map[int]int            `json:"products"`
+	Location   map[string]interface{} `json:"location"`
+}
+
+type OrderItem struct {
+	ProductID int
+	Quantity  int
+}
+
 type Location struct {
 	Latitude  float64
 	Longitude float64
 }
 
-type Product struct {
-	ID       int
-	Quantity int
+type Categories struct {
+	ID           int    `json:"id"`
+	CategoryName string `json:"categoryName"`
 }
 
-var products = []Product{}
+type Brands struct {
+	ID        int    `json:"id"`
+	BrandName string `json:"brandName"`
+}
 
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
@@ -123,6 +138,9 @@ var step int = 1
 var tel string
 var FirstName string
 var LastName string
+
+var products = make(map[int]int)
+var client = http.Client{}
 
 // var products = []int{}
 
@@ -466,23 +484,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 5 && text == "Заказать 🛍":
 		step = 5
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT category_name FROM categories")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/categories.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var category_name string
-			if err := rows.Scan(&category_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var categories []Categories
+		err = json.NewDecoder(resp.Body).Decode(&categories)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range categories {
 			button := []map[string]interface{}{
 				{
-					"text":          category_name,
-					"callback_data": category_name,
+					"text":          category.CategoryName,
+					"callback_data": category.CategoryName,
 				},
 			}
 			buttons = append(buttons, button)
@@ -498,7 +518,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
@@ -507,28 +530,29 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	case button == "backToGoods":
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT category_name FROM categories")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/categories.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var category_name string
-			if err := rows.Scan(&category_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var categories []Categories
+		err = json.NewDecoder(resp.Body).Decode(&categories)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range categories {
 			button := []map[string]interface{}{
 				{
-					"text":          category_name,
-					"callback_data": category_name,
+					"text":          category.CategoryName,
+					"callback_data": category.CategoryName,
 				},
 			}
 			buttons = append(buttons, button)
 		}
-
 		buttons = append(buttons, []map[string]interface{}{
 			{
 				"text":          "Назад",
@@ -540,7 +564,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
@@ -551,29 +578,29 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		step = 6
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT * FROM brands")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/brands.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var brand_id int
-			var brand_name string
-			if err := rows.Scan(&brand_id, &brand_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var brands []Brands
+		err = json.NewDecoder(resp.Body).Decode(&brands)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, brand := range brands {
 			button := []map[string]interface{}{
 				{
-					"text":          brand_name,
-					"callback_data": brand_id,
+					"text":          brand.BrandName,
+					"callback_data": brand.ID,
 				},
 			}
 			buttons = append(buttons, button)
 		}
-
 		buttons = append(buttons, []map[string]interface{}{
 			{
 				"text":          "Назад",
@@ -585,7 +612,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
 		step += 1
@@ -673,10 +703,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		finalPrice := 0
 		cartText := ""
 
-		for _, p := range products {
+		for ID := range products {
 
 			//запрос
-			rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", p.ID)
+			rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", ID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -690,8 +720,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 					return
 				}
 
-				cartText += name + " " + strconv.Itoa(p.Quantity) + " ✖️ " + strconv.Itoa(price)
-				finalPrice += price * p.Quantity
+				cartText += name + " " + strconv.Itoa(products[ID]) + " ✖️ " + strconv.Itoa(price)
+				finalPrice += price * products[ID]
 			}
 
 		}
@@ -743,19 +773,31 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 10:
 
 		time := time.Now().Unix()
-		location := Location{
-			Latitude:  latitude,
-			Longitude: longitude,
+		// location := Location{
+		// 	Latitude:  latitude,
+		// 	Longitude: longitude,
+		// }
+		// jsonOrder, _ := json.Marshal(products)
+		// jsonData, _ := json.Marshal(location)
+		order := Order{
+			CustomerID: chatId,
+			OrderDate:  time,     // Формат даты: гггг-мм-дд
+			Products:   products, // Карта products с товарами
+			Location: map[string]interface{}{
+				"latitude":  latitude,  // Долгота
+				"longitude": longitude, // Широта
+			},
 		}
-		jsonOrder, _ := json.Marshal(products)
-		jsonData, _ := json.Marshal(location)
+		jsonData, _ := json.Marshal(order)
 
-		_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
-		if err != nil {
-			fmt.Println("Ошибка сохранения заказа ", err)
-		} else {
-			fmt.Println("заказ добавлен")
-		}
+		fmt.Println(string(jsonData))
+
+		// _, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
+		// if err != nil {
+		// 	fmt.Println("Ошибка сохранения заказа ", err)
+		// } else {
+		// 	fmt.Println("заказ добавлен")
+		// }
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
@@ -824,19 +866,19 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		// Проверяем, есть ли товар с таким id в массиве
 		found := false
-		for i, p := range products {
-			if p.ID == productID {
+		for ID := range products {
+			if ID == productID {
 				// Если товар найден, увеличиваем его количество
-				products[i].Quantity += quantity
+				products[ID] += quantity
 				found = true
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
-						{"text": "➖", "callback_data": "minus:" + productStr},
-						{"text": products[i].Quantity, "callback_data": "quantity"},
-						{"text": "➕", "callback_data": "add:" + productStr},
+						{"text": "➖", "callback_data": "minus:" + strconv.Itoa(ID)},
+						{"text": strconv.Itoa(products[ID]), "callback_data": "quantity"},
+						{"text": "➕", "callback_data": "add:" + strconv.Itoa(ID)},
 					},
-					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
+					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(ID)}},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
@@ -853,7 +895,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		// Если товара с таким id нет в массиве, добавляем его
 		if !found {
-			products = append(products, Product{ID: productID, Quantity: quantity})
+			products[productID] = quantity
 			// Создаем новую инлайн клавиатуру с обновленным числом
 			buttons := [][]map[string]interface{}{
 				{
@@ -884,15 +926,15 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Пример добавления товара с id=3 и количеством 2
 		quantity := 1
 
-		for i, p := range products {
-			if p.ID == productID {
+		for ID := range products {
+			if ID == productID {
 				// Если товар найден, уменьшаем его количество
-				products[i].Quantity -= quantity
+				products[ID] -= quantity
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
 						{"text": "➖", "callback_data": "minus:" + productStr},
-						{"text": products[i].Quantity, "callback_data": quantity},
+						{"text": strconv.Itoa(products[ID]), "callback_data": quantity},
 						{"text": "➕", "callback_data": "add:" + productStr},
 					},
 					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
@@ -906,16 +948,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-				if products[i].Quantity == 0 {
-					// Находим индекс элемента с заданным ID
-					indexToRemove := -1
-					for i, product := range products {
-						if product.ID == productID {
-							indexToRemove = i
-							break
-						}
-					}
-					products = append(products[:indexToRemove], products[indexToRemove+1:]...)
+				if products[productID] == 0 {
+					delete(products, productID)
 				}
 				break
 			}
