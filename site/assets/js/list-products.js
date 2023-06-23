@@ -32,7 +32,7 @@ sendChangeData.addEventListener("click", getChangeData);
 /* ---------- ОТРИСОВКА ТАБЛИЦЫ ТОВАРОВ ---------- */
 function renderListProducts() {
     // собираем все значения полей
-    let params = "vendor_id=" + vendor_id;
+    let params = "filters&vendor_id=" + vendor_id;
 
     [brand_idEl, category_idEl, searchEl, limitEl, orderbyEl].forEach(item => {
 currentPage=2;
@@ -43,15 +43,16 @@ currentPage=2;
                 params += "&search=name:" + searchEl.value + ";description:" + searchEl.value;
             } else if (item.id === "orderby") {
                 params += "&orderby=" + item.value + ":asc"; 
-            } else if ((item.id==="limit")&&(!(currentPage===1))) {
-                
-                params += "&offset=" + ((currentPage-1)*limitEl.value + 1);
-            } else {
-                params += "&" + item.id + "=" + item.value;  
+            }else {
+                    params += "&" + item.id + "=" + item.value;  
             }
         }
 
+        if ((item.id === "limit") && !(currentPage===1)) {
+            params += "&offset=" + ((currentPage-1)*limitEl.value + 1);
+        }
     })
+
 console.log(params);
     // if(!(searchEl.value.trim())) {
     //     let search = "name:" + searchEl.value + ";description:" + searchEl.value;
@@ -76,8 +77,9 @@ console.log(params);
     // разбираем значения полей
 
     // получаем строку get параметров запроса
-
+    sendRequestGET('http://localhost/api/products?' + params);
     // отправляем запрос на сервер
+
 
     // получаем данные
 
