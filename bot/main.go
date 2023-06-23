@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -103,17 +104,46 @@ type UserT struct {
 	City        string
 }
 
-type Location struct {
+type Order struct {
+	CustomerID  int                    `json:"customer_id"`
+	OrderDate   int64                  `json:"order_date"`
+	Products    map[int]int            `json:"products"`
+	Coordinates map[string]interface{} `json:"coordinates"`
+}
+
+type OrderItem struct {
+	ProductID int
+	Quantity  int
+}
+
+type Coordinates struct {
 	Latitude  float64
 	Longitude float64
 }
 
-type Product struct {
-	ID       int
-	Quantity int
+type Cities struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
-var products = []Product{}
+type Categories struct {
+	ID           int    `json:"id"`
+	CategoryName string `json:"category_name"`
+}
+
+type Brands struct {
+	ID        int    `json:"id"`
+	BrandName string `json:"brand_name"`
+}
+
+type Product struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Photo       string `json:"photo"`
+	Price       int    `json:"price"`
+	MaxPrice    int    `json:"max_price"`
+}
 
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
@@ -123,6 +153,9 @@ var step int = 1
 var tel string
 var FirstName string
 var LastName string
+
+var products = make(map[int]int)
+var client = http.Client{}
 
 // var products = []int{}
 
@@ -206,7 +239,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		buttons := [][]map[string]interface{}{
 			{{"text": "Русский 🇷🇺", "callback_data": "russian"}},
-			{{"text": "Узбекский 🇺🇿", "callback_data": "uzbekistan"}},
+			{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbekistan"}},
 			{{"text": "Ўзбекча 🇺🇿", "callback_data": "usbecha"}},
 		}
 
@@ -272,38 +305,40 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		fmt.Println(step)
 
-		var city_id int = 1
 		tel = phone
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT name FROM cities")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/cities.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var name string
-			if err := rows.Scan(&name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var cities []Cities
+		err = json.NewDecoder(resp.Body).Decode(&cities)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range cities {
 			button := []map[string]interface{}{
 				{
-					"text":          name,
-					"callback_data": city_id,
+					"text":          category.Name,
+					"callback_data": category.ID,
 				},
 			}
 			buttons = append(buttons, button)
-
-			city_id += 1
 		}
 
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
 		step += 1
@@ -332,14 +367,27 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			user.tg_id = id
 			user.PhoneNumber = tel
 			user.City = button
-			//если не зарегистрирован - добавляем в БД и сохраняем в ОП
-			_, err := Db.Query("INSERT INTO `customers`(`first_name`, `last_name`, `tg_username`, `tg_id`, `phone`, `city_id`) VALUES(?, ?, ?, ?, ?, ?)", FirstName, LastName, username, id, tel, button)
-			if err != nil {
-				fmt.Println("Ошибка сохранения пользователя ", err)
-			} else {
-				fmt.Println("пользователь добавлен")
+			// Создаем тело запроса в виде строки JSON
+			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `, "coordinates": "value2"}`
 
+			// Создаем новый POST-запрос
+			req, err := http.NewRequest("POST", "http://nginx:80/api/customers.php", bytes.NewBufferString(requestBody))
+			if err != nil {
+				fmt.Println("Ошибка при создании запроса:", err)
+				return
 			}
+
+			// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
+			req.Header.Set("Content-Type", "application/json")
+
+			// Отправляем запрос с использованием стандартного клиента HTTP
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				fmt.Println("Ошибка при выполнении запроса:", err)
+				return
+			}
+			defer resp.Body.Close()
 
 			usersDB[id] = user
 
@@ -363,40 +411,16 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
-				{
-					{
-						"text": "Заказать 🛍",
-					},
+				{{"text": "Заказать 🛍"}},
+
+				{{"text": "Актуальный курс 💹"},
+					{"text": "Настройки ⚙️"},
 				},
-				{
-					{
-						"text": "Актуальные цены на рынке 📈",
-					},
+				{{"text": "Мои заказы 📕"},
+					{"text": "Актуальные цены на рынке 📈"},
 				},
-				{
-					{
-						"text": "Актуальный курс 💹",
-					},
-				},
-				{
-					{
-						"text": "Настройки ⚙️",
-					},
-				},
-				{
-					{
-						"text": "Мои заказы 📕",
-					},
-				},
-				{
-					{
-						"text": "Информация ℹ️",
-					},
-				},
-				{
-					{
-						"text": "Связаться 📞",
-					},
+				{{"text": "Связаться 📞"},
+					{"text": "Корзина 🗑"},
 				},
 			},
 			"resize_keyboard":   true,
@@ -416,40 +440,16 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
-				{
-					{
-						"text": "Заказать 🛍",
-					},
+				{{"text": "Заказать 🛍"}},
+
+				{{"text": "Актуальный курс 💹"},
+					{"text": "Настройки ⚙️"},
 				},
-				{
-					{
-						"text": "Актуальные цены на рынке 📈",
-					},
+				{{"text": "Мои заказы 📕"},
+					{"text": "Актуальные цены на рынке 📈"},
 				},
-				{
-					{
-						"text": "Актуальный курс 💹",
-					},
-				},
-				{
-					{
-						"text": "Настройки ⚙️",
-					},
-				},
-				{
-					{
-						"text": "Мои заказы 📕",
-					},
-				},
-				{
-					{
-						"text": "Информация ℹ️",
-					},
-				},
-				{
-					{
-						"text": "Связаться 📞",
-					},
+				{{"text": "Связаться 📞"},
+					{"text": "Корзина 🗑"},
 				},
 			},
 			"resize_keyboard":   true,
@@ -466,23 +466,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 5 && text == "Заказать 🛍":
 		step = 5
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT category_name FROM categories")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/categories.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var category_name string
-			if err := rows.Scan(&category_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var categories []Categories
+		err = json.NewDecoder(resp.Body).Decode(&categories)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range categories {
 			button := []map[string]interface{}{
 				{
-					"text":          category_name,
-					"callback_data": category_name,
+					"text":          category.CategoryName,
+					"callback_data": category.CategoryName,
 				},
 			}
 			buttons = append(buttons, button)
@@ -498,7 +500,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
@@ -507,28 +512,29 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	case button == "backToGoods":
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT category_name FROM categories")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/categories.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var category_name string
-			if err := rows.Scan(&category_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var categories []Categories
+		err = json.NewDecoder(resp.Body).Decode(&categories)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range categories {
 			button := []map[string]interface{}{
 				{
-					"text":          category_name,
-					"callback_data": category_name,
+					"text":          category.CategoryName,
+					"callback_data": category.CategoryName,
 				},
 			}
 			buttons = append(buttons, button)
 		}
-
 		buttons = append(buttons, []map[string]interface{}{
 			{
 				"text":          "Назад",
@@ -540,7 +546,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
@@ -551,29 +560,29 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		step = 6
 		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT * FROM brands")
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/brands.php")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var brand_id int
-			var brand_name string
-			if err := rows.Scan(&brand_id, &brand_name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var brands []Brands
+		err = json.NewDecoder(resp.Body).Decode(&brands)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, brand := range brands {
 			button := []map[string]interface{}{
 				{
-					"text":          brand_name,
-					"callback_data": brand_id,
+					"text":          brand.BrandName,
+					"callback_data": brand.ID,
 				},
 			}
 			buttons = append(buttons, button)
 		}
-
 		buttons = append(buttons, []map[string]interface{}{
 			{
 				"text":          "Назад",
@@ -592,34 +601,29 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		break
 
 	case step == 7:
-
-		//запрос
-		rows, err := Db.Query("SELECT id, name, description, photo, price, max_price FROM products WHERE brand_id = ?", button)
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/products.php?brand_id=" + button)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
-		defer rows.Close()
+		defer resp.Body.Close()
 
-		for rows.Next() {
-			var productId int
-			var name string
-			var description string
-			var photo string
-			var price int
-			var max_price int
-			if err := rows.Scan(&productId, &name, &description, &photo, &price, &max_price); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
+		var product []Product
+		err = json.NewDecoder(resp.Body).Decode(&product)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
 
+		// Используем полученные данные
+		for _, product := range product {
 			// Создаем объект инлайн клавиатуры
 			buttons := [][]map[string]interface{}{
 				{
-					{"text": "➖", "callback_data": "minus:" + strconv.Itoa(productId)},
+					{"text": "➖", "callback_data": "minus:" + strconv.Itoa(product.ID)},
 					{"text": "0", "callback_data": "quantity"},
-					{"text": "➕", "callback_data": "add:" + strconv.Itoa(productId)},
+					{"text": "➕", "callback_data": "add:" + strconv.Itoa(product.ID)},
 				},
-				{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(productId)}},
+				{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(product.ID)}},
 				{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 			}
 
@@ -629,10 +633,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-			fmt.Println(photo)
+			fmt.Println(product.Photo)
 
 			// Создание URL запроса
-			apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&caption="+name+" кнауф "+description+" Среднерыночная цена в городе Ташкент "+strconv.Itoa(max_price)+" сум Цена Стройбота "+strconv.Itoa(price)+" сум &photo="+photo+"&reply_markup="+string(inlineKeyboardJSON), token, strconv.Itoa(id))
+			apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&caption="+product.Name+" кнауф "+product.Description+" Среднерыночная цена в городе Ташкент "+strconv.Itoa(product.MaxPrice)+" сум Цена Стройбота "+strconv.Itoa(product.Price)+" сум &photo="+product.Photo+"&reply_markup="+string(inlineKeyboardJSON), token, strconv.Itoa(id))
 			requestURL, err := url.Parse(apiURL)
 			if err != nil {
 				log.Fatal(err)
@@ -672,27 +676,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 8 && button == "goToCart":
 		finalPrice := 0
 		cartText := ""
+		for ID := range products {
 
-		for _, p := range products {
-
-			//запрос
-			rows, err := Db.Query("SELECT name, price FROM products WHERE id = ?", p.ID)
+			fmt.Println(ID)
+			// Создаем GET-запрос
+			resp, err := http.Get("http://nginx:80/api/products.php?id=" + strconv.Itoa(ID))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
-			defer rows.Close()
+			defer resp.Body.Close()
 
-			for rows.Next() {
-				var name string
-				var price int
-				if err := rows.Scan(&name, &price); err != nil {
-					fmt.Println("Ошибка чтения данных:", err.Error())
-					return
-				}
-
-				cartText += name + " " + strconv.Itoa(p.Quantity) + " ✖️ " + strconv.Itoa(price)
-				finalPrice += price * p.Quantity
+			var product Product
+			err = json.NewDecoder(resp.Body).Decode(&product)
+			if err != nil {
+				fmt.Println("Ошибка при декодировании JSON:", err)
+				return
 			}
+
+			cartText += product.Name + " " + strconv.Itoa(products[ID]) + " ✖️ " + strconv.Itoa(product.Price)
+			finalPrice += product.Price * products[ID]
 
 		}
 		// Создаем объект инлайн клавиатуры
@@ -743,62 +745,45 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 10:
 
 		time := time.Now().Unix()
-		location := Location{
-			Latitude:  latitude,
-			Longitude: longitude,
+		// location := Location{
+		// 	Latitude:  latitude,
+		// 	Longitude: longitude,
+		// }
+		// jsonOrder, _ := json.Marshal(products)
+		// jsonData, _ := json.Marshal(location)
+		order := Order{
+			CustomerID: chatId,
+			OrderDate:  time,     // Формат даты: гггг-мм-дд
+			Products:   products, // Карта products с товарами
+			Coordinates: map[string]interface{}{
+				"latitude":  latitude,  // Долгота
+				"longitude": longitude, // Широта
+			},
 		}
-		jsonOrder, _ := json.Marshal(products)
-		jsonData, _ := json.Marshal(location)
+		jsonData, _ := json.Marshal(order)
 
-		_, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
-		if err != nil {
-			fmt.Println("Ошибка сохранения заказа ", err)
-		} else {
-			fmt.Println("заказ добавлен")
-		}
+		fmt.Println(string(jsonData))
+
+		// _, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
+		// if err != nil {
+		// 	fmt.Println("Ошибка сохранения заказа ", err)
+		// } else {
+		// 	fmt.Println("заказ добавлен")
+		// }
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
 			"keyboard": [][]map[string]interface{}{
-				{
-					{
-						"text": "Заказать 🛍",
-					},
+				{{"text": "Заказать 🛍"}},
+
+				{{"text": "Актуальный курс 💹"},
+					{"text": "Настройки ⚙️"},
 				},
-				{
-					{
-						"text": "Актуальные цены на рынке 📈",
-					},
+				{{"text": "Мои заказы 📕"},
+					{"text": "Актуальные цены на рынке 📈"},
 				},
-				{
-					{
-						"text": "Актуальный курс 💹",
-					},
-				},
-				{
-					{
-						"text": "Настройки ⚙️",
-					},
-				},
-				{
-					{
-						"text": "Мои заказы 📕",
-					},
-				},
-				{
-					{
-						"text": "Информация ℹ️",
-					},
-				},
-				{
-					{
-						"text": "Связаться 📞",
-					},
-				},
-				{
-					{
-						"text": "Корзина 🗑",
-					},
+				{{"text": "Связаться 📞"},
+					{"text": "Корзина 🗑"},
 				},
 			},
 			"resize_keyboard":   true,
@@ -810,6 +795,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа&reply_markup=" + string(keyboardJSON))
 
+		products = make(map[int]int)
 		step = 5
 		break
 	}
@@ -824,19 +810,19 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		// Проверяем, есть ли товар с таким id в массиве
 		found := false
-		for i, p := range products {
-			if p.ID == productID {
+		for ID := range products {
+			if ID == productID {
 				// Если товар найден, увеличиваем его количество
-				products[i].Quantity += quantity
+				products[ID] += quantity
 				found = true
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
-						{"text": "➖", "callback_data": "minus:" + productStr},
-						{"text": products[i].Quantity, "callback_data": "quantity"},
-						{"text": "➕", "callback_data": "add:" + productStr},
+						{"text": "➖", "callback_data": "minus:" + strconv.Itoa(ID)},
+						{"text": strconv.Itoa(products[ID]), "callback_data": "quantity"},
+						{"text": "➕", "callback_data": "add:" + strconv.Itoa(ID)},
 					},
-					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
+					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(ID)}},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
@@ -853,7 +839,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		// Если товара с таким id нет в массиве, добавляем его
 		if !found {
-			products = append(products, Product{ID: productID, Quantity: quantity})
+			products[productID] = quantity
 			// Создаем новую инлайн клавиатуру с обновленным числом
 			buttons := [][]map[string]interface{}{
 				{
@@ -884,15 +870,15 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Пример добавления товара с id=3 и количеством 2
 		quantity := 1
 
-		for i, p := range products {
-			if p.ID == productID {
+		for ID := range products {
+			if ID == productID {
 				// Если товар найден, уменьшаем его количество
-				products[i].Quantity -= quantity
+				products[ID] -= quantity
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
 						{"text": "➖", "callback_data": "minus:" + productStr},
-						{"text": products[i].Quantity, "callback_data": quantity},
+						{"text": strconv.Itoa(products[ID]), "callback_data": quantity},
 						{"text": "➕", "callback_data": "add:" + productStr},
 					},
 					{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
@@ -906,16 +892,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-				if products[i].Quantity == 0 {
-					// Находим индекс элемента с заданным ID
-					indexToRemove := -1
-					for i, product := range products {
-						if product.ID == productID {
-							indexToRemove = i
-							break
-						}
-					}
-					products = append(products[:indexToRemove], products[indexToRemove+1:]...)
+				if products[productID] == 0 {
+					delete(products, productID)
 				}
 				break
 			}
@@ -930,8 +908,22 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	if text == "Актуальные цены на рынке 📈" {
 
-		dt := time.Now().Format("01-02-2006 15:04:05")
+		channelURL := "https://t.me/stroyb0t"
+
+		// Получаем текущую дату и время
+		currentTime := time.Now()
+
+		// Создаем объект временной зоны GMT+5
+		location := time.FixedZone("GMT+5", 5*60*60)
+
+		// Устанавливаем временную зону для текущего времени
+		currentTime = currentTime.In(location)
+
+		// Форматируем дату и время в нужном формате
+		formattedTime := currentTime.Format("01-02-2006 15:04:05")
+
 		buttons := [][]map[string]interface{}{
+			{{"text": "Перейти", "url": channelURL}},
 			{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
 		}
 
@@ -941,14 +933,28 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Актуальные цены на " + dt + "&reply_markup=" + string(inlineKeyboardJSON))
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Цена на строительные материалы  " + formattedTime + "&reply_markup=" + string(inlineKeyboardJSON))
 
 	}
 
 	if text == "Актуальный курс 💹" {
 
-		dt := time.Now().Format("01-02-2006 15:04:05")
+		channelURL := "https://t.me/stroyb0t2"
+
+		// Получаем текущую дату и время
+		currentTime := time.Now()
+
+		// Создаем объект временной зоны GMT+5
+		location := time.FixedZone("GMT+5", 5*60*60)
+
+		// Устанавливаем временную зону для текущего времени
+		currentTime = currentTime.In(location)
+
+		// Форматируем дату и время в нужном формате
+		formattedTime := currentTime.Format("01-02-2006 15:04:05")
+
 		buttons := [][]map[string]interface{}{
+			{{"text": "Перейти", "url": channelURL}},
 			{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
 		}
 
@@ -958,19 +964,30 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Актуальный курс на " + dt + "&reply_markup=" + string(inlineKeyboardJSON))
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Актуальные курсы валют " + formattedTime + "&reply_markup=" + string(inlineKeyboardJSON))
 
 	}
 
 	if text == "Настройки ⚙️" {
 		buttons := [][]map[string]interface{}{
-			{{"text": "Мой номер", "callback_data": "number"}},
-			{{"text": "Город", "callback_data": "city"}},
-			{{"text": "Язык", "callback_data": "backToMenu"}},
-			{{"text": "Оферта", "callback_data": "oferta"}},
-			{{"text": "Жалобы и предложения", "callback_data": "book"}},
-			{{"text": "Стать партнёром", "callback_data": "partnership"}},
+			{{"text": "Изменить номер", "callback_data": "number"},
+				{"text": "Изменить город", "callback_data": "city"}},
+
+			{{"text": "Изменить язык", "callback_data": "backToMenu"},
+				{"text": "Публичная оферта", "callback_data": "oferta"}},
+
+			{{"text": "Информация", "callback_data": "info"},
+				{"text": "Стать партнёром", "callback_data": "partnership"}},
+
+			{{"text": "Обратная связь", "callback_data": "book"}},
 		}
+
+		buttons = append(buttons, []map[string]interface{}{
+			{
+				"text":          "Назад",
+				"callback_data": "backToMenu",
+			},
+		})
 
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
@@ -982,30 +999,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	}
 
-	if button == "city" {
-		var city_id int = 1
-		buttons := [][]map[string]interface{}{}
-		//запрос
-		rows, err := Db.Query("SELECT name FROM cities")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
+	if button == "info" {
 
-		for rows.Next() {
-			var name string
-			if err := rows.Scan(&name); err != nil {
-				fmt.Println("Ошибка чтения данных:", err.Error())
-				return
-			}
-			button := []map[string]interface{}{
-				{
-					"text":          name,
-					"callback_data": city_id,
-				},
-			}
-			buttons = append(buttons, button)
-			city_id += 1
+		buttons := [][]map[string]interface{}{
+			{{"text": "Назад 🔙", "callback_data": ""}},
 		}
 
 		inlineKeyboard := map[string]interface{}{
@@ -1013,6 +1010,45 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		}
 
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Информация о проекте&reply_markup=" + string(inlineKeyboardJSON))
+
+	}
+
+	if button == "city" {
+		buttons := [][]map[string]interface{}{}
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/cities.php")
+		if err != nil {
+			log.Fatal("Ошибка при выполнении запроса:", err)
+		}
+		defer resp.Body.Close()
+
+		var cities []Cities
+		err = json.NewDecoder(resp.Body).Decode(&cities)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, category := range cities {
+			button := []map[string]interface{}{
+				{
+					"text":          category.Name,
+					"callback_data": category.ID,
+				},
+			}
+			buttons = append(buttons, button)
+		}
+
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
+		}
+
+		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
+		if err != nil {
+			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+		}
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
 
@@ -1032,22 +1068,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Мои заказы &reply_markup=" + string(inlineKeyboardJSON))
-	}
-
-	if text == "Информация ℹ️" {
-
-		buttons := [][]map[string]interface{}{
-			{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
-		}
-
-		inlineKeyboard := map[string]interface{}{
-			"inline_keyboard": buttons,
-		}
-
-		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Информация о проекте&reply_markup=" + string(inlineKeyboardJSON))
-
 	}
 
 	if text == "Связаться 📞" {
