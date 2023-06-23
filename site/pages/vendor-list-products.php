@@ -115,12 +115,44 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-wrapper"><div class="dataTables_paginate paging_simple_numbers" id="datatable-ecommerce-list_paginate"><ul class="pagination pagination-modern pagination-modern-spacing justify-content-center"><li class="paginate_button page-item previous disabled" id="datatable-ecommerce-list_previous"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="0" tabindex="0" class="page-link"><i class="fas fa-chevron-left"></i></a></li><li class="paginate_button page-item active"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item next" id="datatable-ecommerce-list_next"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="3" tabindex="0" class="page-link"><i class="fas fa-chevron-right"></i></a></li></ul></div></div>
+                <div class="pagination-wrapper">
+                    <div class="page-switch">                
+                        <div class="page-switch__prev">
+                            <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
+                        </div>
+                        <span class="current-page">1</span>
+                        <div class="page-switch__next">
+                            <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
+                        </div>
+                    </div>
+                    <div class="page-status">стр <span class="current-page">1</span> из <span class="total-page">8</span></div>
+                </div>
 
         </div>
     </section>       
 
 <style>
+.page-switch {
+    display: flex;
+}
+.page-switch svg {
+    width: 15px;
+    cursor: pointer;
+}
+
+.page-switch__prev svg {
+    transform: rotate(90deg);
+}
+
+.page-switch__next svg {
+    transform: rotate(270deg);
+}
+
+.page-switch .current-page {
+    margin: 0 10px;
+    font-weight: 700;
+}
+
 .pagination {
     display: flex;
     padding-left: 0;
@@ -150,20 +182,11 @@ td, th {
 
 
 
+</div>
+    </section>    
+      
         
+<script src="./../assets/js/main.js"></script>    
 <?php include('./../components/footer.php'); ?>
 
-
-<!-- ?filters&orderBy="article"&brand_id=1&category_id=0&vendor_id=111&search=""&limit=20&quantity=61
-
-где     filters - показывает, что запрос на фильтрацию по полям
-        orderBy - по какому полю сортировка
-        brand_id - только этот бренд
-        category_id - только эта категория
-        vendor_id - товары только этого поставщика
-        search - содержащие в названии или описании эту строку
-        limit - сколько записей выбирать
-        quantity - с какой записи этой выборки
-
-        brand_id и category_id равны 0, если по ним выборка не нужна (те выгружать все)
-        search - пустая строка, если не нужен поиск -->
+        

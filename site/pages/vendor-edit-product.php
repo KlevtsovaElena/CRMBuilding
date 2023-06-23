@@ -1,14 +1,6 @@
 <?php include('./../components/header.php'); ?>
-    <!-- <div>ПРИМЕР ЭЛЕМЕНТОВ
-        <input type="text" placeholder="test">
-        <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
-        <button class="btn btn-ok">Сохранить товар</button>
-        <button class="btn btn-neutral">Сбросить</button>
-        <button class="btn btn-delete">Удалить товар</button>
-    </div> -->
-
                 
-    <p class="page-title">Добавить товар</p>
+    <p class="page-title">Редактировать товар</p>
 
     <!-- соберём данные для отображения в форме -->
 
@@ -106,11 +98,9 @@
     </form>
 
 
-        </div>
+    </div>
     </section>    
       
         
 <script src="./../assets/js/main.js"></script>
-<script src="./../assets/js/add-product.js"></script>
-
 <?php include('./../components/footer.php'); ?>
