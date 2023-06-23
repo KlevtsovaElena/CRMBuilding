@@ -1,17 +1,18 @@
 console.log('подключили list-products');
 let currentPage = 1;
-let vendor_id=document.getElementById('vendor_id');
-let limit=document.getElementById('limit').value;
-
-let totalProducts=document.querySelectorAll('.list-products__row').length;
-
-let brand_id;
-let category_id;
-let search;
-let offset;
-let orderby;
+let vendor_id = document.getElementById('vendor_id').value;
+let limitEl = document.getElementById('limit');
+let totalProductsEl = document.querySelectorAll('.list-products__row');
 
 
+let limit = limitEl.value
+let totalProducts = totalProductsEl.length;
+
+let brand_idEl = document.getElementById('brand_id');
+let category_idEl = document.getElementById('category_id');
+let searchEl = document.getElementById('search');
+let offsetEl = document.getElementById('offset');
+let orderbyEl = document.getElementById('orderby');
 
 renderPagination(totalProducts, limit);
 
@@ -31,15 +32,40 @@ sendChangeData.addEventListener("click", getChangeData);
 /* ---------- ОТРИСОВКА ТАБЛИЦЫ ТОВАРОВ ---------- */
 function renderListProducts() {
     // собираем все значения полей
-    limit=document.getElementById('limit').value;
+    let params = "vendor_id=" + vendor_id;
+
+    [brand_idEl, category_idEl, searchEl, limitEl, orderbyEl].forEach(item => {
+currentPage=2;
+
+        if(item.value.trim()) {
+
+            if (item.id === "search") {
+                params += "&search=name:" + searchEl.value + ";description:" + searchEl.value;
+            } else if (item.id === "orderby") {
+                params += "&orderby=" + item.value + ":asc"; 
+            } else if ((item.id==="limit")&&(!(currentPage===1))) {
+                
+                params += "&offset=" + ((currentPage-1)*limitEl.value + 1);
+            } else {
+                params += "&" + item.id + "=" + item.value;  
+            }
+        }
+
+    })
+console.log(params);
+    // if(!(searchEl.value.trim())) {
+    //     let search = "name:" + searchEl.value + ";description:" + searchEl.value;
+    // }
+
+    // if(!(limit.value)) {
+        
+    // }
     
-    let totalProducts=document.querySelectorAll('.list-products__row').length;
+
+
+
+    totalProducts = totalProductsEl.length;
     
-    let brand_id;
-    let category_id;
-    let search;
-    let offset;
-    let orderby;
 
 
 
