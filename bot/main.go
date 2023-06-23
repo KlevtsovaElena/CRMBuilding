@@ -367,14 +367,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			user.tg_id = id
 			user.PhoneNumber = tel
 			user.City = button
-			// //если не зарегистрирован - добавляем в БД и сохраняем в ОП
-			// _, err := Db.Query("INSERT INTO `customers`(`first_name`, `last_name`, `tg_username`, `tg_id`, `phone`, `city_id`) VALUES(?, ?, ?, ?, ?, ?)", FirstName, LastName, username, id, tel, button)
-			// if err != nil {
-			// 	fmt.Println("Ошибка сохранения пользователя ", err)
-			// } else {
-			// 	fmt.Println("пользователь добавлен")
-
-			// }
 			// Создаем тело запроса в виде строки JSON
 			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `, "coordinates": "value2"}`
 
@@ -916,6 +908,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	if text == "Актуальные цены на рынке 📈" {
 
+		channelURL := "https://t.me/stroyb0t"
+
 		// Получаем текущую дату и время
 		currentTime := time.Now()
 
@@ -929,6 +923,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 		buttons := [][]map[string]interface{}{
+			{{"text": "Перейти", "url": channelURL}},
 			{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
 		}
 
@@ -944,6 +939,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	if text == "Актуальный курс 💹" {
 
+		channelURL := "https://t.me/stroyb0t2"
+
 		// Получаем текущую дату и время
 		currentTime := time.Now()
 
@@ -957,6 +954,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 		buttons := [][]map[string]interface{}{
+			{{"text": "Перейти", "url": channelURL}},
 			{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
 		}
 
