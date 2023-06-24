@@ -10,6 +10,5 @@
         public int $city_id;
         public int $tg_id;
         public string $tg_username;
-        public ?Coordinate $coordinates;  // JSON
     }
 ?>
