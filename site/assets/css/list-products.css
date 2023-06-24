@@ -70,3 +70,9 @@
 #list-products th[data-sort="asc"]:before {
     opacity: 1;
 }
+
+.info-table {
+    font-size: 0.9rem;
+    text-align: center;
+    padding-top: 10px;
+}
