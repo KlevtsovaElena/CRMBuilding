@@ -76,3 +76,21 @@
     text-align: center;
     padding-top: 10px;
 }
+
+.garbage{
+    cursor: pointer;
+    transition: all var(--speed-transition);
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 0.5rem;
+}
+
+.garbage:hover .garbage-svg {
+    cursor: pointer;
+    stroke: var(--secondary-color-hover);
+}
+
+td:nth-last-child(1) {
+    padding-right: 30px;
+    position: relative;
+}

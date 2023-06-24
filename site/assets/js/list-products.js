@@ -281,11 +281,28 @@ function getChangeDataFilters() {
 
 
 }
-sendChangeData.addEventListener("click", getChangeData);
+sendChangeData.addEventListener("click", getChangeDataFilters);
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
+const garbage = document.querySelectorAll('.garbage');
+
 function deleteProduct() {
+
+    // запрашиваем подтверждение удаления
+    let isDelete = false;
+
+    isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
+
+    console.log(isDelete);
+
+    if(isDelete) {
+        console.log("удаляем");
+    } else {
+        console.log(" ни в коем случае");  
+    }
     // делаем запрос на удаление товара по id
+
+
 
     // найдём id товара (по атрибуту)
 
@@ -295,37 +312,42 @@ function deleteProduct() {
     // то при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
     // но нужно из общего количества удалить 1 
 
-    // отрисуем пагинацию
+    // // отрисуем пагинацию
 
-    // если карент пейдж больше чем тотал пейдж, то приравнять
+    // // если карент пейдж больше чем тотал пейдж, то приравнять
 
-    // соберём строку запроса
-    params = "";
+    // // соберём строку запроса
+    // params = "";
 
-    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    if (hasFilters) {
-        params = hasFilters;
-    }
+    // // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    // if (hasFilters) {
+    //     params = hasFilters;
+    // }
 
-    // если применялась сортировка, то добавляем в параметры
-    if (orderby) {
-        params += "&orderby=" + orderby;
-    }
+    // // если применялась сортировка, то добавляем в параметры
+    // if (orderby) {
+    //     params += "&orderby=" + orderby;
+    // }
 
-    // добавим лимит
-    if (limit) {
+    // // добавим лимит
+    // if (limit) {
 
-        // определим с какой записи брать данные
-        offset = limit*(currentPage-1) + 1;
+    //     // определим с какой записи брать данные
+    //     offset = limit*(currentPage-1) + 1;
 
-        // добавим лимит и смещение в параметры
-        params += "&limit=" + limit + "&offset=" + offset; 
+    //     // добавим лимит и смещение в параметры
+    //     params += "&limit=" + limit + "&offset=" + offset; 
         
-    } 
+    // } 
 
-    console.log(params);
+    // console.log(params);
 
 }
+
+// отслеживаем клик по корзине
+garbage.forEach(item => {
+    item.addEventListener("click", deleteProduct);
+})
 
 
 
