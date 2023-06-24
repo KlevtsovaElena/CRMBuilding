@@ -7,6 +7,9 @@ let nextButton;
 let totalPages;
 let brands = {};
 let categories = {};
+let orderby = "";
+let offset;
+let hasFilters="";
 let vendor_id = document.getElementById('vendor_id').value;
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -123,95 +126,75 @@ function switchPage(variance) {
     }
    
     // соберём строку запроса
-    params = "&brand_id=2"
+    params = "";
 
-    // отправим запрос
-    totalProductsJson = sendRequestGET('http://localhost/api/products.php?vendor_id=111' + params);
-    totalProducts = JSON.parse(totalProductsJson);
+    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    if (hasFilters) {
+        params = hasFilters;
+    }
 
-    // отрисуем таблицу
-    renderListProducts(totalProducts)
+    // если применялась сортировка, то добавляем в параметры
+    if (orderby) {
+        params += "&orderby=" + orderby;
+    }
+
+    // тк фильтруем мы только по нажатии на кнопку Применить,
+    // то при нажатии на перекл стр нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
+    // поэтому просто запрашиваем лимит со смещением
+
+    // добавим лимит и смещение в параметры (лимит будет всегда, если страничек больше 1)
+    offset = limit*(currentPage-1) + 1;
+    params += "&limit=" + limit + "&offset=" + offset; 
+
+    console.log('пагинация ', params);
+
+
+// пагинацию перерисовыать не нужно
+
+    // // отправим запрос
+    // totalProductsJson = sendRequestGET('http://localhost/api/products.php?vendor_id=' + vendor_id + params);
+    // totalProducts = JSON.parse(totalProductsJson);
+
+    // // отрисуем таблицу
+    // renderListProducts(totalProducts)
 }
 
 
-/* ---------- СОБЕРЁМ СТРОКУ ЗАПРОСА ---------- */
-function getRequestParams() {
-    // собираем все значения полей
-    params = "vendor_id=" + vendor_id;
+/* ---------- СОБЕРЁМ СТРОКУ ЗАПРОСА ФИЛЬТРАЦИИ---------- */
+function getFilters() {
 
-    [brand_idEl, category_idEl, searchEl, limitEl, orderbyEl].forEach(item => {
-currentPage=2;
+    // сбросим параметры строки запроса
+    params = "";
 
-        if(item.value.trim()) {
+    limit = limitEl.value;
 
-            if (item.id === "search") {
-                params += "&search=name:" + searchEl.value + ";description:" + searchEl.value;
-            } else if (item.id === "orderby") {
-                params += "&orderby=" + item.value + ":asc"; 
-            }else {
-                    params += "&" + item.id + "=" + item.value;  
+    // проверяем на наличие данных, если есть, о нормализуем (если надо)
+    // и добавляем в параметр строки запроса 
+    [brand_idEl, category_idEl, searchEl].forEach(item => {
+        if (item.value.trim()) {
+            if  (item.id === 'search') {
+                params += "&search=name:" + item.value + ";description=" + item.value;
+            } else {
+                params += "&" + item.id + "=" + item.value;
             }
-        }
-
-        if ((item.id === "limit") && !(currentPage===1)) {
-            params += "&offset=" + ((currentPage-1)*limitEl.value + 1);
         }
     })
 
-console.log(params);
-    // if(!(searchEl.value.trim())) {
-    //     let search = "name:" + searchEl.value + ";description:" + searchEl.value;
-    // }
+    // вернём параметры
+    return params;
 
-    // if(!(limit.value)) {
-        
-    // }
-    
-
-
-
-    // totalProducts = totalProductsEl.length;
-    
-
-
-
-
-
-
-
-    // разбираем значения полей
-
-    // получаем строку get параметров запроса
-    sendRequestGET('http://localhost/api/products?' + params);
-    // отправляем запрос на сервер
-
-
-    // получаем данные
-
-    // перепишем totalProducts 
 }
 
 
-/* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ ---------- */
-const sendChangeData = document.querySelector('.form-filters').querySelector('button');
-function getChangeData() {
+/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА) ---------- */
 
-    // сбрасываем нумерацию страниц
-    currentPage = 1;
-
-    // вызываем отрисовку таблицы
-    renderListProducts()
-}
-sendChangeData.addEventListener("click", getChangeData);
-
-/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ ---------- */
+//получаем все элементы заголовка для отслеживания клика
 const headTableProducts = document.getElementById('list-products').querySelectorAll('th');
 
 function sortChange() {
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
-
 
     if (!dataSort) {
 
@@ -231,12 +214,123 @@ function sortChange() {
     } else if (dataSort === "desc") {
         // если значение атрибута desc, то меняем его на asc
         event.target.setAttribute('data-sort', 'asc');
-
     }
 
+    // собираем значение для параметра orderby
+    orderby = event.target.getAttribute('data-id') + ":" + event.target.getAttribute('data-sort');
+
+    // соберём строку запроса
+    params = "";
+
+    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    if (hasFilters) {
+        params = hasFilters;
+    }
+
+    params += "&orderby=" + orderby;
+
+    // добавим лимит
+    if (limit) {
+
+        // определим с какой записи брать данные
+        offset = limit*(currentPage-1) + 1;
+
+        // добавим лимит и смещение в параметры
+        params += "&limit=" + limit + "&offset=" + offset; 
+        
+    } 
+
+console.log(params);
+
+// делаем запрос
+
+// отрисовываем только таблицу (пагинация остаётся прежней)
 }
 
+// отслеживаем клик по заголовку
 headTableProducts.forEach(item => {
     item.addEventListener("click", sortChange);
 })
+
+
+/* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ ---------- */
+const sendChangeData = document.querySelector('.form-filters').querySelector('button');
+
+function getChangeDataFilters() {
+
+    // соберём строку запроса     
+    hasFilters = getFilters();
+    params = hasFilters;
+
+    if (orderby) {
+        params += "&orderby=" + orderby;
+    }
+
+    console.log(params);
+    // сбрасываем нумерацию страниц
+    currentPage = 1;
+
+    // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
+
+
+
+    // вызываем отрисовку таблицы
+
+
+
+
+
+}
+sendChangeData.addEventListener("click", getChangeData);
+
+/* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
+function deleteProduct() {
+    // делаем запрос на удаление товара по id
+
+    // найдём id товара (по атрибуту)
+
+    // запрос к апи на удаление
+
+    // тк фильтруем мы только по нажатии на кнопку Применить,
+    // то при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
+    // но нужно из общего количества удалить 1 
+
+    // отрисуем пагинацию
+
+    // если карент пейдж больше чем тотал пейдж, то приравнять
+
+    // соберём строку запроса
+    params = "";
+
+    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    if (hasFilters) {
+        params = hasFilters;
+    }
+
+    // если применялась сортировка, то добавляем в параметры
+    if (orderby) {
+        params += "&orderby=" + orderby;
+    }
+
+    // добавим лимит
+    if (limit) {
+
+        // определим с какой записи брать данные
+        offset = limit*(currentPage-1) + 1;
+
+        // добавим лимит и смещение в параметры
+        params += "&limit=" + limit + "&offset=" + offset; 
+        
+    } 
+
+    console.log(params);
+
+}
+
+
+
+
+
+
+
 
