@@ -26,13 +26,51 @@ function getChangeData() {
     // вызываем отрисовку таблицы
     renderListProducts()
 }
-
 sendChangeData.addEventListener("click", getChangeData);
+
+/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ ---------- */
+const headTableProducts = document.getElementById('list-products').querySelectorAll('th');
+
+function sortChange() {
+
+    // получим значение атрибута data-sort
+    let dataSort = event.target.getAttribute('data-sort');
+
+
+    if (!dataSort) {
+
+        // если атрибут пуст,
+        // то всем заголовкам устанавливаем пустое значение этого атрибута
+        headTableProducts.forEach(item => {
+            item.setAttribute('data-sort', '');
+        })
+
+        // а заголовку, по кот кликнули, устанавливаем asc
+        event.target.setAttribute('data-sort', 'asc');
+
+    } else if (dataSort === "asc") {
+        // если значение атрибута asc, то меняем его на desc
+        event.target.setAttribute('data-sort', 'desc');
+
+    } else if (dataSort === "desc") {
+        // если значение атрибута desc, то меняем его на asc
+        event.target.setAttribute('data-sort', 'asc');
+
+    }
+
+}
+
+headTableProducts.forEach(item => {
+    item.addEventListener("click", sortChange);
+})
+
+
+
 
 /* ---------- ОТРИСОВКА ТАБЛИЦЫ ТОВАРОВ ---------- */
 function renderListProducts() {
     // собираем все значения полей
-    let params = "filters&vendor_id=" + vendor_id;
+    let params = "vendor_id=" + vendor_id;
 
     [brand_idEl, category_idEl, searchEl, limitEl, orderbyEl].forEach(item => {
 currentPage=2;

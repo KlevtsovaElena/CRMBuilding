@@ -27,39 +27,27 @@
                     <input type="hidden" id="vendor_id" name="vendor_id" value="111">
                     
                     <div class="form-elements-container">
-                        <!-- список -->
-                        <label>Сортировать по
-                            <select id="orderby" name="orderby" value="">
-                                <option value="article">Артикул</option>
-                                <option value="brand_id">Бренд</option>
-                                <option value="category_id">Категория</option>
-                                <option value="name">Наименование</option>
-                                <option value="price:asc">Цена min</option>
-                                <option value="price:asc">Цена max</option>
-                                <option value="quantity_available">Остаток</option>
-                            </select>
-                            </label>
-                        <!-- список -->
+                        
                         <label>Бренд
-                        <select id="brand_id" name="brand_id" value="">
-                            <option value="">Все</option>
-                            <?php foreach($brands as $brand) { ?>
-                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php }; ?>
-                        </select>
+                            <select id="brand_id" name="brand_id" value="">
+                                <option value="">Все</option>
+                                <?php foreach($brands as $brand) { ?>
+                                    <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                                <?php }; ?>
+                            </select>
                         </label>
                         <!-- список -->
                         <label>Категория
-                        <select id="category_id" name="category_id" value="">
-                            <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                            <option value="">Все</option>
-                            <?php foreach($categories as $category) { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                            <?php }; ?>
-                        </select>
+                            <select id="category_id" name="category_id" value="">
+                                <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                                <option value="">Все</option>
+                                <?php foreach($categories as $category) { ?>
+                                    <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                                <?php }; ?>
+                            </select>
                         </label>
                         <!-- список -->
-                        <label>Показывать по
+                        <div class="d-iblock">Показывать по
                             <select id="limit" name="limit" value="" required>
                                 <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
                                 <option value="20">20</option>
@@ -67,15 +55,13 @@
                                 <option value="100">100</option>
                                 <option value="">все</option>
                             </select>
-                            </label>
-                        <label>
-                            <br>
-                            <input type="search" id="search" name="search" value="" placeholder="Поиск">
-                            
-                        </label>
-                        <div>
-                            <button class="btn btn-ok" >Применить</button>
                         </div>
+                        
+                        <br>
+                        <input type="search" id="search" name="search" value="" placeholder="Поиск">
+                        
+                        <button class="btn btn-ok d-iblock" >Применить</button>
+                        
                     </div>
                 </div>
 
@@ -84,18 +70,14 @@
 
                         <thead>
                             <tr role="row">
-                                <!-- <th style="width: 17px;">
-                                    <input type="checkbox" name="select-all"  value="" style="width: 17px;">
-                                </th> -->
-                                <th>Артикул</th>
-                                <th>Наименование</th>
-                              
-                                <th>Бренд</th>
-                                <th>Категория</th>
-                                <th>Картинка</th>
-                                <th>Остаток</th>
-                                <th>Цена</th>
-                                <th>Цена рыночная</th>
+
+                                <th data-id="article" data-sort="">Артикул</th>
+                                <th data-id="name" data-sort="">Наименование</th>
+                                <th data-id="brand_id" data-sort="">Бренд</th>
+                                <th data-id="category_id" data-sort="">Категория</th>
+                                <th data-id="quantity_available" data-sort="">Остаток</th>
+                                <th data-id="price" data-sort="">Цена</th>
+                                <th data-id="max_price" data-sort="">Цена рыночная</th>
                                
                             </tr>
                         </thead>
@@ -112,10 +94,9 @@
                             <tr role="row" class="list-products__row">
                                 <!-- <td style="width: 17px;"><input type="checkbox" value="" style="width: 17px;"></td> -->
                                 <td><a href="#"><strong><?= $product['article']; ?></strong></a></td>
-                                <td><a href="#"><strong><?= $product['name']; ?></strong></a></td>
+                                <td  class="list-products_name"><a href="#"><img src="<?= $product['photo']; ?>" /><strong><?= $product['name']; ?></strong></a></td>
                                 <td><?= $brands_table[$product['brand_id']]; ?></td>
                                 <td><?= $categories_table[$product['category_id']]; ?></td>
-                                <td><img src="<?= $product['photo']; ?>" /></td>
                                 <td><?= $product['quantity_available']; ?></td>
                                 <td><?= $product['price']; ?></td>
                                 <td><?= $product['max_price']; ?></td>
@@ -133,7 +114,7 @@
                     
                     <tr role="row" class="list-products__row">
                         <td><a href="#"><strong>${article}</strong></a></td>
-                        <td><a href="#"><strong>${name}</strong></a></td>
+                        <td class="list-products_name"><a href="#"><strong>${name}</strong></a></td>
                         <td>${brand_id}</td>
                         <td>${category_id}</td>
                         <td>${photo}</td>
@@ -165,6 +146,12 @@
 <style>
 .page-switch {
     display: flex;
+    justify-content: center;
+}
+.page-status {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    text-align: center;
 }
 .page-switch svg {
     width: 15px;
@@ -191,13 +178,59 @@
 }
 .products {
     margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
 }
-.table {
-    background-color: white;
+#list-products {
+ 
+    font-size: 0.8rem;
+    width: 100%; 
 }
-td, th {
+#list-products td, #list-products th {
     padding: 5px;
-    border: 1px solid black;
+    /* border: 1px solid var(--light-color); */
+}
+#list-products tr:nth-child(odd){
+    background: rgba(0, 0, 0, 0.05);
+    
+}
+#list-products th {
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    text-align: left;
+    position: relative;
+    padding: 10px 15px 10px 10px;
+    white-space: nowrap;
+    cursor: pointer;
+   
+}
+
+.list-products_name {
+    color: var(--primary-color)
+}
+.list-products_name:hover {
+    color: var(--primary-color-hover);
+}
+.list-products_name img {
+    width: 30px;
+    height: 30px;
+    margin-right: 3px;
+    vertical-align: middle;
+    object-fit: contain;
+}
+
+.form-filters {
+    margin-top: 20px;
+}
+
+.form-filters label {
+    margin-right: 10px;
+    font-size: 0.9rem;
 }
 .form-filters input, 
 .form-filters select {
@@ -206,12 +239,32 @@ td, th {
     width: 100px;
 }
 .form-filters input[type="search"] {
-    width: 200px;
+    width: 220px;
+    margin-top: 20px;
+    margin-right: 10px;
 }
 
-img {
-    width: 30px;
-    height: 30px;
+th:after {
+    right: 0;
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+th:before {
+    right: 6px;
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-products th.desc:after {
+    opacity: 1;
+}
+
+#list-products th.asc:before {
+    opacity: 1;
 }
 </style>
 
