@@ -1,5 +1,19 @@
-<?php include('./../components/header.php'); ?>
-                
+<?php 
+    // собираем массив из подключаемых файлов css и js
+    $styleSrc = [
+        "<link rel='stylesheet' href='./../assets/css/base.css'>",
+        "<link rel='stylesheet' href='./../assets/css/list-products.css'>"
+    ];
+    $scriptsSrc = [
+        "<script src='./../assets/js/main.js'></script>",
+        "<script src='./../assets/js/list-products.js'></script>"
+    ];
+?>
+
+<!-- подключим хэдер -->
+<?php include('./../components/header.php'); ?>   
+
+
                 <p class="page-title">СПИСОК ТОВАРОВ</p>
 
                 <a href="./../pages/vendor-add-product.php" class="btn btn-ok d-iblock">+ Добавить товар</a>
@@ -9,88 +23,80 @@
                 <?php
                     $brandsJson = file_get_contents("http://nginx/api/brands.php");
                     $brands = json_decode($brandsJson, true);
+                    $brands_table = [];
+                    foreach($brands as $brand) {
+                        $brands_table += [$brand['id'] => $brand['brand_name']];
+                    }
+
                     $categoriesJson = file_get_contents("http://nginx/api/categories.php");
                     $categories = json_decode($categoriesJson, true);
+                    $categories_table = [];
+                    foreach($categories as $category) {
+                        $categories_table += [$category['id'] => $category['category_name']];
+                    }
                 ?>
 
-                <form class="form-filters" action="#" method="post" enctype="multipart/form-data">
+                <div class="form-filters">
 
-                    <input type="hidden" name="vendorId" value="111">
+                    <input type="hidden" id="vendor_id" name="vendor_id" value="111">
                     
                     <div class="form-elements-container">
-                        <!-- список -->
-                        <label>Сортировать по
-                            <select id="brandId" name="brandId" value="" required>
-                                <option value="1">артикул</option>
-                                <option value="2">бренд</option>
-                                <option value="3">категория</option>
-                                <option value="4">наименование</option>
-                                <option value="3">цена</option>
-                                <option value="4">остаток</option>
-                            </select>
-                            </label>
-                        <!-- список -->
+                        
                         <label>Бренд
-                        <select id="brandId" name="brandId" value="" required>
-                            <option value="0">Все</option>
-                            <?php foreach($brands as $brand) { ?>
-                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php }; ?>
-                        </select>
+                            <select id="brand_id" name="brand_id" value="">
+                                <option value="">Все</option>
+                                <?php foreach($brands as $brand) { ?>
+                                    <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                                <?php }; ?>
+                            </select>
                         </label>
                         <!-- список -->
                         <label>Категория
-                        <select id="categoryId" name="categoryId" value="" required>
-                            <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                            <option value="0">Все</option>
-                            <?php foreach($categories as $category) { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                            <?php }; ?>
-                        </select>
+                            <select id="category_id" name="category_id" value="">
+                                <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                                <option value="">Все</option>
+                                <?php foreach($categories as $category) { ?>
+                                    <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                                <?php }; ?>
+                            </select>
                         </label>
                         <!-- список -->
-                        <label>Показывать по
-                            <select id="categoryId" name="categoryId" value="" required>
+                        <div class="d-iblock">Показывать по
+                            <select id="limit" name="limit" value="" required>
                                 <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                                <option value="20">20</option>
+                                <option value="3">3</option>
                                 <option value="40">40</option>
                                 <option value="100">100</option>
-                                <option value="0">все</option>
+                                <option value="">все</option>
                             </select>
-                            </label>
-                        <label>
-                            <br>
-                            <input type="search" id="search" name="search" value="" placeholder="Поиск">
-                            
-                        </label>
-                        <div>
-                            <button class="btn btn-ok" type="submit">Применить</button>
                         </div>
+                        
+                        <br>
+                        <input type="search" id="search" name="search" value="" placeholder="Поиск">
+                        
+                        <button class="btn btn-ok d-iblock" >Применить</button>
+                        
                     </div>
-                </form>
+                </div>
 
                 <div class="products">
                     <table id="list-products">
 
                         <thead>
                             <tr role="row">
-                                <!-- <th style="width: 17px;">
-                                    <input type="checkbox" name="select-all"  value="" style="width: 17px;">
-                                </th> -->
-                                <th>Артикул</th>
-                                <th>Наименование</th>
-                              
-                                <th>Бренд</th>
-                                <th>Категория</th>
-                                <th>Картинка</th>
-                                <th>Остаток</th>
-                                <th>Цена</th>
-                                <th>Цена рыночная</th>
+
+                                <th data-id="article" data-sort="">Артикул</th>
+                                <th data-id="name" data-sort="">Наименование</th>
+                                <th data-id="brand_id" data-sort="">Бренд</th>
+                                <th data-id="category_id" data-sort="">Категория</th>
+                                <th data-id="quantity_available" data-sort="">Остаток</th>
+                                <th data-id="price" data-sort="">Цена</th>
+                                <th data-id="max_price" data-sort="">Цена рыночная</th>
                                
                             </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody class="list-products__body">
 
                             <?php
                                 $productsJson = file_get_contents("http://nginx/api/products.php?vendor_id=111");
@@ -99,13 +105,12 @@
                                 foreach($products as $product) {
                             ?>
 
-                            <tr role="row">
+                            <tr role="row" class="list-products__row">
                                 <!-- <td style="width: 17px;"><input type="checkbox" value="" style="width: 17px;"></td> -->
                                 <td><a href="#"><strong><?= $product['article']; ?></strong></a></td>
-                                <td><a href="#"><strong><?= $product['name']; ?></strong></a></td>
-                                <td><?= $product['brand_id']; ?></td>
-                                <td><?= $product['category_id']; ?></td>
-                                <td><?= $product['photo']; ?></td>
+                                <td  class="list-products_name"><a href="#"><img src="<?= $product['photo']; ?>" /><strong><?= $product['name']; ?></strong></a></td>
+                                <td><?= $brands_table[$product['brand_id']]; ?></td>
+                                <td><?= $categories_table[$product['category_id']]; ?></td>
                                 <td><?= $product['quantity_available']; ?></td>
                                 <td><?= $product['price']; ?></td>
                                 <td><?= $product['max_price']; ?></td>
@@ -115,55 +120,39 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-wrapper"><div class="dataTables_paginate paging_simple_numbers" id="datatable-ecommerce-list_paginate"><ul class="pagination pagination-modern pagination-modern-spacing justify-content-center"><li class="paginate_button page-item previous disabled" id="datatable-ecommerce-list_previous"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="0" tabindex="0" class="page-link"><i class="fas fa-chevron-left"></i></a></li><li class="paginate_button page-item active"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item next" id="datatable-ecommerce-list_next"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="3" tabindex="0" class="page-link"><i class="fas fa-chevron-right"></i></a></li></ul></div></div>
 
-        </div>
-    </section>       
+                <div class="pagination-wrapper"></div>
 
-<style>
-.pagination {
-    display: flex;
-    padding-left: 0;
-    list-style: none;
-}
-.products {
-    margin-top: 10px;
-}
-.table {
-    background-color: white;
-}
-td, th {
-    padding: 5px;
-    border: 1px solid black;
-}
-.form-filters input, 
-.form-filters select {
-    max-width: unset;
-    min-width: unset;
-    width: 100px;
-}
-.form-filters input[type="search"] {
-    width: 200px;
-}
-</style>
+                <!-- ШАБЛОНЫ -->
+                <template id="template-body-table">
+                    
+                    <tr role="row" class="list-products__row">
+                        <td><a href="#"><strong>${article}</strong></a></td>
+                        <td class="list-products_name"><a href="#"><strong>${name}</strong></a></td>
+                        <td>${brand_id}</td>
+                        <td>${category_id}</td>
+                        <td>${photo}</td>
+                        <td>${quantity_available}</td>
+                        <td>${price}</td>
+                        <td>${max_price}</td>
+                    </tr>
+         
+                </template>
 
-
-
-
-        
+                <template id="template-pagination">
+                    <div class="page-switch">                
+                        <button class="page-switch__prev"  onclick="switchPage(-1)" disabled>
+                            <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
+                        </button>
+                        <span class="current-page">${currentPage}</span>
+                        <button class="page-switch__next" onclick="switchPage(1)" >
+                            <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
+                        </button>
+                    </div>
+                    <div class="page-status">стр <span class="current-page">${currentPage}</span> из <span class="total-page">${totalPages}</span></div>
+                </template>
+      
+<!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
 
-
-<!-- ?filters&orderBy="article"&brand_id=1&category_id=0&vendor_id=111&search=""&limit=20&quantity=61
-
-где     filters - показывает, что запрос на фильтрацию по полям
-        orderBy - по какому полю сортировка
-        brand_id - только этот бренд
-        category_id - только эта категория
-        vendor_id - товары только этого поставщика
-        search - содержащие в названии или описании эту строку
-        limit - сколько записей выбирать
-        quantity - с какой записи этой выборки
-
-        brand_id и category_id равны 0, если по ним выборка не нужна (те выгружать все)
-        search - пустая строка, если не нужен поиск -->
+        

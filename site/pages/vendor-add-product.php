@@ -1,52 +1,61 @@
-<?php include('./../components/header.php'); ?>
-    <!-- <div>ПРИМЕР ЭЛЕМЕНТОВ
-        <input type="text" placeholder="test">
-        <textarea name="" id="" cols="30" rows="10" placeholder="test"></textarea>
-        <button class="btn btn-ok">Сохранить товар</button>
-        <button class="btn btn-neutral">Сбросить</button>
-        <button class="btn btn-delete">Удалить товар</button>
-    </div> -->
+<?php 
+    // собираем массив из подключаемых файлов css и js
+    $styleSrc = [
+        "<link rel='stylesheet' href='./../assets/css/base.css'>",
+        "<link rel='stylesheet' href='./../assets/css/add-product.css'>"
+    ];
+    $scriptsSrc = [
+        "<script src='./../assets/js/main.js'></script>",
+        "<script src='./../assets/js/add-product.js'></script>"
+    ];
+?>
 
+<!-- подключим хэдер -->
+<?php include('./../components/header.php'); ?>
                 
     <p class="page-title">Добавить товар</p>
 
     <!-- соберём данные для отображения в форме -->
-
     <?php
         $brandsJson = file_get_contents("http://nginx/api/brands.php");
         $brands = json_decode($brandsJson, true);
+
         $categoriesJson = file_get_contents("http://nginx/api/categories.php");
         $categories = json_decode($categoriesJson, true);
     ?>
                         
     <!-- Форма добавления товаров -->
     <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">
-
+        
+        <!-- здесь храним id поставщика -->
         <input type="hidden" id="vendor_id" name="vendor_id" value="111">
         
+       
         <div class="form-add-product__elements form-elements-container">
-            <div class="form-add-product__elements__item">
+
+             <!-- наименование -->
+            <div class="form-add-product__elements-item">
                 <p>Наименование</p><input type="text" id="name" name="name" value="" required>
                 <div class="error-info d-none"></div>
             </div>
 
-        <!-- фото -->
-        <div class="form-add-product__elements__item">
-            <p>Изображениe для карточки</p> 
-            <p>(Рекомендованные параметры такие НА такие)</p>
-            <p>(Допустимые форматы: .jpg, .jpeg, .png)</p>
-            <div class="img-title-form">
-                
-                <div class="img-title-prew img-guide"><img></div>
-                <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
-                <div><progress id="progress" max="100" value="0" class="d-none"></progress></div>
-                          
+            <!-- фото -->
+            <div class="form-add-product__elements-item">
+                <p>Изображениe для карточки</p> 
+                <p>(Рекомендованные пропорции 3:2)</p>
+                <p>(Допустимые форматы: .jpg, .jpeg, .png)</p>
+                <div class="form-add-product__elements-item__img">
+                    
+                    <div class="form-add-product__elements-item__img-prew"><img></div>
+                    <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
+                    <div><progress id="progress" max="100" value="0" class="d-none"></progress></div>
+                            
+                </div>
+                <div class="error-info d-none"></div> 
             </div>
-            <div class="error-info d-none"></div> 
-        </div>
 
-            <!-- список -->
-            <div class="form-add-product__elements__item">
+            <!-- бренд -->
+            <div class="form-add-product__elements-item">
                 <p>Бренд</p>
                 <select id="brand_id" name="brand_id" value="" required>
                     <option value="" selected hidden>Выберите бренд...</option>
@@ -59,8 +68,8 @@
                 <div class="error-info d-none"></div> 
             </div>
 
-            <!-- список -->
-            <div class="form-add-product__elements__item">
+            <!-- категория -->
+            <div class="form-add-product__elements-item">
                 <p>Категория</p>
                 <select id="category_id" name="category_id" value="" required>
                     <option value="" selected hidden>Выберите категорию...</option>
@@ -73,36 +82,43 @@
                 <div class="error-info d-none"></div> 
             </div>
 
-            <div class="form-add-product__elements__item">
+            <!-- описание -->
+            <div class="form-add-product__elements-item">
                 <p>Описание</p><textarea id="description" name="description" required></textarea>
                 <div class="error-info d-none"></div> 
             </div>
 
-            <div class="form-add-product__elements__item">
+            <!-- артикул -->
+            <div class="form-add-product__elements-item">
                 <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="" required placeholder="0">
                 <div class="error-info d-none"></div>
             </div> 
 
-            <div class="form-add-product__elements__item">
-                <p>Количество</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="" required placeholder="0">
+            <!-- количество остатков -->
+            <div class="form-add-product__elements-item">
+                <p>Количество остатков</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="" required placeholder="0">
                 <div class="error-info d-none"></div> 
             </div>
 
-            <div class="form-add-product__elements__item">
-                <p>Цена (руб.)</p><input type="number" id="price" name="price" min="0" value="" required placeholder="0">
+            <!-- цена поставщика -->
+            <div class="form-add-product__elements-item">
+                <p>Цена </p><input type="number" id="price" name="price" min="0" value="" required placeholder="0">
                 <div class="error-info d-none"></div> 
             </div>
 
-            <div class="form-add-product__elements__item">
-                <p>Цена рыночная (руб.)</p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
+            <!-- рыночная цена -->
+            <div class="form-add-product__elements-item">
+                <p>Цена рыночная </p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
                 <div class="error-info d-none"></div> 
-            </div>
-            
+            </div> 
+
         </div>
+
         <div>
             <button class="btn btn-ok" onclick="addProduct()">Сохранить</button>
             <a href="vendor-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
         </div>
     </form>
 
+<!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
