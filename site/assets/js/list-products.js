@@ -14,6 +14,10 @@ let searchEl = document.getElementById('search');
 let offsetEl = document.getElementById('offset');
 let orderbyEl = document.getElementById('orderby');
 
+let prevButton;
+let nextButton;
+let totalPages;
+
 renderPagination(totalProducts, limit);
 
 /* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ ---------- */
@@ -129,7 +133,7 @@ console.log(params);
 function renderPagination(totalProducts, limit) {
 
     // из полученных переменных получаем кол-во страниц
-    let totalPages = Math.ceil(totalProducts/limit);
+    totalPages = Math.ceil(totalProducts/limit);
 
     // найдём шаблон и контейнер для отрисовки
     const tmplPagination = document.getElementById('template-pagination').innerHTML;
@@ -144,7 +148,8 @@ function renderPagination(totalProducts, limit) {
                                                     .replace('${totalPages}', totalPages);
 
     
-
+    prevButton = document.querySelector('.page-switch__prev');
+    nextButton = document.querySelector('.page-switch__next');
     console.log('totalPages', totalPages);
 }
 
@@ -155,9 +160,20 @@ function switchPage(variance) {
 
     currentPage = currentPage + variance;
 
+    if (currentPage === 1) {
+       prevButton.setAttribute('disabled', '');
+       if (totalPages > 1) {
+            nextButton.removeAttribute('disabled');
+       }
+    } else if (currentPage > 1) {
+        prevButton.removeAttribute('disabled');
+
+        if (currentPage === totalPages) {
+            nextButton.setAttribute('disabled', '');
+        }
+    }
+
+
     containerCurrentPage.innerText = currentPage;
     
-    renderListProducts();
-
-
 }

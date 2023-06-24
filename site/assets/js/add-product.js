@@ -36,14 +36,19 @@ function addProduct() {
 
         console.log(item.getAttribute('name') + "    " + item.value);
 
-        const errorInfoContainer = item.closest('.form-add-product__elements__item').querySelector('.error-info');
+        const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
         
         if (!(item.value.trim())) {
             // пустое поле
-            item.classList.add('error');   
-            errorInfoContainer.innerText = "Заполните данные!";
-            errorInfoContainer.classList.remove('d-none');
-            hasError = true;
+            if (item.id === "photo") {
+                choiceImage.classList.add('error');
+            } else {
+            
+                item.classList.add('error');   
+                errorInfoContainer.innerText = "Заполните данные!";
+                errorInfoContainer.classList.remove('d-none');
+                hasError = true;
+            }
             
         } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available") || (item.id === "article")) {
 
@@ -72,10 +77,10 @@ function addProduct() {
                 console.log (typeof(priceValue), typeof(maxPriceValue));
                 console.log(priceValue > maxPriceValue);
 
-                if (priceValue > maxPriceValue) {
+                if (priceValue >= maxPriceValue) {
                     console.log('больше');
                     item.classList.add('error');   
-                    errorInfoContainer.innerText = "Рыночная цена меньше вашей!";
+                    errorInfoContainer.innerText = "Эта цена должна быть больше вашей!";
                     errorInfoContainer.classList.remove('d-none');
                     price.classList.add('error');
                     hasError = true; 
@@ -119,6 +124,7 @@ function addProduct() {
         } else {
 
             item.classList.remove('error');
+            choiceImage.classList.remove('error')
             errorInfoContainer.innerText = "";
             errorInfoContainer.classList.add('d-none');
         }
@@ -151,6 +157,8 @@ function addProduct() {
 
     // получаем ответ с сервера
 
+    formAddProduct.reset();
+    imagePreview.innerHTML = "<img>";
 
 }
 
@@ -176,3 +184,22 @@ const loadFile = () => {
     photoFileName = null;
     fileReader.readAsDataURL(file);
 }
+
+/* ---------- ПРЕДПРОСМОТР ИЗОБРАЖЕНИЯ ---------- */
+
+let imagePreview = document.querySelector('.form-add-product__elements-item__img-prew');
+let choiceImage = document.querySelector('.form-add-product__elements-item__img');
+const handleFilePreview = (e) => {
+    console.log("prew");
+  let files = e.target.files;
+
+  imagePreview.querySelector('img').remove();
+
+  let image = document.createElement('img');
+  image.src = window.URL.createObjectURL(files[0]);
+  imagePreview.appendChild(image);
+
+}
+
+photo.addEventListener('change', handleFilePreview);
+
