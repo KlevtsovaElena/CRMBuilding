@@ -270,6 +270,7 @@ function getChangeDataFilters() {
     hasFilters = getFilters();
     params = hasFilters;
 
+
     if (orderby) {
         params += "&orderby=" + orderby;
     }
@@ -279,7 +280,6 @@ function getChangeDataFilters() {
     currentPage = 1;
 
     // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
-
 
 
     // вызываем отрисовку таблицы
