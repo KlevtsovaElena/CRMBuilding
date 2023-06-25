@@ -10,12 +10,22 @@ function sendRequestGET(url){
 }
 
 //функция для отправки запросов POST json`ном
-function sendRequestPOST(url, params){
+function sendRequestPOST(url, params) {
 
     let requestObj = new XMLHttpRequest();
     requestObj.open('POST', url, false);
     requestObj.setRequestHeader('Content-Type', 'application/json');
     requestObj.send(params);
+    return requestObj.responseText;
+
+}
+
+//функция для отправки запросов DELETE
+function sendRequestDELETE(url) {
+
+    let requestObj = new XMLHttpRequest();
+    requestObj.open('DELETE', url, false);
+    requestObj.send();
     return requestObj.responseText;
 
 }

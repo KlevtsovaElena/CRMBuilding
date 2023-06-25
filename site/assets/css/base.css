@@ -473,3 +473,10 @@ th {
     white-space: nowrap;
     cursor: pointer;
 }
+
+.garbage-svg {
+    fill:none;
+    stroke: var(--secondary-color);
+    stroke-width:2;
+    stroke-miterlimit:10;
+}

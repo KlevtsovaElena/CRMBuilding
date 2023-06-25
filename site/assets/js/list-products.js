@@ -16,6 +16,13 @@ let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
 let limit = limitEl.value
+// найдём шаблон и контейнер для отрисовки
+const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
+const containerListProducts = document.querySelector('.list-products__body');
+// найдём шаблон и контейнер для отрисовки
+const tmplPagination = document.getElementById('template-pagination').innerHTML;
+const containerPagination = document.querySelector('.pagination-wrapper');
+
 
 // соберём значения брендов и категорий
 brand_idEl.querySelectorAll('option').forEach(item => {
@@ -41,23 +48,23 @@ renderListProducts(totalProducts);
 
 /* ---------- ОТРИСОВКА ТОВАРОВ В ТАБЛИЦЕ---------- */
 function renderListProducts(totalProducts) {
-    
-    // найдём шаблон и контейнер для отрисовки
-    const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
-    const containerListProducts = document.querySelector('.list-products__body');
+    let records = totalProductsCount;
+
 
     // очистим контейнер
     containerListProducts.innerHTML = "";
 
     // если записей нет, то выводим об этом инфо и выходим
-    if (totalProducts.length === 0) {
+    if (totalProductsCount === 0) {
         const info = document.querySelector('.info-table');
-        info.innerText = "Записей с такими параметрами нет";
+        info.innerText = "Записей нет";
         return;
     }
 
     // заполним данными и отрисуем шаблон
-    for (i = 0; i < limit; i++) {
+    if ((limit) && (limit < records)) { records = limit; }
+
+    for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts[i]['article'])
                                                         .replace('${photo}',  totalProducts[i]['photo'])
                                                         .replace('${name}', totalProducts[i]['name'])
@@ -65,6 +72,7 @@ function renderListProducts(totalProducts) {
                                                         .replace('${category_id}', categories[totalProducts[i]['category_id']])
                                                         .replace('${quantity_available}', totalProducts[i]['quantity_available'])
                                                         .replace('${price}', totalProducts[i]['price'])
+                                                        .replace('${id}', totalProducts[i]['id'])
                                                         .replace('${max_price}', totalProducts[i]['max_price']);
     }
 }
@@ -74,11 +82,11 @@ function renderListProducts(totalProducts) {
 function renderPagination(totalProductsCount, limit) {
 
     // из полученных переменных получаем кол-во страниц
-    totalPages = Math.ceil(totalProductsCount/limit);
-
-    // найдём шаблон и контейнер для отрисовки
-    const tmplPagination = document.getElementById('template-pagination').innerHTML;
-    const containerPagination = document.querySelector('.pagination-wrapper');
+    if ((limit) && limit < totalProductsCount) {
+        totalPages = Math.ceil(totalProductsCount/limit);
+    } else {
+        totalPages = 1;
+    }
 
     // очистим контейнер
     containerPagination.innerHTML = "";
@@ -262,6 +270,7 @@ function getChangeDataFilters() {
     hasFilters = getFilters();
     params = hasFilters;
 
+
     if (orderby) {
         params += "&orderby=" + orderby;
     }
@@ -273,7 +282,6 @@ function getChangeDataFilters() {
     // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
 
 
-
     // вызываем отрисовку таблицы
 
 
@@ -281,51 +289,81 @@ function getChangeDataFilters() {
 
 
 }
-sendChangeData.addEventListener("click", getChangeData);
+sendChangeData.addEventListener("click", getChangeDataFilters);
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
+const garbage = document.querySelectorAll('.garbage');
+
 function deleteProduct() {
+
+    // запрашиваем подтверждение удаления
+    let isDelete = false;
+
+    isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
+
+    if(!isDelete) {
+        console.log(" ни в коем случае");
+        return;
+    }
+
+    // если подтвердили удаление
+    console.log("удаляем");
+
+    // найдём id товара по атрибуту product-id
+    const productId = event.target.closest('.list-products__row').getAttribute('product-id');
+
     // делаем запрос на удаление товара по id
+    sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
 
-    // найдём id товара (по атрибуту)
+    // теперь перерисуем таблицу с учётом удалённого товара
 
-    // запрос к апи на удаление
-
-    // тк фильтруем мы только по нажатии на кнопку Применить,
     // то при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
     // но нужно из общего количества удалить 1 
+    totalProductsCount = totalProductsCount - 1;
+
+    if (totalProductsCount === 0) {
+        const info = document.querySelector('.info-table');
+        info.innerText = "Записей нет";
+        // очистим контейнер
+        containerListProducts.innerHTML = "";
+        return;
+    }
 
     // отрисуем пагинацию
+    renderPagination(totalProductsCount, limit);
 
-    // если карент пейдж больше чем тотал пейдж, то приравнять
+    // // соберём строку запроса
+    // params = "";
 
-    // соберём строку запроса
-    params = "";
+    // // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    // if (hasFilters) {
+    //     params = hasFilters;
+    // }
 
-    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    if (hasFilters) {
-        params = hasFilters;
-    }
+    // // если применялась сортировка, то добавляем в параметры
+    // if (orderby) {
+    //     params += "&orderby=" + orderby;
+    // }
 
-    // если применялась сортировка, то добавляем в параметры
-    if (orderby) {
-        params += "&orderby=" + orderby;
-    }
+    // // добавим лимит
+    // if (limit) {
 
-    // добавим лимит
-    if (limit) {
+    //     // определим с какой записи брать данные
+    //     offset = limit*(currentPage-1) + 1;
 
-        // определим с какой записи брать данные
-        offset = limit*(currentPage-1) + 1;
-
-        // добавим лимит и смещение в параметры
-        params += "&limit=" + limit + "&offset=" + offset; 
+    //     // добавим лимит и смещение в параметры
+    //     params += "&limit=" + limit + "&offset=" + offset; 
         
-    } 
+    // } 
 
-    console.log(params);
+    // console.log(params);
 
 }
+
+// отслеживаем клик по корзине
+garbage.forEach(item => {
+    item.addEventListener("click", deleteProduct);
+})
 
 
 
