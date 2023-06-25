@@ -73,6 +73,8 @@ function renderListProducts(totalProducts) {
                                                         .replace('${quantity_available}', totalProducts[i]['quantity_available'])
                                                         .replace('${price}', totalProducts[i]['price'])
                                                         .replace('${id}', totalProducts[i]['id'])
+                                                        .replace('${id}', totalProducts[i]['id'])
+                                                        .replace('${id}', totalProducts[i]['id'])
                                                         .replace('${max_price}', totalProducts[i]['max_price']);
     }
 }

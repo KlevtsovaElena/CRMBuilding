@@ -1,11 +1,11 @@
-#photo {
+#new_photo {
     border: none;
     width: unset;
     min-width: unset;
     max-width: unset;
 }
 
-#photo:focus {
+#new_photo:focus {
     box-shadow: none;
 }
 
