@@ -92,13 +92,13 @@ type InlineButton struct {
 }
 
 type UserT struct {
-	ID          int
-	FirstName   string
-	LastName    string
-	Username    string
-	tg_id       int
-	PhoneNumber string
-	City        string
+	ID          int    `json:"id"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	Username    string `json:"tg_username"`
+	Tg_id       int    `json:"tg_id"`
+	PhoneNumber string `json:"phone"`
+	City        int    `json:"city_id"`
 }
 
 type Order struct {
@@ -377,11 +377,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			user.FirstName = FirstName
 			user.LastName = LastName
 			user.Username = username
-			user.tg_id = id
+			user.Tg_id = id
 			user.PhoneNumber = tel
-			user.City = button
+			user.City, _ = strconv.Atoi(button)
 			// Создаем тело запроса в виде строки JSON
-			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `}`
+			requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
+			fmt.Println(requestBody)
 
 			sendPost(requestBody, "http://nginx:80/api/customers.php")
 
@@ -742,10 +743,27 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		jsonProducts, _ := json.Marshal(products)
 		jsonCoordinates, _ := json.Marshal(coordinates)
 
-		// Создаем тело запроса в виде строки JSON
-		requestBody := `{"customer_id":` + strconv.Itoa(chatId) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/customers.php?tg_id=" + strconv.Itoa(chatId))
+		if err != nil {
+			log.Fatal("Ошибка при выполнении запроса:", err)
+		}
+		defer resp.Body.Close()
 
-		sendPost(requestBody, "http://nginx:80/api/orders/create-with-vendor-calc.php")
+		var user []UserT
+		err = json.NewDecoder(resp.Body).Decode(&user)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, user := range user {
+			// Создаем тело запроса в виде строки JSON
+			requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
+
+			fmt.Println(requestBody)
+			sendPost(requestBody, "http://nginx:80/api/orders/create-with-vendor-calc.php")
+		}
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
