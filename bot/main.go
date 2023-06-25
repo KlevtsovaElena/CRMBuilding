@@ -396,7 +396,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			usersDB[id] = user
 
 		} else {
+			// Создаем тело запроса в виде строки JSON
+			requestBody := `{"tg_id":` + strconv.Itoa(id) + `, "city_id": ` + button + `}`
 
+			sendPost(requestBody, "http://nginx:80/api/customers.php")
 		}
 
 		file, _ := os.Create("db.json")
@@ -750,7 +753,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Создаем тело запроса в виде строки JSON
 		requestBody := `{"customer_id":` + strconv.Itoa(chatId) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
 
-		sendPost(requestBody, "http://nginx:80/api/orders.php")
+		sendPost(requestBody, "http://nginx:80/api/orders/create-with-vendor-calc.php")
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
