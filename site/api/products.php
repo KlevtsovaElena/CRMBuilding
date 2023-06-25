@@ -21,7 +21,9 @@ class ProductsController extends BaseController
     protected function onGet()
     {
         $result = $this->productRepository->get($_GET);
-        echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        
+        if ($result)
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 
     protected function onPost()
@@ -32,7 +34,7 @@ class ProductsController extends BaseController
 
         if (isset($post['id']))
         {
-            $this->productRepository->update($post);
+            $this->productRepository->updateById($post);
             return;
         }
 
