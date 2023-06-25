@@ -150,6 +150,7 @@ body {
     padding: 15px;
     min-width: 100px;
     transition: all var(--speed-transition); 
+    cursor: pointer;
 }
 
 input, textarea, select {
@@ -234,6 +235,11 @@ input:focus, textarea:focus, select:focus {
 .btn-neutral:active {
     box-shadow: var(--shadow-neutral-color-active);
     border:none;
+}
+
+.btn-group-3 {
+    display: flex;
+    justify-content: space-between;
 }
 
 

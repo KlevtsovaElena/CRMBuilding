@@ -28,7 +28,7 @@
     <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">
         
         <!-- здесь храним id поставщика -->
-        <input type="hidden" id="vendor_id" name="vendor_id" value="111">
+        <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
         
        
         <div class="form-add-product__elements form-elements-container">
@@ -47,7 +47,7 @@
                 <div class="form-add-product__elements-item__img">
                     
                     <div class="form-add-product__elements-item__img-prew"><img></div>
-                    <input type="file"  id="photo" name="photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
+                    <input type="file"  id="new_photo" name="new_photo" accept="image/png, image/jpg, image/jpeg" required onchange="loadFile()">  
                     <div><progress id="progress" max="100" value="0" class="d-none"></progress></div>
                             
                 </div>
