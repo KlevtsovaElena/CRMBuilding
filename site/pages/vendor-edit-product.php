@@ -36,7 +36,6 @@
             <?php 
                 $productJson = file_get_contents("http://nginx/api/products.php?id=" . $id);
                 $product = json_decode($productJson, true);
-                var_dump($product);
             ?>
             <div class="form-add-product__elements form-elements-container">
 
@@ -131,9 +130,13 @@
 
             </div>
 
-            <div>
-                <button class="btn btn-ok" onclick="editProduct()">Сохранить</button>
-                <a href="vendor-edit-product.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
+            <div class="btn-group-3">
+                <div>
+                    <button class="btn btn-ok" onclick="editProduct()">Сохранить</button>
+                    <a href="vendor-edit-product.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
+                </div>
+            
+                <div class="btn btn-delete" onclick="deleteProductFromEditForm(<?= $id; ?>)">Удалить товар</div>
             </div>
         </form>
     </section>

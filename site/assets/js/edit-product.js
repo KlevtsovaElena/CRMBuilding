@@ -2,7 +2,9 @@ console.log("подключили edit-product.js");
 
 let photo = document.getElementById("photo");
 let productId = formAddProduct.getAttribute('product-id');
-console.log(productId);
+
+let odj;
+
 function editProduct() {
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
@@ -15,10 +17,11 @@ function editProduct() {
         return;
     }
     
-    let odj;
+    
     // соберём json для передачи на сервер
     if (!new_photo.value) {
         obj = JSON.stringify({
+            id: productId,
             vendor_id: vendor_id.value,
             'name':  nameProduct.value,
             brand_id: brand_id.value,
@@ -32,6 +35,7 @@ function editProduct() {
         });
     } else {
         obj = JSON.stringify({
+            id: productId,
             vendor_id: vendor_id.value,
             'name':  nameProduct.value,
             brand_id: brand_id.value,
@@ -48,11 +52,10 @@ function editProduct() {
 
     console.log(obj);
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/products.php?id=' + productId, obj);
+    sendRequestPOST('http://localhost/api/products.php', obj);
 
     // получаем ответ с сервера
 
-    alert('Данные отправлены');
 
 }
 
@@ -172,4 +175,28 @@ if (!new_photo.value) {
 
     return hasError;
 
+}
+
+function deleteProductFromEditForm(id) {
+    console.log(id);
+
+    // запрашиваем подтверждение удаления
+    let isDelete = false;
+
+    isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
+
+    if(!isDelete) {
+        console.log(" ни в коем случае");
+        return;
+    }
+
+    // если подтвердили удаление
+    console.log("удаляем");
+
+    // делаем запрос на удаление товара по id
+    sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+
+    alert("Товар удалён");
+
+    window.location.href = 'http://localhost/pages/vendor-add-product.php';
 }
