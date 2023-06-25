@@ -39,7 +39,7 @@
     <section class="form-filters">
 
         <!-- здесь храним id поставщика -->
-        <input type="hidden" id="vendor_id" name="vendor_id" value="111">
+        <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
         
         <div class="form-elements-container">
             
@@ -68,7 +68,7 @@
             <div class="d-iblock">Показывать по
                 <select id="limit" name="limit" value="" required>
                     <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                    <option value="5">5</option>
+                    <option value="100">100</option>
                     <option value="40">40</option>
                     <option value="100">100</option>
                     <option value="">все</option>
@@ -118,8 +118,8 @@
     <template id="template-body-table">
         
         <tr role="row" class="list-products__row" product-id="${id}">
-            <td><a href="#"><strong>${article}</strong></a></td>
-            <td class="list-products_name"><a href="#"><img src="${photo}" /><strong>${name}</strong></td>
+            <td><a href="vendor-edit-product.php?id=${id}"><strong>${article}</strong></a></td>
+            <td class="list-products_name"><a href="vendor-edit-product.php?id=${id}"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${brand_id}</td>
             <td>${category_id}</td>
             <td>${quantity_available}</td>

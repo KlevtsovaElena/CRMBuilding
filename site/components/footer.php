@@ -5,7 +5,7 @@
 <?php
 
 for ($i = 0; $i < count($scriptsSrc); $i++) {
-   echo $scriptsSrc[$i];
+   echo $scriptsSrc[$i] . '<br>';
 }; 
 
 ?> 
