@@ -104,38 +104,20 @@
             </thead>
 
             <tbody class="list-products__body">
-
-                <!-- <?php
-                    $productsJson = file_get_contents("http://nginx/api/products.php?vendor_id=111");
-                    $products = json_decode($productsJson, true);
-
-                    for ($i = 0; $i < $limitRows; $i++) {
-                ?>
-
-                <tr role="row" class="list-products__row">
-                    
-                    <td><a href="#"><strong><?= $products[$i]['article']; ?></strong></a></td>
-                    <td  class="list-products_name"><a href="#"><img src="<?= $products[$i]['photo']; ?>" /><strong><?= $products[$i]['name']; ?></strong></a></td>
-                    <td><?= $brands_table[$products[$i]['brand_id']]; ?></td>
-                    <td><?= $categories_table[$products[$i]['category_id']]; ?></td>
-                    <td><?= $products[$i]['quantity_available']; ?></td>
-                    <td><?= $products[$i]['price']; ?></td>
-                    <td><?= $products[$i]['max_price']; ?></td>
-                </tr>
-
-                <?php } ?> -->
+                <!-- контент таблицы из шаблона -->
             </tbody>
+
         </table>
         <div class="info-table"></div>
     </section>
 
-    <section class="pagination-wrapper"></section>
+    <section class="pagination-wrapper"><!-- пагинация --></section>
 
     <!-- ШАБЛОНЫ -->
     <!-- шаблон таблицы -->
     <template id="template-body-table">
         
-        <tr role="row" class="list-products__row">
+        <tr role="row" class="list-products__row" product-id="${id}">
             <td><a href="#"><strong>${article}</strong></a></td>
             <td class="list-products_name"><a href="#"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${brand_id}</td>

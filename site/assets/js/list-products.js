@@ -16,6 +16,13 @@ let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
 let limit = limitEl.value
+// найдём шаблон и контейнер для отрисовки
+const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
+const containerListProducts = document.querySelector('.list-products__body');
+// найдём шаблон и контейнер для отрисовки
+const tmplPagination = document.getElementById('template-pagination').innerHTML;
+const containerPagination = document.querySelector('.pagination-wrapper');
+
 
 // соберём значения брендов и категорий
 brand_idEl.querySelectorAll('option').forEach(item => {
@@ -41,23 +48,23 @@ renderListProducts(totalProducts);
 
 /* ---------- ОТРИСОВКА ТОВАРОВ В ТАБЛИЦЕ---------- */
 function renderListProducts(totalProducts) {
-    
-    // найдём шаблон и контейнер для отрисовки
-    const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
-    const containerListProducts = document.querySelector('.list-products__body');
+    let records = totalProductsCount;
+
 
     // очистим контейнер
     containerListProducts.innerHTML = "";
 
     // если записей нет, то выводим об этом инфо и выходим
-    if (totalProducts.length === 0) {
+    if (totalProductsCount === 0) {
         const info = document.querySelector('.info-table');
-        info.innerText = "Записей с такими параметрами нет";
+        info.innerText = "Записей нет";
         return;
     }
 
     // заполним данными и отрисуем шаблон
-    for (i = 0; i < limit; i++) {
+    if ((limit) && (limit < records)) { records = limit; }
+
+    for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts[i]['article'])
                                                         .replace('${photo}',  totalProducts[i]['photo'])
                                                         .replace('${name}', totalProducts[i]['name'])
@@ -65,6 +72,7 @@ function renderListProducts(totalProducts) {
                                                         .replace('${category_id}', categories[totalProducts[i]['category_id']])
                                                         .replace('${quantity_available}', totalProducts[i]['quantity_available'])
                                                         .replace('${price}', totalProducts[i]['price'])
+                                                        .replace('${id}', totalProducts[i]['id'])
                                                         .replace('${max_price}', totalProducts[i]['max_price']);
     }
 }
@@ -74,11 +82,11 @@ function renderListProducts(totalProducts) {
 function renderPagination(totalProductsCount, limit) {
 
     // из полученных переменных получаем кол-во страниц
-    totalPages = Math.ceil(totalProductsCount/limit);
-
-    // найдём шаблон и контейнер для отрисовки
-    const tmplPagination = document.getElementById('template-pagination').innerHTML;
-    const containerPagination = document.querySelector('.pagination-wrapper');
+    if ((limit) && limit < totalProductsCount) {
+        totalPages = Math.ceil(totalProductsCount/limit);
+    } else {
+        totalPages = 1;
+    }
 
     // очистим контейнер
     containerPagination.innerHTML = "";
@@ -293,28 +301,36 @@ function deleteProduct() {
 
     isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
 
-    console.log(isDelete);
-
-    if(isDelete) {
-        console.log("удаляем");
-    } else {
-        console.log(" ни в коем случае");  
+    if(!isDelete) {
+        console.log(" ни в коем случае");
+        return;
     }
+
+    // если подтвердили удаление
+    console.log("удаляем");
+
+    // найдём id товара по атрибуту product-id
+    const productId = event.target.closest('.list-products__row').getAttribute('product-id');
+
     // делаем запрос на удаление товара по id
+    sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
 
+    // теперь перерисуем таблицу с учётом удалённого товара
 
-
-    // найдём id товара (по атрибуту)
-
-    // запрос к апи на удаление
-
-    // тк фильтруем мы только по нажатии на кнопку Применить,
     // то при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
     // но нужно из общего количества удалить 1 
+    totalProductsCount = totalProductsCount - 1;
 
-    // // отрисуем пагинацию
+    if (totalProductsCount === 0) {
+        const info = document.querySelector('.info-table');
+        info.innerText = "Записей нет";
+        // очистим контейнер
+        containerListProducts.innerHTML = "";
+        return;
+    }
 
-    // // если карент пейдж больше чем тотал пейдж, то приравнять
+    // отрисуем пагинацию
+    renderPagination(totalProductsCount, limit);
 
     // // соберём строку запроса
     // params = "";
