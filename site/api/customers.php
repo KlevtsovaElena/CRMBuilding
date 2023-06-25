@@ -16,7 +16,9 @@
         protected function onGet()
         {
             $result = $this->customerRepository->get($_GET);
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            
+            if ($result)
+                echo json_encode($result, JSON_UNESCAPED_UNICODE);
         }   
 
         protected function onPost()
@@ -25,7 +27,13 @@
 
             if (isset($post['id']))
             {
-                $this->customerRepository->update($post);
+                $this->customerRepository->updateById($post);
+                return;
+            }
+
+            if (isset($post['tg_id']) && $this->customerRepository->getByTgId($post['tg_id']) != null)
+            {
+                $this->customerRepository->updateByTgId($post);
                 return;
             }
 
