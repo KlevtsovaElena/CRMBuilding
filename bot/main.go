@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type ResponseT struct {
@@ -156,11 +153,6 @@ var LastName string
 
 var products = make(map[int]int)
 var client = http.Client{}
-
-// var products = []int{}
-
-// создаем соединение с БД
-var Db, Err = sql.Open("mysql", "root:admin@tcp(mysql:3306)/crm-building")
 
 func main() {
 
