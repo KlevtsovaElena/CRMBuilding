@@ -117,8 +117,8 @@ type OrderItem struct {
 }
 
 type Coordinates struct {
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 type Cities struct {
@@ -224,6 +224,27 @@ func main() {
 		lastMessage = responseObj.Result[number-1].UpdateID + 1
 
 	}
+}
+
+func sendPost(requestBody string, url string) {
+	// Создаем новый POST-запрос
+	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
+	if err != nil {
+		fmt.Println("Ошибка при создании запроса:", err)
+		return
+	}
+
+	// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
+	req.Header.Set("Content-Type", "application/json")
+
+	// Отправляем запрос с использованием стандартного клиента HTTP
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Ошибка при выполнении запроса:", err)
+		return
+	}
+	defer resp.Body.Close()
 }
 
 func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string, latitude float64, longitude float64) {
@@ -368,40 +389,14 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			user.PhoneNumber = tel
 			user.City = button
 			// Создаем тело запроса в виде строки JSON
-			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `, "coordinates": "value2"}`
+			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `}`
 
-			// Создаем новый POST-запрос
-			req, err := http.NewRequest("POST", "http://nginx:80/api/customers.php", bytes.NewBufferString(requestBody))
-			if err != nil {
-				fmt.Println("Ошибка при создании запроса:", err)
-				return
-			}
-
-			// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
-			req.Header.Set("Content-Type", "application/json")
-
-			// Отправляем запрос с использованием стандартного клиента HTTP
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil {
-				fmt.Println("Ошибка при выполнении запроса:", err)
-				return
-			}
-			defer resp.Body.Close()
+			sendPost(requestBody, "http://nginx:80/api/customers.php")
 
 			usersDB[id] = user
 
 		} else {
 
-			fmt.Println(id)
-			fmt.Println(button)
-			//если зарегистрирован - обновляем в БД
-			_, err := Db.Exec("UPDATE `customers` SET city_id = ? WHERE tg_id = ?", button, id)
-			if err != nil {
-				fmt.Println("Ошибка обновления пользователя ", err)
-			} else {
-				fmt.Println("пользователь обновлён")
-			}
 		}
 
 		file, _ := os.Create("db.json")
@@ -745,31 +740,17 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 10:
 
 		time := time.Now().Unix()
-		// location := Location{
-		// 	Latitude:  latitude,
-		// 	Longitude: longitude,
-		// }
-		// jsonOrder, _ := json.Marshal(products)
-		// jsonData, _ := json.Marshal(location)
-		order := Order{
-			CustomerID: chatId,
-			OrderDate:  time,     // Формат даты: гггг-мм-дд
-			Products:   products, // Карта products с товарами
-			Coordinates: map[string]interface{}{
-				"latitude":  latitude,  // Долгота
-				"longitude": longitude, // Широта
-			},
+		coordinates := Coordinates{
+			Latitude:  latitude,
+			Longitude: longitude,
 		}
-		jsonData, _ := json.Marshal(order)
+		jsonProducts, _ := json.Marshal(products)
+		jsonCoordinates, _ := json.Marshal(coordinates)
 
-		fmt.Println(string(jsonData))
+		// Создаем тело запроса в виде строки JSON
+		requestBody := `{"customer_id":` + strconv.Itoa(chatId) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
 
-		// _, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
-		// if err != nil {
-		// 	fmt.Println("Ошибка сохранения заказа ", err)
-		// } else {
-		// 	fmt.Println("заказ добавлен")
-		// }
+		sendPost(requestBody, "http://nginx:80/api/orders.php")
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
