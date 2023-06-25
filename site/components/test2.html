@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRMBuilding</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./../assets/css/base.css">
+
+
+</head>
+<body>
+
+
+    <header>
+
+        <div class="menu-top">
+            <div class="menu-top__container">
+                <div class="menu-top__logo">LOGO</div>
+                <div class="menu-top__profile">
+                    <div class="menu-top__profile-name">        
+                        Поставщик
+                    </div>
+                    <div class="menu-top__profile-avatar">П</div>
+                    <div class="logout">
+                        
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <path d="M15 16.5V19C15 20.1046 14.1046 21 13 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3H13C14.1046 3 15 3.89543 15 5V8.0625M11 12H21M21 12L18.5 9.5M21 12L18.5 14.5"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g>
+                        </svg>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <nav class="menu-left" >
+            
+    
+            <button class="menu-left__collapse" onclick="toggleMenu()">
+               <span>&#10094 </span><span>Свернуть меню</span> 
+            </button>
+            <ul class="menu-left__items">
+                <li class="menu-left__item">
+                    <a href="#" class="menu-left__item-link">
+                        <svg fill="#ced4da" viewBox="0 0 36.00 36.00" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <title>house-solid</title> <path class="clr-i-solid clr-i-solid-path-1" d="M33,19a1,1,0,0,1-.71-.29L18,4.41,3.71,18.71a1,1,0,0,1-1.41-1.41l15-15a1,1,0,0,1,1.41,0l15,15A1,1,0,0,1,33,19Z"/>
+                            <path class="clr-i-solid clr-i-solid-path-2" d="M18,7.79,6,19.83V32a2,2,0,0,0,2,2h7V24h6V34h7a2,2,0,0,0,2-2V19.76Z"/> <rect x="0" y="0" width="36" height="36" fill-opacity="0"/> </g> 
+                        </svg>
+                        <span>Главная</span>
+                    </a>
+                </li>
+                <li class="menu-left__item">
+                    <a href="#" class="menu-left__item-link">
+                        <svg stroke="#ced4da" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g> </g>
+                            </svg>
+                        <span>Добавить товар</span>
+                    </a>
+                </li>
+                <li class="menu-left__item">
+                    <a href="test2.html" class="menu-left__item-link">
+                        <svg fill="#ced4da" viewBox="0 0 37 37" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <title>list</title> <path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
+                        </svg>
+                        <span>Список товаров</span>
+                    </a>
+                </li>
+                <li class="menu-left__item">
+                    <a href="#" class="menu-left__item-link">
+                        <svg stroke="#ced4da" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <path d="M15 16.5V19C15 20.1046 14.1046 21 13 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3H13C14.1046 3 15 3.89543 15 5V8.0625M11 12H21M21 12L18.5 9.5M21 12L18.5 14.5"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g>
+                        </svg>
+                        <span>item</span>
+                    </a>
+                </li>
+                <li class="menu-left__item">
+                    <a href="#" class="menu-left__item-link">
+                        <svg stroke="#ced4da" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <path d="M15 16.5V19C15 20.1046 14.1046 21 13 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3H13C14.1046 3 15 3.89543 15 5V8.0625M11 12H21M21 12L18.5 9.5M21 12L18.5 14.5"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g>
+                        </svg>
+                        <span>item</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </header>
+        <section class="main-content">
+            <div class="container">
+                
+                <div><h3>СПИСОК ТОВАРОВ</h3></div>
+
+                <a href="test1.html" class="btn btn-ok d-iblock">+ Добавить товар</a>
+                <form action="#" method="post" enctype="multipart/form-data">
+
+                    <input type="hidden" name="vendorId" value="111">
+                    
+                    <div class="form-elements-container">
+                        <!-- список -->
+                        <label>Сортировать по
+                            <select id="brandId" name="brandId" value="" required>
+                                <option value="1">артикул</option>
+                                <option value="2">бренд</option>
+                                <option value="3">категория</option>
+                                <option value="4">наименование</option>
+                                <option value="3">цена</option>
+                                <option value="4">остаток</option>
+                            </select>
+                            </label>
+                        <!-- список -->
+                        <label>Бренд
+                        <select id="brandId" name="brandId" value="" required>
+                            <option value="1">Все</option>
+                            <option value="1">Бренд1</option>
+                            <option value="2">Бренд2</option>
+                            <option value="3">Бренд3</option>
+                            <option value="4">Бренд4</option>
+                        </select>
+                        </label>
+                        <!-- список -->
+                        <label>Категория
+                        <select id="categoryId" name="categoryId" value="" required>
+                            <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                            <option value="1">Все</option>
+                            <option value="1">Категория1</option>
+                            <option value="2">Категория2</option>
+                            <option value="3">Категория3</option>
+                            <option value="4">Категория4</option>
+                        </select>
+                        </label>
+                        <!-- список -->
+                        <label>Показывать по
+                            <select id="categoryId" name="categoryId" value="" required>
+                                <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                                <option value="1">20</option>
+                                <option value="1">40</option>
+                                <option value="2">100</option>
+                                <option value="3">все</option>
+                            </select>
+                            </label>
+                        <label>
+                            <input type="search" id="search" name="search" value="" required placeholder="Поиск">
+                            </input>
+                        </label>
+                        <div>
+                            <button class="btn btn-ok" type="submit">Применить</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="products">
+                    <table class="table table-ecommerce-simple table-striped mb-0 dataTable no-footer" id="datatable-ecommerce-list" style="min-width: 550px;" role="grid" aria-describedby="datatable-ecommerce-list_info">
+
+                        <thead>
+                            <tr role="row"><th width="3%" class="sorting_disabled" rowspan="1" colspan="1" aria-label="" style="width: 17px;"><input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value=""></th><th width="8%" class="sorting" tabindex="0" aria-controls="datatable-ecommerce-list" rowspan="1" colspan="1" aria-label="ID: activate to sort column ascending" style="width: 57.3375px;">ID</th><th width="28%" class="sorting_desc" tabindex="0" aria-controls="datatable-ecommerce-list" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="width: 272.025px;" aria-sort="descending">Name</th><th width="23%" class="sorting" tabindex="0" aria-controls="datatable-ecommerce-list" rowspan="1" colspan="1" aria-label="Slug: activate to sort column ascending" style="width: 218.562px;">Slug</th><th width="38%" class="sorting" tabindex="0" aria-controls="datatable-ecommerce-list" rowspan="1" colspan="1" aria-label="Parent Category: activate to sort column ascending" style="width: 379.275px;">Parent Category</th></tr>
+                        </thead>
+                        <tbody>
+                                                      
+                        <tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>199</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 9</strong></a></td>
+                                <td class="">category-name-example-9</td>
+                                <td class="">Parent Category Name 9</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>198</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 8</strong></a></td>
+                                <td class="">category-name-example-8</td>
+                                <td class="">Parent Category Name 8</td>
+                            </tr><tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>197</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 7</strong></a></td>
+                                <td class="">category-name-example-7</td>
+                                <td class="">Parent Category Name 7</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>196</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 6</strong></a></td>
+                                <td class="">category-name-example-6</td>
+                                <td class="">Parent Category Name 6</td>
+                            </tr><tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>195</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 5</strong></a></td>
+                                <td class="">category-name-example-5</td>
+                                <td class="">Parent Category Name 5</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>194</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 4</strong></a></td>
+                                <td class="">category-name-example-4</td>
+                                <td class="">Parent Category Name 4</td>
+                            </tr><tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>193</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 3</strong></a></td>
+                                <td class="">category-name-example-3</td>
+                                <td class="">Parent Category Name 3</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>192</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 2</strong></a></td>
+                                <td class="">category-name-example-2</td>
+                                <td class="">Parent Category Name 2</td>
+                            </tr><tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>206</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 16</strong></a></td>
+                                <td class="">category-name-example-16</td>
+                                <td class="">Parent Category Name 16</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>205</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 15</strong></a></td>
+                                <td class="">category-name-example-15</td>
+                                <td class="">Parent Category Name 15</td>
+                            </tr><tr role="row" class="odd">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>204</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 14</strong></a></td>
+                                <td class="">category-name-example-14</td>
+                                <td class="">Parent Category Name 14</td>
+                            </tr><tr role="row" class="even">
+                                <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value=""></td>
+                                <td><a href="ecommerce-category-form.html"><strong>203</strong></a></td>
+                                <td class="sorting_1"><a href="ecommerce-category-form.html"><strong>Category Name Example 13</strong></a></td>
+                                <td class="">category-name-example-13</td>
+                                <td class="">Parent Category Name 13</td>
+                            </tr></tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper"><div class="dataTables_paginate paging_simple_numbers" id="datatable-ecommerce-list_paginate"><ul class="pagination pagination-modern pagination-modern-spacing justify-content-center"><li class="paginate_button page-item previous disabled" id="datatable-ecommerce-list_previous"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="0" tabindex="0" class="page-link"><i class="fas fa-chevron-left"></i></a></li><li class="paginate_button page-item active"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item next" id="datatable-ecommerce-list_next"><a href="#" aria-controls="datatable-ecommerce-list" data-dt-idx="3" tabindex="0" class="page-link"><i class="fas fa-chevron-right"></i></a></li></ul></div></div>
+
+        </div>
+    </section>       
+
+<style>
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+}
+.products {
+    margin-top: 10px;
+}
+.table {
+    background-color: white;
+}
+</style>
+
+
+
+
+        
+<script src="./../assets/js/main.js"></script>
+</body>
+</html>
