@@ -16,7 +16,9 @@
         protected function onGet()
         {
             $result = $this->citiesRepository->get($_GET);
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+
+            if ($result)
+                echo json_encode($result, JSON_UNESCAPED_UNICODE);
         }   
 
         protected function onPost()
@@ -25,7 +27,7 @@
 
             if (isset($post['id']))
             {
-                $this->citiesRepository->update($post);
+                $this->citiesRepository->updateById($post);
                 return;
             }
 
