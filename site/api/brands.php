@@ -16,7 +16,9 @@
         protected function onGet()
         {
             $result = $this->brandsRepository->get($_GET);
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+
+            if ($result)
+                echo json_encode($result, JSON_UNESCAPED_UNICODE);
         }   
 
         protected function onPost()
@@ -25,7 +27,7 @@
 
             if (isset($post['id']))
             {
-                $this->brandsRepository->update($post);
+                $this->brandsRepository->updateById($post);
                 return;
             }
 

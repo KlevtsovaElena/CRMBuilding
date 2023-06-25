@@ -1,0 +1,96 @@
+@import url('pagination.css');
+
+.products {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.list-products_name {
+    color: var(--primary-color)
+}
+
+.list-products_name a:hover {
+    color: var(--primary-color-hover);
+}
+
+.list-products_name img {
+    width: 45px;
+    height: 30px;
+    margin-right: 3px;
+    vertical-align: middle;
+    object-fit: contain;
+}
+
+.form-filters {
+    margin-top: 20px;
+}
+
+.form-filters label {
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+.form-filters input, 
+.form-filters select {
+    max-width: unset;
+    min-width: unset;
+    width: 100px;
+}
+
+.form-filters input[type="search"] {
+    width: 220px;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+
+#list-products th:after {
+    right: 0;
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+#list-products th:before {
+    right: 6px;
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-products th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-products th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.info-table {
+    font-size: 0.9rem;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.garbage{
+    cursor: pointer;
+    transition: all var(--speed-transition);
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 0.5rem;
+}
+
+.garbage:hover .garbage-svg {
+    cursor: pointer;
+    stroke: var(--secondary-color-hover);
+}
+
+td:nth-last-child(1) {
+    padding-right: 30px;
+    position: relative;
+}
