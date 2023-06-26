@@ -152,7 +152,7 @@ abstract class BaseRepository
             $searchQueryParamValues = $this->getQuerySearchParameterValues($searchParams, 'ss1_');
 
             if (count($searchQueryParams) > 0) {
-                $whereParams = $whereParams . ' AND ' . implode(' AND ', $searchQueryParams);
+                $whereParams = $whereParams .' AND (' . implode(' OR ', $searchQueryParams).')';
                 $queryParamValues = array_merge($queryParamValues, $searchQueryParamValues);
             }
         }
