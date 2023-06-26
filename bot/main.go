@@ -171,14 +171,12 @@ func main() {
 		//посмотреть данные
 		fmt.Println(string(data))
 
-		// var responseObj ResponseT
 		//парсим данные из json
 		var responseObj ResponseT
 		json.Unmarshal(data, &responseObj)
 
 		var need InlineButton
 		json.Unmarshal(data, &need)
-		//fmt.Println(responseObj)
 
 		//считаем количество новых сообщений
 		number := len(responseObj.Result)
@@ -797,9 +795,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	if strings.SplitN(button, ":", 2)[0] == "add" {
 		productStr := strings.Split(button, ":")[1]
 		productID, _ := strconv.Atoi(productStr)
-		// products = append(products, productID)
-		// fmt.Println(products)
-		// Пример добавления товара с id=3 и количеством 2
 		quantity := 1
 
 		// Проверяем, есть ли товар с таким id в массиве
