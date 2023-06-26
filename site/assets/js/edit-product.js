@@ -55,7 +55,7 @@ function editProduct() {
     sendRequestPOST('http://localhost/api/products.php', obj);
 
     // получаем ответ с сервера
-
+    alert("Данные изменены");
 
 }
 

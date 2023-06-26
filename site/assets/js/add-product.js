@@ -57,6 +57,7 @@ function addProduct() {
 
     formAddProduct.reset();
     imagePreview.innerHTML = "<img>";
+    alert("Данные отправлены");
 
 }
 

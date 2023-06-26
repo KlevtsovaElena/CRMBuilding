@@ -60,7 +60,9 @@ renderListProducts(totalProducts);
 function renderListProducts(totalProducts) {
 
     // очистим контейнер
-    containerListProducts.innerHTML = "";
+    containerListProducts.innerHTML = "";   
+    // сброс инфы внизу страницы
+    info.innerText = "";
 
     // если записей нет, то выводим об этом инфо и выходим
     if (totalProducts.length === 0) {
@@ -149,8 +151,6 @@ function renderPagination(totalProductsCount, limit) {
 
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
-    // сброс инфы внизу страницы
-    info.innerText = "";
 
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
@@ -441,27 +441,197 @@ function deleteProduct() {
 
 
 
-
-
-
+// Погоняем тестово какой приходит ответ при запрсе с параметрами
 
 
 // function test() {
+//     let paramsTest="";
+//     let testPrducts = [];
+
+//     // пустые параметры = все товары  
+//     // 1. при загрузке страницы
+//     // 2. при фильтрации если установлен новый лимит  
 //     let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
 //     let totalProductsJson = sendRequestGET(url);
-//     console.log(JSON.parse(totalProductsJson)); 
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
 
-//     params="&category_id=4";
-//     totalProductsJson = sendRequestGET(url+params);
-//     console.log(JSON.parse(totalProductsJson));  
+//     // только фильтрация - только brand_id = грузим всё этого бренда
+//     paramsTest="&brand_id=2";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
 
-//     params="&category_id=4&search=name:фиолетовый";
-//     totalProductsJson = sendRequestGET(url+params);
-//     console.log(JSON.parse(totalProductsJson));
-    
-//     params="&category_id=4&search=name:фиолетовый";
-//     totalProductsJson = sendRequestGET(url+params);
-//     console.log(url+params);
-//     console.log(JSON.parse(totalProductsJson));
+//     // только фильтрация - только brand_id и категория
+//     paramsTest="&brand_id=3&category_id=1";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только фильтрация - только category_id = грузим всё этого бренда
+//     paramsTest="&category_id=1";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только поиск = грузим всё, где есть поисковое слово в описании или наименовании
+//     paramsTest="&search=name:стеновой;description:стеновой";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только фильтрация -  brand_id, search грузим всё
+//     paramsTest="&brand_id=1&search=name:стеновой;description:стеновой";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только фильтрация - category_id, brand_id, search грузим всё
+//     paramsTest="&category_id=1&brand_id=1&search=name:стеновой;description:стеновой";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только сортировка без лимита
+//     paramsTest="&orderby=price:desc";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // только сортировка с лимитом
+//     paramsTest="&orderby=price:desc&limit=5&offset=5";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }
+
+//     // сортировка с лимитом и фильтром
+//     paramsTest="&orderby=price:desc&limit=5&offset=1&brand_id=2";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }  
+
+//     // сортировка с лимитом и фильтром без поиска
+//     paramsTest="&orderby=price:desc&limit=5&offset=1&brand_id=1";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }  
+
+//     // сортировка с лимитом и фильтром с поиском
+//     paramsTest="&orderby=price:desc&limit=5&offset=1&brand_id=1&search=name:стеновой;description:стеновой";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }  
+
+//     // лимит и фильтр
+//     paramsTest="&limit=5&offset=1&brand_id=1";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }  
+
+//     // лимит и search
+//     paramsTest="&limit=5&offset=1&search=name:стеновой;description:стеновой";
+//     totalProductsJson = sendRequestGET(url+paramsTest);
+//     if (totalProductsJson) {
+//             testPrducts = JSON.parse(totalProductsJson);
+//             console.log(url+paramsTest);
+//             console.log(testPrducts); 
+//     } else {
+//             testPrducts = [];
+//             console.log(url+paramsTest);
+//             console.log(testPrducts);
+//     }  
+
 // }
+
 // test();
