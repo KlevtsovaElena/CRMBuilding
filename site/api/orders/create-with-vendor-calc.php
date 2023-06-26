@@ -58,6 +58,7 @@ use repositories\ProductRepository;
                 \DbContext::getConnection()->commit();
             } catch(Exception $e) {
                 \DbContext::getConnection()->rollBack();
+                die($e);
             }
         }
     }
