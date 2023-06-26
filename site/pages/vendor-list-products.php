@@ -22,17 +22,9 @@
     <?php
         $brandsJson = file_get_contents("http://nginx/api/brands.php");
         $brands = json_decode($brandsJson, true);
-        // $brands_table = [];
-        // foreach($brands as $brand) {
-        //     $brands_table += [$brand['id'] => $brand['brand_name']];
-        // }
 
         $categoriesJson = file_get_contents("http://nginx/api/categories.php");
         $categories = json_decode($categoriesJson, true);
-        // $categories_table = [];
-        // foreach($categories as $category) {
-        //     $categories_table += [$category['id'] => $category['category_name']];
-        // }
     ?>
 
     <!-- Выбор фильтров -->
@@ -46,32 +38,36 @@
             <!-- выбор бренда -->
             <label>Бренд
                 <select id="brand_id" name="brand_id" value="">
+
                     <option value="">Все</option>
                     <?php foreach($brands as $brand) { ?>
                         <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
                     <?php }; ?>
+
                 </select>
             </label>
 
             <!-- выбор категории -->
             <label>Категория
                 <select id="category_id" name="category_id" value="">
-                    <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                    
                     <option value="">Все</option>
                     <?php foreach($categories as $category) { ?>
                         <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
                     <?php }; ?>
+
                 </select>
             </label>
 
             <!-- выбор кол-во записей на листе -->
             <div class="d-iblock">Показывать по
                 <select id="limit" name="limit" value="" required>
-                    <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                    <option value="100">100</option>
+                    
+                    <option value="5">5</option>
+                    <option value="20">20</option>
                     <option value="40">40</option>
-                    <option value="3">3</option>
                     <option value="">все</option>
+
                 </select>
             </div>
             

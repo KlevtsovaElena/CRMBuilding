@@ -11,22 +11,25 @@ let brands = {};
 let categories = {};
 let orderby = "";
 let offset;
-let hasFilters="";
+let filters="";
 let vendor_id = document.getElementById('vendor_id').value;
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
-let limit = limitEl.value
-// найдём шаблон и контейнер для отрисовки
+let limit = limitEl.value;
+let totalProducts = [];
+
+// найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
 const containerListProducts = document.querySelector('.list-products__body');
-// найдём шаблон и контейнер для отрисовки
+// найдём шаблон и контейнер для отрисовки пагинации
 const tmplPagination = document.getElementById('template-pagination').innerHTML;
 const containerPagination = document.querySelector('.pagination-wrapper');
+// контейнер информации внизу страницы
+const info = document.querySelector('.info-table');
 
-
-// соберём значения брендов и категорий
+// закэшируем брендов и категорий
 brand_idEl.querySelectorAll('option').forEach(item => {
     brands[item.value] = item.innerText;
 })
@@ -36,12 +39,15 @@ category_idEl.querySelectorAll('option').forEach(item => {
 
 // получение записей товаров из БД
 let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+console.log(url);
 let totalProductsJson = sendRequestGET(url);
-let totalProducts = JSON.parse(totalProductsJson);
+if (totalProductsJson) {
+    totalProducts = JSON.parse(totalProductsJson);
+}
 
 // подсчёт полученных записей
 let totalProductsCount = totalProducts.length;
-
+console.log(totalProductsCount);
 // отрисуем пагинацию
 renderPagination(totalProductsCount, limit);
 
@@ -51,22 +57,29 @@ renderListProducts(totalProducts);
 
 /* ---------- ОТРИСОВКА ТОВАРОВ В ТАБЛИЦЕ---------- */
 function renderListProducts(totalProducts) {
-    let records = totalProducts.length;
-
 
     // очистим контейнер
     containerListProducts.innerHTML = "";
 
     // если записей нет, то выводим об этом инфо и выходим
     if (totalProducts.length === 0) {
-        const info = document.querySelector('.info-table');
         info.innerText = "Записей нет";
         return;
     }
 
-    // заполним данными и отрисуем шаблон
-    if ((limit) && (limit < records)) { records = limit; }
+    // количество показываемых записей на странице
+    let records;
+    
+    // если лимит установлен и он меньше кол-ва записей, то records = limit
+    // иначе выводим всё records = totalProducts.length
+    if ((limit) && (limit < totalProducts.length)) {
+        records = limit; 
+    } else {
+        records = totalProducts.length;
+    }
 
+    console.log("покажем" + records);
+    // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts[i]['article'])
                                                         .replace('${photo}',  totalProducts[i]['photo'])
@@ -85,6 +98,7 @@ function renderListProducts(totalProducts) {
 
 /* ---------- ОТРИСОВКА ПАГИНАЦИИ ---------- */
 function renderPagination(totalProductsCount, limit) {
+
 
     // из полученных переменных получаем кол-во страниц
     if ((limit) && limit < totalProductsCount) {
@@ -115,6 +129,8 @@ function renderPagination(totalProductsCount, limit) {
 
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
+    // сброс инфы внизу страницы
+    info.innerText = "";
 
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
@@ -123,32 +139,32 @@ function switchPage(variance) {
     containerCurrentPage.forEach(item => {
         item.innerText = currentPage;
     })
-
+    console.log("totalPages ",  totalPages, "currentPage ",  currentPage);
     // 2. настроим возможность/невозможность переключения страниц 
     if (currentPage === 1) {
        prevButton.setAttribute('disabled', '');
        if (totalPages > 1) {
             nextButton.removeAttribute('disabled');
        }
-    } else if (currentPage > 1) {
+    } else if (currentPage === totalPages) {
         prevButton.removeAttribute('disabled');
-
-        if (currentPage === totalPages) {
-            nextButton.setAttribute('disabled', '');
-        }
+        nextButton.setAttribute('disabled', '');
+    } else {
+        prevButton.removeAttribute('disabled');
+        nextButton.removeAttribute('disabled');
     }
    
     // соберём строку запроса
     params = "";
 
     // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    if (hasFilters) {
-        params = hasFilters;
+    if (filters) {
+        params = filters;
     }
 
     // если применялась сортировка, то добавляем в параметры
     if (orderby) {
-        params += "&orderby=" + orderby;
+        params += orderby;
     }
 
     // тк фильтруем мы только по нажатии на кнопку Применить,
@@ -156,24 +172,28 @@ function switchPage(variance) {
     // поэтому просто запрашиваем лимит со смещением
 
     // добавим лимит и смещение в параметры (лимит будет всегда, если страничек больше 1)
-    offset = limit*(currentPage-1) + 1;
+    offset = limit*(currentPage-1);
     params += "&limit=" + limit + "&offset=" + offset; 
 
     console.log('пагинация ', url+params);
 
 
-// пагинацию перерисовыать не нужно
+    // отправим запрос
+    totalProductsJson = sendRequestGET(url + params);
+    if (totalProductsJson) {
+        totalProducts = JSON.parse(totalProductsJson);
+    } else {
+        totalProducts = [];
+    }
 
-    // // отправим запрос
-    // totalProductsJson = sendRequestGET('http://localhost/api/products.php?vendor_id=' + vendor_id + params);
-    // totalProducts = JSON.parse(totalProductsJson);
+    // отрисуем таблицу
+    renderListProducts(totalProducts);
 
-    // // отрисуем таблицу
-    // renderListProducts(totalProducts)
+    // пагинацию перерисовывать не нужно
 }
 
 
-/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА) ---------- */
+/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 
 //получаем все элементы заголовка для отслеживания клика
 const headTableProducts = document.getElementById('list-products').querySelectorAll('th');
@@ -204,23 +224,23 @@ function sortChange() {
     }
 
     // собираем значение для параметра orderby
-    orderby = event.target.getAttribute('data-id') + ":" + event.target.getAttribute('data-sort');
-console.log(orderby);
+    orderby = "&orderby=" + event.target.getAttribute('data-id') + ":" + event.target.getAttribute('data-sort');
+
     // соберём строку запроса
     params = "";
 
     // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    if (hasFilters) {
-        params = hasFilters;
+    if (filters) {
+        params = filters;
     }
 
-    params += "&orderby=" + orderby;
+    params += orderby;
 
-    // добавим лимит
+    // если есть лимит, добавим лимит
     if (limit) {
 
         // определим с какой записи брать данные
-        offset = limit*(currentPage-1) + 1;
+        offset = limit*(currentPage-1);
 
         // добавим лимит и смещение в параметры
         params += "&limit=" + limit + "&offset=" + offset; 
@@ -229,14 +249,17 @@ console.log(orderby);
 
 console.log('сортировка', url+params);
 
-// делаем запрос
-totalProductsJson = sendRequestGET(url+params);
-totalProducts = JSON.parse(totalProductsJson);
+    // делаем запрос
+    totalProductsJson = sendRequestGET(url+params);
+
+    if (totalProductsJson) {
+        totalProducts = JSON.parse(totalProductsJson);
+    } else {
+        totalProducts = [];
+    }
 
 // отрисовываем только таблицу (пагинация остаётся прежней)
 renderListProducts(totalProducts);
-
-
 
 }
 
@@ -246,27 +269,42 @@ headTableProducts.forEach(item => {
 })
 
 
-/* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ ---------- */
+/* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ (Выборка по фильтрам) ---------- */
 const sendChangeData = document.querySelector('.form-filters').querySelector('button');
 
 function getChangeDataFilters() {
 
-    // соберём строку запроса     
-    hasFilters = getFilters();
-    params = hasFilters;
-
-
-    if (orderby) {
-        params += "&orderby=" + orderby;
-    }
-
-    console.log('фильры ', url+params);
     // сбрасываем нумерацию страниц
     currentPage = 1;
 
-    // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
+    // соберём строку запроса     
+    filters = getFilters();
+    params = filters;
 
-    // вызываем отрисовку таблицы
+    if(orderby) {
+        params += orderby;
+    }
+
+    console.log('фильтры ', url+params);
+
+    // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
+    totalProductsJson = sendRequestGET(url+params);
+
+    if (totalProductsJson) {
+        totalProducts = JSON.parse(totalProductsJson);
+    } else {
+        totalProducts = [];
+    }
+
+
+    // подсчёт полученных записей
+    let totalProductsCount = totalProducts.length;
+
+    // отрисуем пагинацию
+    renderPagination(totalProductsCount, limit);
+
+    // отрисуем таблицу
+    renderListProducts(totalProducts);
 
 }
 sendChangeData.addEventListener("click", getChangeDataFilters);
@@ -285,8 +323,7 @@ function getFilters() {
     [brand_idEl, category_idEl, searchEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
-                // params += "&search=name:" + item.value + ";description=" + item.value;
-                params += "&search=name:" + item.value;
+                params += "&search=name:" + item.value + ";description:" + item.value;
             } else {
                 params += "&" + item.id + "=" + item.value;
             }
@@ -331,7 +368,6 @@ function deleteProduct() {
     totalProductsCount = totalProductsCount - 1;
 
     if (totalProductsCount === 0) {
-        const info = document.querySelector('.info-table');
         info.innerText = "Записей нет";
         // очистим контейнер
         containerListProducts.innerHTML = "";
@@ -345,13 +381,13 @@ function deleteProduct() {
     params = "";
 
     // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    if (hasFilters) {
-        params = hasFilters;
+    if (filters) {
+        params = filters;
     }
 
     // если применялась сортировка, то добавляем в параметры
     if (orderby) {
-        params += "&orderby=" + orderby;
+        params += orderby;
     }
 
     console.log('после удаления элемента (доработать)', url+params);
@@ -359,7 +395,7 @@ function deleteProduct() {
     // if (limit) {
 
     //     // определим с какой записи брать данные
-    //     offset = limit*(currentPage-1) + 1;
+    //     offset = limit*(currentPage-1);
 
     //     // добавим лимит и смещение в параметры
     //     params += "&limit=" + limit + "&offset=" + offset; 
@@ -381,22 +417,22 @@ garbage.forEach(item => {
 
 
 
-function test() {
-    let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
-    let totalProductsJson = sendRequestGET(url);
-    console.log(JSON.parse(totalProductsJson)); 
+// function test() {
+//     let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+//     let totalProductsJson = sendRequestGET(url);
+//     console.log(JSON.parse(totalProductsJson)); 
 
-    params="&category_id=4";
-    totalProductsJson = sendRequestGET(url+params);
-    console.log(JSON.parse(totalProductsJson));  
+//     params="&category_id=4";
+//     totalProductsJson = sendRequestGET(url+params);
+//     console.log(JSON.parse(totalProductsJson));  
 
-    params="&category_id=4&search=name:фиолетовый";
-    totalProductsJson = sendRequestGET(url+params);
-    console.log(JSON.parse(totalProductsJson));
+//     params="&category_id=4&search=name:фиолетовый";
+//     totalProductsJson = sendRequestGET(url+params);
+//     console.log(JSON.parse(totalProductsJson));
     
-    params="&category_id=4&search=name:фиолетовый";
-    totalProductsJson = sendRequestGET(url+params);
-    console.log(url+params);
-    console.log(JSON.parse(totalProductsJson));
-}
-test();
+//     params="&category_id=4&search=name:фиолетовый";
+//     totalProductsJson = sendRequestGET(url+params);
+//     console.log(url+params);
+//     console.log(JSON.parse(totalProductsJson));
+// }
+// test();
