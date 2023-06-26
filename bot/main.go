@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type ResponseT struct {
@@ -95,13 +92,13 @@ type InlineButton struct {
 }
 
 type UserT struct {
-	ID          int
-	FirstName   string
-	LastName    string
-	Username    string
-	tg_id       int
-	PhoneNumber string
-	City        string
+	ID          int    `json:"id"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	Username    string `json:"tg_username"`
+	Tg_id       int    `json:"tg_id"`
+	PhoneNumber string `json:"phone"`
+	City        int    `json:"city_id"`
 }
 
 type Order struct {
@@ -117,8 +114,8 @@ type OrderItem struct {
 }
 
 type Coordinates struct {
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 type Cities struct {
@@ -156,11 +153,6 @@ var LastName string
 
 var products = make(map[int]int)
 var client = http.Client{}
-
-// var products = []int{}
-
-// создаем соединение с БД
-var Db, Err = sql.Open("mysql", "root:admin@tcp(mysql:3306)/crm-building")
 
 func main() {
 
@@ -224,6 +216,27 @@ func main() {
 		lastMessage = responseObj.Result[number-1].UpdateID + 1
 
 	}
+}
+
+func sendPost(requestBody string, url string) {
+	// Создаем новый POST-запрос
+	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
+	if err != nil {
+		fmt.Println("Ошибка при создании запроса:", err)
+		return
+	}
+
+	// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
+	req.Header.Set("Content-Type", "application/json")
+
+	// Отправляем запрос с использованием стандартного клиента HTTP
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Ошибка при выполнении запроса:", err)
+		return
+	}
+	defer resp.Body.Close()
 }
 
 func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string, latitude float64, longitude float64) {
@@ -364,44 +377,22 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			user.FirstName = FirstName
 			user.LastName = LastName
 			user.Username = username
-			user.tg_id = id
+			user.Tg_id = id
 			user.PhoneNumber = tel
-			user.City = button
+			user.City, _ = strconv.Atoi(button)
 			// Создаем тело запроса в виде строки JSON
-			requestBody := `{"first_name":` + FirstName + `, "last_name":` + LastName + `, "phone":` + tel + `, "city_id": ` + button + `, "tg_username": ` + username + `, "coordinates": "value2"}`
+			requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
+			fmt.Println(requestBody)
 
-			// Создаем новый POST-запрос
-			req, err := http.NewRequest("POST", "http://nginx:80/api/customers.php", bytes.NewBufferString(requestBody))
-			if err != nil {
-				fmt.Println("Ошибка при создании запроса:", err)
-				return
-			}
-
-			// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
-			req.Header.Set("Content-Type", "application/json")
-
-			// Отправляем запрос с использованием стандартного клиента HTTP
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil {
-				fmt.Println("Ошибка при выполнении запроса:", err)
-				return
-			}
-			defer resp.Body.Close()
+			sendPost(requestBody, "http://nginx:80/api/customers.php")
 
 			usersDB[id] = user
 
 		} else {
+			// Создаем тело запроса в виде строки JSON
+			requestBody := `{"tg_id":` + strconv.Itoa(id) + `, "city_id": ` + button + `}`
 
-			fmt.Println(id)
-			fmt.Println(button)
-			//если зарегистрирован - обновляем в БД
-			_, err := Db.Exec("UPDATE `customers` SET city_id = ? WHERE tg_id = ?", button, id)
-			if err != nil {
-				fmt.Println("Ошибка обновления пользователя ", err)
-			} else {
-				fmt.Println("пользователь обновлён")
-			}
+			sendPost(requestBody, "http://nginx:80/api/customers.php")
 		}
 
 		file, _ := os.Create("db.json")
@@ -745,31 +736,34 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	case step == 10:
 
 		time := time.Now().Unix()
-		// location := Location{
-		// 	Latitude:  latitude,
-		// 	Longitude: longitude,
-		// }
-		// jsonOrder, _ := json.Marshal(products)
-		// jsonData, _ := json.Marshal(location)
-		order := Order{
-			CustomerID: chatId,
-			OrderDate:  time,     // Формат даты: гггг-мм-дд
-			Products:   products, // Карта products с товарами
-			Coordinates: map[string]interface{}{
-				"latitude":  latitude,  // Долгота
-				"longitude": longitude, // Широта
-			},
+		coordinates := Coordinates{
+			Latitude:  latitude,
+			Longitude: longitude,
 		}
-		jsonData, _ := json.Marshal(order)
+		jsonProducts, _ := json.Marshal(products)
+		jsonCoordinates, _ := json.Marshal(coordinates)
 
-		fmt.Println(string(jsonData))
+		// Создаем GET-запрос
+		resp, err := http.Get("http://nginx:80/api/customers.php?tg_id=" + strconv.Itoa(chatId))
+		if err != nil {
+			log.Fatal("Ошибка при выполнении запроса:", err)
+		}
+		defer resp.Body.Close()
 
-		// _, err := Db.Query("INSERT INTO `orders`(`customer_id`,`order_date`, `order`, `location`) VALUES(?,?,?,?)", strconv.Itoa(chatId), time, jsonOrder, jsonData)
-		// if err != nil {
-		// 	fmt.Println("Ошибка сохранения заказа ", err)
-		// } else {
-		// 	fmt.Println("заказ добавлен")
-		// }
+		var user []UserT
+		err = json.NewDecoder(resp.Body).Decode(&user)
+		if err != nil {
+			log.Fatal("Ошибка при декодировании JSON:", err)
+		}
+
+		// Используем полученные данные
+		for _, user := range user {
+			// Создаем тело запроса в виде строки JSON
+			requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
+
+			fmt.Println(requestBody)
+			sendPost(requestBody, "http://nginx:80/api/orders/create-with-vendor-calc.php")
+		}
 
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
