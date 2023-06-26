@@ -17,3 +17,5 @@
     <p class="page-title">Новый заказ</p>
 
 <?php include('./../components/footer.php'); ?>
+
+

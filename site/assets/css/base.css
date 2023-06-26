@@ -259,6 +259,7 @@ input:focus, textarea:focus, select:focus {
     left: 0;
     top: 0;
     border-bottom: 1px solid var(--border-form-elem);
+    z-index: 2;
 }
    
 .menu-top__container {
