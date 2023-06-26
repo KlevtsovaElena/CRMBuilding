@@ -1,4 +1,6 @@
 console.log('подключили list-products');
+
+
 // определим основные переменные
 let currentPage = 1;
 let params;
@@ -33,7 +35,8 @@ category_idEl.querySelectorAll('option').forEach(item => {
 })
 
 // получение записей товаров из БД
-let totalProductsJson = sendRequestGET('http://localhost/api/products.php?vendor_id=' + vendor_id);
+let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+let totalProductsJson = sendRequestGET(url);
 let totalProducts = JSON.parse(totalProductsJson);
 
 // подсчёт полученных записей
@@ -48,14 +51,14 @@ renderListProducts(totalProducts);
 
 /* ---------- ОТРИСОВКА ТОВАРОВ В ТАБЛИЦЕ---------- */
 function renderListProducts(totalProducts) {
-    let records = totalProductsCount;
+    let records = totalProducts.length;
 
 
     // очистим контейнер
     containerListProducts.innerHTML = "";
 
     // если записей нет, то выводим об этом инфо и выходим
-    if (totalProductsCount === 0) {
+    if (totalProducts.length === 0) {
         const info = document.querySelector('.info-table');
         info.innerText = "Записей нет";
         return;
@@ -156,7 +159,7 @@ function switchPage(variance) {
     offset = limit*(currentPage-1) + 1;
     params += "&limit=" + limit + "&offset=" + offset; 
 
-    console.log('пагинация ', params);
+    console.log('пагинация ', url+params);
 
 
 // пагинацию перерисовыать не нужно
@@ -167,32 +170,6 @@ function switchPage(variance) {
 
     // // отрисуем таблицу
     // renderListProducts(totalProducts)
-}
-
-
-/* ---------- СОБЕРЁМ СТРОКУ ЗАПРОСА ФИЛЬТРАЦИИ---------- */
-function getFilters() {
-
-    // сбросим параметры строки запроса
-    params = "";
-
-    limit = limitEl.value;
-
-    // проверяем на наличие данных, если есть, о нормализуем (если надо)
-    // и добавляем в параметр строки запроса 
-    [brand_idEl, category_idEl, searchEl].forEach(item => {
-        if (item.value.trim()) {
-            if  (item.id === 'search') {
-                params += "&search=name:" + item.value + ";description=" + item.value;
-            } else {
-                params += "&" + item.id + "=" + item.value;
-            }
-        }
-    })
-
-    // вернём параметры
-    return params;
-
 }
 
 
@@ -228,7 +205,7 @@ function sortChange() {
 
     // собираем значение для параметра orderby
     orderby = event.target.getAttribute('data-id') + ":" + event.target.getAttribute('data-sort');
-
+console.log(orderby);
     // соберём строку запроса
     params = "";
 
@@ -250,11 +227,17 @@ function sortChange() {
         
     } 
 
-console.log(params);
+console.log('сортировка', url+params);
 
 // делаем запрос
+totalProductsJson = sendRequestGET(url+params);
+totalProducts = JSON.parse(totalProductsJson);
 
 // отрисовываем только таблицу (пагинация остаётся прежней)
+renderListProducts(totalProducts);
+
+
+
 }
 
 // отслеживаем клик по заголовку
@@ -277,21 +260,45 @@ function getChangeDataFilters() {
         params += "&orderby=" + orderby;
     }
 
-    console.log(params);
+    console.log('фильры ', url+params);
     // сбрасываем нумерацию страниц
     currentPage = 1;
 
     // будем запрашивать ВСЕ данные, чтобы знать общее количество отфильтрованных данных
 
-
     // вызываем отрисовку таблицы
-
-
-
-
 
 }
 sendChangeData.addEventListener("click", getChangeDataFilters);
+
+
+/* ---------- СОБЕРЁМ СТРОКУ ЗАПРОСА ФИЛЬТРАЦИИ---------- */
+function getFilters() {
+
+    // сбросим параметры строки запроса
+    params = "";
+
+    limit = limitEl.value;
+
+    // проверяем на наличие данных, если есть, о нормализуем (если надо)
+    // и добавляем в параметр строки запроса 
+    [brand_idEl, category_idEl, searchEl].forEach(item => {
+        if (item.value.trim()) {
+            if  (item.id === 'search') {
+                // params += "&search=name:" + item.value + ";description=" + item.value;
+                params += "&search=name:" + item.value;
+            } else {
+                params += "&" + item.id + "=" + item.value;
+            }
+        }
+    })
+
+    // вернём параметры
+    return params;
+
+}
+
+
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
 const garbage = document.querySelectorAll('.garbage');
@@ -334,19 +341,20 @@ function deleteProduct() {
     // отрисуем пагинацию
     renderPagination(totalProductsCount, limit);
 
-    // // соберём строку запроса
-    // params = "";
+    // соберём строку запроса
+    params = "";
 
-    // // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
-    // if (hasFilters) {
-    //     params = hasFilters;
-    // }
+    // если фильтры применялись (была нажата кнопка), то записываем в параметры полученные фильтры
+    if (hasFilters) {
+        params = hasFilters;
+    }
 
-    // // если применялась сортировка, то добавляем в параметры
-    // if (orderby) {
-    //     params += "&orderby=" + orderby;
-    // }
+    // если применялась сортировка, то добавляем в параметры
+    if (orderby) {
+        params += "&orderby=" + orderby;
+    }
 
+    console.log('после удаления элемента (доработать)', url+params);
     // // добавим лимит
     // if (limit) {
 
@@ -373,4 +381,22 @@ garbage.forEach(item => {
 
 
 
+function test() {
+    let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+    let totalProductsJson = sendRequestGET(url);
+    console.log(JSON.parse(totalProductsJson)); 
 
+    params="&category_id=4";
+    totalProductsJson = sendRequestGET(url+params);
+    console.log(JSON.parse(totalProductsJson));  
+
+    params="&category_id=4&search=name:фиолетовый";
+    totalProductsJson = sendRequestGET(url+params);
+    console.log(JSON.parse(totalProductsJson));
+    
+    params="&category_id=4&search=name:фиолетовый";
+    totalProductsJson = sendRequestGET(url+params);
+    console.log(url+params);
+    console.log(JSON.parse(totalProductsJson));
+}
+test();

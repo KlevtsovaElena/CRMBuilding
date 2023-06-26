@@ -70,7 +70,7 @@
                     <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
                     <option value="100">100</option>
                     <option value="40">40</option>
-                    <option value="100">100</option>
+                    <option value="3">3</option>
                     <option value="">все</option>
                 </select>
             </div>
