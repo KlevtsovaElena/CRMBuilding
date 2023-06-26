@@ -19,6 +19,7 @@ let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
 let limit = limitEl.value;
 let totalProducts = [];
+let garbage;
 
 // найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
@@ -93,6 +94,13 @@ function renderListProducts(totalProducts) {
                                                         .replace('${id}', totalProducts[i]['id'])
                                                         .replace('${max_price}', totalProducts[i]['max_price']);
     }
+
+    garbage = document.querySelectorAll('.garbage');
+    // отслеживаем клик по корзине
+    garbage.forEach(item => {
+        item.addEventListener("click", deleteProduct);
+    })
+    console.log(garbage);
 }
 
 
@@ -107,6 +115,9 @@ function renderPagination(totalProductsCount, limit) {
         totalPages = 1;
     }
 
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
     // очистим контейнер
     containerPagination.innerHTML = "";
 
@@ -118,10 +129,19 @@ function renderPagination(totalProductsCount, limit) {
     prevButton = document.querySelector('.page-switch__prev');
     nextButton = document.querySelector('.page-switch__next');
 
-    // если количество страниц>1, то делаем активной кнопку далее
-    if (totalPages > 1) {
-        nextButton.removeAttribute('disabled');
-    }
+    // 2. настроим возможность/невозможность переключения страниц 
+    if (currentPage === 1) {
+        prevButton.setAttribute('disabled', '');
+        if (totalPages > 1) {
+             nextButton.removeAttribute('disabled');
+        }
+     } else if (currentPage === totalPages) {
+         prevButton.removeAttribute('disabled');
+         nextButton.setAttribute('disabled', '');
+     } else {
+         prevButton.removeAttribute('disabled');
+         nextButton.removeAttribute('disabled');
+     }
 
     console.log('totalPages', totalPages);
 }
@@ -338,10 +358,10 @@ function getFilters() {
 
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
-const garbage = document.querySelectorAll('.garbage');
 
 function deleteProduct() {
 
+    console.log("delete");
     // запрашиваем подтверждение удаления
     let isDelete = false;
 
@@ -363,9 +383,12 @@ function deleteProduct() {
 
     // теперь перерисуем таблицу с учётом удалённого товара
 
-    // то при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
+    // при нажатии на удаление товара нам не нужно заново узнавать сколько ВСЕГО данных по фильтрам
     // но нужно из общего количества удалить 1 
     totalProductsCount = totalProductsCount - 1;
+
+    // отрисуем пагинацию
+    renderPagination(totalProductsCount, limit);  
 
     if (totalProductsCount === 0) {
         info.innerText = "Записей нет";
@@ -374,8 +397,6 @@ function deleteProduct() {
         return;
     }
 
-    // отрисуем пагинацию
-    renderPagination(totalProductsCount, limit);
 
     // соберём строку запроса
     params = "";
@@ -390,26 +411,34 @@ function deleteProduct() {
         params += orderby;
     }
 
-    console.log('после удаления элемента (доработать)', url+params);
-    // // добавим лимит
-    // if (limit) {
+    // добавим лимит
+    if (limit) {
 
-    //     // определим с какой записи брать данные
-    //     offset = limit*(currentPage-1);
+        // определим с какой записи брать данные
+        offset = limit*(currentPage-1);
 
-    //     // добавим лимит и смещение в параметры
-    //     params += "&limit=" + limit + "&offset=" + offset; 
+        // добавим лимит и смещение в параметры
+        params += "&limit=" + limit + "&offset=" + offset; 
         
-    // } 
+    } 
+    console.log('после удаления элемента (доработать)', url+params);
+ 
+    // делаем запрос
+    totalProductsJson = sendRequestGET(url+params);
 
-    // console.log(params);
+    if (totalProductsJson) {
+        totalProducts = JSON.parse(totalProductsJson);
+    } else {
+        totalProducts = [];
+    }
+
+    // отрисовываем таблицу
+    renderListProducts(totalProducts);
+
 
 }
 
-// отслеживаем клик по корзине
-garbage.forEach(item => {
-    item.addEventListener("click", deleteProduct);
-})
+
 
 
 
