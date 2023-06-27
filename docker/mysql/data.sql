@@ -46,6 +46,7 @@ DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -70,6 +71,7 @@ CREATE TABLE `commissioners` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL,
   `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(200) DEFAULT NULL,
   `tg_username` varchar(300) DEFAULT NULL,
   `tg_id` bigint unsigned DEFAULT NULL,
@@ -85,10 +87,16 @@ CREATE TABLE `customers` (
   `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `city_id` int unsigned NOT NULL,
   `tg_id` bigint unsigned NOT NULL,
+  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `city_id` int unsigned NOT NULL,
+  `tg_id` bigint unsigned NOT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`) VALUES
+(5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch'),
+(19,	'Лол',	'',	'79167625303',	12,	892205925,	'rodionaka');
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`) VALUES
 (5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch'),
 (19,	'Лол',	'',	'79167625303',	12,	892205925,	'rodionaka');
@@ -100,9 +108,19 @@ CREATE TABLE `order_vendors` (
   `vendor_id` int unsigned NOT NULL,
   `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `status` tinyint unsigned NOT NULL,
+  `order_id` int unsigned NOT NULL,
+  `vendor_id` int unsigned NOT NULL,
+  `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `status` tinyint unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`) VALUES
+(3,	124,	1,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(4,	1,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(5,	1,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(6,	1,	2,	'[]',	1),
+(7,	1,	2,	'',	1);
 INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`) VALUES
 (3,	124,	1,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
 (4,	1,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
@@ -117,9 +135,23 @@ CREATE TABLE `orders` (
   `order_date` int unsigned NOT NULL,
   `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `location` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `location` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `products`, `location`) VALUES
+(124,	892205925,	1687282054,	'{\"13\":1,\"14\":2,\"15\":3}',	'{\"latitude\": 0, \"longitude\": 0}'),
+(125,	892205925,	1687282279,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(130,	892205925,	1687300121,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
+(131,	892205925,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(132,	892205925,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(133,	892205925,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(134,	892205925,	1687300807,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(135,	892205925,	1687301289,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
+(136,	892205925,	1687346529,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(137,	892205925,	1687346529,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}');
 INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `products`, `location`) VALUES
 (124,	892205925,	1687282054,	'{\"13\":1,\"14\":2,\"15\":3}',	'{\"latitude\": 0, \"longitude\": 0}'),
 (125,	892205925,	1687282279,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
@@ -138,6 +170,8 @@ CREATE TABLE `price_changes` (
   `product_id` int unsigned NOT NULL,
   `date_change` int unsigned NOT NULL,
   `old_price` int unsigned DEFAULT NULL,
+  `date_change` int unsigned NOT NULL,
+  `old_price` int unsigned DEFAULT NULL,
   `new_price` int unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -150,7 +184,16 @@ CREATE TABLE `products` (
   `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `article` int unsigned NOT NULL,
+  `name` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `article` int unsigned NOT NULL,
   `category_id` int unsigned NOT NULL,
+  `brand_id` int unsigned NOT NULL,
+  `vendor_id` int unsigned NOT NULL,
+  `quantity_available` int unsigned NOT NULL,
+  `price` int unsigned NOT NULL,
+  `max_price` int unsigned NOT NULL,
   `brand_id` int unsigned NOT NULL,
   `vendor_id` int unsigned NOT NULL,
   `quantity_available` int unsigned NOT NULL,
@@ -209,16 +252,22 @@ DROP TABLE IF EXISTS `vendors`;
 CREATE TABLE `vendors` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `city_id` int unsigned NOT NULL,
+  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `tg_id` bigint unsigned DEFAULT NULL,
   `coordinates` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `coordinates` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`) VALUES
+(1,	'Поставщик',	4,	NULL,	NULL,	NULL,	NULL,	NULL),
+(2,	'Поставщик 2',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	NULL);
 (1,	'Поставщик',	4,	NULL,	NULL,	NULL,	NULL,	NULL),
 (2,	'Поставщик 2',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	NULL);
 
