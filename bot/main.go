@@ -706,7 +706,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		encodedCartText := url.QueryEscape(cartText)
-		encodedText := url.QueryEscape("\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + " сум"
+		encodedText := url.QueryEscape("\nИтого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> сум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + " сум"
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + encodedCartText + encodedText + "</b>&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON))
 
 		step += 1
