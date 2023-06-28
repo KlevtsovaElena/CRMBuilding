@@ -1,4 +1,3 @@
-
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -16,164 +15,135 @@
 <?php include('./../components/header.php'); ?>   
 
     <p class="page-title">Новый заказ</p>
-
+    <!-- здесь храним id поставщика -->
+    <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $_GET['order_id'] ?>">
     <!-- соберём данные для отображения в форме -->
 
     <?php
-        $newOrderJson = file_get_contents("http://nginx/api/orders.php?id=" . $_GET['id'] . '"');
-        $newOrder = json_decode($newOrderJson, true);
-        print_r($newOrder);
+        $orderId = $_GET['order_id'];
+        $timestamp = 1687282054;
+        $date = date('d.m.Y (H:i)', $timestamp);
+        print_r($date);
 
-        $ordersJson = file_get_contents("http://nginx/api/orders.php");
-        $orders = json_decode($ordersJson, true);
+        //функция для расчета расстояния по координатам
+        function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2, $unit = 'kilometers') {
+            $theta = $longitude1 - $longitude2; 
+            $distance = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta))); 
+            $distance = acos($distance); 
+            $distance = rad2deg($distance); 
+            $distance = $distance * 60 * 1.1515; 
+            switch($unit) { 
+                //для расчета в милях
+              case 'miles': 
+                break; 
+                //для расчета в километрах
+              case 'kilometers' : 
+                $distance = $distance * 1.609344; 
+            } 
+            //округляем значение до целого числа
+            return (round($distance,0)); 
+          }
 
-        $vendorProductsJson = file_get_contents("http://nginx/api/ordervendors.php?id=");
-        $vendorProducts = json_decode($brandsJson, true);
+          print_r(getDistanceBetweenPointsNew(55.657107, 37.569608, 57.569608, 35.569608, $unit = 'kilometers'));
+        // print_r($orderId);
+        // $newOrderJson = file_get_contents("http://nginx/api/orders.php?id=" . $_GET['id'] . '"');
+        // $newOrder = json_decode($newOrderJson, true);
+        // print_r($newOrder);
 
-        $productsJson = file_get_contents("http://nginx/api/products.php?id=");
-        $products = json_decode($brandsJson, true);
+        // $ordersJson = file_get_contents("http://nginx/api/orders.php");
+        // $orders = json_decode($ordersJson, true);
 
-        $categoriesJson = file_get_contents("http://nginx/api/categories.php");
-        $categories = json_decode($categoriesJson, true);
+        // $vendorProductsJson = file_get_contents("http://nginx/api/ordervendors.php?id=");
+        // $vendorProducts = json_decode($brandsJson, true);
+
+        // $productsJson = file_get_contents("http://nginx/api/products.php?id=");
+        // $products = json_decode($brandsJson, true);
+
+        // $categoriesJson = file_get_contents("http://nginx/api/categories.php");
+        // $categories = json_decode($categoriesJson, true);
     ?>
 
-    <!-- Выбор фильтров -->
-    <section class="form-filters">
-
-        <!-- здесь храним id поставщика -->
-        <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
-        
-        <div class="form-elements-container">
-            
-            <!-- выбор бренда -->
-            <label>Бренд
-                <select id="brand_id" name="brand_id" value="">
-
-                    <option value="">Все</option>
-                    <?php foreach($brands as $brand) { ?>
-                        <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                    <?php }; ?>
-
-                </select>
-            </label>
-
-            <!-- выбор категории -->
-            <label>Категория
-                <select id="category_id" name="category_id" value="">
-                    
-                    <option value="">Все</option>
-                    <?php foreach($categories as $category) { ?>
-                        <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                    <?php }; ?>
-
-                </select>
-            </label>
-
-            <!-- выбор кол-во записей на листе -->
-            <div class="d-iblock">Показывать по
-                <select id="limit" name="limit" value="" required>
-                    
-                    <option value="12">12</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="">все</option>
-
-                </select>
-            </div>
-            
-            <br>
-
-            <!-- поле поиска -->
-            <input type="search" id="search" name="search" value="" placeholder="Поиск">
-            
-            <button class="btn btn-ok d-iblock">Применить</button>
-            
-        </div>
-    </section>
-
-    <!-- таблица товаров -->
+    <!-- таблица нового заказа -->
     <section class="products">
-        <table id="list-products">
+        <table>
 
-            <thead>
-                <tr role="row">
-
-                    <th data-id="order_id" data-sort="">Заказ № <?php $newOrder['id'] ?> от <?php $newOrder['order_date'] ?>
-                        <div>До клиента: </div> 
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <!-- <th data-id="name" data-sort="">Наименование</th>
-                    <th data-id="brand_id" data-sort="">Бренд</th> -->
-                    <!-- <th data-id="category_id" data-sort="">Категория</th>
-                    <th data-id="quantity_available" data-sort="">Остаток</th>
-                    <th data-id="price" data-sort="">Цена</th>
-                    <th data-id="max_price" data-sort="">Цена рыночная</th> -->
-                    
-                </tr>
-                <tr role="row" class="list-orders__row" order-id="<?php $newOrder['id'] ?>">
-                    <td><a href="vendor-new-order.php?order_id=${order_id}"><strong>${order_id}</strong></a></td>
-                    <td class="list-orders_status">${status}</td>
-                    <td>${order_date}</td>
-                    <td>${products}</td>
-                    <td>${total_price}</td>
-                    <td>${complete_date}</td>
-                </tr>
+            <thead id="new-order">
+                <!-- место для первого шаблона с шапкой таблицы -->
+                
             </thead>
 
-            <tbody class="list-products__body">
-                <!-- контент таблицы из шаблона -->
+            <tbody class="list-products__body" id="new-order-products">
+                <!-- место для шаблона со списком заказанных товаров -->
+            </tbody>
+
+            <tbody class="list-products__body" id="new-order-sum">
+                <!-- место для шаблона с итогом -->
             </tbody>
 
         </table>
-        <div class="info-table"></div>
+        <!-- <div class="info-table"></div> -->
     </section>
-
-    <section class="pagination-wrapper"><!-- пагинация --></section>
 
     <section class="buttons">
-        <button class="btn btn-ok d-iblock">КОНТАКТНЫЕ ДАННЫЕ</button>
-        <button class="btn btn-ok d-iblock">ПОДТВЕРДИТЬ ЗАКАЗ</button>
-        <button class="btn btn-ok d-iblock">ОТМЕНИТЬ ЗАКАЗ</button>
-        <button class="btn btn-ok d-iblock">НЕ ДОЗВОНИЛИСЬ</button>
+        <button class="btn btn-ok d-iblock" onclick="showContact()">КОНТАКТНЫЕ ДАННЫЕ</button>
+        <button class="btn btn-ok d-iblock" onclick="confirmOrder()">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+        <button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
+        <button class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
     </section>
 
-    
-
     <!-- ШАБЛОНЫ -->
-    <!-- шаблон таблицы -->
-    <template id="template-body-table">
-        
-        <tr role="row" class="list-products__row" product-id="${id}">
-            <td><a href="vendor-edit-product.php?id=${id}"><strong>${article}</strong></a></td>
-            <td class="list-products_name"><a href="vendor-edit-product.php?id=${id}"><img src="${photo}" /><strong>${name}</strong></td>
-            <td>${brand_id}</td>
-            <td>${category_id}</td>
-            <td>${quantity_available}</td>
-            <td>${price}</td>
-            <td>${max_price}
+    <!-- шаблон шапки части таблицы -->
+    <template id="template-new-order">
+        <tr role="row">
 
-                <svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg>
- 
-            </td>
+            <th data-id="order_id" data-sort="">
+                <div>Заказ № ${order_id} от ${date}</div>
+                <div>${phone}</div>
+                <div>До клиента: ${distance} километров</div> 
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+
         </tr>
+        
+        <!-- <tr role="row" id="new-order-products"></tr> -->
+        <!-- место шаблона с содержимым заказа -->
 
+        
     </template>
 
-    <!-- шаблон пагинации -->
-    <template id="template-pagination">
-        <div class="page-switch">                
-            <button class="page-switch__prev"  onclick="switchPage(-1)" disabled>
-                <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
-            </button>
-            <span class="current-page">${currentPage}</span>
-            <button class="page-switch__next" onclick="switchPage(1)" disabled>
-                <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
-            </button>
-        </div>
-        <div class="page-status">стр <span class="current-page">${currentPage}</span> из <span class="total-page">${totalPages}</span></div>
+    <!-- шаблон с содержимым заказа -->
+    <template  id="template-new-order-products">
+        <tr role="row" class="list-orders__row" order-id="">
+            <td>${name}</td>
+            <td class="list-orders_status">${quantity}</td>
+            <td>${price} сум</td>
+            <td>${calculated_price} сум</td>
+            <!-- <td>${complete_date}</td> -->
+        </tr>
     </template>
-      
+
+    <!-- шаблон с содержимым заказа -->
+    <template  id="template-new-order-sum">
+        <tr role="row" class="list-orders__row" order-id="">
+            <td>Итого</td>
+            <td>${total_quantity}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <!-- <td>${complete_date}</td> -->
+        </tr>
+        <tr role="row" class="list-orders__row" order-id="">
+            <td>Итого</td>
+            <td></td>
+            <td></td>
+            <td>${total_sum} сум</td>
+            <!-- <td>${complete_date}</td> -->
+        </tr>
+    </template>
+
+
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
 
