@@ -11,6 +11,8 @@ class OrderVendorRepository extends BaseRepository
     const TABLE_NAME = 'order_vendors';
     const CLASS_NAME = 'models\OrderVendor';
 
+    const GET_WITH_DETAILS = 'SELECT * FROM order_vendors'
+
     public function getTableName() : string
     {
         return static::TABLE_NAME;
@@ -36,6 +38,11 @@ class OrderVendorRepository extends BaseRepository
         }
 
         return $item;
+    }
+
+    public function getWithDetails(array $inputParams)
+    {
+
     }
 }
 ?>
