@@ -194,9 +194,15 @@ function deleteProductFromEditForm(id) {
     console.log("удаляем");
 
     // делаем запрос на удаление товара по id
-    sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
 
     alert("Товар удалён");
 
-    window.location.href = 'http://localhost/pages/vendor-add-product.php';
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    // переход обратно на странницу списка товаров с прежними параметрами
+    window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
 }

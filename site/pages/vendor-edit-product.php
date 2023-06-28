@@ -1,4 +1,3 @@
-<?php $id = $_GET['id']; ?>
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -12,7 +11,9 @@
     ];
 ?>
 <?php include('./../components/header.php'); ?>
-                
+       
+<?php $id = $_GET['id']; ?>
+
     <p class="page-title">Редактировать товар</p>
 
         <!-- соберём данные для отображения в форме -->
