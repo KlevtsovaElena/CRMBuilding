@@ -1,5 +1,6 @@
 package main
 
+//подключение требуемых пакетов
 import (
 	"bytes"
 	"encoding/json"
@@ -14,6 +15,7 @@ import (
 	"time"
 )
 
+// структура для приходящих сообщений и обычных кнопок
 type ResponseT struct {
 	Ok     bool `json:"ok"`
 	Result []struct {
@@ -49,6 +51,7 @@ type ResponseT struct {
 	} `json:"result"`
 }
 
+// структура для инлайн кнопок
 type InlineButton struct {
 	Ok     bool `json:"ok"`
 	Result []struct {
@@ -91,6 +94,7 @@ type InlineButton struct {
 	} `json:"result"`
 }
 
+// структура пользователя
 type UserT struct {
 	ID          int    `json:"id"`
 	FirstName   string `json:"first_name"`
@@ -101,6 +105,7 @@ type UserT struct {
 	City        int    `json:"city_id"`
 }
 
+// структура заказа
 type Order struct {
 	CustomerID  int                    `json:"customer_id"`
 	OrderDate   int64                  `json:"order_date"`
@@ -108,31 +113,37 @@ type Order struct {
 	Coordinates map[string]interface{} `json:"coordinates"`
 }
 
+// структура корзины в заказе
 type OrderItem struct {
 	ProductID int
 	Quantity  int
 }
 
+// структура геопозиции
 type Coordinates struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
+// структура городов
 type Cities struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
+// структура категорий
 type Categories struct {
 	ID           int    `json:"id"`
 	CategoryName string `json:"category_name"`
 }
 
+// структура брендов
 type Brands struct {
 	ID        int    `json:"id"`
 	BrandName string `json:"brand_name"`
 }
 
+// структура товара
 type Product struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
@@ -142,9 +153,11 @@ type Product struct {
 	MaxPrice    int    `json:"max_price"`
 }
 
+// переменные для подключения к боту
 var host string = "https://api.telegram.org/bot"
 var token string = "6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o"
 
+// переменная шага в боте (слежка за шагом пользователя)
 var step int = 1
 
 var tel string
@@ -156,8 +169,10 @@ var client = http.Client{}
 
 func main() {
 
+	//обнуление последнего id сообщения
 	lastMessage := 0
 
+	//цикл для проверки на наличие новых сообщений
 	for range time.Tick(time.Second * 1) {
 
 		//отправляем запрос к Telegram API на получение сообщений
@@ -171,14 +186,13 @@ func main() {
 		//посмотреть данные
 		fmt.Println(string(data))
 
-		// var responseObj ResponseT
 		//парсим данные из json
 		var responseObj ResponseT
 		json.Unmarshal(data, &responseObj)
 
+		//парсим данные из json  (для нажатия на инлайн кнопку)
 		var need InlineButton
 		json.Unmarshal(data, &need)
-		//fmt.Println(responseObj)
 
 		//считаем количество новых сообщений
 		number := len(responseObj.Result)
@@ -218,6 +232,7 @@ func main() {
 	}
 }
 
+// функция для отправки POST запроса
 func sendPost(requestBody string, url string) {
 	// Создаем новый POST-запрос
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
@@ -239,17 +254,18 @@ func sendPost(requestBody string, url string) {
 	defer resp.Body.Close()
 }
 
+// функция для отправки сообщения пользователю
 func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string, latitude float64, longitude float64) {
 
-	fmt.Println(text)
-
 	switch {
+	//кейс при заходе человека в бот или его перезагрузка
 	case text == "/start":
 
 		step = 1
 		FirstName = firstName
 		LastName = lastName
 
+		//собираем объект клавиатуры для выбора языка
 		buttons := [][]map[string]interface{}{
 			{{"text": "Русский 🇷🇺", "callback_data": "russian"}},
 			{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbekistan"}},
@@ -260,14 +276,18 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
+		//кодирование клавиатуры в json для отправки
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 		// http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesId))
+		//отправка сообщения
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, добро пожаловать в Стройбот. Выберите язык&reply_markup=" + string(inlineKeyboardJSON))
 
+		//следующий шаг
 		step += 1
 		break
 
+	//кейс отправки номера телефона
 	case step == 2:
 
 		// Создаем объект клавиатуры
@@ -291,14 +311,18 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		// Преобразуем клавиатуру в JSON
 		keyboardJSON, _ := json.Marshal(keyboard)
+
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
 
+		//следующий шаг
 		step += 1
 		break
 
+	//кейс на случай отказа передать телефон
 	case step == 3 && text == "Нет":
 
+		//создаём объект клавиатуры
 		buttons := [][]map[string]interface{}{
 			{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
 		}
@@ -307,16 +331,18 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			"inline_keyboard": buttons,
 		}
 
+		//кодируем клавиатуру в json
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
+		//отправка сообщения
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=К сожалению вы не сможете пройти дальше, если не укажите номер телефона&reply_markup=" + string(inlineKeyboardJSON))
 
+		//переходим на шаг с предложением поделится номером телефона
 		step -= 1
 		break
 
+	//кейс с выбором города пользователя
 	case step == 3:
-
-		fmt.Println(step)
 
 		tel = phone
 		buttons := [][]map[string]interface{}{}
@@ -344,23 +370,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			buttons = append(buttons, button)
 		}
 
+		//создаём объект клавиатуры
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
 
+		//кодируем клавиатуру в json
 		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 		if err != nil {
 			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
 		}
 
+		//отправляем сообщение
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
+		//следующий шаг
 		step += 1
 		break
 
+	//шаг с записью человека в бд или обновление его данных если он зарегистрирован
 	case step == 4:
-
-		fmt.Println(FirstName)
-		fmt.Println(LastName)
 
 		//создали "бд юзеров"
 		usersDB := make(map[int]UserT)
@@ -384,6 +412,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
 			fmt.Println(requestBody)
 
+			//передаём тело в фуекцию отправки POST запросов
 			sendPost(requestBody, "http://nginx:80/api/customers.php")
 
 			usersDB[id] = user
@@ -395,6 +424,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			sendPost(requestBody, "http://nginx:80/api/customers.php")
 		}
 
+		//запись пользователя в кэш
 		file, _ := os.Create("db.json")
 		jsonString, _ := json.Marshal(usersDB)
 		file.Write(jsonString)
@@ -423,10 +453,13 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Отправляем сообщение с клавиатурой
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
 
+		//следующий шаг
 		step += 1
 		break
 
 	case button == "backToMenu":
+
+		//устанавливаем для этого кейса постоянный шаг
 		step = 4
 		// Создаем объект клавиатуры
 		keyboard := map[string]interface{}{
@@ -455,7 +488,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		break
 
 	case step == 5 && text == "Заказать 🛍":
+
+		//устанавливаем для этого кейса постоянный шаг
 		step = 5
+
 		buttons := [][]map[string]interface{}{}
 		// Создаем GET-запрос
 		resp, err := http.Get("http://nginx:80/api/categories.php")
@@ -487,20 +523,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			},
 		})
 
+		//создаём объект клавиатуры
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
 
+		//кодируем клавиатуру в json
 		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 		if err != nil {
 			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
 		}
 
+		//отправляем сообщение
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
+		//следующий шаг
 		step += 1
 		break
 
+	//кейс для отработки возвращения на шаг с выбором категории товара
 	case button == "backToGoods":
 		buttons := [][]map[string]interface{}{}
 		// Создаем GET-запрос
@@ -533,20 +574,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			},
 		})
 
+		//создаём объект клавиатуры
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
 
+		//кодируем клавиатуру в json
 		inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 		if err != nil {
 			log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
 		}
 
+		//отправляем сообщение
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
+		//переходим к следующему шагу
 		step = 6
 		break
 
+	//кейс с выбором бренда товара
 	case step == 6:
 
 		step = 6
@@ -581,13 +627,17 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			},
 		})
 
+		//создаём объект клавиатуры
 		inlineKeyboard := map[string]interface{}{
 			"inline_keyboard": buttons,
 		}
 
+		//кодируем клавиатуру в json
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
+		//отпраляем сообщение
 		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
+		//следующий шаг
 		step += 1
 		break
 
