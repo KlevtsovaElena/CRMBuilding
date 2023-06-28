@@ -19,7 +19,7 @@ abstract class BaseRepository
         $properties = [];
         foreach ($classProperties as $property => $value) {
             if (array_key_exists($property, $inputProperties))
-                $properties[$prefix . $property] = $inputProperties[$prefix . $property];
+                $properties[$prefix . $property] = $inputProperties[$property];
         }
         return $properties;
     }
@@ -95,7 +95,7 @@ abstract class BaseRepository
         return $queryParams;
     }
 
-    protected function getOrderybyQueryString($inputParams): string
+    protected function getOrderbyQueryString($inputParams): string
     {
         $resultString = null;
         $customParams = $this->getCustomParameters($inputParams, ';');
@@ -159,7 +159,7 @@ abstract class BaseRepository
         $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), $whereParams);
 
         if (isset($inputParams['orderby']))
-            $query = $query . $this->getOrderybyQueryString($inputParams['orderby']);
+            $query = $query . $this->getOrderbyQueryString($inputParams['orderby']);
 
         if (isset($inputParams['limit']))
         {

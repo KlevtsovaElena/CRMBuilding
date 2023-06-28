@@ -171,12 +171,14 @@ func main() {
 		//посмотреть данные
 		fmt.Println(string(data))
 
+		// var responseObj ResponseT
 		//парсим данные из json
 		var responseObj ResponseT
 		json.Unmarshal(data, &responseObj)
 
 		var need InlineButton
 		json.Unmarshal(data, &need)
+		//fmt.Println(responseObj)
 
 		//считаем количество новых сообщений
 		number := len(responseObj.Result)
@@ -624,8 +626,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			fmt.Println(product.Photo)
 
-			// Создание URL запроса
-			apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&caption="+product.Name+" кнауф "+product.Description+" Среднерыночная цена в городе Ташкент "+strconv.Itoa(product.MaxPrice)+" сум Цена Стройбота "+strconv.Itoa(product.Price)+" сум &photo="+product.Photo+"&reply_markup="+string(inlineKeyboardJSON), token, strconv.Itoa(id))
+			//создание запроса
+			caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + "Цена среднерыночная \n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\nЦена Стройбота \n<b>" + strconv.Itoa(product.Price) + " сум</b>")
+			apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
 			requestURL, err := url.Parse(apiURL)
 			if err != nil {
 				log.Fatal(err)
@@ -664,6 +667,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 	case step == 8 && button == "goToCart":
 		finalPrice := 0
+		benefit := 0
+		marketPrice := 0
 		cartText := ""
 		for ID := range products {
 
@@ -682,8 +687,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				return
 			}
 
-			cartText += product.Name + " " + strconv.Itoa(products[ID]) + " ✖️ " + strconv.Itoa(product.Price)
+			cartText += product.Name + "\n" + strconv.Itoa(products[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(products[ID]*product.Price) + " сум\n"
 			finalPrice += product.Price * products[ID]
+			marketPrice += product.MaxPrice * products[ID]
+			benefit += product.MaxPrice*products[ID] - product.Price*products[ID]
 
 		}
 		// Создаем объект инлайн клавиатуры
@@ -698,7 +705,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
-		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + cartText + " Итого: " + strconv.Itoa(finalPrice) + "&reply_markup=" + string(inlineKeyboardJSON))
+		encodedCartText := url.QueryEscape(cartText)
+		encodedText := url.QueryEscape("\nИтого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> сум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + " сум"
+		http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + encodedCartText + encodedText + "</b>&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON))
 
 		step += 1
 		break
@@ -795,6 +804,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 	if strings.SplitN(button, ":", 2)[0] == "add" {
 		productStr := strings.Split(button, ":")[1]
 		productID, _ := strconv.Atoi(productStr)
+		// products = append(products, productID)
+		// fmt.Println(products)
+		// Пример добавления товара с id=3 и количеством 2
 		quantity := 1
 
 		// Проверяем, есть ли товар с таким id в массиве
