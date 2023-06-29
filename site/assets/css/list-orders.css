@@ -1,4 +1,5 @@
 @import url('pagination.css');
+
 .orders {
     margin-top: 10px;
     margin-bottom: 20px;
@@ -27,10 +28,9 @@
 
 .list-orders_status {
     padding: 5px;
-    width: 100%;
     color: var(--light-color);
     font-weight: 600;
-    word-spacing: nowrap;
+    white-space: nowrap;
 }
 
 /* статус создан */
@@ -64,11 +64,41 @@
 }
 
 .row-status0 {
-    background: rgba(255, 0, 0, 0.1)!important;
+    /* background: rgba(255, 0, 0, 0.1)!important;     */
+    background: rgba(255, 255, 0, 0.2)!important;
     border: 1px solid white;
 }
 #search {
     width: 250px;
+}
+
+#list-orders th[data-sort]:after {
+    right: 0;
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+#list-orders th[data-sort]:before {
+    right: 6px;
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-products th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-products th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.info-table {
+    font-size: 0.9rem;
+    text-align: center;
+    padding-top: 10px;
 }
 
 
