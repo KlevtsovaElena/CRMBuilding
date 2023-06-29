@@ -34,5 +34,25 @@
         {
             return $this->get(["id" => $id]);
         }
+
+        public function getAllByIds(array $ids) : array 
+        {
+            $queryParams = $this->getQueryIdsArrayParams($ids);
+            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), '`id` IN ('.implode(',', array_keys($queryParams)) .')');
+
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($queryParams);
+    
+            return array_map([$this, 'map'], $statement->fetchAll());
+        }
+
+        private function getQueryIdsArrayParams(array $ids)
+        {
+            $resultArray = [];
+            foreach($ids as $key => $value)
+                $resultArray[':id'.$key] = $value;
+
+            return $resultArray;
+        }
     }
 ?>
