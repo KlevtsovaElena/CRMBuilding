@@ -195,6 +195,27 @@ input:focus, textarea:focus, select:focus {
     opacity: 0.5;
 }
 
+/* ---COUNTER в хэдере---- */
+.orders-with-counter {
+    position: relative;
+}
+
+.counter {
+    position: absolute;
+    bottom: 7px;
+    right: -17px;
+    background-color: var(--secondary-color);
+    color: var(--light-color);
+    font-size: 10px;
+    padding: 1px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 50%;
+    text-align: center;
+}
+
+
 /* ---BUTTON---- */
 
 .btn-ok {
