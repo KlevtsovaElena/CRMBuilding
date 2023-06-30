@@ -6,8 +6,7 @@ let orderStatus = {
     "1": "Просмотрен",
     "2": "Подтверждён",
     "3": "Отменён",
-    "4": "Звершён",
-    "5": "Не дозвонились"
+    "4": "Звершён"
 }
 
 // найдём шаблон и контейнер для отрисовки заказов
@@ -28,7 +27,7 @@ console.log(headTableOrders);
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/order-vendors/get-with-details.php?vendor_id=' + vendor_id;
+let url = 'http://localhost/api/order-vendors/get-with-details.php?vendor_id=' + vendor_id + "&orderby=id:desc";
 
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
@@ -43,7 +42,10 @@ let filters = "";
 let limitParams = "";
 let params = "";
 
+// УДАЛИТЬ КОГДА БУДЕМ ПОЛУЧАТЬ COUNT
+// ---------------------------------
 let paramsTest = "";
+// ---------------------------------
 
 let limit = limitEl.value;
 let offset = containerPagination.getAttribute('offset');
@@ -56,6 +58,7 @@ let totalOrdersCount;
 let ordersJson;
 // заполним страницу данными
 startRenderPage();
+
 
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
 function startRenderPage() {
@@ -74,14 +77,13 @@ function startRenderPage() {
 
 }
 
+
 /* ---------- СБОР ПАРАМЕТРОВ запроса---------- */
 function getParams() {
 
     paramsTest = "";
     // сначала фильтры 
     filters = getFilters();
-
-    console.log("filters", filters);
 
     // теперь проверим как у нас с сортировкой
     // ищем в каждом заголовке по атрибуту data-sort
@@ -94,10 +96,11 @@ function getParams() {
     }
 
     // добавим лимит
+    limit = limitEl.value;
     limitParams = "&limit=" + limit + "&offset=" + offset
     params = filters + orderby + limitParams;
     paramsTest = filters + orderby;
-    console.log("params += filters + orderby + limitParams;", params);
+    console.log("params ", params);
     return params;
 }
 
@@ -113,6 +116,7 @@ function getFilters() {
 
     return params;
 }
+
 
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ДАННЫХ В ОТВЕТЕ ---------- */
 function changeData() {
@@ -140,8 +144,11 @@ function changeData() {
 
 }
 
+
 /* ---------- ПОЛУЧЕНИЕ ДАННЫХ ИЗ БД ---------- */
 function getOrdersData(params, paramsTest) {
+
+    // ПЕРЕДЕЛАТЬ КОГДА БУДЕМ ПОЛУЧАТЬ COUNT
     // -----------------------------------------------------------------------
     //кол-во ПОТОМ ПОЛУЧАТЬ ИЗ АПИ
     let test2 = [];
@@ -154,7 +161,7 @@ function getOrdersData(params, paramsTest) {
 
     // подсчёт полученных записей
     totalOrdersCount = test2.length;
-    console.log(totalOrdersCount);
+
 
     // -------------------------------------------------------------------
 
@@ -166,7 +173,7 @@ function getOrdersData(params, paramsTest) {
     } else {
         orders = [];
     }
-console.log(orders);
+console.log('всего ' + totalOrdersCount + ' выборка ' + orders.length);
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (orders.length === 0 && totalOrdersCount > 0) {
         changeData();
@@ -174,6 +181,7 @@ console.log(orders);
     }
 
 }
+
 
 /* ---------- ОТРИСОВКА ТОВАРОВ В ТАБЛИЦЕ---------- */
 function renderListOrders(orders) {
@@ -209,15 +217,41 @@ function renderListOrders(orders) {
 
         let products = "";
         let totalPrice = 0; 
-
+        let productName = "";
         // соберём данные заказанных товаров и общую стоимость заказа
+        // for (let j = 0; j < orders[i]['products'].length; j++){
+        //     // если вдруг товар в базе не найден,
+        //     // т.е. его названия нет в ответе, то установим name="Товар не найден в базе "
+        //     if (!orders[i]['products'][j]['name']) {
+        //         productName = "Товар в базе не найден";
+        //     } else {
+        //         productName = orders[i]['products'][j]['name'];
+        //     }
+        //     products += productName + " (" + 
+        //                     (orders[i]['products'][j]['quantity']) + '), ';
+        //                     // если вдруг товар в базе не найден,
+        //                     // т.е. его цены нет в ответе, то мы её не учитываем
+        //                     if (orders[i]['products'][j]['price']) {
+        //                         totalPrice += orders[i]['products'][j]['quantity'] * orders[i]['products'][j]['price'];
+        //                     }
+
+        // }
+
+
         for (let j = 0; j < orders[i]['products'].length; j++){
+
+            productName = orders[i]['products'][j]['name'];
+            
             products += orders[i]['products'][j]['name'] + " (" + 
                             (orders[i]['products'][j]['quantity']) + '), ';
-                            totalPrice = orders[i]['products'][j]['quantity'] * orders[i]['products'][j]['price'];
-
+                            totalPrice += orders[i]['products'][j]['quantity'] * orders[i]['products'][j]['price'];
+                            
         }
 
+
+
+
+console.log(totalPrice);
         products = products.slice(0, -2);
 
         // отформатируем дату
@@ -231,6 +265,9 @@ function renderListOrders(orders) {
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders[i]['order_id'])
                                                         .replace('${order_id}', orders[i]['order_id'])
+                                                        .replace('${order_id}', orders[i]['order_id'])
+                                                        .replace('${id}', orders[i]['id'])
+                                                        .replace('${id}', orders[i]['id'])
                                                         .replace('${id}', orders[i]['id'])
                                                         .replace('${status}', orders[i]['status'])
                                                         .replace('${status}', orders[i]['status'])
@@ -242,7 +279,10 @@ function renderListOrders(orders) {
         
     }  
 
+    info.innerText = "Всего " + totalOrdersCount + declinationWord(totalOrdersCount, [' запись', ' записи', ' записей']);
+
 }
+
 
 /* ---------- ОТРИСОВКА ПАГИНАЦИИ ---------- */
 function renderPagination(totalOrdersCount, limit) {
@@ -284,11 +324,92 @@ function renderPagination(totalOrdersCount, limit) {
         nextButton.removeAttribute('disabled');
     }
 
-    console.log('totalPages', totalPages);
 }
 
+
+/* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
+function switchPage(variance) {
+
+    // 1. поменяем номер странички
+    currentPage = currentPage + variance;
+
+    // и офсет
+    offset = (currentPage - 1) * limit;
+   
+    // отрисуем страничку
+    startRenderPage();
+
+}
+
+
+/* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
+function sortChange() {
+
+    // получим значение атрибута data-sort
+    let dataSort = event.target.getAttribute('data-sort');
+
+    if (!dataSort) {
+
+        // если атрибут пуст,
+        // то всем заголовкам устанавливаем пустое значение этого атрибута
+        headTableOrders.forEach(item => {
+            item.setAttribute('data-sort', '');
+        })
+
+        // а заголовку, по кот кликнули, устанавливаем asc
+        event.target.setAttribute('data-sort', 'asc');
+
+    } else if (dataSort === "asc") {
+        // если значение атрибута asc, то меняем его на desc
+        event.target.setAttribute('data-sort', 'desc');
+
+    } else if (dataSort === "desc") {
+        // если значение атрибута desc, то меняем его на asc
+        event.target.setAttribute('data-sort', 'asc');
+    }
+
+    // отрисуем страничку
+    startRenderPage();
+}
+
+// отслеживаем клик по заголовку
+headTableOrders.forEach(item => {
+    item.addEventListener("click", sortChange);
+})
+
+
+/* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ (Выборка по фильтрам) ---------- */
+const sendChangeData = document.querySelector('.form-filters').querySelector('button');
+
+function applyFilters() {
+
+    // сбрасываем нумерацию страниц и офсет
+    currentPage = 1;
+    offset = 0;
+
+    // заполним страницу данными
+    startRenderPage();
+
+}
+sendChangeData.addEventListener("click", applyFilters);
+
+
 // тестовая
-function searchOrder() {
-   let x =  sendRequestGET('http://localhost/api/ordervendors.php?vendor_id=' + vendor_id + "&search=order_id:" + document.getElementById('search').value);
-    console.log(x);
+// function searchOrder() {
+//    let x =  sendRequestGET('http://localhost/api/ordervendors.php?vendor_id=' + vendor_id + "&search=order_id:" + document.getElementById('search').value);
+//     console.log(x);
+// }
+
+
+/* ---------- ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА ДРУГУЮ СТРАНИЦУ---------- */
+function showOrder(id) {
+
+    // перебросим пользователя на страницу заказа в зависимости от статуса
+    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+    if (document.querySelector(`[order-id="${id}"]`).classList.contains('row-status0')) {
+        document.location.href = "http://localhost/pages/vendor-new-order.php?id=" + id + params ; 
+    } else {
+        document.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
+    }
+
 }

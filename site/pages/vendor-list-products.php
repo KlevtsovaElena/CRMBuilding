@@ -278,7 +278,7 @@ if (count($_GET) !== 0) {
     <template id="template-body-table">
         
         <tr role="row" class="list-products__row" product-id="${id}">
-            <td><a href="vendor-edit-product.php?id=${id}"><strong>${article}</strong></a></td>
+            <td><a href="javascript: editProduct(${id})"><strong>${article}</strong></a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${brand_id}</td>
             <td>${category_id}</td>

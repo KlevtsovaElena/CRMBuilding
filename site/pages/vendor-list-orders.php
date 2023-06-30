@@ -42,7 +42,7 @@
                         </select>
                     </div>
                     <br>
-                    <button class="btn btn-ok d-iblock" onclick="searchOrder()">Применить</button>
+                    <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
             </section>
@@ -145,7 +145,7 @@ if (count($_GET) !== 0) {
                         </select>
                     </div>
                     <br>
-                    <button class="btn btn-ok d-iblock" onclick="searchOrder()">Применить</button>
+                    <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
             </section>
@@ -192,8 +192,8 @@ if (count($_GET) !== 0) {
 
                     <tr role="row" class="list-orders__row row-status${status}" order-id="${id}">
 
-                        <td><a href="vendor-new-order.php?order_id=${order_id}"><strong>${order_id}</strong></a></td>
-                        <td><a href="vendor-new-order.php?order_id=${order_id}" class="list-orders_status d-block status${status}">${status}</a></td>
+                        <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
+                        <td><a href="javascript: showOrder(${id})" class="list-orders_status d-block status${status}">${status}</a></td>
                         <td>${order_date}</td>
                         <td class="list-orders_products">${products}</td>
                         <td>${total_price}</td>

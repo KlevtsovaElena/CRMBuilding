@@ -21,7 +21,6 @@
     white-space: unset;
 }
 
-#list-orders th, 
 #list-orders td { 
     padding: 15px 5px;
 }
@@ -87,11 +86,11 @@
     font-family: sans-serif;
 }
 
-#list-products th[data-sort="desc"]:after {
+#list-orders th[data-sort="desc"]:after {
     opacity: 1;
 }
 
-#list-products th[data-sort="asc"]:before {
+#list-orders th[data-sort="asc"]:before {
     opacity: 1;
 }
 
