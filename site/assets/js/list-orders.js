@@ -53,6 +53,7 @@ if (offset !==0) {
 
 let orders = [];
 let totalOrdersCount;
+let ordersJson;
 // заполним страницу данными
 startRenderPage();
 
@@ -158,7 +159,7 @@ function getOrdersData(params, paramsTest) {
     // -------------------------------------------------------------------
 
     // сделаем запрос с параметрами, запишем данные в переменную orders
-    let ordersJson = sendRequestGET(url + params);
+    ordersJson = sendRequestGET(url + params);
 
     if (ordersJson) {
         orders = JSON.parse(ordersJson);
@@ -269,7 +270,7 @@ function renderPagination(totalOrdersCount, limit) {
     prevButton = document.querySelector('.page-switch__prev');
     nextButton = document.querySelector('.page-switch__next');
 
-    // 2. настроим возможность/невозможность переключения страниц 
+    // настроим возможность/невозможность переключения страниц 
     if (currentPage === 1) {
         prevButton.setAttribute('disabled', '');
         if (totalPages > 1) {

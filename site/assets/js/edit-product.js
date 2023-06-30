@@ -105,12 +105,7 @@ function validationEdit() {
 
                 // и сравним с ценой продавца
                 // цена продавца д.б. меньше рыночной
-                console.log (priceValue, maxPriceValue);
-                console.log (typeof(priceValue), typeof(maxPriceValue));
-                console.log(priceValue > maxPriceValue);
-
                 if (priceValue >= maxPriceValue) {
-                    console.log('больше');
                     item.classList.add('error');   
                     errorInfoContainer.innerText = "Эта цена должна быть больше вашей!";
                     errorInfoContainer.classList.remove('d-none');
@@ -118,7 +113,6 @@ function validationEdit() {
                     hasError = true; 
 
                 } else {
-                    console.log("не больше");
                     item.classList.remove('error');
                     errorInfoContainer.innerText = "";
                     errorInfoContainer.classList.add('d-none');
@@ -194,7 +188,7 @@ function deleteProductFromEditForm(id) {
     console.log("удаляем");
 
     // делаем запрос на удаление товара по id
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    sendRequestDELETE('http://localhost/api/products.php?id=' + id);
 
     alert("Товар удалён");
 
