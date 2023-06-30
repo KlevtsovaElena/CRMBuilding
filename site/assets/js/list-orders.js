@@ -404,6 +404,10 @@ sendChangeData.addEventListener("click", applyFilters);
 /* ---------- ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА ДРУГУЮ СТРАНИЦУ---------- */
 function showOrder(id) {
 
+    // заменяем в истории браузера стр на стр с get параметрами
+    // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
+    history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
+
     // перебросим пользователя на страницу заказа в зависимости от статуса
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
     if (document.querySelector(`[order-id="${id}"]`).classList.contains('row-status0')) {

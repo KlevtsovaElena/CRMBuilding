@@ -393,6 +393,10 @@ function deleteProduct() {
 /* ---------- ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА ДРУГУЮ СТРАНИЦУ---------- */
 function editProduct(id) {
 
+    // заменяем в истории браузера стр на стр с get параметрами
+    // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
+    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + params);
+
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
     document.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + params ; 
 }
