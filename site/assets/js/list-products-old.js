@@ -13,8 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products-with-count.php?vendor_id=' + vendor_id;
-// let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -166,15 +165,15 @@ function getProductsData(params, paramsTest) {
     // -----------------------------------------------------------------------
     //кол-во ПОТОМ ПОЛУЧАТЬ ИЗ АПИ
     let test2 = [];
-    let test = sendRequestGET('http://localhost/api/products.php?vendor_id=' + vendor_id + paramsTest);
+    let test = sendRequestGET(url + paramsTest);
     if (test) {
         test2 = JSON.parse(test);
     } else {
         test2 = [];
     }
 
-    // // подсчёт полученных записей
-    // totalProductsCount = test2.length;
+    // подсчёт полученных записей
+    totalProductsCount = test2.length;
 
 
     // -------------------------------------------------------------------
@@ -185,18 +184,11 @@ function getProductsData(params, paramsTest) {
     if (totalProductsJson) {
         totalProducts = JSON.parse(totalProductsJson);
     } else {
-        totalProducts = {
-            'count': 0,
-            'products': []
-        };
+        totalProducts = [];
     }
-console.log(totalProducts);
-    // подсчёт полученных записей
-    totalProductsCount = totalProducts['count'];
-
-console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
+console.log('всего ' + totalProductsCount + ' выборка ' + totalProducts.length);
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
-    if (totalProducts['products'].length === 0 && totalProductsCount > 0) {
+    if (totalProducts.length === 0 && totalProductsCount > 0) {
         changeData();
         return;
     }
@@ -212,38 +204,38 @@ function renderListProducts(totalProducts) {
     // сброс инфы внизу страницы
     info.innerText = "";
 
-    // количество записей
-    let records = totalProducts['products'].length;
-
     // если записей вообще нет                
-    if (records === 0) {
+    if (totalProducts.length === 0) {
         info.innerText = "Записей нет";
         // сбросим офсет
         offset = 0;
         return;
     }
 
-
+    // количество показываемых записей на странице
+    let records;
     
     // если лимит установлен и он меньше кол-ва записей, то records = limit
-    // иначе выводим всё records = totalProducts['products].length
-    if ((limit) && (limit < records)) {
+    // иначе выводим всё records = totalProducts.length
+    if ((limit) && (limit < totalProducts.length)) {
         records = limit; 
-    } 
+    } else {
+        records = totalProducts.length;
+    }
 
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
-        containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
-                                                        .replace('${photo}',  totalProducts['products'][i]['photo'])
-                                                        .replace('${name}', totalProducts['products'][i]['name'])
-                                                        .replace('${brand_id}', brands[totalProducts['products'][i]['brand_id']])
-                                                        .replace('${category_id}', categories[totalProducts['products'][i]['category_id']])
-                                                        .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
-                                                        .replace('${price}', totalProducts['products'][i]['price'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${max_price}', totalProducts['products'][i]['max_price']);
+        containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts[i]['article'])
+                                                        .replace('${photo}',  totalProducts[i]['photo'])
+                                                        .replace('${name}', totalProducts[i]['name'])
+                                                        .replace('${brand_id}', brands[totalProducts[i]['brand_id']])
+                                                        .replace('${category_id}', categories[totalProducts[i]['category_id']])
+                                                        .replace('${quantity_available}', totalProducts[i]['quantity_available'])
+                                                        .replace('${price}', totalProducts[i]['price'])
+                                                        .replace('${id}', totalProducts[i]['id'])
+                                                        .replace('${id}', totalProducts[i]['id'])
+                                                        .replace('${id}', totalProducts[i]['id'])
+                                                        .replace('${max_price}', totalProducts[i]['max_price']);
     }
 
 

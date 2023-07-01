@@ -209,6 +209,97 @@ abstract class BaseRepository
         ];
         $statement->execute($queryValueParams);
     }
+
+
+    // лена----добавила только это, больше здесь ничего не трогала------------------------------------------------------------
+        // получение в одном запросе и кол-ва по условиям и лимитированный кусок записей по этим условиям
+        const COUNT_QUERY = 'SELECT COUNT(*) as count FROM `%s` WHERE %s';
+
+        public function getWithCount(array $inputParams): array|object|null
+        {
+            $validParams = $this->getAssociatePropertiesWithClass($inputParams);
+    
+            $queryParams = $this->getQueryParameterAssociate($validParams);
+            $queryParamValues = $this->getQueryParameterValues($validParams);
+            $whereParams = count($queryParams) > 0 ? implode(' AND ', $queryParams) : '1';
+    
+            if (isset($inputParams['search'])) {
+                $customParams = $this->getCustomParameters($inputParams['search'], ';');
+                $searchParams = $this->getAssociatePropertiesWithClass($customParams);
+                $searchQueryParams = $this->getQuerySearchParameterAssociate($searchParams, 'ss1_');
+                $searchQueryParamValues = $this->getQuerySearchParameterValues($searchParams, 'ss1_');
+    
+                if (count($searchQueryParams) > 0) {
+                    $whereParams = $whereParams .' AND (' . implode(' OR ', $searchQueryParams).')';
+                    $queryParamValues = array_merge($queryParamValues, $searchQueryParamValues);
+                }
+            }
+    
+            // до этой записи в функции точно так же, как и в обычном get
+            // а дальше нам сначала надо получить кол-во записей без лимита $countRecords
+            $queryCount = sprintf(static::COUNT_QUERY, $this->getTableName(), $whereParams);
+    
+            $statement = \DbContext::getConnection()->prepare($queryCount);
+            $statement->execute($queryParamValues);
+    
+            $countRecords = $statement->fetch();
+
+            $arrayDataWithCount = $countRecords;    
+    
+            // а затем дособирать строку запроса + orderby и limit offset
+            // и получить кусок данных из базы по лимиту
+            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), $whereParams);
+            if (isset($inputParams['orderby']))
+                $query = $query . $this->getOrderbyQueryString($inputParams['orderby']);
+    
+            if (isset($inputParams['limit']))
+            {
+                $query = $query.' LIMIT :ss_limit';
+                $queryParamValues[':ss_limit'] = $inputParams['limit'];
+    
+                if (isset($inputParams['offset']))
+                {
+                    $query = $query.' OFFSET :ss_offset';
+                    $queryParamValues[':ss_offset'] = $inputParams['offset'];
+                }
+            }
+    
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($queryParamValues);
+
+            // сейчас в $arrayDataWithCount мы имеем ['count' => 45]
+
+            // вот здесь я не совсем поняла, что происходит
+            // и сделала так )
+            // в итоге мне надо получить ['count'=> 45,
+            //                            'products' => [ {все записи по лимиту}]]
+            
+            // если нет id в параметрах, то добавляем  'products' => [ {все записи по лимиту}]
+            if (!array_key_exists('id', $inputParams)) {
+                $arrayDataWithCount['products'] = array_map([$this, 'map'], $statement->fetchAll());
+                return $arrayDataWithCount;
+            } 
+
+
+            // остальные случаи, когда есть id
+            // я так поняла их можно опустить, тк в этот эндпойнт я не собираюсь передавать id
+            
+            // // если есть id и ответ пустой
+            // if (!$data = $statement->fetch()) 
+            //     return null;
+            
+
+            // // а это для того случая, если есть id и ответ не пустой??
+            // return $this->map($data);
+
+
+        }
+// ---------------------------------------------------------------------
+
+
+
+
+
 }
 
 ?>
