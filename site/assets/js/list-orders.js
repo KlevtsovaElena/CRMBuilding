@@ -21,16 +21,15 @@ const containerPagination = document.querySelector('.pagination-wrapper');
 const info = document.querySelector('.info-table');
 //получаем все элементы заголовка для отслеживания сортировки
 const headTableOrders = document.getElementById('list-orders').querySelectorAll('[data-sort]');
-console.log(headTableOrders);
-
 
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/order-vendors/get-with-details.php?vendor_id=' + vendor_id + "&orderby=id:desc";
+let url = 'http://localhost/api/order-vendors/get-with-details.php?vendor_id=' + vendor_id;
 
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
+let offsetEl = containerPagination.getAttribute('offset');
 
 let prevButton;
 let nextButton;
@@ -56,6 +55,7 @@ if (offset !==0) {
 let orders = [];
 let totalOrdersCount;
 let ordersJson;
+
 // заполним страницу данными
 startRenderPage();
 
@@ -87,12 +87,24 @@ function getParams() {
 
     // теперь проверим как у нас с сортировкой
     // ищем в каждом заголовке по атрибуту data-sort
+    // 1. если нет поля сортировки, то сортируем только по дате desc
+    // 2. если есть поле, то сначала по полю, потом по дате desc
+    // 3. если есть поле и это дата, то сортируем только по этому полю
     for (let i = 0; i < headTableOrders.length; i++) {
 
         if (headTableOrders[i].getAttribute('data-sort')) {
-            orderby = "&orderby=" + headTableOrders[i].getAttribute('data-id') + ":" + headTableOrders[i].getAttribute('data-sort');
-            break; 
+            if(headTableOrders[i].getAttribute('data-id') === 'order_date'){
+                orderby = "&orderby=order_date:" + headTableOrders[i].getAttribute('data-sort');  
+                break;
+            } else {
+                orderby = "&orderby=" + headTableOrders[i].getAttribute('data-id') + ":" + headTableOrders[i].getAttribute('data-sort') + ";order_date:desc";
+                break; 
+            }
         }
+    }
+
+    if(!orderby) {
+        orderby = "&orderby=order_date:desc";
     }
 
     // добавим лимит
@@ -213,7 +225,7 @@ function renderListOrders(orders) {
 
 
     // собираем данные и отрисовываем в таблице
-    for (let i = records - 1; i >= 0; i--) {
+    for (let i = 0; i < records; i++) {
 
         let products = "";
         let totalPrice = 0; 
@@ -392,13 +404,6 @@ function applyFilters() {
 
 }
 sendChangeData.addEventListener("click", applyFilters);
-
-
-// тестовая
-// function searchOrder() {
-//    let x =  sendRequestGET('http://localhost/api/ordervendors.php?vendor_id=' + vendor_id + "&search=order_id:" + document.getElementById('search').value);
-//     console.log(x);
-// }
 
 
 /* ---------- ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА ДРУГУЮ СТРАНИЦУ---------- */
