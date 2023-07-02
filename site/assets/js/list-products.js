@@ -13,8 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products-with-count.php?vendor_id=' + vendor_id;
-// let url = 'http://localhost/api/products.php?vendor_id=' + vendor_id;
+let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id;
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -33,14 +32,6 @@ let orderby = "";
 let filters = "";
 let limitParams = "";
 let params = "";
-
-
-// УДАЛИТЬ КОГДА БУДЕМ ПОЛУЧАТЬ COUNT
-// ---------------------------------
-let paramsTest = "";
-// ---------------------------------
-
-
 
 let limit = limitEl.value;
 let offset = containerPagination.getAttribute('offset');
@@ -73,7 +64,7 @@ function startRenderPage() {
     params = getParams();
 
     // 2. получим данные по указанным параметрам из БД
-    getProductsData(params, paramsTest);
+    getProductsData(params);
 
     // 3. отрисуем пагинацию
     renderPagination(totalProductsCount, limit);
@@ -87,7 +78,6 @@ function startRenderPage() {
 /* ---------- СБОР ПАРАМЕТРОВ запроса---------- */
 function getParams() {
 
-    paramsTest = "";
     // сначала фильтры 
     filters = getFilters();
 
@@ -103,10 +93,9 @@ function getParams() {
 
     // добавим лимит
     limit = limitEl.value;
-    limitParams = "&limit=" + limit + "&offset=" + offset
+    limitParams = "&limit=" + limit + "&offset=" + offset;
     params = filters + orderby + limitParams;
-    paramsTest = filters + orderby;
-    console.log("параметры " + params);
+
     return params;
 }
 
@@ -151,33 +140,15 @@ function changeData() {
     
     // 4. перепишем параметры
     params = filters + orderby + "&limit=" + limit + "&offset=" + offset;
-    paramsTest = filters + orderby
 
     // 5. делаем снова запрос на получение другого куска данных
-    getProductsData(params, paramsTest);
+    getProductsData(params);
 
 }
 
 
 /* ---------- ПОЛУЧЕНИЕ ДАННЫХ ИЗ БД ---------- */
-function getProductsData(params, paramsTest) {
-
-    // ПЕРЕДЕЛАТЬ КОГДА БУДЕМ ПОЛУЧАТЬ COUNT
-    // -----------------------------------------------------------------------
-    //кол-во ПОТОМ ПОЛУЧАТЬ ИЗ АПИ
-    let test2 = [];
-    let test = sendRequestGET('http://localhost/api/products.php?vendor_id=' + vendor_id + paramsTest);
-    if (test) {
-        test2 = JSON.parse(test);
-    } else {
-        test2 = [];
-    }
-
-    // // подсчёт полученных записей
-    // totalProductsCount = test2.length;
-
-
-    // -------------------------------------------------------------------
+function getProductsData(params) {
 
     // сделаем запрос с параметрами, запишем данные в переменную totalProducts
     totalProductsJson = sendRequestGET(url + params);
@@ -190,11 +161,12 @@ function getProductsData(params, paramsTest) {
             'products': []
         };
     }
-console.log(totalProducts);
-    // подсчёт полученных записей
+
+    // количество записей в базе по указанным параметрам
     totalProductsCount = totalProducts['count'];
 
-console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
+    console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
+
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (totalProducts['products'].length === 0 && totalProductsCount > 0) {
         changeData();
@@ -222,8 +194,6 @@ function renderListProducts(totalProducts) {
         offset = 0;
         return;
     }
-
-
     
     // если лимит установлен и он меньше кол-ва записей, то records = limit
     // иначе выводим всё records = totalProducts['products].length
@@ -247,9 +217,12 @@ function renderListProducts(totalProducts) {
     }
 
 
-
+    // выведем внизу таблицы сколько всего записей 
     info.innerText = "Всего " + totalProductsCount + declinationWord(totalProductsCount, [' запись', ' записи', ' записей']);
 
+    // этот кусок кода относится к мусорке
+    // здесь, тк изначально таких элементов на стр нет,
+    // и они появляются только после отрисовки таблицы
     garbage = document.querySelectorAll('.garbage');
     // отслеживаем клик по корзине
     garbage.forEach(item => {
