@@ -30,6 +30,7 @@ abstract class BaseRepository
 
         $columns = implode(', ', array_keys($sqlParams));
         $parameters = implode(', ', array_values($sqlParams));
+
         $query = sprintf(static::ADD_QUERY, $this->getTableName(), $columns, $parameters);
 
         $statement = \DbContext::getConnection()->prepare($query);
@@ -79,7 +80,7 @@ abstract class BaseRepository
         return $this->map($data);
     }
 
-    public function getCount(array $inputParams): int
+    public function getCountWithoutLimit(array $inputParams): int
     {
         // Параметры однозначного совпадения (WHERE)
         $whereParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
@@ -109,12 +110,26 @@ abstract class BaseRepository
 
     public function updateById(array $inputParams)
     {
+        $objectParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        $equalParams = SqlHelper::getEqualParams(array_keys($objectParams));
 
+        if (array_key_exists('id', $equalParams))
+            unset($equalParams['id']);
+
+        $stringParams = implode(', ', $equalParams);
+        $query = sprintf(static::UPDATE_QUERY, $this->getTableName(), $stringParams);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute($objectParams);
     }
 
     public function removeById(array $inputParams)
     {
-
+        $query = sprintf(static::REMOVE_BY_ID, $this->getTableName());
+        $statement = \DbContext::getConnection()->prepare($query);
+        $queryValueParams = [
+            'id' => $inputParams['id']
+        ];
+        $statement->execute($queryValueParams);
     }
 }
 

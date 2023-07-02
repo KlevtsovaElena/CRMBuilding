@@ -15,12 +15,15 @@ class GetProductsWithCountController extends BaseController
 
     protected function onGet()
     {
-        $count = $this->productRepository->getCount($_GET);
+        $count = $this->productRepository->getCountWithoutLimit($_GET);
         $products = $this->productRepository->get($_GET);
+
+        if (isset($_GET['id']) && $products)
+            $products = [$products];
 
         echo json_encode([
             "count" => $count,
-            "products" => $products
+            "products" => $products ?? []
         ]);
     }
 }

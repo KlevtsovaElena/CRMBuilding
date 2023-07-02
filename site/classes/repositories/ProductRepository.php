@@ -40,7 +40,7 @@
         public function getAllByIds(array $ids) : array 
         {
             $queryParams = $this->getQueryIdsArrayParams($ids);
-            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), '`id` IN ('.implode(',', array_keys($queryParams)) .')');
+            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), 'WHERE `id` IN ('.implode(',', array_keys($queryParams)) .')');
 
             $statement = \DbContext::getConnection()->prepare($query);
             $statement->execute($queryParams);

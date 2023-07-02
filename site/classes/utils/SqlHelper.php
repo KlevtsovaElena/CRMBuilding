@@ -116,7 +116,7 @@
 
             $predicates = static::getSearchPredicatesArray(array_keys($searchObjectParams));
 
-            $searchString .= implode(' AND ', $predicates).')';
+            $searchString .= implode(' OR ', $predicates).')';
 
             return $searchString;
         }
@@ -139,7 +139,7 @@
         public static function getWhereString(array $whereParams) : string
         {
             $whereString = 'WHERE ';
-            $wherePredicates = static::getWherePredicatesArray(array_keys($whereParams));
+            $wherePredicates = static::getEqualParams(array_keys($whereParams));
 
             if (is_null($wherePredicates) || count($wherePredicates) == 0)
                 return $whereString.'1';
@@ -147,17 +147,17 @@
             return $whereString.implode(' AND ', $wherePredicates);
         }
 
-        private static function getWherePredicatesArray(array $paramNames) : array
+        public static function getEqualParams(array $paramNames) : array
         {
             $params = [];
     
             foreach ($paramNames as $paramName)
-                $params[$paramName] = static::getWherePredicate($paramName);
+                $params[$paramName] = static::getEqualParam($paramName);
     
             return $params;
         }
 
-        private static function getWherePredicate(string $paramName) : string 
+        private static function getEqualParam(string $paramName) : string 
         {
             return $paramName . '=' .static::getSqlParamByName($paramName);
         }
@@ -182,7 +182,13 @@
             $filteredParams = [];
             foreach ($names as $name) {
                 if (array_key_exists($name, $params))
-                    $filteredParams[$name] = $params[$name];
+                {
+                    $value = $params[$name];
+                    if (is_object($value) || is_array($value))
+                        $value = json_encode($value);
+
+                    $filteredParams[$name] = $value;
+                }
             }
             return $filteredParams;
         }

@@ -18,6 +18,7 @@ class CustomerRepository extends BaseRepository
 
     public function __construct()
     {
+        parent::__construct();
         $this->coordinateRepository = new CoordinateRepository();
     }
 
@@ -43,17 +44,16 @@ class CustomerRepository extends BaseRepository
 
     public function updateByTgId(array $inputParams)
     {
-        $params = $this->getAssociatePropertiesWithClass($inputParams);
-        $queryColmParams = $this->getQueryParameterAssociate($params);
-        $queryValueParams = $this->getQueryParameterValues($params);
+        $objectParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        $equalParams = SqlHelper::getEqualParams(array_keys($objectParams));
 
-        if (array_key_exists('tg_id', $queryColmParams))
-            unset($queryColmParams['tg_id']);
+        if (array_key_exists('tg_id', $equalParams))
+            unset($equalParams['tg_id']);
 
-        $stringParams = implode(', ', $queryColmParams);
+        $stringParams = implode(', ', $equalParams);
         $query = sprintf(static::UPDATE_BY_TG_ID_QUERY, $this->getTableName(), $stringParams);
         $statement = \DbContext::getConnection()->prepare($query);
-        $statement->execute($queryValueParams);
+        $statement->execute($objectParams);
     }
 
     public function getByTgId(int $tgId) : Customer|null
