@@ -4,6 +4,7 @@
     
     use models\Category;
     use abstraction\BaseRepository;
+    use utils\SqlHelper;
 
     class CategoryRepository extends BaseRepository
     {
@@ -23,7 +24,8 @@
         public function map(array $row): Category
         {
             $item = new Category();
-            foreach ($this->getAssociatePropertiesWithClass($row) as $key => $value)
+
+            foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
                 $item->$key = $value;
     
             return $item;

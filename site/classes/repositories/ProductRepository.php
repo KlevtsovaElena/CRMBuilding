@@ -1,5 +1,6 @@
 <?php 
     namespace repositories;
+    use utils\SqlHelper;
 
     require_once($_SERVER['DOCUMENT_ROOT'].'/classes/autoloader.php');
     
@@ -24,7 +25,8 @@
         public function map(array $row): Product
         {
             $item = new Product();
-            foreach ($this->getAssociatePropertiesWithClass($row) as $key => $value)   
+
+            foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
                 $item->$key = $value;
     
             return $item;
@@ -37,8 +39,11 @@
 
         public function getAllByIds(array $ids) : array 
         {
+            if (is_null($ids) || count($ids) == 0)
+                return [];
+
             $queryParams = $this->getQueryIdsArrayParams($ids);
-            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), '`id` IN ('.implode(',', array_keys($queryParams)) .')');
+            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), 'WHERE `id` IN ('.implode(',', array_keys($queryParams)) .')');
 
             $statement = \DbContext::getConnection()->prepare($query);
             $statement->execute($queryParams);
