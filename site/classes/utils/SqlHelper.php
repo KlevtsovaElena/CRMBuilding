@@ -164,7 +164,7 @@
 
         private static function getSqlParamByName(string $name) : string
         {
-            return ':' . $name;
+            return ':' . str_replace('.', '_', $name);
         }
 
         public static function getSqlParams(array $params)
@@ -191,6 +191,35 @@
                 }
             }
             return $filteredParams;
+        }
+        
+        public static function filterParamsWithReplace(array $replaceFromNameAndToNamePair, array $inputParams)
+        {
+            $filteredParams = [];
+
+            foreach($replaceFromNameAndToNamePair as $fromName => $toName)
+            {
+                if (array_key_exists($fromName, $inputParams))
+                {
+                    $value = $inputParams[$fromName];
+                    if (is_object($value) || is_array($value))
+                        $value = json_encode($value);
+
+                    $filteredParams[$toName] = $value;
+                }
+            }
+
+            return $filteredParams;
+        }
+
+        public static function convertToSqlParam(array $params)
+        {
+            $result = [];
+
+            foreach ($params as $key => $value)
+                $result[str_replace('.', '_', static::getSqlParamByName($key))] = $value;
+
+            return $result;
         }
     }
 ?>

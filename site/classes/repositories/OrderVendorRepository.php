@@ -1,17 +1,18 @@
 <?php
-    namespace repositories;
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
+namespace repositories;
 
-    use models\OrderVendor;
-    use abstraction\BaseRepository;
-    use utils\SqlHelper;
+require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
-    class OrderVendorRepository extends BaseRepository
-    {
-        const TABLE_NAME = 'order_vendors';
-        const CLASS_NAME = 'models\OrderVendor';
+use models\OrderVendor;
+use abstraction\BaseRepository;
+use utils\SqlHelper;
 
-        const GET_WITH_DETAILS = 'SELECT ov.`id` as `id`,
+class OrderVendorRepository extends BaseRepository
+{
+    const TABLE_NAME = 'order_vendors';
+    const CLASS_NAME = 'models\OrderVendor';
+
+    const GET_WITH_DETAILS = 'SELECT ov.`id` as `id`,
                                         ov.`order_id` as `order_id`,
                                         ov.`vendor_id` as `vendor_id`,
                                         v.`coordinates` as `vendor_location`,
@@ -26,61 +27,98 @@
                                     INNER JOIN orders o
                                     ON o.id = ov.order_id
                                     INNER JOIN customers c
-                                    ON c.id = o.customer_id';
+                                    ON c.id = o.customer_id 
+                                    %s';
 
-        public function getTableName() : string
-        {
-            return static::TABLE_NAME;
-        }
+    private static array $orderVendorsDetailsAssociation = [
+        'id' => 'ov.id',
+        'order_id' => 'ov.order_id',
+        'vendor_id' => 'ov.vendor_id',
+        'vendor_location' => 'v.coordinates',
+        'order_date' => 'o.order_date',
+        'status' => 'ov.status',
+        'customer_phone' => 'c.phone',
+        'order_location' => 'o.location',
+        'products' => 'ov.products'
+    ];
 
-        public function getObjectClassName() : string
-        {
-            return static::CLASS_NAME;
-        }
-
-        public function map(array $row): OrderVendor
-        {
-            $item = new OrderVendor();
-            
-            foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
-            {
-                if ($key == 'products')
-                {
-                    $item->$key = isset($value) ? json_decode($value, true) : [];
-                    continue;
-                }
-
-                $item->$key = $value;
-            }
-
-            return $item;
-        }
-
-        public function mapWithDetails(array $row): array
-        {
-            $item = [];
-            foreach ($row as $key => $value)
-            {
-                if ($key == 'products' || $key == 'order_location' || $key == 'vendor_location')
-                {
-                    $item[$key] = isset($value) ? json_decode($value, true) : [];
-                    continue;
-                }
-
-                $item[$key] = $value;
-            }
-
-            return $item;
-        }
-
-        public function getWithDetails() : array
-        {
-            $query = sprintf(static::GET_WITH_DETAILS);
-
-            $statement = \DbContext::getConnection()->prepare($query);
-            $statement->execute();
-
-            return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
-        }
+    public function getTableName(): string
+    {
+        return static::TABLE_NAME;
     }
+
+    public function getObjectClassName(): string
+    {
+        return static::CLASS_NAME;
+    }
+
+    public function map(array $row): OrderVendor
+    {
+        $item = new OrderVendor();
+
+        foreach (SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value) {
+            if ($key == 'products') {
+                $item->$key = isset($value) ? json_decode($value, true) : [];
+                continue;
+            }
+
+            $item->$key = $value;
+        }
+
+        return $item;
+    }
+
+    public function mapWithDetails(array $row): array
+    {
+        $item = [];
+        foreach ($row as $key => $value) {
+            if ($key == 'products' || $key == 'order_location' || $key == 'vendor_location') {
+                $item[$key] = isset($value) ? json_decode($value, true) : [];
+                continue;
+            }
+
+            $item[$key] = $value;
+        }
+
+        return $item;
+    }
+
+    public function getWithDetails(array $inputParams): array
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$orderVendorsDetailsAssociation, $inputParams);
+
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$orderVendorsDetailsAssociation, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // Получаем все параметры для сортировки
+        $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+        // Отбираем только подходящие для объекта
+        $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$orderVendorsDetailsAssociation, $allOrderByParams);
+        // Получаем часть строки запроса с сортировкой
+        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+        // Получаем часть строки запроса с лимитом и оффсетом
+        $limitString = SqlHelper::getLimitString($inputParams);
+
+        $query = sprintf(static::GET_WITH_DETAILS, implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
+
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+        return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
+}
 ?>
