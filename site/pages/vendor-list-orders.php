@@ -58,8 +58,8 @@
                             <th data-id="status" data-sort="">Статус</th>
                             <th data-id="order_date" data-sort="">Дата создания</th>
                             <th data-id="products">Товары</th>
-                            <th data-id="total_price" data-sort="">Сумма</th>
-                            <th data-id="complete_date" data-sort="">Дата завершения</th>
+                            <th data-id="total_price">Сумма</th>
+                            <th data-id="complete_date">Дата завершения</th>
 
                         </tr>
                     </thead>
@@ -161,8 +161,8 @@ if (count($_GET) !== 0) {
                             <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                             <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
                             <th data-id="products">Товары</th>
-                            <th data-id="total_price" data-sort="">Сумма</th>
-                            <th data-id="complete_date" data-sort="<?php if ($sortBy == 'complete_date')  {echo $mark; } ?>">Дата завершения</th>
+                            <th data-id="total_price">Сумма</th>
+                            <th data-id="complete_date">Дата завершения</th>
 
                         </tr>
                     </thead>
