@@ -1,7 +1,4 @@
 <?php
-
-use models\Product;
-
 include($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
 use abstraction\BaseController as BaseController;
@@ -18,13 +15,17 @@ class GetProductsWithCountController extends BaseController
 
     protected function onGet()
     {
-        $result = $this->productRepository->getWithCount($_GET);
-        
-        if ($result)
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        $count = $this->productRepository->getCountWithoutLimit($_GET);
+        $products = $this->productRepository->get($_GET);
+
+        if (isset($_GET['id']) && $products)
+            $products = [$products];
+
+        echo json_encode([
+            "count" => $count,
+            "products" => $products ?? []
+        ]);
     }
-
-
 }
 
 GetProductsWithCountController::Create()->HandleRequest();

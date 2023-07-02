@@ -1,180 +1,75 @@
 <?php
 namespace abstraction;
 
+use utils\SqlHelper as SqlHelper;
+
 abstract class BaseRepository
 {
-    const GET_BY_PREDICATE_QUERY = 'SELECT * FROM `%s` WHERE %s';
+    const GET_BY_PREDICATE_QUERY = 'SELECT * FROM `%s` %s';
+    const GET_COUNT_BY_PREDICATE_QUERY = 'SELECT COUNT(*) as `count` FROM `%s` %s';
     const ADD_QUERY = 'INSERT INTO `%s`(%s) VALUES (%s)';
     const REMOVE_BY_ID = 'DELETE FROM `%s` WHERE `id`=:id';
     const UPDATE_QUERY = 'UPDATE `%s` SET %s WHERE `id`=:id';
+
+    protected array $entityFields;
 
     public abstract function getTableName(): string;
     public abstract function getObjectClassName(): string;
     public abstract function map(array $row): object;
 
-    protected function getAssociatePropertiesWithClass(array $inputProperties, string $prefix = null): array
+    public function __construct()
     {
-        $classProperties = get_class_vars(static::getObjectClassName());
-
-        $properties = [];
-        foreach ($classProperties as $property => $value) {
-            if (array_key_exists($property, $inputProperties))
-                $properties[$prefix . $property] = $inputProperties[$property];
-        }
-        return $properties;
+        $this->entityFields = array_keys(get_class_vars(static::getObjectClassName()));
     }
 
-    protected final function getQueryParameterAssociate(array $inputProperties, string $prefix = null): array
+    public function add(array $inputParams): int
     {
-        $queryParameters = [];
+        // Получаем параметры совпадающие с наименованием полей объекта
+        $objectParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        $sqlParams = SqlHelper::getSqlParams($objectParams);
 
-        foreach (array_keys($inputProperties) as $property)
-            $queryParameters[$prefix . $property] = $prefix . $property . '=:' . $prefix . $property;
+        $columns = implode(', ', array_keys($sqlParams));
+        $parameters = implode(', ', array_values($sqlParams));
 
-        return $queryParameters;
-    }
-
-    protected final function getQuerySearchParameterAssociate(array $inputProperties, string $prefix): array
-    {
-        $queryParameters = [];
-
-        foreach (array_keys($inputProperties) as $property)
-            $queryParameters[] = 'CONVERT(' . $property . ', CHAR) LIKE :' . $prefix . $property;
-
-        return $queryParameters;
-    }
-
-    protected final function getQuerySearchParameterValues(array $inputProperties, string $prefix = null): array
-    {
-        $params = [];
-
-        foreach ($inputProperties as $property => $value)
-            $params[':' . $prefix . $property] = '%' . $value . '%';
-
-        return $params;
-    }
-
-    protected final function getQueryParameterValues(array $inputProperties, string $prefix = null): array
-    {
-        $params = [];
-
-        foreach ($inputProperties as $property => $value)
-        {
-            if (is_object($value) || is_array($value))
-                 $value = json_encode($value);
-
-            $params[':' . $prefix . $property] = $value;
-        }
-
-        return $params;
-    }
-
-    protected function getCustomParameters(string $paramString, string $splitter)
-    {
-        $queryParams = [];
-        $keyValuePairs = explode($splitter, $paramString);
-        $lastKey = null;
-
-
-        foreach ($keyValuePairs as $keyValuePair) {
-            $paramIndex = strpos($keyValuePair, ':');
-            if ($paramIndex > 0) {
-                $key = substr($keyValuePair, 0, $paramIndex);
-                $value = substr($keyValuePair, $paramIndex + 1);
-
-                $lastKey = $key;
-                $queryParams[$lastKey] = $value;
-                continue;
-            }
-
-            if (isset($lastKey)) {
-                $queryParams[$lastKey] = $queryParams[$lastKey] . $splitter . $keyValuePair;
-            }
-        }
-
-        return $queryParams;
-    }
-
-    protected function getOrderbyQueryString($inputParams): string
-    {
-        $resultString = null;
-        $customParams = $this->getCustomParameters($inputParams, ';');
-        $orderByParams = $this->getAssociatePropertiesWithClass($customParams);
-
-        if (count($orderByParams) > 0) {
-            $result = [];
-            foreach ($orderByParams as $key => $value) {
-                if ($value == 'asc' || $value == 'desc')
-                    $result[$key] = $value;
-            }
-
-            if (count($result) > 0) {
-                $resultString = ' ORDER BY ';
-
-                $items = [];
-                foreach ($result as $key => $value)
-                    $items[] = $key . ' ' . $value;
-
-                $resultString = $resultString . implode(', ', $items);
-            }
-        }
-
-        return $resultString;
-    }
-
-    public function add(array $inputParams) : int
-    {
-        $params = $this->getAssociatePropertiesWithClass($inputParams);
-        $queryValueParams = $this->getQueryParameterValues($params);
-
-        $columns = implode(', ', array_keys($params));
-        $parameters = implode(', ', array_keys($queryValueParams));
         $query = sprintf(static::ADD_QUERY, $this->getTableName(), $columns, $parameters);
 
         $statement = \DbContext::getConnection()->prepare($query);
-        $statement->execute($queryValueParams);
+        $statement->execute($objectParams);
 
         return \DbContext::getConnection()->lastInsertId();
     }
 
     public function get(array $inputParams): array|object|null
     {
-        $validParams = $this->getAssociatePropertiesWithClass($inputParams);
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsByNames($this->entityFields, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
 
-        $queryParams = $this->getQueryParameterAssociate($validParams);
-        $queryParamValues = $this->getQueryParameterValues($validParams);
-        $whereParams = count($queryParams) > 0 ? implode(' AND ', $queryParams) : '1';
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
 
-        if (isset($inputParams['search'])) {
-            $customParams = $this->getCustomParameters($inputParams['search'], ';');
-            $searchParams = $this->getAssociatePropertiesWithClass($customParams);
-            $searchQueryParams = $this->getQuerySearchParameterAssociate($searchParams, 'ss1_');
-            $searchQueryParamValues = $this->getQuerySearchParameterValues($searchParams, 'ss1_');
+        // Получаем все параметры для сортировки
+        $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+        // Отбираем только подходящие для объекта
+        $orderByObjectParams = SqlHelper::filterParamsByNames($this->entityFields, $allOrderByParams);
+        // Получаем часть строки запроса с сортировкой
+        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
 
-            if (count($searchQueryParams) > 0) {
-                $whereParams = $whereParams .' AND (' . implode(' OR ', $searchQueryParams).')';
-                $queryParamValues = array_merge($queryParamValues, $searchQueryParamValues);
-            }
-        }
-        $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), $whereParams);
+        // Получаем часть строки запроса с лимитом и оффсетом
+        $limitString = SqlHelper::getLimitString($inputParams);
 
-        if (isset($inputParams['orderby']))
-            $query = $query . $this->getOrderbyQueryString($inputParams['orderby']);
-
-        if (isset($inputParams['limit']))
-        {
-            $query = $query.' LIMIT :ss_limit';
-            $queryParamValues[':ss_limit'] = $inputParams['limit'];
-
-            if (isset($inputParams['offset']))
-            {
-                $query = $query.' OFFSET :ss_offset';
-                $queryParamValues[':ss_offset'] = $inputParams['offset'];
-            }
-        }
+        // Формируем результирующую строку запроса
+        $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
 
         $statement = \DbContext::getConnection()->prepare($query);
-        $statement->execute($queryParamValues);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
 
         if (!array_key_exists('id', $inputParams))
             return array_map([$this, 'map'], $statement->fetchAll());
@@ -185,19 +80,46 @@ abstract class BaseRepository
         return $this->map($data);
     }
 
+    public function getCountWithoutLimit(array $inputParams): int
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsByNames($this->entityFields, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // Формируем результирующую строку запроса
+        $query = sprintf(static::GET_COUNT_BY_PREDICATE_QUERY, $this->getTableName(), implode(' ', [$whereString, $searchString]));
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+        if (!$data = $statement->fetch())
+            return 0;
+
+        return $data['count'];
+    }
+
     public function updateById(array $inputParams)
     {
-        $params = $this->getAssociatePropertiesWithClass($inputParams);
-        $queryColmParams = $this->getQueryParameterAssociate($params);
-        $queryValueParams = $this->getQueryParameterValues($params);
+        $objectParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+        $equalParams = SqlHelper::getEqualParams(array_keys($objectParams));
 
-        if (array_key_exists('id', $queryColmParams))
-            unset($queryColmParams['id']);
+        if (array_key_exists('id', $equalParams))
+            unset($equalParams['id']);
 
-        $stringParams = implode(', ', $queryColmParams);
+        $stringParams = implode(', ', $equalParams);
         $query = sprintf(static::UPDATE_QUERY, $this->getTableName(), $stringParams);
         $statement = \DbContext::getConnection()->prepare($query);
-        $statement->execute($queryValueParams);
+        $statement->execute($objectParams);
     }
 
     public function removeById(array $inputParams)
@@ -209,97 +131,6 @@ abstract class BaseRepository
         ];
         $statement->execute($queryValueParams);
     }
-
-
-    // лена----добавила только это, больше здесь ничего не трогала------------------------------------------------------------
-        // получение в одном запросе и кол-ва по условиям и лимитированный кусок записей по этим условиям
-        const COUNT_QUERY = 'SELECT COUNT(*) as count FROM `%s` WHERE %s';
-
-        public function getWithCount(array $inputParams): array|object|null
-        {
-            $validParams = $this->getAssociatePropertiesWithClass($inputParams);
-    
-            $queryParams = $this->getQueryParameterAssociate($validParams);
-            $queryParamValues = $this->getQueryParameterValues($validParams);
-            $whereParams = count($queryParams) > 0 ? implode(' AND ', $queryParams) : '1';
-    
-            if (isset($inputParams['search'])) {
-                $customParams = $this->getCustomParameters($inputParams['search'], ';');
-                $searchParams = $this->getAssociatePropertiesWithClass($customParams);
-                $searchQueryParams = $this->getQuerySearchParameterAssociate($searchParams, 'ss1_');
-                $searchQueryParamValues = $this->getQuerySearchParameterValues($searchParams, 'ss1_');
-    
-                if (count($searchQueryParams) > 0) {
-                    $whereParams = $whereParams .' AND (' . implode(' OR ', $searchQueryParams).')';
-                    $queryParamValues = array_merge($queryParamValues, $searchQueryParamValues);
-                }
-            }
-    
-            // до этой записи в функции точно так же, как и в обычном get
-            // а дальше нам сначала надо получить кол-во записей без лимита $countRecords
-            $queryCount = sprintf(static::COUNT_QUERY, $this->getTableName(), $whereParams);
-    
-            $statement = \DbContext::getConnection()->prepare($queryCount);
-            $statement->execute($queryParamValues);
-    
-            $countRecords = $statement->fetch();
-
-            $arrayDataWithCount = $countRecords;    
-    
-            // а затем дособирать строку запроса + orderby и limit offset
-            // и получить кусок данных из базы по лимиту
-            $query = sprintf(static::GET_BY_PREDICATE_QUERY, $this->getTableName(), $whereParams);
-            if (isset($inputParams['orderby']))
-                $query = $query . $this->getOrderbyQueryString($inputParams['orderby']);
-    
-            if (isset($inputParams['limit']))
-            {
-                $query = $query.' LIMIT :ss_limit';
-                $queryParamValues[':ss_limit'] = $inputParams['limit'];
-    
-                if (isset($inputParams['offset']))
-                {
-                    $query = $query.' OFFSET :ss_offset';
-                    $queryParamValues[':ss_offset'] = $inputParams['offset'];
-                }
-            }
-    
-            $statement = \DbContext::getConnection()->prepare($query);
-            $statement->execute($queryParamValues);
-
-            // сейчас в $arrayDataWithCount мы имеем ['count' => 45]
-
-            // вот здесь я не совсем поняла, что происходит
-            // и сделала так )
-            // в итоге мне надо получить ['count'=> 45,
-            //                            'products' => [ {все записи по лимиту}]]
-            
-            // если нет id в параметрах, то добавляем  'products' => [ {все записи по лимиту}]
-            if (!array_key_exists('id', $inputParams)) {
-                $arrayDataWithCount['products'] = array_map([$this, 'map'], $statement->fetchAll());
-                return $arrayDataWithCount;
-            } 
-
-
-            // остальные случаи, когда есть id
-            // я так поняла их можно опустить, тк в этот эндпойнт я не собираюсь передавать id
-            
-            // // если есть id и ответ пустой
-            // if (!$data = $statement->fetch()) 
-            //     return null;
-            
-
-            // // а это для того случая, если есть id и ответ не пустой??
-            // return $this->map($data);
-
-
-        }
-// ---------------------------------------------------------------------
-
-
-
-
-
 }
 
 ?>
