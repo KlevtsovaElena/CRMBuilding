@@ -50,3 +50,8 @@ function declinationWord(n, word) {
     if (n1 == 1) { return word[0]; }
     return word[2];
 }
+
+/* ---------- ОТОБРАЗИТЬ В КРУЖКЕ ТОЛЬКО ПЕРВУЮ БУКВУ ИМЕНИ ---------- */
+let profileAvatar = document.querySelector('.menu-top__profile-avatar');
+let profileName = document.querySelector('.menu-top__profile-name').innerText;
+profileAvatar.innerText = profileName.trim()[0];

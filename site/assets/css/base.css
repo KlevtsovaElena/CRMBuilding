@@ -27,6 +27,8 @@
     --menu-left-width: 250px;
     --menu-left-width-collapse: 50px;
 
+    --font-size-mobile: 12px;
+
 }
 
 /* Сброс дефолтных стилей элементов */
@@ -49,6 +51,7 @@ a {
     font-family: inherit;
     text-decoration: none;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 table, caption, tbody, tfoot, thead, tr, th, td {
@@ -147,10 +150,11 @@ body {
 .btn {
     border-radius: var(--border-radius);
     font-weight: 600;
-    padding: 15px;
+    padding: 15px 9px;
     min-width: 100px;
     transition: all var(--speed-transition); 
     cursor: pointer;
+    font-size: 0.95rem;
 }
 
 input, textarea, select {
@@ -234,6 +238,7 @@ input:focus, textarea:focus, select:focus {
 .btn-delete {
     background: var(--secondary-color);
     color: var(--light-color);
+    text-align: center;
 }
 
 .btn-delete:hover {
@@ -248,6 +253,7 @@ input:focus, textarea:focus, select:focus {
     background: var(--light-color);
     color: var(--dark-color);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+    text-align: center;
 }
 .btn-neutral:hover {
     background: var(--neutral-color-hover); 
@@ -292,7 +298,24 @@ input:focus, textarea:focus, select:focus {
     align-items: center;
 }
 
-.menu-top__logo {
+.menu-top__left {
+    display: flex;
+    align-items: center;
+}
+
+.menu-top__left-toggle svg{
+    cursor: pointer;
+}
+
+.menu-top__left-toggle path {
+    transition: all var(--speed-transition);
+} 
+
+.menu-top__left-toggle:hover path {
+    fill: var(--primary-color-hover);
+} 
+
+.menu-top__left-logo {
     height: var(--menu-top-height);
     padding: 8px 15px;
     font-size: 2rem;
@@ -423,7 +446,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .main-content {
-    margin-left: var(--menu-left-width);;
+    margin-left: var(--menu-left-width);
     margin-top:  var(--menu-top-height);
     padding: 30px;
 }
@@ -507,4 +530,52 @@ th {
     stroke: var(--secondary-color);
     stroke-width:2;
     stroke-miterlimit:10;
+}
+
+@media(max-width: 768px) {
+    .btn {
+        padding: 10px;
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        font-size: 1.2rem;
+    }
+
+    .btn-group-3 {
+        display: block;
+    }
+
+    .page-title {
+        margin: 10px 0;
+    }
+
+    .menu-top__left-toggle {
+        display: block;
+    }
+
+    .menu-top__left-logo {
+        padding: 13px 15px;
+    }
+
+    .menu-left {
+        display: none;
+    }
+
+    .main-content,
+    .main-content.collapsed {
+        margin-left: unset;
+        padding: 10px;
+    }
+
+    html {
+        font-size: var(--font-size-mobile);
+    }
+
+    .menu-top__profile-name {
+        font-size: 1rem;
+    }
+
+    .list-products_name {
+        white-space: nowrap;
+    }
 }

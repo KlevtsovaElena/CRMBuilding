@@ -25,12 +25,15 @@
 
         <div class="menu-top">
             <div class="menu-top__container">
-                <div class="menu-top__logo">LOGO</div>
+                <div class="menu-top__left">
+                    <div class="menu-top__left-logo">LOGO</div>
+                    <div class="menu-top__left-toggle d-none"><svg width="25px" height="25px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M64 192h896v76.8H64V192z m0 281.6h896v76.8H64V473.6z m0 281.6h896V832H64v-76.8z" fill="#444444"></path></g></svg></div>
+                </div>
                 <div class="menu-top__profile">
                     <div class="menu-top__profile-name">        
                         Поставщик
                     </div>
-                    <div class="menu-top__profile-avatar">П</div>
+                    <div class="menu-top__profile-avatar"></div>
                     <div class="logout">
                         
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
