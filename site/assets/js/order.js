@@ -2,11 +2,25 @@
 let id = document.querySelector('.orders').getAttribute('data-id');
 console.log(id);
 
-console.log(document.querySelector('section').innerHTML);
-
 // собираем ссылку для запросов
 link = 'http://localhost/api/ordervendors.php';
 
+//отслеживаем открытие страницы с данным новым заказом, чтобы поменять в БД статус заказа на "Просмотрен"
+document.addEventListener("DOMContentLoaded", () => {
+
+    // соберём json для передачи на сервер
+    //статус в таблице order_vendors меняется на 1 - просмотрен
+    let obj = JSON.stringify({
+        'id': id,
+        'status':  1
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+    console.log('статус заказа  с id ' + id + ' изменен на ' + 1);
+
+  });
 
 //функция для отображения контакта покупателя
 function showContact() {

@@ -16,7 +16,7 @@
     <p class="page-title">Новый заказ</p>
 
     <!-- здесь храним id заказа -->
-    <input type="hidden" id="order_id" name="order_id" value="<?= $_GET['order_id'] ?>">
+    <input type="hidden" id="order_id" name="order_id" value="<?= $_GET['id'] ?>">
 
     <!-- соберём данные для отображения в форме -->
     <?php
@@ -24,11 +24,11 @@
         $infos = json_decode($dataJson, true);
         //print_r($infos);
 
-        //отбираем данные только по нужному номеру заказа
+        //отбираем данные только по нужному id
         $data = [];
 
         foreach ($infos as $info) {
-            if ($info['order_id'] == $_GET['order_id']) {
+            if ($info['id'] == $_GET['id']) {
                 $data = $info;
                 //print_r($data);
             }
@@ -60,7 +60,7 @@
                 <tr role="row">
                     <th class="table-header">
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <?= $date ?> </div>
-                        <div class="contact-data d-none">
+                        <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
                             <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['vendor_location']['longitude']) ?> км</div> 
                         </div> 
@@ -78,8 +78,8 @@
                     <tr role="row" class="list-orders__row">
                         <td><?= $data['products'][$i]['name']; ?></td>
                         <td class="list-orders_status"><?= $data['products'][$i]['quantity'] ?></td>
-                        <td><?= $data['products'][$i]['price']; ?> сум</td>
-                        <td><?= $data['products'][$i]['price'] * $data['products'][$i]['quantity']; ?> сум</td>
+                        <td><?= number_format($data['products'][$i]['price'], 0, ',', ' '); ?> сум</td>
+                        <td><?= number_format($data['products'][$i]['price'] * $data['products'][$i]['quantity'], 0, ',', ' '); ?> сум</td>
                         <?php $totalQuantity += $data['products'][$i]['quantity']; ?>
                         <?php $totalSum += $data['products'][$i]['price'] * $data['products'][$i]['quantity']; ?>
                     </tr>
@@ -94,7 +94,7 @@
                         <td class="total">Итого</td>
                         <td></td>
                         <td></td>
-                        <td><?= $totalSum ?> сум</td>
+                        <td><?= number_format($totalSum, 0, ',', ' '); ?> сум</td>
                     </tr>
             </tbody>
 
@@ -103,7 +103,7 @@
 
     <!-- кнопки, на которые будет нажимать поставщик после просмотра заказа -->
     <section class="buttons">
-        <button class="btn btn-ok d-iblock show-contact" onclick="showContact()">КОНТАКТНЫЕ ДАННЫЕ</button>
+        <!-- <button class="btn btn-ok d-iblock show-contact" onclick="showContact()">КОНТАКТНЫЕ ДАННЫЕ</button> -->
         <button class="btn btn-ok d-iblock" onclick="confirmOrder()">ПОДТВЕРДИТЬ ЗАКАЗ</button>
         <button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
         <button class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
@@ -112,54 +112,6 @@
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
 
-    <!-- ШАБЛОНЫ -->
-    <!-- шаблон шапки части таблицы -->
-    <!-- <template id="template-new-order">
-        <tr role="row">
-
-            <th data-id="order_id" data-sort="">
-                <div>Заказ № ${order_id} от ${date}</div>
-                <div>+ ${phone}</div>
-                <div>До клиента: ${distance} километров</div> 
-            </th>
-            <th></th>
-            <th></th>
-            <th></th>
-
-        </tr> -->
-        
-        <!-- <tr role="row" id="new-order-products"></tr> -->
-        <!-- место шаблона с содержимым заказа -->
-
-        
-    <!-- </template> -->
-
-    <!-- шаблон с содержимым заказа -->
-    <!-- <template  id="template-new-order-products">
-        <tr role="row" class="list-orders__row" order-id="">
-            <td>${name}</td>
-            <td class="list-orders_status">${quantity}</td>
-            <td>${price} сум</td>
-            <td>${calculated_price} сум</td>
-        </tr>
-    </template> -->
-
-    <!-- шаблон с содержимым заказа -->
-    <!-- <template  id="template-new-order-sum">
-        <tr role="row" class="list-orders__row" order-id="">
-            <td>Итого</td>
-            <td>${total_quantity}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr role="row" class="list-orders__row" order-id="">
-            <td>Итого</td>
-            <td></td>
-            <td></td>
-            <td>${total_sum} сум</td>
-        </tr>
-    </template> -->
 
 
 

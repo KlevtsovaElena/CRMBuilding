@@ -410,10 +410,10 @@ function showOrder(id) {
 
     // перебросим пользователя на страницу заказа в зависимости от статуса
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    if (document.querySelector(`[order-id="${id}"]`).classList.contains('row-status0')) {
-        document.location.href = "http://localhost/pages/vendor-new-order.php?id=" + id + params ; 
-    } else {
+    // if (document.querySelector(`[order-id="${id}"]`).classList.contains('row-status0')) {
+    //     document.location.href = "http://localhost/pages/vendor-new-order.php?id=" + id + params ; 
+    // } else {
         document.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
-    }
+    // }
 
 }
