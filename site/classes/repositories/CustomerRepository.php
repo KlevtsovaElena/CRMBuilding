@@ -1,10 +1,10 @@
 <?php
 namespace repositories;
-use abstraction\BaseRepository;
-
 require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
 use models\Customer;
+use abstraction\BaseRepository;
+use utils\SqlHelper;
 
 class CustomerRepository extends BaseRepository
 {
@@ -34,7 +34,8 @@ class CustomerRepository extends BaseRepository
     public function map(array $row): Customer
     {
         $item = new Customer();
-        foreach ($this->getAssociatePropertiesWithClass($row) as $key => $value)
+
+        foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
             $item->$key = $value;
 
         return $item;

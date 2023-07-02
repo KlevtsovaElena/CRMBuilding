@@ -1,5 +1,6 @@
 <?php 
     namespace repositories;
+    use utils\SqlHelper;
 
     require_once($_SERVER['DOCUMENT_ROOT'].'/classes/autoloader.php');
     
@@ -24,7 +25,8 @@
         public function map(array $row): Product
         {
             $item = new Product();
-            foreach ($this->getAssociatePropertiesWithClass($row) as $key => $value)   
+
+            foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
                 $item->$key = $value;
     
             return $item;
