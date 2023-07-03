@@ -197,17 +197,29 @@
         {
             $filteredParams = [];
 
-            foreach($replaceFromNameAndToNamePair as $fromName => $toName)
+            foreach($inputParams as $originalName => $value)
             {
-                if (array_key_exists($fromName, $inputParams))
+                if (array_key_exists($originalName, $replaceFromNameAndToNamePair))
                 {
-                    $value = $inputParams[$fromName];
+                    $value = $inputParams[$originalName];
                     if (is_object($value) || is_array($value))
                         $value = json_encode($value);
-
-                    $filteredParams[$toName] = $value;
+                    
+                    $filteredParams[$replaceFromNameAndToNamePair[$originalName]] = $value;
                 }
             }
+
+            // foreach($replaceFromNameAndToNamePair as $fromName => $toName)
+            // {
+            //     if (array_key_exists($fromName, $inputParams))
+            //     {
+            //         $value = $inputParams[$fromName];
+            //         if (is_object($value) || is_array($value))
+            //             $value = json_encode($value);
+
+            //         $filteredParams[$toName] = $value;
+            //     }
+            // }
 
             return $filteredParams;
         }
