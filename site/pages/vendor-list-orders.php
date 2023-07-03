@@ -171,10 +171,6 @@ if (count($_GET) !== 0) {
                     <!-- контент таблицы из шаблона -->
                     </tbody>
 
-                    <tbody class="list-orders__body2">
-                    <!-- контент таблицы из шаблона -->
-                    </tbody>
-
                 </table>
 
                 <div class="info-table"></div>

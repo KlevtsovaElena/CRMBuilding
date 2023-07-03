@@ -12,6 +12,16 @@ class OrderVendorRepository extends BaseRepository
     const TABLE_NAME = 'order_vendors';
     const CLASS_NAME = 'models\OrderVendor';
 
+    const GET_COUNT_WITH_DETAILS = 'SELECT COUNT(*) as `count`
+                                        FROM order_vendors ov
+                                        INNER JOIN vendors v
+                                        ON v.id = ov.vendor_id
+                                        INNER JOIN orders o
+                                        ON o.id = ov.order_id
+                                        INNER JOIN customers c
+                                        ON c.id = o.customer_id 
+                                        %s';
+
     const GET_WITH_DETAILS = 'SELECT ov.`id` as `id`,
                                         ov.`order_id` as `order_id`,
                                         ov.`vendor_id` as `vendor_id`,
@@ -119,6 +129,39 @@ class OrderVendorRepository extends BaseRepository
         $statement->execute(array_merge($whereParams, $formattedSearchParams));
 
         return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
+
+// ЛЕНА добавила только этот метод сюда
+    public function getCountWithDetails(array $inputParams): int
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$orderVendorsDetailsAssociation, $inputParams);
+
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$orderVendorsDetailsAssociation, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+        // Формируем результирующую строку запроса
+        $query = sprintf(static::GET_COUNT_WITH_DETAILS,  implode(' ', [$whereString, $searchString]));
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+        
+                    if (!$data = $statement->fetch())
+                        return 0;
+        
+                    return $data['count'];
     }
 }
 ?>
