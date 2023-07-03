@@ -209,6 +209,7 @@ function renderListOrders(orders) {
         let products = "";
         let totalPrice = 0; 
         let productName = "";
+        
         // соберём данные заказанных товаров и общую стоимость заказа
         // for (let j = 0; j < orders['orders'][i]['products'].length; j++){
         //     // если вдруг товар в базе не найден,
