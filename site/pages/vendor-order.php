@@ -15,19 +15,9 @@
 
     <!-- соберём данные для отображения в форме -->
     <?php
-        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php");
-        $infos = json_decode($dataJson, true);
-        //print_r($infos);
-
-        //отбираем данные только по нужному id
-        $data = [];
-
-        foreach ($infos as $info) {
-            if ($info['id'] == $_GET['id']) {
-                $data = $info;
-                //print_r($data);
-            }
-        }
+        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
+        $data = json_decode($dataJson, true);
+        $data = $data[0];
 
         //конвертация юникс времени в стандартное в формате d.m.Y (H:i)
         $timestamp = $data['order_date'];
@@ -50,12 +40,12 @@
     <!-- если заказ новый, отражаем это в заголовке -->
     <?php if ($data['status'] == 0) { ?>
 
-        <p class="page-title">Новый заказ</p>
+        <p class="page-title" data-status=" <?= $data['status'] ?> ">Новый заказ</p>
 
     <!-- если заказ уже открывался ранее -->
     <?php }  else {?>
 
-        <p class="page-title">Заказ</p>
+        <p class="page-title" data-status=" <?= $data['status'] ?> ">Заказ</p>
 
     <?php } ?>
 
