@@ -33,7 +33,7 @@
             JSON_UNESCAPED_UNICODE);
 
         }
-
+// сюда добавила ещё общую сумму заказа
         private function getOrderVendorsWithProducts(array $orderVendorsDetails) : array
         {
 
@@ -50,6 +50,8 @@
 
             foreach ($orderVendorsDetails as $ordersVendorItem) 
             {
+                $totalPrice = 0;
+
                 $newArrayItem = [
                     'id' => $ordersVendorItem['id'],
                     'order_id' => $ordersVendorItem['order_id'],
@@ -77,14 +79,14 @@
                                 $newProduct['name'] = $product->name;
                                 $newProduct['price'] = $product->price;
                                 $newProduct['available'] = $product->quantity_available;
+                                $totalPrice += $newProduct['price'] * $vendorProductCount;
                                 break;
                             }
                         }
-
                         $newArrayItem['products'][] = $newProduct;
                     }
                 }
-
+                $newArrayItem['order_price'] =  $totalPrice;
                 $result[] = $newArrayItem;
             }
 
