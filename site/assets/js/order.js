@@ -30,17 +30,6 @@ if (status == 0) {
     
 }
 
-//функция для отображения контакта покупателя
-function showContact() {
-
-    //показываем телефон и расстояние до покупателя в шапке заказа
-    document.querySelector('.contact-data').classList.remove('d-none');
-
-    //скрываем кнопку
-    document.querySelector('.show-contact').classList.add('d-none');
-
-}
-
 //функция для подтверждения заказа поставщиком
 function confirmOrder() {
 
@@ -55,7 +44,46 @@ function confirmOrder() {
     sendRequestPOST(link, obj);
 
     //console.log('статус заказа  с id ' + id + ' изменен на ' + 2);
+
+    //кнопка "Подтвердить заказ" меняется на "Заказ доставлен" с соответствующей функцией по клику на нее
+    let btn = document.getElementById('btn-confirm');
+    console.log(btn);
+    btn.innerHTML = "ЗАКАЗ ДОСТАВЛЕН";
+    btn.onclick = function(){
+        confirmDelivery();
+    };
+
+    // если до подтверждения статус был "отменен", 
+    if(status == 3) {
+        //возвращаем кнопку "Отменить" для возможности отмены заказа
+        btn.insertAdjacentHTML("afterend", `<button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>`);
+    }
+
+    //в случае, если статус до подтверждения был "новый" или "просмотрен"
+    if(status == 0 || status == 1) {
+        //скрываем кнопку "НЕ ДОЗВОНИЛИСЬ"
+        document.getElementById('btn-out-of-reach').classList.add('d-none');
+    }
+
     
+    //возвращение на страницу всех заказов
+    // backToAllOrders();
+
+}
+
+//функция для подтверждения доставки поставщиком
+function confirmDelivery() {
+
+    // соберём json для передачи на сервер
+    //статус в таблице order_vendors меняется на 4 - доставлен (завершен)
+    let obj = JSON.stringify({
+        'id': id,
+        'status':  4
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
     //возвращение на страницу всех заказов
     backToAllOrders();
 

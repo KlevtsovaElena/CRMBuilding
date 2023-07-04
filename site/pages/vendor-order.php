@@ -103,20 +103,31 @@
     <!-- кнопки, на которые будет нажимать поставщик после просмотра заказа -->
     <section class="buttons">
 
-        <!-- если статус заказа любой, кроме "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ЗАКАЗ" -->
-        <?php if($data['status'] != 2 ) {?>
-        <!-- <button class="btn btn-ok d-iblock show-contact" onclick="showContact()">КОНТАКТНЫЕ ДАННЫЕ</button> -->
-        <button class="btn btn-ok d-iblock" onclick="confirmOrder()">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+        <!-- если статус заказа НЕ "завершен"-->
+        <?php if($data['status'] != 4) {
+
+            //и также НЕ "подтвержден"
+            if($data['status'] != 2) {?>
+                <!-- будет видна кнопка "ПОДТВЕРДИТЬ ЗАКАЗ" -->
+                <button id="btn-confirm" class="btn btn-ok d-iblock" onclick="confirmOrder()">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+            <?php } ?>
+
+            <!-- и также НЕ "отменен"--> 
+            <?php if($data['status'] != 3) {?>
+                <!-- будет видна кнопка "ОТМЕНИТЬ ЗАКАЗ" -->
+                <button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
+            <?php } ?>
+
         <?php } ?>
 
-        <!-- если статус заказа любой, кроме "отменен", будет видна кнопка "ОТМЕНИТЬ ЗАКАЗ" -->
-        <?php if($data['status'] != 3 ) {?>
-        <button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
+        <!-- если статус заказа либо "новый", либо "просмотрен", будет видна кнопка "НЕ ДОЗВОНИЛИСЬ" -->
+        <?php if($data['status'] == 0 || $data['status'] == 1) {?>
+        <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
         <?php } ?>
 
-        <!-- если статус заказа любой, кроме "подтвержден" и "отменен", будет видна кнопка "НЕ ДОЗВОНИЛИСЬ" -->
-        <?php if($data['status'] != 2 && $data['status'] != 3) {?>
-        <button class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
+        <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->
+        <?php if ($data['status'] == 2) {?>
+            <button class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
         <?php } ?>
 
     </section>
