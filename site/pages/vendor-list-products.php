@@ -41,18 +41,6 @@
                 <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
                 
                 <div class="form-elements-container">
-                    
-                    <!-- выбор бренда -->
-                    <label>Бренд
-                        <select id="brand_id" name="brand_id" value="">
-
-                            <option value="">Все</option>
-                            <?php foreach($brands as $brand) { ?>
-                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php }; ?>
-
-                        </select>
-                    </label>
 
                     <!-- выбор категории -->
                     <label>Категория
@@ -61,6 +49,18 @@
                             <option value="">Все</option>
                             <?php foreach($categories as $category) { ?>
                                 <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                            <?php }; ?>
+
+                        </select>
+                    </label>
+
+                    <!-- выбор бренда -->
+                    <label>Бренд
+                        <select id="brand_id" name="brand_id" value="">
+
+                            <option value="">Все</option>
+                            <?php foreach($brands as $brand) { ?>
+                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
                             <?php }; ?>
 
                         </select>
@@ -97,8 +97,8 @@
 
                             <th data-id="article" data-sort="">Артикул</th>
                             <th data-id="name" data-sort="">Наименование</th>
-                            <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="category_id" data-sort="">Категория</th>
+                            <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
                             <th data-id="max_price" data-sort="">Цена среднерыночная</th>
@@ -157,31 +157,6 @@ if (count($_GET) !== 0) {
         
         <div class="form-elements-container">
             
-            <!-- выбор бренда -->
-            <label>Бренд
-                <select id="brand_id" name="brand_id" value="">
-
-                    <option value="">Все</option>
-                    <?php foreach($brands as $brand) {
-                        if (!isset($_GET['brand_id'])) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                        <?php
-                        } else if ($_GET['brand_id'] == $brand['id']) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
-
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
-
-                </select>
-            </label>
-
             <!-- выбор категории -->
             <label>Категория
                 <select id="category_id" name="category_id" value="">
@@ -200,6 +175,31 @@ if (count($_GET) !== 0) {
                         } else {
                         ?>
                             <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>;
+                        <?php 
+                        }
+                    }; ?>
+
+                </select>
+            </label>
+
+            <!-- выбор бренда -->
+            <label>Бренд
+                <select id="brand_id" name="brand_id" value="">
+
+                    <option value="">Все</option>
+                    <?php foreach($brands as $brand) {
+                        if (!isset($_GET['brand_id'])) {
+                        ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php
+                        } else if ($_GET['brand_id'] == $brand['id']) {
+                        ?>
+                            <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
+
+                        <?php
+                        } else {
+                        ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>;
                         <?php 
                         }
                     }; ?>
@@ -249,8 +249,8 @@ if (count($_GET) !== 0) {
 
                     <th data-id="article" data-sort="<?php if ($sortBy == 'article')  {echo $mark; } ?>">Артикул</th>
                     <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
-                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
+                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена среднерыночная</th>
@@ -280,8 +280,8 @@ if (count($_GET) !== 0) {
         <tr role="row" class="list-products__row" product-id="${id}">
             <td><a href="javascript: editProduct(${id})"><strong>${article}</strong></a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
-            <td>${brand_id}</td>
             <td>${category_id}</td>
+            <td>${brand_id}</td>
             <td>${quantity_available}</td>
             <td>${price}</td>
             <td>${max_price}

@@ -62,6 +62,24 @@
                     <div class="error-info d-none"></div> 
                 </div>
 
+                <!-- категория -->
+                <div class="form-add-product__elements-item">
+                    <p>Категория</p>
+                    <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
+
+                        <?php foreach($categories as $category) { 
+                            if ($category['id'] === $product['category_id']) {
+                            ?>
+                                <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
+                            <?php } else { ?>
+                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                            <?php } 
+                        }; ?>
+
+                    </select>
+                    <div class="error-info d-none"></div> 
+                </div>
+
                 <!-- бренд -->
                 <div class="form-add-product__elements-item">
                     <p>Бренд</p>
@@ -74,24 +92,6 @@
                                 <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
                             <?php } else { ?>
                                 <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php } 
-                        }; ?>
-
-                    </select>
-                    <div class="error-info d-none"></div> 
-                </div>
-
-                <!-- категория -->
-                <div class="form-add-product__elements-item">
-                    <p>Категория</p>
-                    <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
-
-                        <?php foreach($categories as $category) { 
-                            if ($category['id'] === $product['category_id']) {
-                            ?>
-                                <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
-                            <?php } else { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
                             <?php } 
                         }; ?>
 
