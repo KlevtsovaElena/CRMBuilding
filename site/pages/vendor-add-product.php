@@ -106,9 +106,9 @@
                 <div class="error-info d-none"></div> 
             </div>
 
-            <!-- рыночная цена -->
+            <!-- среднерыночная цена -->
             <div class="form-add-product__elements-item">
-                <p>Цена рыночная </p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
+                <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
                 <div class="error-info d-none"></div> 
             </div> 
 
