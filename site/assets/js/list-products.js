@@ -208,17 +208,17 @@ function renderListProducts(totalProducts) {
                                                         .replace('${name}', totalProducts['products'][i]['name'])
                                                         .replace('${brand_id}', brands[totalProducts['products'][i]['brand_id']])
                                                         .replace('${category_id}', categories[totalProducts['products'][i]['category_id']])
-                                                        .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
-                                                        .replace('${price}', totalProducts['products'][i]['price'])
+                                                        .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
+                                                        .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${max_price}', totalProducts['products'][i]['max_price']);
+                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
     }
 
 
     // выведем внизу таблицы сколько всего записей 
-    info.innerText = "Всего " + totalProductsCount + declinationWord(totalProductsCount, [' запись', ' записи', ' записей']);
+    info.innerText = "Всего " + totalProductsCount.toLocaleString('ru') + declinationWord(totalProductsCount, [' запись', ' записи', ' записей']);
 
     // этот кусок кода относится к мусорке
     // здесь, тк изначально таких элементов на стр нет,
