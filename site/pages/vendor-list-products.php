@@ -101,7 +101,7 @@
                             <th data-id="category_id" data-sort="">Категория</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
-                            <th data-id="max_price" data-sort="">Цена рыночная</th>
+                            <th data-id="max_price" data-sort="">Цена среднерыночная</th>
                             
                         </tr>
                     </thead>
@@ -253,7 +253,7 @@ if (count($_GET) !== 0) {
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
-                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рыночная</th>
+                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена среднерыночная</th>
                     
                 </tr>
             </thead>
