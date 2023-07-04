@@ -104,11 +104,24 @@ CREATE TABLE `order_vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`) VALUES
-(3,	124,	1,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
-(4,	125,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
-(5,	130,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
-(6,	131,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
-(7,	132,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1);
+(1,	124,	1,	'{\"15\":11,\"15\":21,\"5\":31}',	0),
+(2,	125,	1,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(3,	126,	2,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(4,	126,	1,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(5,	127,	3,	'{\"1\":11,\"4\":21,\"5\":31}',	1),
+(6,	127,	2,	'{\"1\":11,\"15\":21,\"5\":31}',	1),
+(7,	127,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	0),
+(8,	128,	1,	'{\"1\":11,\"15\":21,\"5\":31}',	1),
+(9,	129,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	3),
+(10,	130,	1,	'{\"1\":11,\"15\":21,\"5\":31}',	1),
+(11,	131,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	1),
+(12,	132,	1,	'{\"1\":11,\"15\":21,\"5\":31}',	2),
+(13,	133,	2,	'{\"10\":11,\"15\":1,\"5\":31}',	2),
+(14,	133,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	1),
+(15,	134,	1,	'{\"30\":11,\"15\":21,\"5\":31}',	0),
+(16,	134,	3,	'{\"10\":11,\"15\":1,\"5\":31}',	1),
+(17,	135,	1,	'{\"20\":11,\"20\":21,\"5\":31}',	0),
+(18,	136,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	4);
 
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
@@ -121,16 +134,19 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `products`, `location`) VALUES
-(124,	5,	1687282054,	'{\"13\":1,\"14\":2,\"15\":3}',	'{\"latitude\": 0, \"longitude\": 0}'),
-(125,	19,	1687282279,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
-(130,	5,	1687300121,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
-(131,	19,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
-(132,	5,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
-(133,	19,	1687300310,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
-(134,	5,	1687300807,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
-(135,	19,	1687301289,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
-(136,	5,	1687346529,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
-(137,	19,	1687346529,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}');
+(124,	5,	1688313600,	'{\"13\":1,\"14\":2,\"15\":3}',	'{\"latitude\": 0, \"longitude\": 0}'),
+(125,	19,	1688313660,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(126,	5,	1688313720,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
+(127,	19,	1688313780,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(128,	5,	1688313840,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(129,	19,	1688313900,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(130,	5,	1688313960,	'',	'{\"latitude\": 0, \"longitude\": 0}'),
+(131,	19,	1688314020,	'',	'{\"latitude\": 55.657107, \"longitude\": 37.569608}'),
+(132,	5,	1688314080,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(133,	19,	1688314140,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(134,	19,	1688314200,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(135,	19,	1688314260,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(136,	19,	1688314320,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}');
 
 DROP TABLE IF EXISTS `price_changes`;
 CREATE TABLE `price_changes` (
@@ -211,15 +227,20 @@ CREATE TABLE `vendors` (
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `city_id` int unsigned NOT NULL,
   `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `email` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `tg_id` bigint unsigned DEFAULT NULL,
   `coordinates` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `role` tinyint NOT NULL,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `date_reg` bigint NOT NULL,
+  `unique_id` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `is_active` tinyint NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`) VALUES
-(1,	'Поставщик',	4,	NULL,	NULL,	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}'),
-(2,	'Поставщик 2',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}');
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `unique_id`, `is_active`) VALUES
+(1,	'Поставщик',	4,	NULL,	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	'',	1),
+(2,	'Поставщик 2',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	1,	NULL,	1688481020,	'',	1);
 
--- 2023-06-28 14:21:55
+-- 2023-07-04 14:44:28
