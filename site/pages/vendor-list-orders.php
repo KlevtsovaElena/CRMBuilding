@@ -55,8 +55,8 @@
                         <tr role="row">
 
                             <th data-id="order_id" data-sort="">№ заказа</th>
-                            <th data-id="status" data-sort="">Статус</th>
                             <th data-id="order_date" data-sort="">Дата создания</th>
+                            <th data-id="status" data-sort="">Статус</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
                             <th data-id="complete_date">Дата завершения</th>
@@ -65,10 +65,6 @@
                     </thead>
 
                     <tbody class="list-orders__body">
-                    <!-- контент таблицы из шаблона -->
-                    </tbody>
-
-                    <tbody class="list-orders__body2">
                     <!-- контент таблицы из шаблона -->
                     </tbody>
 
@@ -158,8 +154,8 @@ if (count($_GET) !== 0) {
                         <tr role="row">
 
                             <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№ заказа</th>
-                            <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                             <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
+                            <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
                             <th data-id="complete_date">Дата завершения</th>
@@ -189,8 +185,8 @@ if (count($_GET) !== 0) {
                     <tr role="row" class="list-orders__row row-status${status}" order-id="${id}">
 
                         <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
-                        <td><a href="javascript: showOrder(${id})" class="list-orders_status d-block status${status}">${status}</a></td>
                         <td>${order_date}</td>
+                        <td><a href="javascript: showOrder(${id})" class="list-orders_status d-block status${status}">${status}</a></td>
                         <td class="list-orders_products">${products}</td>
                         <td>${total_price}</td>
                         <td>${complete_date}</td>
