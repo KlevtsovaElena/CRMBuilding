@@ -54,20 +54,6 @@
                 <div class="error-info d-none"></div> 
             </div>
 
-            <!-- бренд -->
-            <div class="form-add-product__elements-item">
-                <p>Бренд</p>
-                <select id="brand_id" name="brand_id" value="" required>
-                    <option value="" selected hidden>Выберите бренд...</option>
-
-                    <?php foreach($brands as $brand) { ?>
-                        <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                    <?php }; ?>
-
-                </select>
-                <div class="error-info d-none"></div> 
-            </div>
-
             <!-- категория -->
             <div class="form-add-product__elements-item">
                 <p>Категория</p>
@@ -76,6 +62,20 @@
 
                     <?php foreach($categories as $category) { ?>
                         <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                    <?php }; ?>
+
+                </select>
+                <div class="error-info d-none"></div> 
+            </div>
+
+            <!-- бренд -->
+            <div class="form-add-product__elements-item">
+                <p>Бренд</p>
+                <select id="brand_id" name="brand_id" value="" required>
+                    <option value="" selected hidden>Выберите бренд...</option>
+
+                    <?php foreach($brands as $brand) { ?>
+                        <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
                     <?php }; ?>
 
                 </select>
