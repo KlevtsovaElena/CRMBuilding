@@ -8,14 +8,45 @@
     ];
 ?>
 
-
-
+<!-- 1. Проверяем есть ли в гет-параметрах роль, если нет то:
+            1. меню не рисуем
+            2. показываем форму выбора
+            3. удаляем куки
+    2. Если роль есть в гет параметре, то:
+            1. подключаем хэдер
+            2. в хэдере проверяем куки (1 или 2)
+            3. рисуем меню поставщика или администратора
+    3. При нажатии на кнопку Войти как Администратор:
+            1. устанавливаем в куки роль = 1
+            2. перезагружаем стр с гет-параметром роли 1
+    4. При нажатии на кнопку Войти как Поставщик аналогично п.3, только с циферкой 2
+      -->
 <?php
-
+if (isset($_GET['role'])) {
     include('components/header.php');
+} else {
+    ?>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRMBuilding</title>
 
-?>
-<?php if (!isset($_GET['role'])) {
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='./../assets/css/base-temp.css'>
+    
+</head>
+<body>
+    <section class="main-content">
+        <div class="container">
+<?php
+}
+
+
+ if (!isset($_GET['role'])) {
 ?>
     <div class="form-elements-container form-index">
         <p class="form-index-p">Войти как</p>
@@ -24,26 +55,7 @@
     </div>
 
 
-    <style>
-        .form-index-p {
-            font-size: 24px;
-            text-align: center;
-        }
-        .form-index-btn {
-            margin: 10px auto;
-            width: 200px;
-            text-align: center;
-        }
 
-        .form-index {
-            width: 600px;
-            height: 400px;
-            padding: 50px;
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-        }
-    </style>
 
     <script>
         // сбрасываем куки, если нет гет параметров
