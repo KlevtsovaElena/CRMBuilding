@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -51,7 +52,7 @@ func SendMessage(text string) int {
 
 	var response SendMessageResponseT
 
-	resp, err := http.Get("https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + channelName + "&text=" + text)
+	resp, err := http.Get("https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + url.QueryEscape(channelName) + "&text=" + url.QueryEscape(text))
 
 	if err != nil {
 		fmt.Println("Произошла сетевая ошибка при отправке сообщения.")
