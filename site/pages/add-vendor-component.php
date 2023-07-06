@@ -13,13 +13,12 @@
 <body>
 
 
+<!-- ---------------------------------------------------------------------------------------------------------------- -->
+<!-- НАЧАЛО - ПЕРЕНЕСТИ ВЕСЬ СЛЕДУЮЩИЙ КОД НА СТРАНИЦУ КАТАЛОГА ПОСТАВЩИКОВ -->
 <button class="btn btn-ok d-iblock" onclick="addVendorToggle()">+ Добавить поставщика</button>
 
 <!-- Добавление поставщика -->
 <section class="add-vendor d-none">
-
-    <!-- здесь храним id поставщика -->
-    <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
 
     <form class="form-add-vendor form-elements-container">
 
@@ -75,14 +74,6 @@
             <div class="error-info d-none"></div>
         </div> 
 
-        <!-- hash -->
-        <div class="form-add-vendor__item d-none">
-            <p>Уникальный идентификатор поставщика</p>
-            <input type="text" id="unique_id" name="unique_id" value="" required>
-            <div class="gen-hash btn btn-ok d-iblock">генератор идентификатора</div>
-            <div class="error-info d-none"></div>
-        </div>
-
         <div>
             <button class="btn btn-ok" onclick="addVendor()">Сохранить</button>
         </div>
@@ -92,22 +83,20 @@
     <div class="vendor-data-temp"></div>
 </section>
 
+<!-- КОНЕЦ - ПЕРЕНЕСТИ ВЕСЬ КОД НА СТРАНИЦУ КАТАЛОГА ПОСТАВЩИКОВ -->
+<!-- ---------------------------------------------------------------------------------------------------------------- -->
+
 
 <script src='./../assets/js/main.js'></script>
     
 </body>
 </html>
 
-<style>
-.gen-hash {
-    margin: 5px 0px;
-}
-</style>
-
 <script>
+
 console.log('подключили add-vendor.js');
+// определим основные переменные
 const formAddVendor = document.querySelector('.form-add-vendor');
-const generateHashButton = document.querySelector('.gen-hash');
 const vendorDataTemp = document.querySelector('.vendor-data-temp');
 const linkBot = document.querySelector('.link-bot');
 
@@ -118,20 +107,14 @@ const comment = formAddVendor.querySelector('#comment');
 const phone = formAddVendor.querySelector('#phone');
 const email = formAddVendor.querySelector('#email');
 const is_active = formAddVendor.querySelector('#is_active');
-const uniqueIdInput = formAddVendor.querySelector('#unique_id');
-
-
-
-let tempPass = ''; 
-
-generateHashButton.addEventListener('click', (e) => {
-    let uniqueId = generateHashString(12);
-    uniqueIdInput.value = uniqueId;
-})
 
 function addVendor() {
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
+
+    // очистим контенеры для вывода информации
+    linkBot.innerText = "";
+    vendorDataTemp.innerText = "";
 
     hasError = validationAddVendor();
 
@@ -141,10 +124,6 @@ function addVendor() {
         return;
     }
 
-    tempPass = generateHashString(10);
-
-    uniqueIdInput.value = generateHashString(12);
-
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
         'name': nameVendor.value.trim(),
@@ -153,9 +132,7 @@ function addVendor() {
         'phone': phone.value,
         'email': email.value.trim(),
         'is_active': is_active.value,
-        'unique_id': uniqueIdInput.value,
-        'temp_password': tempPass,
-        'role': 2
+        'role': 2 // соответствует роли поставщика
     });
 
     // передаём данные на сервер
@@ -169,7 +146,7 @@ function addVendor() {
     }
 console.log(response);
 
-    // formAddVendor.reset();
+    formAddVendor.reset();
 
     // показать ссылку на бота
     linkBot.innerText = response['linkBot'];
@@ -185,22 +162,6 @@ function validationAddVendor() {
 
 function addVendorToggle() {
     document.querySelector('.add-vendor').classList.toggle('d-none');
-}
-
-function generateHashString(n) {
-  const numberChars = '0123456789';
-  const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
- 
-  const stringAll = numberChars + upperChars + lowerChars;
-
-  let result = '';
-
-  for (let i = 0; i < n; i++) {
-    let randomChar = Math.floor(Math.random() * stringAll.length);
-    result += stringAll[randomChar];
-  }
-  return result;
 }
 
 

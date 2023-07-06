@@ -225,8 +225,8 @@ INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `catego
 DROP TABLE IF EXISTS `unit`;
 CREATE TABLE `unit` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name_short` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `name_short` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -252,16 +252,17 @@ CREATE TABLE `vendors` (
   `role` tinyint NOT NULL,
   `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `date_reg` bigint NOT NULL,
-  `unique_id` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `hash_string` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL,
-  `password` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `temp_password` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `temp_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `unique_id`, `is_active`, `password`, `temp_password`) VALUES
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`) VALUES
 (1,	'Поставщик',	4,	NULL,	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL),
 (2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	NULL,	1688481020,	NULL,	1,	NULL,	NULL),
-(3,	'Admin',	1,	NULL,	'admin@admin.admin',	NULL,	NULL,	NULL,	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL);
+(3,	'Admin',	1,	NULL,	'admin@admin.admin',	NULL,	NULL,	NULL,	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL),
+(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	NULL,	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc');
 
--- 2023-07-05 12:38:49
+-- 2023-07-06 09:49:29

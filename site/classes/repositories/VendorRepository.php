@@ -11,6 +11,8 @@
         const TABLE_NAME = 'vendors';
         const CLASS_NAME = 'models\Vendor';
         
+        const UPDATE_QUERY_HASH = 'UPDATE `%s` SET %s WHERE `hash_string`=:hash_string';
+    
         public function getTableName() : string
         {
             return static::TABLE_NAME;
@@ -30,5 +32,22 @@
 
             return $item;
         }
+
+        public function updateByHash(array $inputParams)
+        {
+            $objectParams = SqlHelper::filterParamsByNames($this->entityFields, $inputParams);
+            $equalParams = SqlHelper::getEqualParams(array_keys($objectParams));
+
+            if (array_key_exists('hash_string', $equalParams))
+                unset($equalParams['hash_string']);
+// где-то здесь вместе с обновлением записи по hash_string, нужно ещё очистить само поле hash_string
+            $stringParams = implode(', ', $equalParams);
+echo $stringParams;
+            $query = sprintf(static::UPDATE_QUERY_HASH, $this->getTableName(), $stringParams);
+echo $query;
+            $statement = \DbContext::getConnection()->prepare($query);
+            $statement->execute($objectParams);
+        }
+
     }
 ?>
