@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel='stylesheet' href='./../assets/css/base.css'>
+    <link rel='stylesheet' href='./../assets/css/base-temp.css'>
 </head>
 <body>
 
@@ -54,13 +55,13 @@
 
         <!-- телефон -->
         <div class="form-add-vendor__item">
-            <p>Телефон</p><input type="tel" id="phone" name="phone" value="">
+            <p>Телефон</p><input type="tel" id="phone" name="phone" value="" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
             <div class="error-info d-none"></div>
         </div>
 
         <!-- email -->
         <div class="form-add-vendor__item">
-            <p>Email</p><input type="email" id="email" name="email" value="" required>
+            <p>Email</p><input type="email" id="email" name="email" value="" placeholder="example@example.com" required>
             <div class="error-info d-none"></div>
         </div>
 
@@ -79,8 +80,7 @@
         </div>
 
     </form>
-    <div class="link-bot"></div>
-    <div class="vendor-data-temp"></div>
+<div class="vendor-info"></div>
 </section>
 
 <!-- КОНЕЦ - ПЕРЕНЕСТИ ВЕСЬ КОД НА СТРАНИЦУ КАТАЛОГА ПОСТАВЩИКОВ -->
@@ -97,8 +97,7 @@
 console.log('подключили add-vendor.js');
 // определим основные переменные
 const formAddVendor = document.querySelector('.form-add-vendor');
-const vendorDataTemp = document.querySelector('.vendor-data-temp');
-const linkBot = document.querySelector('.link-bot');
+const vendorInfo = document.querySelector('.vendor-info');
 
 // запишем значения полей формы в переменные
 const nameVendor = formAddVendor.querySelector('#name');
@@ -113,8 +112,7 @@ function addVendor() {
     event.preventDefault(); 
 
     // очистим контенеры для вывода информации
-    linkBot.innerText = "";
-    vendorDataTemp.innerText = "";
+    vendorInfo.innerHTML = "";
 
     hasError = validationAddVendor();
 
@@ -144,26 +142,71 @@ function addVendor() {
     } else {
         return;
     }
-console.log(response);
+
+
+    // показать ссылку на бота, логин и временный пароль
+    vendorInfo.innerHTML = `<p>Поставщик <b> ${nameVendor.value} </b> создан! Скопируйте и отправьте пользователю:</p>
+                            <br>
+                            <p><b>Ссылка для бота:</b></p>
+                            <div class="link-bot">${response['linkBot']}</div>
+                            <br>
+                            <p><b>Вход в CRM</b></p>
+                            <div class="vendor-data-temp">
+                                <p>Логин: ${response['login']}</p>
+                                <p>Временный пароль: ${response['tempPass']}</p>
+                            </div>`
 
     formAddVendor.reset();
-
-    // показать ссылку на бота
-    linkBot.innerText = response['linkBot'];
-    // показать логин и временный пароль
-    vendorDataTemp.innerText = "Логин: " + response['login'] + 
-                                "    Временный пароль: " + response['tempPass'];
-
 }
 
 function validationAddVendor() {
-    return false;
+    hasError = false;
+
+    [nameVendor, cityId, email, is_active].forEach(item => {
+    
+        console.log(item.getAttribute('name') + "    " + item.value);
+
+        const errorInfoContainer = item.closest('.form-add-vendor__item').querySelector('.error-info');
+        
+        if (!(item.value.trim())) {
+            // пустое поле
+            item.classList.add('error');   
+            errorInfoContainer.innerText = "Заполните данные!";
+            errorInfoContainer.classList.remove('d-none');
+            hasError = true;                
+        } else if (item.id === "email") {
+            // если поле email, то проверяем с пом регулярных выражений
+            if (!emailValidation(item.value.trim())) {
+                item.classList.add('error');   
+                errorInfoContainer.innerText = "Неверный формат email!";
+                errorInfoContainer.classList.remove('d-none');
+                hasError = true; 
+            } else {
+                item.classList.remove('error');
+                errorInfoContainer.innerText = "";
+                errorInfoContainer.classList.add('d-none'); 
+            }
+        } else {
+            item.classList.remove('error');
+            errorInfoContainer.innerText = "";
+            errorInfoContainer.classList.add('d-none');
+        }
+    
+    })
+
+    return hasError;
+
 }
 
 function addVendorToggle() {
     document.querySelector('.add-vendor').classList.toggle('d-none');
 }
 
+function emailValidation(emailValue) {
+    const EMAIL_REGEXP = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu;
+    console.log("emailValue " + emailValue + "   " + EMAIL_REGEXP.test(emailValue)); 
+    return EMAIL_REGEXP.test(emailValue);
+}
+
 
 </script>
-        

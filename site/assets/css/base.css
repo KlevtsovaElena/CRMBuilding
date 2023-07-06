@@ -507,3 +507,13 @@ th {
     stroke-width:2;
     stroke-miterlimit:10;
 }
+
+.error {
+    border-color: var(--secondary-color-hover); 
+    box-shadow: 0 0 0 0.8px var(--shadow-form-elem-error);
+}
+
+.error-info {
+    color: var(--secondary-color);
+    font-size: 0.8rem;
+}
