@@ -1,33 +1,34 @@
 <?php
-namespace repositories;
-use abstraction\BaseRepository;
+    namespace repositories;
+    require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
-require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
+    use models\Brand;
+    use abstraction\BaseRepository;
+    use utils\SqlHelper;
 
-use models\Brand;
-
-class BrandRepository extends BaseRepository
-{
-    const TABLE_NAME = 'brands';
-    const CLASS_NAME = 'models\Brand';
-
-    public function getTableName() : string
+    class BrandRepository extends BaseRepository
     {
-        return static::TABLE_NAME;
-    }
+        const TABLE_NAME = 'brands';
+        const CLASS_NAME = 'models\Brand';
 
-    public function getObjectClassName() : string
-    {
-        return static::CLASS_NAME;
-    }
+        public function getTableName() : string
+        {
+            return static::TABLE_NAME;
+        }
 
-    public function map(array $row): Brand
-    {
-        $item = new Brand();
-        foreach ($this->getAssociatePropertiesWithClass($row) as $key => $value)
-            $item->$key = $value;
+        public function getObjectClassName() : string
+        {
+            return static::CLASS_NAME;
+        }
 
-        return $item;
+        public function map(array $row): Brand
+        {
+            $item = new Brand();
+
+            foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
+                $item->$key = $value;
+
+            return $item;
+        }
     }
-}
 ?>

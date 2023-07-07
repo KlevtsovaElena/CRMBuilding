@@ -1,5 +1,4 @@
 <?php
-use models\Category;
     include($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
     use abstraction\BaseController as BaseController;

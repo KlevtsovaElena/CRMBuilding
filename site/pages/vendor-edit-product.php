@@ -1,4 +1,3 @@
-<?php $id = $_GET['id']; ?>
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -12,7 +11,9 @@
     ];
 ?>
 <?php include('./../components/header.php'); ?>
-                
+       
+<?php $id = $_GET['id']; ?>
+
     <p class="page-title">Редактировать товар</p>
 
         <!-- соберём данные для отображения в форме -->
@@ -61,6 +62,24 @@
                     <div class="error-info d-none"></div> 
                 </div>
 
+                <!-- категория -->
+                <div class="form-add-product__elements-item">
+                    <p>Категория</p>
+                    <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
+
+                        <?php foreach($categories as $category) { 
+                            if ($category['id'] === $product['category_id']) {
+                            ?>
+                                <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
+                            <?php } else { ?>
+                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                            <?php } 
+                        }; ?>
+
+                    </select>
+                    <div class="error-info d-none"></div> 
+                </div>
+
                 <!-- бренд -->
                 <div class="form-add-product__elements-item">
                     <p>Бренд</p>
@@ -73,24 +92,6 @@
                                 <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
                             <?php } else { ?>
                                 <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php } 
-                        }; ?>
-
-                    </select>
-                    <div class="error-info d-none"></div> 
-                </div>
-
-                <!-- категория -->
-                <div class="form-add-product__elements-item">
-                    <p>Категория</p>
-                    <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
-
-                        <?php foreach($categories as $category) { 
-                            if ($category['id'] === $product['category_id']) {
-                            ?>
-                                <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
-                            <?php } else { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
                             <?php } 
                         }; ?>
 
@@ -122,9 +123,9 @@
                     <div class="error-info d-none"></div> 
                 </div>
 
-                <!-- рыночная цена -->
+                <!-- среднерыночная цена -->
                 <div class="form-add-product__elements-item">
-                    <p>Цена рыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product['max_price']; ?>" required placeholder="0">
+                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product['max_price']; ?>" required placeholder="0">
                     <div class="error-info d-none"></div> 
                 </div> 
 
