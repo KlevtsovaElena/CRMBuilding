@@ -303,6 +303,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		case provider_step == 2:
 			fmt.Println(longitude, latitude)
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Локация вашего склада записана")
+			provider_step = 1
 
 		case step == 2:
 
