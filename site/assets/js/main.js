@@ -38,3 +38,15 @@ function toggleMenu() {
     menuLeft.classList.toggle('collapsed');
     mainContent.classList.toggle('collapsed');
 }
+
+/* ---------- СКЛОНЕНИЕ СЛОВА ---------- */
+// функция для склонения слова в зависимотси от числа
+// вызывать так declinationWord(число, [' запись', ' записи', ' записей']);
+function declinationWord(n, word) {  
+    n = Math.abs(n) % 100; 
+    let n1 = n % 10;
+    if (n > 10 && n < 20) { return word[2]; }
+    if (n1 > 1 && n1 < 5) { return word[1]; }
+    if (n1 == 1) { return word[0]; }
+    return word[2];
+}

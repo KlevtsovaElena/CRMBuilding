@@ -1,12 +1,12 @@
 <?php
-use models\OrderVendor;
-use models\OrderVendorStatus;
-use repositories\ProductRepository;
     include($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
     use abstraction\BaseController as BaseController;
     use repositories\OrderRepository;
     use repositories\OrderVendorRepository;
+    use models\OrderVendor;
+    use models\OrderVendorStatus;
+    use repositories\ProductRepository;
 
     class CreateOrderWithVendorCalcController extends BaseController
     {
@@ -58,6 +58,7 @@ use repositories\ProductRepository;
                 \DbContext::getConnection()->commit();
             } catch(Exception $e) {
                 \DbContext::getConnection()->rollBack();
+                die($e);
             }
         }
     }

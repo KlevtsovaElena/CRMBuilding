@@ -13,27 +13,141 @@
 <!-- подключим хэдер -->
 <?php include('./../components/header.php'); ?>   
 
-    <p class="page-title">СПИСОК ТОВАРОВ</p>
 
-    <a href="./../pages/vendor-add-product.php" class="btn btn-ok d-iblock">+ Добавить товар</a>
+<p class="page-title">СПИСОК ТОВАРОВ</p>
 
-    <!-- соберём данные для отображения в форме -->
+<a href="./../pages/vendor-add-product.php" class="btn btn-ok d-iblock">+ Добавить товар</a>
 
-    <?php
-        $brandsJson = file_get_contents("http://nginx/api/brands.php");
-        $brands = json_decode($brandsJson, true);
-        // $brands_table = [];
-        // foreach($brands as $brand) {
-        //     $brands_table += [$brand['id'] => $brand['brand_name']];
-        // }
+<!-- соберём данные для отображения в форме -->
 
-        $categoriesJson = file_get_contents("http://nginx/api/categories.php");
-        $categories = json_decode($categoriesJson, true);
-        // $categories_table = [];
-        // foreach($categories as $category) {
-        //     $categories_table += [$category['id'] => $category['category_name']];
-        // }
-    ?>
+<?php
+    $brandsJson = file_get_contents("http://nginx/api/brands.php");
+    $brands = json_decode($brandsJson, true);
+
+    $categoriesJson = file_get_contents("http://nginx/api/categories.php");
+    $categories = json_decode($categoriesJson, true);
+?>
+
+<!-- если параметры get пустые -->
+<!-- отрисовываем страницу по дефолту -->
+        <?php 
+        if (count($_GET) == 0)  {
+        ?>
+
+            <!-- Выбор фильтров -->
+            <section class="form-filters">
+
+                <!-- здесь храним id поставщика -->
+                <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
+                
+                <div class="form-elements-container">
+
+                    <!-- выбор категории -->
+                    <label>Категория
+                        <select id="category_id" name="category_id" value="">
+                            
+                            <option value="">Все</option>
+                            <?php foreach($categories as $category) { ?>
+                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                            <?php }; ?>
+
+                        </select>
+                    </label>
+
+                    <!-- выбор бренда -->
+                    <label>Бренд
+                        <select id="brand_id" name="brand_id" value="">
+
+                            <option value="">Все</option>
+                            <?php foreach($brands as $brand) { ?>
+                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                            <?php }; ?>
+
+                        </select>
+                    </label>
+
+                    <!-- выбор кол-во записей на листе -->
+                    <div class="d-iblock">Показывать по
+                        <select id="limit" name="limit" value="" required>
+                            
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+
+                        </select>
+                    </div>
+                    
+                    <br>
+
+                    <!-- поле поиска -->
+                    <input type="search" id="search" name="search" value="" placeholder="Поиск">
+                    
+                    <button class="btn btn-ok d-iblock">Применить</button>
+                    
+                </div>
+            </section>
+
+            <!-- таблица товаров -->
+            <section class="products">
+                <table id="list-products">
+
+                    <thead>
+                        <tr role="row">
+
+                            <th data-id="article" data-sort="">Артикул</th>
+                            <th data-id="name" data-sort="">Наименование</th>
+                            <th data-id="category_id" data-sort="">Категория</th>
+                            <th data-id="brand_id" data-sort="">Бренд</th>
+                            <th data-id="quantity_available" data-sort="">Остаток</th>
+                            <th data-id="price" data-sort="">Цена</th>
+                            <th data-id="max_price" data-sort="">Цена среднерыночная</th>
+                            
+                        </tr>
+                    </thead>
+
+                    <tbody class="list-products__body">
+                        <!-- контент таблицы из шаблона -->
+                    </tbody>
+
+                </table>
+                <div class="info-table"></div>
+            </section>
+
+            <section class="pagination-wrapper" offset="0"><!-- пагинация --></section>
+
+<?php 
+} ?>
+
+
+<!-- если есть параметры get -->
+<!-- Разберём строку get для отрисовки фильтрации -->
+
+<?php 
+if (count($_GET) !== 0) {
+    if(isset($_GET['search'])) {
+        $searchText = $_GET['search'];
+        $search = explode(";description:", $searchText);
+        $searchText = $search[1];
+    } else {
+        $searchText = "";
+    }
+
+    if(isset($_GET['orderby'])) {
+        $orderBy = explode(":", $_GET['orderby']);
+        $sortBy = $orderBy[0];
+        $mark = $orderBy[1];
+    } else {
+        $sortBy = "";
+    }
+
+    if(isset($_GET['offset']) && $_GET['offset'] !== '') {
+        $offset = $_GET['offset'];
+    } else {
+        $offset = 0;
+    }
+
+?>
 
     <!-- Выбор фильтров -->
     <section class="form-filters">
@@ -43,42 +157,83 @@
         
         <div class="form-elements-container">
             
-            <!-- выбор бренда -->
-            <label>Бренд
-                <select id="brand_id" name="brand_id" value="">
-                    <option value="">Все</option>
-                    <?php foreach($brands as $brand) { ?>
-                        <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                    <?php }; ?>
-                </select>
-            </label>
-
             <!-- выбор категории -->
             <label>Категория
                 <select id="category_id" name="category_id" value="">
-                    <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
+                    
                     <option value="">Все</option>
-                    <?php foreach($categories as $category) { ?>
-                        <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                    <?php }; ?>
+                    <?php foreach($categories as $category) {
+                        if (!isset($_GET['category_id'])) {
+                        ?>
+                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                        <?php
+                        } else if ($_GET['category_id'] == $category['id']) {
+                        ?>
+                            <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
+
+                        <?php
+                        } else {
+                        ?>
+                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>;
+                        <?php 
+                        }
+                    }; ?>
+
+                </select>
+            </label>
+
+            <!-- выбор бренда -->
+            <label>Бренд
+                <select id="brand_id" name="brand_id" value="">
+
+                    <option value="">Все</option>
+                    <?php foreach($brands as $brand) {
+                        if (!isset($_GET['brand_id'])) {
+                        ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php
+                        } else if ($_GET['brand_id'] == $brand['id']) {
+                        ?>
+                            <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
+
+                        <?php
+                        } else {
+                        ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>;
+                        <?php 
+                        }
+                    }; ?>
+
                 </select>
             </label>
 
             <!-- выбор кол-во записей на листе -->
             <div class="d-iblock">Показывать по
                 <select id="limit" name="limit" value="" required>
-                    <!-- <option value="" class="select-default" selected>Выберите категорию...</option> -->
-                    <option value="100">100</option>
-                    <option value="40">40</option>
-                    <option value="100">100</option>
-                    <option value="">все</option>
+                        <?php
+                        if (!isset($_GET['limit'])) {
+                        ?>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        <?php
+
+                        } else {
+                            ?>
+                            <option value="10" <?php if ($_GET['limit'] == 10) {echo 'selected';} ?> >10</option>
+                            <option value="20" <?php if ($_GET['limit'] == 20) {echo 'selected';} ?> >20</option>
+                            <option value="50" <?php if ($_GET['limit'] == 50) {echo 'selected';} ?> >50</option>
+                            <option value="100" <?php if ($_GET['limit'] == 100) {echo 'selected';} ?> >100</option>
+                        <?php }
+                        ?> 
                 </select>
             </div>
             
             <br>
 
             <!-- поле поиска -->
-            <input type="search" id="search" name="search" value="" placeholder="Поиск">
+            <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
             
             <button class="btn btn-ok d-iblock">Применить</button>
             
@@ -92,13 +247,13 @@
             <thead>
                 <tr role="row">
 
-                    <th data-id="article" data-sort="">Артикул</th>
-                    <th data-id="name" data-sort="">Наименование</th>
-                    <th data-id="brand_id" data-sort="">Бренд</th>
-                    <th data-id="category_id" data-sort="">Категория</th>
-                    <th data-id="quantity_available" data-sort="">Остаток</th>
-                    <th data-id="price" data-sort="">Цена</th>
-                    <th data-id="max_price" data-sort="">Цена рыночная</th>
+                    <th data-id="article" data-sort="<?php if ($sortBy == 'article')  {echo $mark; } ?>">Артикул</th>
+                    <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
+                    <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
+                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
+                    <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
+                    <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
+                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена среднерыночная</th>
                     
                 </tr>
             </thead>
@@ -111,17 +266,22 @@
         <div class="info-table"></div>
     </section>
 
-    <section class="pagination-wrapper"><!-- пагинация --></section>
+    <section class="pagination-wrapper" offset="<?= $offset; ?>"><!-- пагинация --></section>
+
+<?php }?>
+
+
+
 
     <!-- ШАБЛОНЫ -->
     <!-- шаблон таблицы -->
     <template id="template-body-table">
         
         <tr role="row" class="list-products__row" product-id="${id}">
-            <td><a href="vendor-edit-product.php?id=${id}"><strong>${article}</strong></a></td>
-            <td class="list-products_name"><a href="vendor-edit-product.php?id=${id}"><img src="${photo}" /><strong>${name}</strong></td>
-            <td>${brand_id}</td>
+            <td><a href="javascript: editProduct(${id})"><strong>${article}</strong></a></td>
+            <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
+            <td>${brand_id}</td>
             <td>${quantity_available}</td>
             <td>${price}</td>
             <td>${max_price}

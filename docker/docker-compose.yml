@@ -54,3 +54,16 @@ services:
       - ./../bot/:/app/
     ports:
       - 5001:8080
+  
+  currency-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-currency-service
+    volumes:
+      - ./../currency-service/:/app/
+    environment:
+      task_start_hour: "13"
+      task_start_minute: "47"
+      telegram_channel: "@stroybotchannel2"
+      telegram_token: "6366934096:AAFfgYzXMQWi8wYuO-5LKKI_pO_v7qXJBqU"
+      TZ: "Europe/Moscow"

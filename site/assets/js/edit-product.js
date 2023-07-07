@@ -55,7 +55,7 @@ function editProduct() {
     sendRequestPOST('http://localhost/api/products.php', obj);
 
     // получаем ответ с сервера
-
+    alert("Данные изменены");
 
 }
 
@@ -105,12 +105,7 @@ function validationEdit() {
 
                 // и сравним с ценой продавца
                 // цена продавца д.б. меньше рыночной
-                console.log (priceValue, maxPriceValue);
-                console.log (typeof(priceValue), typeof(maxPriceValue));
-                console.log(priceValue > maxPriceValue);
-
                 if (priceValue >= maxPriceValue) {
-                    console.log('больше');
                     item.classList.add('error');   
                     errorInfoContainer.innerText = "Эта цена должна быть больше вашей!";
                     errorInfoContainer.classList.remove('d-none');
@@ -118,7 +113,6 @@ function validationEdit() {
                     hasError = true; 
 
                 } else {
-                    console.log("не больше");
                     item.classList.remove('error');
                     errorInfoContainer.innerText = "";
                     errorInfoContainer.classList.add('d-none');
@@ -198,5 +192,11 @@ function deleteProductFromEditForm(id) {
 
     alert("Товар удалён");
 
-    window.location.href = 'http://localhost/pages/vendor-add-product.php';
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    // переход обратно на странницу списка товаров с прежними параметрами
+    window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
 }

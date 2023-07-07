@@ -352,11 +352,11 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			}
 
 			// Используем полученные данные
-			for _, category := range cities {
+			for _, city := range cities {
 				button := []map[string]interface{}{
 					{
-						"text":          category.Name,
-						"callback_data": category.ID,
+						"text":          city.Name,
+						"callback_data": city.ID,
 					},
 				}
 				buttons = append(buttons, button)
@@ -741,6 +741,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Укажите удобный для Вас адрес&reply_markup=" + string(inlineKeyboardJSON))
+			step += 1
+			break
 
 		case step == 10 && button == "myAdress":
 
@@ -981,7 +983,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		if text == "Актуальный курс 💹" {
 
-			channelURL := "https://t.me/stroyb0t2"
+			channelURL := "https://t.me/stroybotchannel2"
 
 			// Получаем текущую дату и время
 			currentTime := time.Now()
