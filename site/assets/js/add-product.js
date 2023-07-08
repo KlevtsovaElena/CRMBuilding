@@ -15,6 +15,7 @@ let  article = formAddProduct.querySelector('#article');
 let  quantity_available = formAddProduct.querySelector('#quantity_available');
 let  price = formAddProduct.querySelector('#price');
 let  max_price = formAddProduct.querySelector('#max_price');
+let  unit_id = formAddProduct.querySelector('#unit_id');
 
 let priceValue;
 let hasError;
@@ -46,7 +47,7 @@ function addProduct() {
         'quantity_available': quantity_available.value,
         'price': price.value,
         'max_price': max_price.value,
-        'unit': 1,
+        'unit_id': unit_id.value,
         photoFileData,
         photoFileName
     });
@@ -71,7 +72,7 @@ function validationAdd() {
     } else {priceValue = 0;}
 
     // валидация полей (кроме vendorId)
-    [nameProduct, new_photo, brand_id, category_id, 
+    [nameProduct, new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price].forEach(item => {
     
             console.log(item.getAttribute('name') + "    " + item.value);

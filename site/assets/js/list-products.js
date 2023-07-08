@@ -210,6 +210,7 @@ function renderListProducts(totalProducts) {
                                                         .replace('${category_id}', categories[totalProducts['products'][i]['category_id']])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                         .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${unit}', totalProducts['products'][i]['unit_id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])

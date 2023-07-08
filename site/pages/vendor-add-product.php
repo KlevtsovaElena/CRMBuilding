@@ -22,6 +22,9 @@
 
         $categoriesJson = file_get_contents("http://nginx/api/categories.php");
         $categories = json_decode($categoriesJson, true);
+
+        $unitsJson = file_get_contents("http://nginx/api/units.php");
+        $units = json_decode($unitsJson, true);
     ?>
                         
     <!-- Форма добавления товаров -->
@@ -97,6 +100,20 @@
             <!-- количество остатков -->
             <div class="form-add-product__elements-item">
                 <p>Количество остатков</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="" required placeholder="0">
+                <div class="error-info d-none"></div> 
+            </div>
+
+            <!-- единица измерения -->
+            <div class="form-add-product__elements-item">
+                <p>Единица измерения</p>
+                <select id="unit_id" name="unit_id" value="" required>
+                    <option value="" selected hidden>Выберите ед. измерения...</option>
+
+                    <?php foreach($units as $unit) { ?>
+                        <option value="<?= $unit['id']; ?>"><?= $unit['name']; ?></option>
+                    <?php }; ?>
+
+                </select>
                 <div class="error-info d-none"></div> 
             </div>
 

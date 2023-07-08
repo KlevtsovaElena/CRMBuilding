@@ -172,22 +172,22 @@ CREATE TABLE `products` (
   `quantity_available` int unsigned NOT NULL,
   `price` int unsigned NOT NULL,
   `max_price` int unsigned NOT NULL,
-  `unit` int unsigned NOT NULL,
+  `unit_id` tinyint unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price`, `unit`) VALUES
-(1,	'Гипсокартон ФОРУС стеновой простой (12.5мм) (2 сорт)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	1111111,	1,	1,	1,	555,	49000,	51000,	1),
+INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price`, `unit_id`) VALUES
+(1,	'Гипсокартон ФОРУС стеновой простой (12.5мм) (2 сорт)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	1111111,	1,	1,	1,	555,	49000,	51000,	6),
 (2,	'Гипсокартон ФОРУС стеновой влагостойкий (12.5мм) (2 сорт)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	1111112,	1,	1,	2,	444,	51000,	55000,	1),
-(3,	'Гипсокартон ФОРУС потолочный влагостойкий (9.5мм) (2 сорт)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	2222222,	1,	1,	1,	4,	50000,	53000,	1),
+(3,	'Гипсокартон ФОРУС потолочный влагостойкий (9.5мм) (2 сорт)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	2222222,	1,	1,	1,	4,	50000,	53000,	2),
 (4,	'Гипсокартон ФОРУС стеновой простой (12.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	5555555,	1,	1,	2,	222,	56000,	66000,	1),
-(5,	'Гипсокартон ФОРУС потолочный влагостойкий (9.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	99999,	1,	1,	1,	100,	58000,	59000,	1),
-(6,	'Гипсокартон ФОРУС потолочный простой (9.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	99999,	1,	1,	1,	100,	49000,	52000,	1),
+(5,	'Гипсокартон ФОРУС потолочный влагостойкий (9.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	99999,	1,	1,	1,	100,	58000,	59000,	3),
+(6,	'Гипсокартон ФОРУС потолочный простой (9.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	99999,	1,	1,	1,	100,	49000,	52000,	4),
 (7,	'Гипсокартон ФОРУС стеновой влагастойкий (12.5мм)',	'Описание',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	99999,	1,	1,	1,	100,	63000,	64500,	1),
-(8,	'Гипсокартон AZIA потолочный простой (9.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	49000,	53000,	1),
+(8,	'Гипсокартон AZIA потолочный простой (9.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	49000,	53000,	5),
 (9,	'Гипсокартон AZIA стеновой простой (12.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	56000,	57000,	1),
 (10,	'Гипсокартон AZIA потолочный влагостойкий (9.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	60000,	65000,	1),
-(11,	'Гипсокартон AZIA стеновой влагостойкий (12.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	69000,	72000,	1),
+(11,	'Гипсокартон AZIA стеновой влагостойкий (12.5мм)',	'Описание',	'https://devel.prom.uz/upload/product_logos/31/50/3150bb9521557b1ec6fccb615bc40b05.png',	99999,	1,	2,	1,	100,	69000,	72000,	6),
 (12,	'Гипсокартон КНАУФ потолочный простой (9.5мм)',	'Описание',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	99999,	1,	3,	1,	100,	52200,	56700,	1),
 (13,	'Гипсокартон КНАУФ стеновой простой (12.5мм)',	'Описание',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	99999,	1,	3,	1,	100,	59300,	64000,	1),
 (14,	'Гипсокартон КНАУФ потолочный влагостойкий (9.5мм)',	'Описание',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	99999,	1,	3,	1,	100,	67300,	70000,	1),
@@ -197,14 +197,14 @@ INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `catego
 (18,	'Гипсокартон VERO потолочный простой (8.5мм)',	'Описание',	'https://samdoli.uz/upload-file/2022/02/24/1187/350x350-da23cbab-7f69-45a2-b990-f663c14770b4.jpg',	99999,	1,	4,	1,	100,	41500,	50000,	1),
 (19,	'Фасадная Шпаклевка Усиленная (Maestro 25кг)',	'Описание',	'https://postroy-novoe.ru/upload/iblock/12b/12b9cbaa64094370e8fdd69b9235c726.jpeg',	99999,	3,	5,	1,	100,	165000,	170000,	1),
 (20,	'Шпаклевка ЭЛЕРОН Травертин',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	95000,	100000,	1),
-(21,	'Шпаклёвка гипсовая ЭЛЕРОН 01 (20 кг)',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	32500,	43000,	1),
+(21,	'Шпаклёвка гипсовая ЭЛЕРОН 01 (20 кг)',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	32500,	43000,	5),
 (22,	'Шпаклевка фасадная Элерон белая С-003, 20кг',	'Описание',	'https://postroy-novoe.ru/upload/iblock/12b/12b9cbaa64094370e8fdd69b9235c726.jpeg',	99999,	3,	6,	1,	100,	57300,	61000,	1),
 (23,	'Шпаклевочная смесь ЭЛЕРОН УНИВЕРСАЛ (06)',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	28000,	32000,	1),
 (24,	'Шпаклёвка гипсовая ЭЛЕРОН 01',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	34000,	38000,	1),
 (25,	'Шпаклёвка фасадная ЭЛЕРОН 03 (чёрная/25 кг)',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	44500,	50000,	1),
 (26,	'Шпаклёвка гипсовая ЭЛЕРОН 04',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	32000,	37000,	1),
 (27,	'Шпаклевочная смесь ЭЛЕРОН 03 Fasad серый 20кг',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	44700,	50000,	1),
-(28,	'Шпаклёвка гипсовая ЭЛЕРОН 01',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	34700,	39000,	1),
+(28,	'Шпаклёвка гипсовая ЭЛЕРОН 01',	'Описание',	'https://totaltools.tj/image/cache/catalog/i-500x500.jpg',	99999,	3,	6,	1,	100,	34700,	39000,	4),
 (29,	'Декоративная шпатлевка RED STONE VENTUM',	'Описание',	'https://ventumplus.com/img_product/38.jpg?v=2',	99999,	3,	7,	1,	100,	142000,	144000,	1),
 (30,	'Шпаклевка Fixer',	'Описание',	'https://stroyinvest-market.ru/upload/resize_cache/iblock/2cd/l9fka5mfrm5it1gjnnpxql3d05877pmo/800_800_0/6b218b7d_385b_11e6_b1dc_000c2926fe71_3cc3fbaa_54ca_11eb_80cb_3cecef01db2d.resize1.jpg',	99999,	3,	8,	1,	100,	30000,	33000,	1),
 (31,	'Шпаклевка гипсовая Fugen Knauf',	'Описание',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1656334021/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/Xz_s07vVf0mj2kodJguxPg/81975392.png',	99999,	3,	9,	1,	100,	57000,	61000,	1),
@@ -212,7 +212,7 @@ INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `catego
 (33,	'Грунтовка HAYAT 1 л',	'Описание',	'https://roagt.com/img/p/1/7/7/8/1778-medium_default.jpg',	99999,	4,	12,	1,	100,	35000,	37000,	1),
 (34,	'Грунтовка HAYAT 5 л',	'Описание',	'https://roagt.com/img/p/1/7/7/8/1778-medium_default.jpg',	99999,	4,	12,	1,	100,	115000,	121000,	1),
 (35,	'Грунтовка HAYAT 2,8 л',	'Описание',	'https://roagt.com/img/p/1/7/7/8/1778-medium_default.jpg',	99999,	4,	12,	1,	100,	65000,	70000,	1),
-(36,	'Грунтовка Fixer 3 л',	'Описание',	'https://www.rosotdelka.ru/materials/ASTI/fiks/fiks-asti-upakovka.jpg',	99999,	4,	8,	1,	100,	40000,	41500,	1),
+(36,	'Грунтовка Fixer 3 л',	'Описание',	'https://www.rosotdelka.ru/materials/ASTI/fiks/fiks-asti-upakovka.jpg',	99999,	4,	8,	1,	100,	40000,	41500,	7),
 (37,	'Грунтовка Fixer 1 л',	'Описание',	'https://www.rosotdelka.ru/materials/ASTI/fiks/fiks-asti-upakovka.jpg',	99999,	4,	8,	1,	100,	20000,	23000,	1),
 (38,	'Грунтовка Fixer 5 л',	'Описание',	'https://www.rosotdelka.ru/materials/ASTI/fiks/fiks-asti-upakovka.jpg',	99999,	4,	8,	1,	100,	75000,	76500,	1),
 (39,	'Megamix грунтовка 1.0 фиолетовый',	'Описание',	'https://i4.stat01.com/2/5699/156987826/075a3e/megamix-jemal-metallik-nazvanie-cveta-quot-191-venera-quot-880ml.jpg',	99999,	4,	11,	1,	100,	60000,	70000,	1),
@@ -222,15 +222,15 @@ INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `catego
 (43,	'ГРУНТОВКА ГФ-021 АЛКИДНАЯ',	'Описание',	'https://lakokraska-ya.ru/images/items/396.png',	99999,	4,	13,	1,	100,	45000,	50000,	1),
 (44,	'Грунтовка Акриловая (Maestro 5кг)',	'Описание',	'https://marshall-paints.ru/upload/image/9L_Maestro_Facade_Grunt.png',	99999,	4,	11,	1,	100,	85000,	90000,	1);
 
-DROP TABLE IF EXISTS `unit`;
-CREATE TABLE `unit` (
+DROP TABLE IF EXISTS `units`;
+CREATE TABLE `units` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name_short` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `unit` (`id`, `name_short`, `name`) VALUES
+INSERT INTO `units` (`id`, `name_short`, `name`) VALUES
 (1,	'шт',	'штука'),
 (2,	'упак',	'упаковка'),
 (3,	'компл',	'комплект'),
@@ -265,4 +265,4 @@ INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`,
 (3,	'Admin',	1,	NULL,	'admin@admin.admin',	NULL,	NULL,	NULL,	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL),
 (4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	NULL,	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc');
 
--- 2023-07-06 09:49:29
+-- 2023-07-08 15:20:07
