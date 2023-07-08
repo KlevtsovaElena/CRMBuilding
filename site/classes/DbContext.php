@@ -1,9 +1,4 @@
 <?php
-
-    // Загрузка переменных окружения из файла .env
-    $dotenv = Dotenv::createImmutable(__DIR__);
-    $dotenv->load();
-
     class DbContext
     {
         private static $connection;
