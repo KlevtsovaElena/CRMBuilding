@@ -95,7 +95,6 @@
                     <thead>
                         <tr role="row">
 
-                            <th data-id="article" data-sort="">Артикул</th>
                             <th data-id="name" data-sort="">Наименование</th>
                             <th data-id="category_id" data-sort="">Категория</th>
                             <th data-id="brand_id" data-sort="">Бренд</th>
@@ -247,7 +246,6 @@ if (count($_GET) !== 0) {
             <thead>
                 <tr role="row">
 
-                    <th data-id="article" data-sort="<?php if ($sortBy == 'article')  {echo $mark; } ?>">Артикул</th>
                     <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
                     <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
@@ -278,7 +276,7 @@ if (count($_GET) !== 0) {
     <template id="template-body-table">
         
         <tr role="row" class="list-products__row" product-id="${id}">
-            <td><a href="javascript: editProduct(${id})"><strong>${article}</strong></a></td>
+            
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
             <td>${brand_id}</td>

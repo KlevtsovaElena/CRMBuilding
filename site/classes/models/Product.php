@@ -5,9 +5,9 @@
     {
         public int $id;
         public string $name;
-        public string $description;
+        public ?string $description;
         public string $photo;
-        public int $article;
+        public ?int $article;
         public int $category_id;
         public int $brand_id;
         public int $vendor_id;

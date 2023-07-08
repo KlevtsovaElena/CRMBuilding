@@ -101,13 +101,13 @@
 
                 <!-- описание -->
                 <div class="form-add-product__elements-item">
-                    <p>Описание</p><textarea id="description" name="description" required><?= $product['description']; ?></textarea>
+                    <p>Описание</p><textarea id="description" name="description"><?= $product['description']; ?></textarea>
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- артикул -->
-                <div class="form-add-product__elements-item">
-                    <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="<?= $product['article']; ?>" required placeholder="0">
+                <div class="form-add-product__elements-item d-none">
+                    <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="<?= $product['article']; ?>" placeholder="0">
                     <div class="error-info d-none"></div>
                 </div> 
 
