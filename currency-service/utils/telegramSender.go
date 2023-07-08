@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 var channelName string = os.Getenv("telegram_channel")
-var token string = os.Getenv("telegram_token")
+var token string = ""
 
 type SendMessageResponseT struct {
 	Ok     bool `json:"ok"`
@@ -39,6 +41,13 @@ type PinMessageResponseT struct {
 }
 
 func SendMessage(text string) int {
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+	token = os.Getenv("CURRENCY_BOT_TOKEN")
+
 	if len(channelName) == 0 {
 		fmt.Println("Не удалось отправить сообщение: не указано имя канала.")
 		return -1

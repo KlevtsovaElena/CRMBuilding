@@ -54,7 +54,7 @@ services:
       - ./../bot/:/app/
     ports:
       - 5001:8080
-  
+
   currency-service:
     build:
       context: .

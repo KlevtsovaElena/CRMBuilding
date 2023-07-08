@@ -1,4 +1,9 @@
 <?php
+
+    // Загрузка переменных окружения из файла .env
+    $dotenv = Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+
     class DbContext
     {
         private static $connection;
@@ -11,7 +16,7 @@
             return static::$connection;
         }
 
-        private static function createConnection() : PDO 
+        private static function createConnection() : PDO
         {
             $host = $_ENV['MYSQL_HOST'];
             $database = $_ENV['MYSQL_DB'];
