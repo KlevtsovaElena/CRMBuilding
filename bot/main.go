@@ -286,6 +286,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		switch {
 		case text == "/start":
 
+			step = 1
+
 			//собираем объект клавиатуры для выбора языка
 			buttons := [][]map[string]interface{}{
 				{{"text": "Русский 🇷🇺", "callback_data": "russian"}},
