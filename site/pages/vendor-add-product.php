@@ -84,13 +84,13 @@
 
             <!-- описание -->
             <div class="form-add-product__elements-item">
-                <p>Описание</p><textarea id="description" name="description" required></textarea>
+                <p>Описание</p><textarea id="description" name="description"></textarea>
                 <div class="error-info d-none"></div> 
             </div>
 
             <!-- артикул -->
-            <div class="form-add-product__elements-item">
-                <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="" required placeholder="0">
+            <div class="form-add-product__elements-item d-none">
+                <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="0" placeholder="0">
                 <div class="error-info d-none"></div>
             </div> 
 
