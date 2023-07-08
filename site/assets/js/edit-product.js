@@ -21,30 +21,32 @@ function editProduct() {
     // соберём json для передачи на сервер
     if (!new_photo.value) {
         obj = JSON.stringify({
-            id: productId,
-            vendor_id: vendor_id.value,
+            'id': productId,
+            'vendor_id': vendor_id.value,
             'name':  nameProduct.value,
-            brand_id: brand_id.value,
-            category_id: category_id.value,
-            description: description.value,
-            article: article.value,
-            quantity_available: quantity_available.value,
-            price: price.value,
-            max_price: max_price.value,
-            photo: photo.value
+            'brand_id': brand_id.value,
+            'category_id': category_id.value,
+            'description': description.value,
+            'article': article.value,
+            'quantity_available': quantity_available.value,
+            'price': price.value,
+            'max_price': max_price.value,
+            'unit_id': unit_id.value,
+            'photo': photo.value
         });
     } else {
         obj = JSON.stringify({
-            id: productId,
-            vendor_id: vendor_id.value,
+            'id': productId,
+            'vendor_id': vendor_id.value,
             'name':  nameProduct.value,
-            brand_id: brand_id.value,
-            category_id: category_id.value,
-            description: description.value,
-            article: article.value,
-            quantity_available: quantity_available.value,
-            price: price.value,
-            max_price: max_price.value,
+            'brand_id': brand_id.value,
+            'category_id': category_id.value,
+            'description': description.value,
+            'article': article.value,
+            'quantity_available': quantity_available.value,
+            'price': price.value,
+            'max_price': max_price.value,
+            'unit_id': unit_id.value,
             photoFileData,
             photoFileName
         });
@@ -67,7 +69,7 @@ function validationEdit() {
     } else {priceValue = 0;}
 
    // валидация полей (кроме vendorId)
-   [nameProduct, brand_id, category_id, description, article, 
+   [nameProduct, brand_id, category_id, unit_id, 
     quantity_available, price, max_price].forEach(item => {
 
         console.log(item.getAttribute('name') + "    " + item.value);
@@ -82,7 +84,7 @@ function validationEdit() {
             errorInfoContainer.classList.remove('d-none');
             hasError = true;
             
-        } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available") || (item.id === "article")) {
+        } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available")) {
 
             // не пустое поле и числовое значение д.б. >= 0
             if (!(Number(item.value) >= 0)) {

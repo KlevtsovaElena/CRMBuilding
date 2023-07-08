@@ -15,6 +15,7 @@ let  article = formAddProduct.querySelector('#article');
 let  quantity_available = formAddProduct.querySelector('#quantity_available');
 let  price = formAddProduct.querySelector('#price');
 let  max_price = formAddProduct.querySelector('#max_price');
+let  unit_id = formAddProduct.querySelector('#unit_id');
 
 let priceValue;
 let hasError;
@@ -37,15 +38,16 @@ function addProduct() {
     
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
-        vendor_id: vendor_id.value,
+        'vendor_id': vendor_id.value,
         'name':  nameProduct.value,
-        brand_id: brand_id.value,
-        category_id: category_id.value,
-        description: description.value,
-        article: article.value,
-        quantity_available: quantity_available.value,
-        price: price.value,
-        max_price: max_price.value,
+        'brand_id': brand_id.value,
+        'category_id': category_id.value,
+        'description': description.value,
+        'article': article.value,
+        'quantity_available': quantity_available.value,
+        'price': price.value,
+        'max_price': max_price.value,
+        'unit_id': unit_id.value,
         photoFileData,
         photoFileName
     });
@@ -70,7 +72,7 @@ function validationAdd() {
     } else {priceValue = 0;}
 
     // валидация полей (кроме vendorId)
-    [nameProduct, new_photo, brand_id, category_id, description, article, 
+    [nameProduct, new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price].forEach(item => {
     
             console.log(item.getAttribute('name') + "    " + item.value);
@@ -88,7 +90,7 @@ function validationAdd() {
                     hasError = true;
                 }
                 
-            } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available") || (item.id === "article")) {
+            } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available")) {
     
                 // не пустое поле и числовое значение д.б. >= 0
                 if (!(Number(item.value) >= 0)) {

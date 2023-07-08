@@ -38,13 +38,3 @@
 .form-add-product__elements-item {
     margin-bottom: 15px;
 }
-
-.error {
-    border-color: var(--secondary-color-hover); 
-    box-shadow: 0 0 0 0.8px var(--shadow-form-elem-error);
-}
-
-.error-info {
-    color: var(--secondary-color);
-    font-size: 0.8rem;
-}

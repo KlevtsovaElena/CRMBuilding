@@ -58,7 +58,7 @@
             $this->vendorRepository->add($post);
 
             // формируем ссылку на бота с hash 
-            $linkBot = 'https://t.me/Uzstroibot?start=' . $post['hash_string'];
+            $linkBot = 'https://t.me/Uzstroibot?start=provider_' . $post['hash_string'];
             // https://t.me/Uzstroibot?start=hazetypXJkIIk
 
             // возвращаем на фронт данные 
