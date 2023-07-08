@@ -280,7 +280,7 @@ if (count($_GET) !== 0) {
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
             <td>${brand_id}</td>
-            <td>${quantity_available}</td>
+            <td>${quantity_available} шт</td>
             <td>${price}</td>
             <td>${max_price}
 
