@@ -42,9 +42,9 @@
                 unset($equalParams['hash_string']);
 // где-то здесь вместе с обновлением записи по hash_string, нужно ещё очистить само поле hash_string
             $stringParams = implode(', ', $equalParams);
-echo $stringParams;
+
             $query = sprintf(static::UPDATE_QUERY_HASH, $this->getTableName(), $stringParams);
-echo $query;
+
             $statement = \DbContext::getConnection()->prepare($query);
             $statement->execute($objectParams);
         }
