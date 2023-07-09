@@ -102,16 +102,16 @@ type MessageInlineT struct {
 
 // структура пользователя
 type UserT struct {
-	ID          int    `json:"id"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	Username    string `json:"tg_username"`
-	Step        int    `json:"step"`
-	IsProvider  bool   `json:"is_provider"`
-	Tg_id       int    `json:"tg_id"`
-	PhoneNumber string `json:"phone"`
-	City        int    `json:"city_id"`
-	Cart[]
+	ID          int         `json:"id"`
+	FirstName   string      `json:"first_name"`
+	LastName    string      `json:"last_name"`
+	Username    string      `json:"tg_username"`
+	Step        int         `json:"step"`
+	IsProvider  bool        `json:"is_provider"`
+	Tg_id       int         `json:"tg_id"`
+	PhoneNumber string      `json:"phone"`
+	City        int         `json:"city_id"`
+	Cart        map[int]int `json:"cart"`
 }
 
 // структура заказа
@@ -135,19 +135,19 @@ type Coordinates struct {
 }
 
 // структура городов
-type Cities struct {
+type City struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 // структура категорий
-type Categories struct {
+type Category struct {
 	ID           int    `json:"id"`
 	CategoryName string `json:"category_name"`
 }
 
 // структура брендов
-type Brands struct {
+type Brand struct {
 	ID        int    `json:"id"`
 	BrandName string `json:"brand_name"`
 }
@@ -164,17 +164,10 @@ type Product struct {
 
 // переменные для подключения к боту
 var host string = "https://api.telegram.org/bot"
-var token string = ""
+var token string
 
-// карты для определения шага в боте (слежка за шагом пользователя или шагом поставщика)
-var providerStep = make(map[int]int)
-var userSteps = make(map[int]int)
-
-// данные все пользователей
+// данные всеx пользователей
 var usersDB map[int]UserT
-
-// карта корзины
-var products = make(map[int]int)
 
 // переменная для запросов к API
 var client = http.Client{}
@@ -187,7 +180,6 @@ func main() {
 
 	// достаём токен бота из .env файла
 	err := godotenv.Load()
-	//os.LookupEnv("BOT_TOKEN")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -205,7 +197,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		data, _ := os.ReadAll(response.Body)
+		data, _ := ioutil.ReadAll(response.Body)
 
 		//посмотреть данные
 		fmt.Println(string(data))
@@ -239,6 +231,12 @@ func main() {
 	}
 }
 
+func getUsers() {
+	//считываем из бд при включении
+	dataFile, _ := ioutil.ReadFile("db.json")
+	json.Unmarshal(dataFile, &usersDB)
+}
+
 // функция для отправки POST запроса
 func sendPost(requestBody string, url string) {
 	// Создаем новый POST-запрос
@@ -262,10 +260,12 @@ func sendPost(requestBody string, url string) {
 }
 
 // функция для отправки сообщения пользователю
-func sendMessage(chatId int, text string, keyboard string) {
+func sendMessage(chatId int, text string, keyboard map[string]interface{}) {
 	url := host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=" + text
-	if keyboard != "" {
-		url += "&reply_markup=" + keyboard
+	if keyboard != nil {
+		// Преобразуем клавиатуру в JSON
+		keyboardJSON, _ := json.Marshal(keyboard)
+		url += "&reply_markup=" + string(keyboardJSON)
 	}
 	http.Get(url)
 }
@@ -274,46 +274,56 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 	text := message.Message.Text
 	chatId := 0
-	if message.UpdateID != 0 {
+	if messageInline.CallbackQuery.From.ID == 0 {
 		chatId = message.Message.From.ID
 	} else {
 		chatId = messageInline.CallbackQuery.From.ID
 	}
-	messageTime := message.Message.Date
+
 	firstName := message.Message.From.FirstName
 	lastName := message.Message.From.LastName
-	mesIdRepl := message.Message.MessageID
 	phone := message.Message.Contact.PhoneNumber
 	latitude := message.Message.Location.Latitude
 	longitude := message.Message.Location.Longitude
+	username := message.Message.From.Username
 	button := messageInline.CallbackQuery.Data
 	id := messageInline.CallbackQuery.From.ID
 	mesIdInline := messageInline.CallbackQuery.Message.MessageID
-	username := messageInline.CallbackQuery.From.Username
 
 	isProvider := false
-	if strings.ContainsAny(text, "provider_") {
-		isProvider = true
+
+	// Проверяем, есть ли параметр после "/start"
+	if strings.HasPrefix(text, "/start ") {
+		// Извлекаем значение параметра
+		paramValue := strings.TrimPrefix(text, "/start ")
+
+		// Проверяем значение параметра
+		if strings.Contains(paramValue, "provider") {
+
+			isProvider = true
+
+		}
 	}
 
 	//есть ли юзер
 	_, exist := usersDB[chatId]
 	if !exist {
 		user := UserT{}
-		user.ID = id
-		user.FirstName = FirstName
-		user.LastName = LastName
+		user.ID = chatId
+		user.FirstName = firstName
+		user.LastName = lastName
 		user.Username = username
-		user.Tg_id = id
-		user.PhoneNumber = tel
+		user.Tg_id = chatId
+		user.PhoneNumber = phone
 		user.City, _ = strconv.Atoi(button)
+		user.Cart = make(map[int]int)
 		// Создаем тело запроса в виде строки JSON
-		requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
+		requestBody := `{"first_name":"` + firstName + `", "last_name":"` + lastName + `", "phone":"` + phone + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
 		fmt.Println(requestBody)
 
 		sendPost(requestBody, "http://nginx:80/api/customers.php")
 
-		user.isProvider = isProvider
+		user.IsProvider = isProvider
 		user.Step = 1
 
 		usersDB[chatId] = user
@@ -325,42 +335,36 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		sendPost(requestBody, "http://nginx:80/api/customers.php")
 	}
 
-	//пишем бизнес логику ----------- мозги
-
-	//fmt.Println(text)
+	file, _ := os.Create("db.json")
+	jsonString, _ := json.Marshal(usersDB)
+	file.Write(jsonString)
 
 	if usersDB[chatId].IsProvider {
 
-		switch usersDB[chatId].Step {
-
-		}
-	} else {
-		switch usersDB[chatId].Step {
-
-		}
-	}
-
-	// Проверяем, есть ли параметр после "/start"
-	if strings.HasPrefix(text, "/start ") {
-		// Извлекаем значение параметра
-		paramValue := strings.TrimPrefix(text, "/start ")
-
-		// Проверяем значение параметра
-		if strings.Contains(paramValue, "provider") {
-
-			sendMessage(chatId, "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте", "")
-			//http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте")
-			providerStep[chatId] += 1
-		}
-
-	} else {
-
 		switch {
 
-		// кейс для начального сообщения для пользователя
-		case text == "/start":
+		case usersDB[chatId].Step == 1:
+			sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 
-			userSteps[chatId] = 1
+		case usersDB[chatId].Step == 2:
+			sendMessage(chatId, "Локация вашего склада записана", nil)
+			user := usersDB[chatId]
+			user.Step = 1
+			usersDB[chatId] = user
+
+		}
+
+	} else {
+		switch {
+		// кейс для начального сообщения для пользователя
+		case text == "/start" || usersDB[chatId].Step == 1:
+
+			user := usersDB[chatId]
+			user.Step = 1
+			usersDB[chatId] = user
 
 			//собираем объект клавиатуры для выбора языка
 			buttons := [][]map[string]interface{}{
@@ -373,25 +377,16 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			//кодирование клавиатуры в json для отправки
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			// http.Get(host + token + "/deleteMessage?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesId))
-			//отправка сообщения
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, добро пожаловать в Стройбот. Выберите язык&reply_markup=" + string(inlineKeyboardJSON))
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык", inlineKeyboard)
 
 			//следующий шаг
-			userSteps[chatId] += 1
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
-		// кейс после отправки локации для поставщика
-		case providerStep[chatId] == 2:
-			fmt.Println(longitude, latitude)
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Локация вашего склада записана")
-			providerStep[chatId] = 1
-
 		// кейс для получения номера телефона
-		case userSteps[id] == 2:
+		case usersDB[chatId].Step == 2 || button == "backToPhone":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -412,17 +407,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
-
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Поделится номером телефона", keyboard)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для обработки отказа от отправки телефона
-		case userSteps[chatId] == 3 && text == "Нет":
+		case usersDB[chatId].Step == 3 && text == "Нет":
 
 			// создаём объект клавиатуры
 			buttons := [][]map[string]interface{}{
@@ -433,19 +426,20 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=К сожалению вы не сможете пройти дальше, если не укажите номер телефона&reply_markup=" + string(inlineKeyboardJSON))
-
-			// уходим на предыдущий шаг
-			userSteps[chatId] -= 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "К сожалению вы не сможете пройти дальше, если не укажите номер телефона", inlineKeyboard)
+			user := usersDB[chatId]
+			user.Step -= 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для вывода городов для выбора
-		case userSteps[chatId] == 3:
+		case usersDB[chatId].Step == 3:
 
-			fmt.Println(userSteps[chatId])
+			user := usersDB[chatId]
+			user.PhoneNumber = phone
+			user.Username = username
+			usersDB[chatId] = user
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
@@ -455,7 +449,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 			defer resp.Body.Close()
 
-			var cities []Cities
+			var cities []City
 			err = json.NewDecoder(resp.Body).Decode(&cities)
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
@@ -477,53 +471,20 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
-			if err != nil {
-				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
-			}
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
-
-			// следующий шаг
-			userSteps[chatId] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Выберите свой город", inlineKeyboard)
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для вывода меню пользователю и запись или обновление пользователя в бд
-		case userSteps[id] == 4:
+		case usersDB[chatId].Step == 4:
 
-			fmt.Println(FirstName)
-			fmt.Println(LastName)
+			// формируем json и отправляем данные пользователя на бэк
+			requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
+			fmt.Println(requestBody)
 
-			//определяем зарегистрирован ли пользователь
-			_, exist := usersDB[id]
-			if !exist {
-				user := UserT{}
-				user.ID = id
-				user.FirstName = FirstName
-				user.LastName = LastName
-				user.Username = username
-				user.Tg_id = id
-				user.PhoneNumber = tel
-				user.City, _ = strconv.Atoi(button)
-				// Создаем тело запроса в виде строки JSON
-				requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
-				fmt.Println(requestBody)
-
-				sendPost(requestBody, "http://nginx:80/api/customers.php")
-
-				usersDB[id] = user
-
-			} else {
-				// Создаем тело запроса в виде строки JSON
-				requestBody := `{"tg_id":` + strconv.Itoa(id) + `, "city_id": ` + button + `}`
-
-				sendPost(requestBody, "http://nginx:80/api/customers.php")
-			}
-
-			file, _ := os.Create("db.json")
-			jsonString, _ := json.Marshal(usersDB)
-			file.Write(jsonString)
+			sendPost(requestBody, "http://nginx:80/api/customers.php")
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -544,17 +505,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
-
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Главное меню", keyboard)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для возращения пользователя в меню
 		case button == "backToMenu":
-			userSteps[id] = 4
+			user := usersDB[chatId]
+			user.Step = 4
+
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
@@ -574,16 +536,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Главное меню", keyboard)
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для вывода категорий товаров на выбор
-		case userSteps[chatId] == 5 && text == "Заказать 🛍":
-			userSteps[chatId] = 5
+		case usersDB[chatId].Step == 5 && text == "Заказать 🛍" || button == "backToGoods":
+
+			user := usersDB[chatId]
+			user.Step = 5
+
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/categories.php")
@@ -592,7 +556,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 			defer resp.Body.Close()
 
-			var categories []Categories
+			var categories []Category
 			err = json.NewDecoder(resp.Body).Decode(&categories)
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
@@ -620,72 +584,17 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
-			if err != nil {
-				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
-			}
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
-
-			// следующий шаг
-			userSteps[chatId] += 1
-			break
-
-		// кейс для возращения к категориям товаров
-		case button == "backToGoods":
-			buttons := [][]map[string]interface{}{}
-			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/categories.php")
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var categories []Categories
-			err = json.NewDecoder(resp.Body).Decode(&categories)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, category := range categories {
-				button := []map[string]interface{}{
-					{
-						"text":          category.CategoryName,
-						"callback_data": category.CategoryName,
-					},
-				}
-				buttons = append(buttons, button)
-			}
-			buttons = append(buttons, []map[string]interface{}{
-				{
-					"text":          "Назад",
-					"callback_data": "backToMenu",
-				},
-			})
-
-			// создаём объект клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
-			if err != nil {
-				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
-			}
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
-
-			// следующий шаг
-			userSteps[id] = 6
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Выберите материал", inlineKeyboard)
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для вывода брендов товаров для пользователя
-		case userSteps[id] == 6:
+		case usersDB[chatId].Step == 6:
 
-			userSteps[id] = 6
+			user := usersDB[chatId]
+			user.Step = 6
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/brands.php")
@@ -694,7 +603,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 			defer resp.Body.Close()
 
-			var brands []Brands
+			var brands []Brand
 			err = json.NewDecoder(resp.Body).Decode(&brands)
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
@@ -722,17 +631,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			//кодируем клавиатуру в json
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
-
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Выберите бренд", inlineKeyboard)
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для отображения выбранных товаров по фильтрам
-		case userSteps[id] == 7:
+		case usersDB[chatId].Step == 7:
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/products.php?brand_id=" + button)
 			if err != nil {
@@ -805,16 +711,21 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				fmt.Println("Response:", string(responseData))
 			}
 
-			// следующий шаг
-			userSteps[id] += 1
+			// перезаписываем шаг
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для отображения корзины покупателя
-		case userSteps[id] == 8 && button == "goToCart":
+		case usersDB[chatId].Step == 8 && button == "goToCart":
+
+			user := usersDB[chatId]
 			finalPrice := 0
 			benefit := 0
+			marketPrice := 0
 			cartText := ""
-			for ID := range products {
+			for ID := range usersDB[chatId].Cart {
 
 				fmt.Println(ID)
 				// Создаем GET-запрос
@@ -831,9 +742,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					return
 				}
 
-				cartText += product.Name + "\n" + strconv.Itoa(products[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(products[ID]*product.Price) + " сум\n"
-				finalPrice += product.Price * products[ID]
-				benefit += product.MaxPrice*products[ID] - product.Price*products[ID]
+				cartText += product.Name + "\n" + strconv.Itoa(usersDB[chatId].Cart[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(usersDB[chatId].Cart[ID]*product.Price) + " сум\n"
+				finalPrice += product.Price * usersDB[chatId].Cart[ID]
+				marketPrice += product.MaxPrice * usersDB[chatId].Cart[ID]
+				benefit += product.MaxPrice*usersDB[chatId].Cart[ID] - product.Price*usersDB[chatId].Cart[ID]
 
 			}
 
@@ -847,19 +759,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
 			encodedCartText := url.QueryEscape(cartText)
-			encodedText := url.QueryEscape("\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + " сум"
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + encodedCartText + encodedText + "</b>&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON))
+			encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+			finalText := encodedCartText + encodedText
 
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, finalText, inlineKeyboard)
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для покупки выбранных товаров пользователем
-		case userSteps[id] == 9 && button == "buy":
+		case usersDB[chatId].Step == 9 && button == "buy":
 			buttons := [][]map[string]interface{}{
 				{{"text": "Заказать на свой адрес", "callback_data": "myAdress"}},
 				{{"text": "Заказать на другой адрес", "callback_data": "anotherAdress"}},
@@ -870,17 +781,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// кодируем клавиатуру в json
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Укажите удобный для Вас адрес&reply_markup=" + string(inlineKeyboardJSON))
-
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Укажите удобный для Вас адрес", inlineKeyboard)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс при нажатии на указание своего адреса
-		case userSteps[id] == 10 && button == "myAdress":
+		case usersDB[chatId].Step == 10 && button == "myAdress":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -901,17 +810,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится местоположением?&reply_markup=" + string(keyboardJSON))
-
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс при нажатии на указание другого адреса
-		case userSteps[id] == 10 && button == "anotherAdress":
+		case usersDB[chatId].Step == 10 && button == "anotherAdress":
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
@@ -925,24 +832,22 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Отправьте другой адрес?&reply_markup=" + string(keyboardJSON))
-
-			// следующий шаг
-			userSteps[id] += 1
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			user := usersDB[chatId]
+			user.Step += 1
+			usersDB[chatId] = user
 			break
 
 		// кейс для вывода сообщения о заказе и его отправка на бекенд
-		case userSteps[chatId] == 11:
+		case usersDB[chatId].Step == 11:
 
 			time := time.Now().Unix()
 			coordinates := Coordinates{
 				Latitude:  latitude,
 				Longitude: longitude,
 			}
-			jsonProducts, _ := json.Marshal(products)
+			jsonProducts, _ := json.Marshal(usersDB[chatId].Cart)
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
 			// Создаем GET-запрос
@@ -952,14 +857,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 			defer resp.Body.Close()
 
-			var user []UserT
-			err = json.NewDecoder(resp.Body).Decode(&user)
+			var userInfo []UserT
+			err = json.NewDecoder(resp.Body).Decode(&userInfo)
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
 
 			// Используем полученные данные
-			for _, user := range user {
+			for _, user := range userInfo {
 				// Создаем тело запроса в виде строки JSON
 				requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
 
@@ -986,37 +891,37 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Преобразуем клавиатуру в JSON
-			keyboardJSON, _ := json.Marshal(keyboard)
-			// Отправляем сообщение с клавиатурой
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа&reply_markup=" + string(keyboardJSON))
-
+			user := usersDB[chatId]
 			// обнуляем корзину
-			products = make(map[int]int)
+			user.Cart = make(map[int]int)
 
-			// следующий шаг
-			userSteps[chatId] = 5
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа", keyboard)
+			user.Step = 5
+			usersDB[chatId] = user
 			break
 		}
 
 		// кейс при нажатии на + в карточке товара
 		if strings.SplitN(button, ":", 2)[0] == "add" {
+			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 1
 
 			// Проверяем, есть ли товар с таким id в массиве
 			found := false
-			for ID := range products {
+			for ID := range user.Cart {
 				if ID == productID {
 					// Если товар найден, увеличиваем его количество
-					products[ID] += quantity
+					user.Cart[ID] += quantity
+					usersDB[chatId] = user
 					found = true
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": strconv.Itoa(products[ID]), "callback_data": "quantity"},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
 						{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + strconv.Itoa(ID)}},
@@ -1036,9 +941,17 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				}
 			}
 
-			// Если товара с таким id нет в массиве, добавляем его
+			// Если товара с таким id нет в карте, добавляем его
 			if !found {
-				products[productID] = quantity
+				user := usersDB[chatId]
+				// Проверяем, инициализирована ли карта `Cart`
+				if usersDB[chatId].Cart == nil {
+					user.Cart = make(map[int]int)
+				}
+
+				user.Cart[productID] = quantity
+				usersDB[chatId] = user
+
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
@@ -1050,33 +963,36 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
-				//создаём объект клавиатуры
+				// Создаем объект клавиатуры
 				inlineKeyboard := map[string]interface{}{
 					"inline_keyboard": buttons,
 				}
 
-				// кодируем клавиатуру в json
+				// Кодируем клавиатуру в JSON
 				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
 			}
+
 		}
 
 		// кейс для - в карточке товаров
 		if strings.SplitN(button, ":", 2)[0] == "minus" {
+			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 1
 
-			for ID := range products {
+			for ID := range usersDB[chatId].Cart {
 				if ID == productID {
 					// Если товар найден, уменьшаем его количество
-					products[ID] -= quantity
+					user.Cart[ID] -= quantity
+					usersDB[chatId] = user
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖", "callback_data": "minus:" + productStr},
-							{"text": strconv.Itoa(products[ID]), "callback_data": quantity},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
 							{"text": "➕", "callback_data": "add:" + productStr},
 						},
 						{{"text": "Добавить в корзину 🛒", "callback_data": "add:" + productStr}},
@@ -1090,8 +1006,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 					http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-					if products[productID] == 0 {
-						delete(products, productID)
+					if usersDB[chatId].Cart[productID] == 0 {
+						delete(usersDB[chatId].Cart, productID)
 					}
 					break
 				}
@@ -1124,10 +1040,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Цена на строительные материалы  " + formattedTime + "&reply_markup=" + string(inlineKeyboardJSON))
-
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Цена на строительные материалы "+formattedTime, inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку актуальный курс
@@ -1156,10 +1070,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Актуальные курсы валют " + formattedTime + "&reply_markup=" + string(inlineKeyboardJSON))
-
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Актуальные курсы валют "+formattedTime, inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку настройки
@@ -1188,10 +1100,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Настройки&reply_markup=" + string(inlineKeyboardJSON))
-
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Настройки", inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку справка
@@ -1205,10 +1115,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Информация о проекте&reply_markup=" + string(inlineKeyboardJSON))
-
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Информация о проекте", inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку изменить город
@@ -1221,7 +1129,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 			defer resp.Body.Close()
 
-			var cities []Cities
+			var cities []City
 			err = json.NewDecoder(resp.Body).Decode(&cities)
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
@@ -1242,14 +1150,35 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
-			if err != nil {
-				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Выберите свой город", inlineKeyboard)
+			user := usersDB[chatId]
+			user.Step = 4
+			usersDB[chatId] = user
+		}
+
+		// кейс при нажатии на кнопку изменить город
+		if button == "number" {
+			// Создаем объект клавиатуры
+			keyboard := map[string]interface{}{
+				"keyboard": [][]map[string]interface{}{
+					{
+						{
+							"text":            "Да",
+							"request_contact": true,
+						},
+					},
+				},
+				"resize_keyboard":   true,
+				"one_time_keyboard": true,
 			}
 
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Поделится номером телефона", keyboard)
 
-			userSteps[id] = 4
+			user := usersDB[chatId]
+			user.Step = 4
+			usersDB[chatId] = user
 		}
 
 		// кейс при нажатии на кнопку мои заказы
@@ -1263,9 +1192,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Мои заказы &reply_markup=" + string(inlineKeyboardJSON))
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Мои заказы", inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку связаться
@@ -1279,17 +1207,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Связаться &reply_markup=" + string(inlineKeyboardJSON))
-
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Связаться", inlineKeyboard)
 		}
 	}
-
-}
-
-func getUsers() {
-	//считываем из бд при включении
-	dataFile, _ := ioutil.ReadFile("db.json")
-	json.Unmarshal(dataFile, &usersDB)
 }
