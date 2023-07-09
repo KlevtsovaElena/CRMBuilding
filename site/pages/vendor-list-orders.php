@@ -30,9 +30,22 @@
                 <div class="form-elements-container">
                     <!-- поле поиска -->
                     <input type="search" id="search" name="search" value="" placeholder="Поиск по №заказа">
+                    <!-- выбор статуса -->
+                    <div class="d-iblock">Статус
+                        <select id="status" name="status" value="">
+
+                            <option value="">Все</option>
+                            <option value="0">Новый</option>
+                            <option value="1">Просмотрен</option>
+                            <option value="2">Подтверждён</option>
+                            <option value="3">Отменён</option>
+                            <option value="4">Завершён</option>
+
+                        </select>
+                    </div>
                     <!-- выбор кол-во записей на листе -->
                     <div class="d-iblock">Показывать по
-                        <select id="limit" name="limit" value="" required>
+                        <select id="limit" name="limit" value="">
 
                             <option value="10">10</option>
                             <option value="20">20</option>
