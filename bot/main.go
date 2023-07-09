@@ -159,20 +159,24 @@ type Product struct {
 var host string = "https://api.telegram.org/bot"
 var token string = ""
 
-// переменная шага в боте (слежка за шагом пользователя)
-var provider_step = 1
-
-var step int = 1
-
 var tel string
 var FirstName string
 var LastName string
 
+// карты для определения шага в боте (слежка за шагом пользователя или шагом поставщика)
+var providerStep = make(map[int]int)
+var userSteps = make(map[int]int)
+
+// карта корзины
 var products = make(map[int]int)
+
+// переменная для запросов к API
 var client = http.Client{}
 
+// главная функция работы бота
 func main() {
 
+	// достаём токен бота из .env файла
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -278,15 +282,17 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		if strings.Contains(paramValue, "provider") {
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте")
-			provider_step += 1
+			providerStep[chatId] += 1
 		}
 
 	} else {
 
 		switch {
+
+		// кейс для начального сообщения для пользователя
 		case text == "/start":
 
-			step = 1
+			userSteps[chatId] = 1
 
 			//собираем объект клавиатуры для выбора языка
 			buttons := [][]map[string]interface{}{
@@ -307,15 +313,17 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, добро пожаловать в Стройбот. Выберите язык&reply_markup=" + string(inlineKeyboardJSON))
 
 			//следующий шаг
-			step += 1
+			userSteps[chatId] += 1
 			break
 
-		case provider_step == 2:
+		// кейс после отправки локации для поставщика
+		case providerStep[chatId] == 2:
 			fmt.Println(longitude, latitude)
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Локация вашего склада записана")
-			provider_step = 1
+			providerStep[chatId] = 1
 
-		case step == 2:
+		// кейс для получения номера телефона
+		case userSteps[id] == 2:
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -341,11 +349,14 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится номером телефона&reply_markup=" + string(keyboardJSON))
 
-			step += 1
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 3 && text == "Нет":
+		// кейс для обработки отказа от отправки телефона
+		case userSteps[chatId] == 3 && text == "Нет":
 
+			// создаём объект клавиатуры
 			buttons := [][]map[string]interface{}{
 				{{"text": "Назад 🔙", "callback_data": "backToPhone"}},
 			}
@@ -354,16 +365,19 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=К сожалению вы не сможете пройти дальше, если не укажите номер телефона&reply_markup=" + string(inlineKeyboardJSON))
 
-			step -= 1
+			// уходим на предыдущий шаг
+			userSteps[chatId] -= 1
 			break
 
-		case step == 3:
+		// кейс для вывода городов для выбора
+		case userSteps[chatId] == 3:
 
-			fmt.Println(step)
+			fmt.Println(userSteps[chatId])
 
 			tel = phone
 			buttons := [][]map[string]interface{}{}
@@ -380,7 +394,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
 
-			// Используем полученные данные
+			// Используем полученные данные и подставляем их в кнопки
 			for _, city := range cities {
 				button := []map[string]interface{}{
 					{
@@ -391,20 +405,25 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				buttons = append(buttons, button)
 			}
 
+			// создаём объект клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 			if err != nil {
 				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
 			}
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
-			step += 1
+
+			// следующий шаг
+			userSteps[chatId] += 1
 			break
 
-		case step == 4:
+		// кейс для вывода меню пользователю и запись или обновление пользователя в бд
+		case userSteps[id] == 4:
 
 			fmt.Println(FirstName)
 			fmt.Println(LastName)
@@ -470,11 +489,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
 
-			step += 1
+			userSteps[id] += 1
 			break
 
+		// кейс для возращения пользователя в меню
 		case button == "backToMenu":
-			step = 4
+			userSteps[id] = 4
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
@@ -498,11 +518,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			keyboardJSON, _ := json.Marshal(keyboard)
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Главное меню&reply_markup=" + string(keyboardJSON))
-			step += 1
+			userSteps[id] += 1
 			break
 
-		case step == 5 && text == "Заказать 🛍":
-			step = 5
+		// кейс для вывода категорий товаров на выбор
+		case userSteps[chatId] == 5 && text == "Заказать 🛍":
+			userSteps[chatId] = 5
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/categories.php")
@@ -517,7 +538,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
 
-			// Используем полученные данные
+			// Используем полученные данные и подставляем их в кнопки
 			for _, category := range categories {
 				button := []map[string]interface{}{
 					{
@@ -534,10 +555,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				},
 			})
 
+			// создаём объект клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 			if err != nil {
 				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
@@ -545,9 +568,11 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
-			step += 1
+			// следующий шаг
+			userSteps[chatId] += 1
 			break
 
+		// кейс для возращения к категориям товаров
 		case button == "backToGoods":
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
@@ -563,7 +588,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
 
-			// Используем полученные данные
+			// Используем полученные данные и подставляем их в кнопки
 			for _, category := range categories {
 				button := []map[string]interface{}{
 					{
@@ -580,10 +605,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				},
 			})
 
+			// создаём объект клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, err := json.Marshal(inlineKeyboard)
 			if err != nil {
 				log.Fatal("Ошибка при маршалинге данных в формат JSON:", err)
@@ -591,12 +618,14 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите материал&reply_markup=" + string(inlineKeyboardJSON))
 
-			step = 6
+			// следующий шаг
+			userSteps[id] = 6
 			break
 
-		case step == 6:
+		// кейс для вывода брендов товаров для пользователя
+		case userSteps[id] == 6:
 
-			step = 6
+			userSteps[id] = 6
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/brands.php")
@@ -611,7 +640,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
 
-			// Используем полученные данные
+			// Используем полученные данные и подставляем их в кнопки
 			for _, brand := range brands {
 				button := []map[string]interface{}{
 					{
@@ -628,17 +657,22 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				},
 			})
 
+			//создаём объект клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			//кодируем клавиатуру в json
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Бренд&reply_markup=" + string(inlineKeyboardJSON))
-			step += 1
+
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 7:
+		// кейс для отображения выбранных товаров по фильтрам
+		case userSteps[id] == 7:
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/products.php?brand_id=" + button)
 			if err != nil {
@@ -665,10 +699,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
+				// создаём объект клавиатуры
 				inlineKeyboard := map[string]interface{}{
 					"inline_keyboard": buttons,
 				}
 
+				// кодируем клавиатуру в json
 				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 				fmt.Println(product.Photo)
@@ -709,10 +745,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				fmt.Println("Response:", string(responseData))
 			}
 
-			step += 1
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 8 && button == "goToCart":
+		// кейс для отображения корзины покупателя
+		case userSteps[id] == 8 && button == "goToCart":
 			finalPrice := 0
 			benefit := 0
 			cartText := ""
@@ -738,42 +776,51 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 				benefit += product.MaxPrice*products[ID] - product.Price*products[ID]
 
 			}
-			// Создаем объект инлайн клавиатуры
+
 			buttons := [][]map[string]interface{}{
 				{{"text": "Оформить заказ", "callback_data": "buy"}},
 				{{"text": "Назад", "callback_data": "backToGoods"}},
 			}
 
+			// Создаем объект инлайн клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 			encodedCartText := url.QueryEscape(cartText)
 			encodedText := url.QueryEscape("\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + " сум"
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=" + encodedCartText + encodedText + "</b>&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON))
 
-			step += 1
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 9 && button == "buy":
+		// кейс для покупки выбранных товаров пользователем
+		case userSteps[id] == 9 && button == "buy":
 			buttons := [][]map[string]interface{}{
 				{{"text": "Заказать на свой адрес", "callback_data": "myAdress"}},
 				{{"text": "Заказать на другой адрес", "callback_data": "anotherAdress"}},
 			}
 
+			// Создаем объект инлайн клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
 
+			// кодируем клавиатуру в json
 			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Укажите удобный для Вас адрес&reply_markup=" + string(inlineKeyboardJSON))
-			step += 1
+
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 10 && button == "myAdress":
+		// кейс при нажатии на указание своего адреса
+		case userSteps[id] == 10 && button == "myAdress":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -798,10 +845,13 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			keyboardJSON, _ := json.Marshal(keyboard)
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Поделится местоположением?&reply_markup=" + string(keyboardJSON))
-			step += 1
+
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 10 && button == "anotherAdress":
+		// кейс при нажатии на указание другого адреса
+		case userSteps[id] == 10 && button == "anotherAdress":
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
@@ -819,10 +869,13 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			keyboardJSON, _ := json.Marshal(keyboard)
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Отправьте другой адрес?&reply_markup=" + string(keyboardJSON))
-			step += 1
+
+			// следующий шаг
+			userSteps[id] += 1
 			break
 
-		case step == 11:
+		// кейс для вывода сообщения о заказе и его отправка на бекенд
+		case userSteps[chatId] == 11:
 
 			time := time.Now().Unix()
 			coordinates := Coordinates{
@@ -878,11 +931,15 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			// Отправляем сообщение с клавиатурой
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа&reply_markup=" + string(keyboardJSON))
 
+			// обнуляем корзину
 			products = make(map[int]int)
-			step = 5
+
+			// следующий шаг
+			userSteps[chatId] = 5
 			break
 		}
 
+		// кейс при нажатии на + в карточке товара
 		if strings.SplitN(button, ":", 2)[0] == "add" {
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -906,10 +963,12 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 					}
 
+					// создаём объект клавиатуры
 					inlineKeyboard := map[string]interface{}{
 						"inline_keyboard": buttons,
 					}
 
+					// кодируем клавиатуру в json
 					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 					http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
@@ -931,17 +990,19 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
+				//создаём объект клавиатуры
 				inlineKeyboard := map[string]interface{}{
 					"inline_keyboard": buttons,
 				}
 
+				// кодируем клавиатуру в json
 				inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 				http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
 			}
-			fmt.Println(products)
 		}
 
+		// кейс для - в карточке товаров
 		if strings.SplitN(button, ":", 2)[0] == "minus" {
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -975,10 +1036,9 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 					break
 				}
 			}
-
-			fmt.Println(products)
 		}
 
+		// кейс при нажатии на кнопку актуальные цены
 		if text == "Актуальные цены на рынке 📈" {
 
 			channelURL := "https://t.me/stroyb0t"
@@ -1010,6 +1070,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		}
 
+		// кейс при нажатии на кнопку актуальный курс
 		if text == "Актуальный курс 💹" {
 
 			channelURL := "https://t.me/stroybotchannel2"
@@ -1041,6 +1102,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		}
 
+		// кейс при нажатии на кнопку настройки
 		if text == "Настройки ⚙️" {
 			buttons := [][]map[string]interface{}{
 				{{"text": "Изменить номер", "callback_data": "number"},
@@ -1072,6 +1134,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		}
 
+		// кейс при нажатии на кнопку справка
 		if button == "info" {
 
 			buttons := [][]map[string]interface{}{
@@ -1088,6 +1151,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		}
 
+		// кейс при нажатии на кнопку изменить город
 		if button == "city" {
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
@@ -1125,9 +1189,10 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(id) + "&text=Выберите свой город&reply_markup=" + string(inlineKeyboardJSON))
 
-			step = 4
+			userSteps[id] = 4
 		}
 
+		// кейс при нажатии на кнопку мои заказы
 		if text == "Мои заказы 📕" {
 
 			buttons := [][]map[string]interface{}{
@@ -1143,6 +1208,7 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Мои заказы &reply_markup=" + string(inlineKeyboardJSON))
 		}
 
+		// кейс при нажатии на кнопку связаться
 		if text == "Связаться 📞" {
 
 			buttons := [][]map[string]interface{}{
