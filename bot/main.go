@@ -19,81 +19,85 @@ import (
 
 // структура для приходящих сообщений и обычных кнопок
 type ResponseT struct {
-	Ok     bool `json:"ok"`
-	Result []struct {
-		UpdateID int `json:"update_id"`
-		Message  struct {
+	Ok     bool       `json:"ok"`
+	Result []MessageT `json:"result"`
+}
+
+type MessageT struct {
+	UpdateID int `json:"update_id"`
+	Message  struct {
+		MessageID int `json:"message_id"`
+		From      struct {
+			ID           int    `json:"id"`
+			IsBot        bool   `json:"is_bot"`
+			FirstName    string `json:"first_name"`
+			LastName     string `json:"last_name"`
+			Username     string `json:"username"`
+			LanguageCode string `json:"language_code"`
+		} `json:"from"`
+		Chat struct {
+			ID        int    `json:"id"`
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+			Username  string `json:"username"`
+			Type      string `json:"type"`
+		} `json:"chat"`
+		Date    int `json:"date"`
+		Contact struct {
+			PhoneNumber string `json:"phone_number"`
+		} `json:"contact"`
+		Location struct {
+			Latitude  float64 `json:"latitude"`
+			Longitude float64 `json:"longitude"`
+		} `json:"location"`
+		Text string `json:"text"`
+		Data string `json:"data"`
+	} `json:"message"`
+}
+
+// структура для инлайн кнопок
+type ResponseInlineT struct {
+	Ok     bool             `json:"ok"`
+	Result []MessageInlineT `json:"result"`
+}
+
+type MessageInlineT struct {
+	UpdateID      int `json:"update_id"`
+	CallbackQuery struct {
+		ID   string `json:"id"`
+		From struct {
+			ID           int    `json:"id"`
+			IsBot        bool   `json:"is_bot"`
+			FirstName    string `json:"first_name"`
+			Username     string `json:"username"`
+			LanguageCode string `json:"language_code"`
+		} `json:"from"`
+		Message struct {
 			MessageID int `json:"message_id"`
 			From      struct {
-				ID           int    `json:"id"`
-				IsBot        bool   `json:"is_bot"`
-				FirstName    string `json:"first_name"`
-				LastName     string `json:"last_name"`
-				Username     string `json:"username"`
-				LanguageCode string `json:"language_code"`
+				ID        int64  `json:"id"`
+				IsBot     bool   `json:"is_bot"`
+				FirstName string `json:"first_name"`
+				Username  string `json:"username"`
 			} `json:"from"`
 			Chat struct {
 				ID        int    `json:"id"`
 				FirstName string `json:"first_name"`
-				LastName  string `json:"last_name"`
 				Username  string `json:"username"`
 				Type      string `json:"type"`
 			} `json:"chat"`
-			Date    int `json:"date"`
-			Contact struct {
-				PhoneNumber string `json:"phone_number"`
-			} `json:"contact"`
-			Location struct {
-				Latitude  float64 `json:"latitude"`
-				Longitude float64 `json:"longitude"`
-			} `json:"location"`
-			Text string `json:"text"`
-			Data string `json:"data"`
+			Date        int    `json:"date"`
+			Text        string `json:"text"`
+			ReplyMarkup struct {
+				InlineKeyboard [][]struct {
+					Text         string `json:"text"`
+					CallbackData string `json:"callback_data"`
+				} `json:"inline_keyboard"`
+			} `json:"reply_markup"`
 		} `json:"message"`
-	} `json:"result"`
-}
-
-// структура для инлайн кнопок
-type InlineButton struct {
-	Ok     bool `json:"ok"`
-	Result []struct {
-		UpdateID      int `json:"update_id"`
-		CallbackQuery struct {
-			ID   string `json:"id"`
-			From struct {
-				ID           int    `json:"id"`
-				IsBot        bool   `json:"is_bot"`
-				FirstName    string `json:"first_name"`
-				Username     string `json:"username"`
-				LanguageCode string `json:"language_code"`
-			} `json:"from"`
-			Message struct {
-				MessageID int `json:"message_id"`
-				From      struct {
-					ID        int64  `json:"id"`
-					IsBot     bool   `json:"is_bot"`
-					FirstName string `json:"first_name"`
-					Username  string `json:"username"`
-				} `json:"from"`
-				Chat struct {
-					ID        int    `json:"id"`
-					FirstName string `json:"first_name"`
-					Username  string `json:"username"`
-					Type      string `json:"type"`
-				} `json:"chat"`
-				Date        int    `json:"date"`
-				Text        string `json:"text"`
-				ReplyMarkup struct {
-					InlineKeyboard [][]struct {
-						Text         string `json:"text"`
-						CallbackData string `json:"callback_data"`
-					} `json:"inline_keyboard"`
-				} `json:"reply_markup"`
-			} `json:"message"`
-			ChatInstance string `json:"chat_instance"`
-			Data         string `json:"data"`
-		} `json:"callback_query"`
-	} `json:"result"`
+		ChatInstance string `json:"chat_instance"`
+		Data         string `json:"data"`
+	} `json:"callback_query"`
 }
 
 // структура пользователя
@@ -102,9 +106,12 @@ type UserT struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	Username    string `json:"tg_username"`
+	Step        int    `json:"step"`
+	IsProvider  bool   `json:"is_provider"`
 	Tg_id       int    `json:"tg_id"`
 	PhoneNumber string `json:"phone"`
 	City        int    `json:"city_id"`
+	Cart[]
 }
 
 // структура заказа
@@ -159,13 +166,12 @@ type Product struct {
 var host string = "https://api.telegram.org/bot"
 var token string = ""
 
-var tel string
-var FirstName string
-var LastName string
-
 // карты для определения шага в боте (слежка за шагом пользователя или шагом поставщика)
 var providerStep = make(map[int]int)
 var userSteps = make(map[int]int)
+
+// данные все пользователей
+var usersDB map[int]UserT
 
 // карта корзины
 var products = make(map[int]int)
@@ -176,8 +182,12 @@ var client = http.Client{}
 // главная функция работы бота
 func main() {
 
+	//достаем юзеров из кэща
+	getUsers()
+
 	// достаём токен бота из .env файла
 	err := godotenv.Load()
+	//os.LookupEnv("BOT_TOKEN")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -195,7 +205,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		data, _ := ioutil.ReadAll(response.Body)
+		data, _ := os.ReadAll(response.Body)
 
 		//посмотреть данные
 		fmt.Println(string(data))
@@ -205,7 +215,7 @@ func main() {
 		json.Unmarshal(data, &responseObj)
 
 		//парсим данные из json  (для нажатия на инлайн кнопку)
-		var need InlineButton
+		var need ResponseInlineT
 		json.Unmarshal(data, &need)
 
 		//считаем количество новых сообщений
@@ -219,25 +229,8 @@ func main() {
 		//в цикле доставать инормацию по каждому сообщению
 		for i := 0; i < number; i++ {
 
-			text := responseObj.Result[i].Message.Text
-			chatId := responseObj.Result[i].Message.From.ID
-			messageTime := responseObj.Result[i].Message.Date
-			firstName := responseObj.Result[i].Message.From.FirstName
-			lastName := responseObj.Result[i].Message.From.LastName
-			mesIdRepl := responseObj.Result[i].Message.MessageID
-			phone := responseObj.Result[i].Message.Contact.PhoneNumber
-			latitude := responseObj.Result[i].Message.Location.Latitude
-			longitude := responseObj.Result[i].Message.Location.Longitude
-			button := need.Result[i].CallbackQuery.Data
-			id := need.Result[i].CallbackQuery.From.ID
-			mesIdInline := need.Result[i].CallbackQuery.Message.MessageID
-			username := need.Result[i].CallbackQuery.From.Username
-
-			//пишем бизнес логику ----------- мозги
-
-			//отвечаем пользователю на его сообщение
-			go sendMessage(chatId, id, mesIdInline, mesIdRepl, messageTime, text, button, phone, firstName, lastName, username, latitude, longitude)
-
+			//обработка одного сообщения
+			go processMessage(responseObj.Result[i], need.Result[i])
 		}
 
 		//запоминаем update_id  последнего сообщения
@@ -269,9 +262,83 @@ func sendPost(requestBody string, url string) {
 }
 
 // функция для отправки сообщения пользователю
-func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime int, text string, button string, phone string, firstName string, lastName string, username string, latitude float64, longitude float64) {
+func sendMessage(chatId int, text string, keyboard string) {
+	url := host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=" + text
+	if keyboard != "" {
+		url += "&reply_markup=" + keyboard
+	}
+	http.Get(url)
+}
 
-	fmt.Println(text)
+func processMessage(message MessageT, messageInline MessageInlineT) {
+
+	text := message.Message.Text
+	chatId := 0
+	if message.UpdateID != 0 {
+		chatId = message.Message.From.ID
+	} else {
+		chatId = messageInline.CallbackQuery.From.ID
+	}
+	messageTime := message.Message.Date
+	firstName := message.Message.From.FirstName
+	lastName := message.Message.From.LastName
+	mesIdRepl := message.Message.MessageID
+	phone := message.Message.Contact.PhoneNumber
+	latitude := message.Message.Location.Latitude
+	longitude := message.Message.Location.Longitude
+	button := messageInline.CallbackQuery.Data
+	id := messageInline.CallbackQuery.From.ID
+	mesIdInline := messageInline.CallbackQuery.Message.MessageID
+	username := messageInline.CallbackQuery.From.Username
+
+	isProvider := false
+	if strings.ContainsAny(text, "provider_") {
+		isProvider = true
+	}
+
+	//есть ли юзер
+	_, exist := usersDB[chatId]
+	if !exist {
+		user := UserT{}
+		user.ID = id
+		user.FirstName = FirstName
+		user.LastName = LastName
+		user.Username = username
+		user.Tg_id = id
+		user.PhoneNumber = tel
+		user.City, _ = strconv.Atoi(button)
+		// Создаем тело запроса в виде строки JSON
+		requestBody := `{"first_name":"` + FirstName + `", "last_name":"` + LastName + `", "phone":"` + tel + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
+		fmt.Println(requestBody)
+
+		sendPost(requestBody, "http://nginx:80/api/customers.php")
+
+		user.isProvider = isProvider
+		user.Step = 1
+
+		usersDB[chatId] = user
+
+	} else {
+		// Создаем тело запроса в виде строки JSON
+		requestBody := `{"tg_id":` + strconv.Itoa(id) + `, "city_id": ` + button + `}`
+
+		sendPost(requestBody, "http://nginx:80/api/customers.php")
+	}
+
+	//пишем бизнес логику ----------- мозги
+
+	//fmt.Println(text)
+
+	if usersDB[chatId].IsProvider {
+
+		switch usersDB[chatId].Step {
+
+		}
+	} else {
+		switch usersDB[chatId].Step {
+
+		}
+	}
 
 	// Проверяем, есть ли параметр после "/start"
 	if strings.HasPrefix(text, "/start ") {
@@ -281,7 +348,8 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 		// Проверяем значение параметра
 		if strings.Contains(paramValue, "provider") {
 
-			http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте")
+			sendMessage(chatId, "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте", "")
+			//http.Get(host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=Здравствуйте, отправьте местоположение склада, выбрав его на карте")
 			providerStep[chatId] += 1
 		}
 
@@ -379,7 +447,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			fmt.Println(userSteps[chatId])
 
-			tel = phone
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
 			resp, err := http.Get("http://nginx:80/api/cities.php")
@@ -427,13 +494,6 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 			fmt.Println(FirstName)
 			fmt.Println(LastName)
-
-			//создали "бд юзеров"
-			usersDB := make(map[int]UserT)
-
-			//считываем из бд при включении
-			dataFile, _ := ioutil.ReadFile("db.json")
-			json.Unmarshal(dataFile, &usersDB)
 
 			//определяем зарегистрирован ли пользователь
 			_, exist := usersDB[id]
@@ -1225,4 +1285,11 @@ func sendMessage(chatId int, id int, mesIdInline int, mesIdRepl int, messageTime
 
 		}
 	}
+
+}
+
+func getUsers() {
+	//считываем из бд при включении
+	dataFile, _ := ioutil.ReadFile("db.json")
+	json.Unmarshal(dataFile, &usersDB)
 }
