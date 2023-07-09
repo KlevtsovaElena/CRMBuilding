@@ -30,9 +30,22 @@
                 <div class="form-elements-container">
                     <!-- поле поиска -->
                     <input type="search" id="search" name="search" value="" placeholder="Поиск по №заказа">
+                    <!-- выбор статуса -->
+                    <div class="d-iblock">Статус
+                        <select id="status" name="status" value="">
+
+                            <option value="">Все</option>
+                            <option value="0">Новый</option>
+                            <option value="1">Просмотрен</option>
+                            <option value="2">Подтверждён</option>
+                            <option value="3">Отменён</option>
+                            <option value="4">Завершён</option>
+
+                        </select>
+                    </div>
                     <!-- выбор кол-во записей на листе -->
                     <div class="d-iblock">Показывать по
-                        <select id="limit" name="limit" value="" required>
+                        <select id="limit" name="limit" value="">
 
                             <option value="10">10</option>
                             <option value="20">20</option>
@@ -57,6 +70,8 @@
                             <th data-id="order_id" data-sort="">№ заказа</th>
                             <th data-id="order_date" data-sort="">Дата создания</th>
                             <th data-id="status" data-sort="">Статус</th>
+                            <th data-id="customer_id">Клиент ID</th>
+                            <th data-id="customer_phone" data-sort="">Телефон</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
                             <th data-id="complete_date">Дата завершения</th>
@@ -94,6 +109,12 @@ if (count($_GET) !== 0) {
         $searchText = "";
     }
 
+    if(isset($_GET['status'])) {
+        $status = $_GET['status'];
+    } else {
+        $status = "";
+    }
+
     if(isset($_GET['orderby'])) {
         $orderBy = explode(":", $_GET['orderby']);
         $sortBy = $orderBy[0];
@@ -116,6 +137,36 @@ if (count($_GET) !== 0) {
                 <div class="form-elements-container">
                     <!-- поле поиска -->
                     <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск по №заказа">
+                    <!-- выбор статуса -->
+                    <div class="d-iblock">Статус
+                        <select id="status" name="status" value="">
+
+                            <?php
+                            if (!isset($_GET['status'])) {
+                            ?>
+                                <option value="">Все</option>
+                                <option value="0">Новый</option>
+                                <option value="1">Просмотрен</option>
+                                <option value="2">Подтверждён</option>
+                                <option value="3">Отменён</option>
+                                <option value="4">Завершён</option>
+                                
+                            <?php
+
+                            } else {
+                                ?>
+                                <option value="">Все</option>
+                                <option value="0"  <?php if ($_GET['status'] == 0) {echo 'selected';} ?> >Новый</option>
+                                <option value="1"  <?php if ($_GET['status'] == 1) {echo 'selected';} ?> >Просмотрен</option>
+                                <option value="2"  <?php if ($_GET['status'] == 2) {echo 'selected';} ?> >Подтверждён</option>
+                                <option value="3"  <?php if ($_GET['status'] == 3) {echo 'selected';} ?> >Отменён</option>
+                                <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Завершён</option>
+
+                            <?php }
+                            ?> 
+
+                        </select>
+                    </div>
                     <!-- выбор кол-во записей на листе -->
                     <div class="d-iblock">Показывать по
                         <select id="limit" name="limit" value="" required>
@@ -153,9 +204,14 @@ if (count($_GET) !== 0) {
                     <thead>
                         <tr role="row">
 
+
+                        <th data-id="order_id" data-sort="">№ заказа</th>
+
                             <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№ заказа</th>
                             <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
                             <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
+                            <th data-id="customer_id">Клиент ID</th>
+                            <th data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
                             <th data-id="complete_date">Дата завершения</th>
@@ -187,6 +243,8 @@ if (count($_GET) !== 0) {
                         <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
                         <td>${order_date}</td>
                         <td><a href="javascript: showOrder(${id})" class="list-orders_status d-block status${status}">${status}</a></td>
+                        <td>${customer_id}</td>
+                        <td>${customer_phone}</td>
                         <td class="list-orders_products">${products}</td>
                         <td>${total_price}</td>
                         <td>${complete_date}</td>

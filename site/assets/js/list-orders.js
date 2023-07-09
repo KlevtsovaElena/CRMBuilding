@@ -6,7 +6,7 @@ let orderStatus = {
     "1": "Просмотрен",
     "2": "Подтверждён",
     "3": "Отменён",
-    "4": "Звершён"
+    "4": "Завершён"
 }
 
 // найдём шаблон и контейнер для отрисовки заказов
@@ -29,6 +29,7 @@ let url = 'http://localhost/api/order-vendors/get-count-with-details.php?vendor_
 
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
+let statusEl = document.getElementById('status');
 let offsetEl = containerPagination.getAttribute('offset');
 
 let prevButton;
@@ -115,6 +116,9 @@ function getFilters() {
     // сбросим параметры строки запроса
     params = "";
 
+    if(statusEl.value) {
+        params += "&status=" + statusEl.value;
+    }
     // проверим значение поиска
     if(searchEl.value.trim()) {
         params += "&search=order_id:" + searchEl.value;
@@ -263,6 +267,8 @@ function renderListOrders(orders) {
                                                         .replace('${status}', orderStatus[orders['orders'][i]['status']])
                                                         .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
+                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
+                                                        .replace('${customer_id}', "id")
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
                                                         .replace('${complete_date}', '');
         
