@@ -267,6 +267,8 @@ function renderListOrders(orders) {
                                                         .replace('${status}', orderStatus[orders['orders'][i]['status']])
                                                         .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
+                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
+                                                        .replace('${customer_id}', "id")
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
                                                         .replace('${complete_date}', '');
         
