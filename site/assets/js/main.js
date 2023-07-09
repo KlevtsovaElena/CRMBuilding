@@ -50,3 +50,14 @@ function declinationWord(n, word) {
     if (n1 == 1) { return word[0]; }
     return word[2];
 }
+
+/* ---------- ВЫДЕЛЕНИЕ АКТИВНОГО ПУНКТА МЕНЮ---------- */
+let pageName = window.location.pathname + window.location.search;
+let itemNav = document.querySelectorAll('[data-page-name]');
+
+itemNav.forEach( item => {
+    if (pageName.includes(item.getAttribute('data-page-name'))) {
+        item.classList.add('active');
+    }
+})
+

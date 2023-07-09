@@ -416,6 +416,9 @@ input:focus, textarea:focus, select:focus {
     background-color:var(--left-menu-bgColor-hover);
 }  
 
+.menu-left__item.active {
+    color: var(--primary-color-hover);
+}
 
 .menu-left__item-link {
     display: flex;
