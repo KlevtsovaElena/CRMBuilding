@@ -79,7 +79,7 @@
                         <span>Пункт 1</span>
                     </a>
                 </li> -->
-                <li class="menu-left__item">
+                <li class="menu-left__item"  data-page-name = "/pages/admin.php?section=categories">
                     <a href="./../pages/admin.php?section=categories" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -89,7 +89,7 @@
                         <span>Категории</span>
                     </a>
                 </li>
-                <li class="menu-left__item">
+                <li class="menu-left__item"   data-page-name = "/pages/admin.php?section=brands">
                     <a href="./../pages/admin.php?section=brands" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -142,7 +142,7 @@
             </button>
 
             <ul class="menu-left__items">
-                <li class="menu-left__item">
+                <li class="menu-left__item" data-page-name = "/index.php">
                     <a href="#" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -153,7 +153,7 @@
                         <span>Главная</span>
                     </a>
                 </li>
-                <li class="menu-left__item">
+                <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
                     <a href="./../pages/vendor-add-product.php" class="menu-left__item-link">
                         <svg stroke="#ced4da" viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -163,7 +163,7 @@
                         <span>Добавить товар</span>
                     </a>
                 </li>
-                <li class="menu-left__item">
+                <li class="menu-left__item" data-page-name = "/pages/vendor-list-products.php">
                     <a href="./../pages/vendor-list-products.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -173,7 +173,7 @@
                         <span>Список товаров</span>
                     </a>
                 </li>
-                <li class="menu-left__item">
+                <li class="menu-left__item"  data-page-name = "/pages/vendor-list-orders.php">
                     <a href="./../pages/vendor-list-orders.php" class="menu-left__item-link">
                         <svg class="fill" viewBox="0 0 1024 1024" fill="#ced4da" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
