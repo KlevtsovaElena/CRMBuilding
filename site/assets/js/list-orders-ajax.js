@@ -77,7 +77,6 @@ function startRenderPage() {
 /* ---------- СБОР ПАРАМЕТРОВ запроса---------- */
 function getParams() {
 
-    paramsTest = "";
     // сначала фильтры 
     filters = getFilters();
 
@@ -149,7 +148,7 @@ function changeData() {
         params = filters + orderby + "&limit=" + limit + "&offset=" + offset;
 
         // 5. делаем снова запрос на получение другого куска данных
-        getOrdersData(params, paramsTest);
+        getOrdersData(params);
 
 }
 

@@ -173,18 +173,8 @@
                         <span>Список товаров</span>
                     </a>
                 </li>
-                <li class="menu-left__item" data-page-name = "/pages/vendor-list-orders.php">
-                    <a href="./../pages/vendor-list-orders.php" class="menu-left__item-link">
-                        <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g id="SVGRepo_iconCarrier"> <title>list</title> <path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
-                        </svg>
-                        <span>Список заказов22222</span>
-                    </a>
-                </li>
                 <li class="menu-left__item"  data-page-name = "/pages/vendor-list-orders.php">
-                    <a href="./../pages/vendor-list-orders-ajax.php" class="menu-left__item-link">
+                    <a href="./../pages/vendor-list-orders.php" class="menu-left__item-link">
                         <svg class="fill" viewBox="0 0 1024 1024" fill="#ced4da" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>

@@ -212,3 +212,18 @@ function editProduct(id) {
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
     window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + params ; 
 }
+
+/* ---------- СОХРАНЕНИЕ ПОЗИЦИИ СКРОЛЛА ПОСЛЕ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ---------- */
+let cords = ['scrollX','scrollY']; 
+// сохраняем позицию скролла в sessionStorage
+window.addEventListener('unload', e => cords.forEach(cord => sessionStorage[cord] = window[cord])); 
+// вешаем событие на загрузку (ресурсов) страницы
+window.addEventListener('load', e => {
+    // если в sessionStorage имеются данные
+    if (sessionStorage[cords[0]]) {
+        // скроллим к сохраненным координатам
+        window.scroll(...cords.map(cord => sessionStorage[cord]));
+        // удаляем данные с sessionStorage
+        cords.forEach(cord => sessionStorage.removeItem(cord));
+    }
+}); 
