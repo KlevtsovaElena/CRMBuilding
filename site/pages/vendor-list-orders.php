@@ -6,7 +6,7 @@
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
-        "<script src='./../assets/js/list-orders.js'></script>"
+        "<script src='./../assets/js/list-orders-ajax.js'></script>"
     ];
 ?>
 <?php include('./../components/header.php'); ?>

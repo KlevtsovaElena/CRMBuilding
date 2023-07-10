@@ -243,7 +243,7 @@ function copyText() {
 
     tempInput.select();
     tempInput.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(tempInput.value);
+    document.execCommand('copy');
 
     document.body.removeChild(tempInput);
 
