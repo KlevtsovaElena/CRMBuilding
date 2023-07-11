@@ -355,7 +355,7 @@ input:focus, textarea:focus, select:focus {
     background: var(--left-menu-bgColor); 
     /* background: var(--left-menu-bgColor);  */
     /* background: var(--color_secondary_200);  */
-    height: 100%; 
+    height: calc(100% - var(--menu-top-height)); 
     width: var(--menu-left-width);
     color: var(--light-color);
     margin-top: var(--menu-top-height);
