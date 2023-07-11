@@ -83,7 +83,7 @@
     cursor: pointer;
     transition: all var(--speed-transition);
     position: absolute;
-    top: calc(50% - 10px);
+    top: calc(50% - 12px);
     right: 0.5rem;
 }
 
@@ -95,4 +95,23 @@
 td:nth-last-child(1) {
     padding-right: 30px;
     position: relative;
+    min-width: 140px;
+}
+
+.change-price {
+    width: 80px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+}
+
+.change-price-input {
+    width: 80px;
+    min-width: unset;
+    max-width: unset;
+}
+
+.save-price, .reset-price {
+    display: none;
+    vertical-align: middle;
+    cursor: pointer;
 }

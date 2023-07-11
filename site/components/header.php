@@ -136,11 +136,6 @@
 
         <nav class="menu-left" >
 
-            <button class="menu-left__collapse" onclick="toggleMenu()">
-                <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
-                <span>Свернуть меню</span> 
-            </button>
-
             <ul class="menu-left__items">
                 <li class="menu-left__item" data-page-name = "/index.php">
                     <a href="#" class="menu-left__item-link">
@@ -153,7 +148,7 @@
                         <span>Главная</span>
                     </a>
                 </li>
-                <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
+                <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
                     <a href="./../pages/vendor-add-product.php" class="menu-left__item-link">
                         <svg stroke="#ced4da" viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -162,7 +157,7 @@
                             </svg>
                         <span>Добавить товар</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-left__item" data-page-name = "/pages/vendor-list-products.php">
                     <a href="./../pages/vendor-list-products.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
@@ -200,7 +195,13 @@
                 </li>
 
             </ul>
+
+            <button class="menu-left__collapse" onclick="toggleMenu()">
+                <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
+                <span>Свернуть меню</span> 
+            </button>
         </nav>
+
 
     </header>
 

@@ -6,7 +6,7 @@
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
-        "<script src='./../assets/js/list-orders-ajax.js'></script>"
+        "<script src='./../assets/js/list-orders.js'></script>"
     ];
 ?>
 <?php include('./../components/header.php'); ?>
@@ -115,13 +115,16 @@ if (count($_GET) !== 0) {
         $status = "";
     }
 
+
     if(isset($_GET['orderby'])) {
-        $orderBy = explode(":", $_GET['orderby']);
+        $orderByArray = explode(";", $_GET['orderby']);
+        $orderBy = explode(":", $orderByArray[0]);
         $sortBy = $orderBy[0];
         $mark = $orderBy[1];
     } else {
         $sortBy = "";
     }
+
 
     if(isset($_GET['offset']) && $_GET['offset'] !== '') {
         $offset = $_GET['offset'];
@@ -203,9 +206,6 @@ if (count($_GET) !== 0) {
 
                     <thead>
                         <tr role="row">
-
-
-                        <th data-id="order_id" data-sort="">№ заказа</th>
 
                             <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№ заказа</th>
                             <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
