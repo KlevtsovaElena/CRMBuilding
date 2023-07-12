@@ -101,15 +101,8 @@
     padding-top: 10px;
 }
 
-.filters-orders {
-    display: flex;
-    gap: 7px;
-    align-items: end;
-    font-size: 0.9rem;
-}
-
-.filters-orders input,
-.filters-orders select {
+.filters-container-flex input,
+.filters-container-flex select {
     min-width: unset;
     min-width: unset;
     width: unset;
@@ -135,10 +128,6 @@
     bottom: 5px;
     left: 5px;
 }     */
-
-.change-status {
-
-}
 
 .change-order-select {
     width: 65%;

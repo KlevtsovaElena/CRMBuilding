@@ -13,7 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id;
+let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id + '&deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -384,8 +384,16 @@ function deleteProduct() {
     // найдём id товара по атрибуту product-id
     const productId = event.target.closest('.list-products__row').getAttribute('product-id');
 
+    // соберём json
+    let obj = JSON.stringify({
+        'id': productId,
+        'deleted':  1
+    });
+
     // делаем запрос на удаление товара по id
-    sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
+    sendRequestPOST('http://localhost/api/products.php', obj);
+
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
 
 
     // заполним страницу данными
@@ -399,10 +407,10 @@ function editProduct(id) {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + params);
+    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + params ; 
+    window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
@@ -410,10 +418,10 @@ function addProduct() {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + params);
+    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-add-product.php?vendor_id="  + vendor_id + params ; 
+    window.location.href = "http://localhost/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
 }
 
 

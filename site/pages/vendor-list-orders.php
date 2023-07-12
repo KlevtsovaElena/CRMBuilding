@@ -27,7 +27,7 @@
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container filters-orders">
+                <div class="form-elements-container filters-container-flex">
                     <!-- поле поиска -->
                     <div class="d-iblock">
                         <div>Поиск</div>
@@ -146,7 +146,7 @@ if (count($_GET) !== 0) {
     }
 
     if(isset($_GET['archive']) && $_GET['archive'] !== '') {
-        $archive = "archive=" . $_GET['archive'];
+        $archive = $_GET['archive'];
     } else {
         $archive = "";
     }
@@ -156,7 +156,7 @@ if (count($_GET) !== 0) {
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container filters-orders">
+                <div class="form-elements-container filters-container-flex">
                     <!-- поле поиска -->
                     <div class="d-iblock">
                         <div>Поиск</div>
@@ -169,7 +169,7 @@ if (count($_GET) !== 0) {
                         <select id="status" name="status" value="">
 
                             <?php
-                            if (!isset($_GET['status'])) {
+                            if (!isset($_GET['status']) && !isset($_GET['archive'])) {
                             ?>
                                 <option value="">Все</option>
                                 <option value="0">Новый</option>
@@ -182,7 +182,7 @@ if (count($_GET) !== 0) {
                                 
                             <?php
 
-                            } else {
+                            } else if (isset($_GET['status'])) {    
                                 ?>
                                 <option value="">Все</option>
                                 <option value="0"  <?php if ($_GET['status'] == 0) {echo 'selected';} ?> >Новый</option>
@@ -190,7 +190,19 @@ if (count($_GET) !== 0) {
                                 <option value="2"  <?php if ($_GET['status'] == 2) {echo 'selected';} ?> >Подтверждён</option>
                                 <option value="3"  <?php if ($_GET['status'] == 3) {echo 'selected';} ?> >Отменён</option>
                                 <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Доставлен</option>
-                                <option value="archive=1" <?php if ($_GET['status'] == 'archive=1') {echo 'selected';} ?>>Только архивные</option>
+                                <option value="archive=1">Только архивные</option>
+
+
+                            <?php 
+                            } else if (isset($_GET['archive'])) {
+                            ?>
+                                <option value="">Все</option>
+                                <option value="0">Новый</option>
+                                <option value="1">Просмотрен</option>
+                                <option value="2">Подтверждён</option>
+                                <option value="3">Отменён</option>
+                                <option value="4">Доставлен</option>
+                                <option value="archive=1" <?php if ($_GET['archive'] == '1') {echo 'selected';} ?>>Только архивные</option>
 
 
                             <?php }
@@ -226,7 +238,7 @@ if (count($_GET) !== 0) {
                     <!-- показывать архивные -->
                     <div class="archive-check">
                         <div >
-                            <input type="checkbox" id="archive" name="archive" value="<?= $archive; ?>" <?php if($archive == "") echo 'checked'; ?>>
+                            <input type="checkbox" id="archive" name="archive" <?php if($archive == 0 || $archive == 1) {echo "value='archive=0'";} else {echo "value='' checked";} ?>>
                             <!-- <svg class="d-none" width="18px" height="18px" viewBox="5 5 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Check"> <path id="Vector" d="M6 12L10.2426 16.2426L18.727 7.75732" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> -->
                         </div>
                         <lable>Архивные</lable>
@@ -283,11 +295,10 @@ if (count($_GET) !== 0) {
                             <div class="change-status d-none">
                                 <select  class="change-order-select" name="change-order" value="">
                             
-                                    <option value="0">Новый</option>
-                                    <option value="1">Просмотрен</option>
-                                    <option value="2">Подтверждён</option>
-                                    <option value="3">Отменён</option>
-                                    <option value="4">Доставлен</option>
+                                    <option value="status=1">Просмотрен</option>
+                                    <option value="status=2">Подтверждён</option>
+                                    <option value="status=3">Отменён</option>
+                                    <option value="status=4">Доставлен</option>
                                     <option value="${archive_status}">${archive_text}</option>
 
                                 </select>

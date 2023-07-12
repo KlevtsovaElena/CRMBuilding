@@ -40,7 +40,7 @@
                 <!-- здесь храним id поставщика -->
                 <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
                 
-                <div class="form-elements-container">
+                <div class="form-elements-container filters-container-flex">
 
                     <!-- выбор категории -->
                     <label>Категория
@@ -154,7 +154,7 @@ if (count($_GET) !== 0) {
         <!-- здесь храним id поставщика -->
         <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
         
-        <div class="form-elements-container">
+        <div class="form-elements-container filters-container-flex">
             
             <!-- выбор категории -->
             <label>Категория
