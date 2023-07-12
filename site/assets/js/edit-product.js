@@ -189,8 +189,18 @@ function deleteProductFromEditForm(id) {
     // если подтвердили удаление
     console.log("удаляем");
 
+    // соберём json
+    let obj = JSON.stringify({
+        'id': id,
+        'deleted':  1
+    });
+
     // делаем запрос на удаление товара по id
-    sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    sendRequestPOST('http://localhost/api/products.php', obj);
+
+
+    // делаем запрос на удаление товара по id
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
 
     alert("Товар удалён");
 

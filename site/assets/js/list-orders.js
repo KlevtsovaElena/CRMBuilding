@@ -272,11 +272,13 @@ function renderListOrders(orders) {
         let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
         //преобразуем дату с сервера в дату, которая у пользователя
         let dateOrder = dateTimeOrder.toLocaleDateString();
-        let archiveStatus = "archive=" + orders['orders'][i]['archive'];
+        let archiveStatus = "";
         let archiveText = "";
         if(orders['orders'][i]['archive'] == '1') {
+            archiveStatus = "archive=0";
             archiveText = "Убрать из архива";
         } else {
+            archiveStatus = "archive=1";
             archiveText = "В архив";
         }
         // заполним шаблон
@@ -459,7 +461,7 @@ archiveCheckEl.onclick = function(){
     }
 }
 
-/* ---------- ИЗМЕНЕНИЕ статуса---------- */
+/* ---------- ИЗМЕНЕНИЕ статуса или архива---------- */
 
 // показать селекты
 function showChangeSelect() {
@@ -468,7 +470,6 @@ function showChangeSelect() {
 
     // общий контейнер селекта
     let changeStatus = rowOrder.querySelector('.change-status');
-
 
     changeStatus.classList.remove('d-none');
 
@@ -482,77 +483,28 @@ function resetChangeOrder() {
     // общий контейнер селекта
     let changeStatus = rowOrder.querySelector('.change-status');
 
-    // сам селект
-    let changeOrderSelect = rowOrder.querySelector('.change-order-select');
-
-    // иконка сохранить
-    let saveOrder = rowOrder.querySelector('.save-order');
-
-    // иконка сбросить
-    let resetOrder = rowOrder.querySelector('.reset-order');
-
     changeStatus.classList.add('d-none');
 }
 
 // сохранить изменения
 function saveChangeOrder() {
-    let rowOrder = event.target.closest('.list-products__row');
-    let idProduct = rowOrder.getAttribute('product-id');
-    let changeOrderSelect = rowOrder.querySelectorAll('.change-order-select');
-    let changePrice = rowOrder.querySelectorAll('.change-price');
+    // вся строка заказа
+    let rowOrder = event.target.closest('.list-orders__row');
 
+    // сам селект
+    let changeOrderSelect = rowOrder.querySelector('.change-order-select');
 
-    let savePrice = rowOrder.querySelector('.save-order');
-    let resetPrice = rowOrder.querySelector('.reset-order');
+    // id заказа, который надо изменить
+    let idOrder = rowOrder.getAttribute('order-id');
 
     let obj = {};
-    changeOrderSelect.forEach(item => {
-        
-        if (item.value) {
-            obj[item.name] = item.value;
-        }
+    obj['id'] = idOrder;
+    obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
+    let objJson = JSON.stringify(obj);
 
-    })
+    sendRequestPOST('http://localhost/api/ordervendors.php', objJson);
 
-    if (Object.keys(obj).length > 0) {
+    // перерисовка страницы
+    startRenderPage();
 
-        // если цена больше среднерыночной, то выходим
-        if (obj.price && obj.max_price) {
-            if (Number(obj.price) >= Number(obj.max_price)) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (obj.price && !obj.max_price) {
-            if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (!obj.price && obj.max_price) {
-            if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        }            
-
-        // если всё ок, то собираем данные и отправляем в БД
-        obj['id'] = idProduct;
-        let objJson = JSON.stringify(obj);
-
-        // отправка запроса на запись 
-        sendRequestPOST('http://localhost/api/products.php', objJson);
-
-        // перерисовка страницы
-        startRenderPage();
-    }
-
-    savePrice.style.display = 'none';
-    resetPrice.style.display = 'none';
-    changePriceInput.forEach(item => {
-        item.value = "";
-        item.setAttribute('type', 'hidden');
-    })
-
-    changePrice.forEach(item => {
-        item.classList.remove('d-none');
-    })
 }
