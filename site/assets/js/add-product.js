@@ -48,6 +48,7 @@ function addProduct() {
         'price': price.value,
         'max_price': max_price.value,
         'unit_id': unit_id.value,
+        'deleted': 0,
         photoFileData,
         photoFileName
     });
