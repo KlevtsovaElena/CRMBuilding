@@ -28,6 +28,7 @@ class OrderVendorRepository extends BaseRepository
                                         v.`coordinates` as `vendor_location`,
                                         o.`order_date` as `order_date`,
                                         ov.`status` as `status`,
+                                        ov.`archive` as `archive`,
                                         c.`phone` as `customer_phone`,
                                         o.`location` as `order_location`,
                                         ov.`products` as `products`
@@ -47,6 +48,7 @@ class OrderVendorRepository extends BaseRepository
         'vendor_location' => 'v.coordinates',
         'order_date' => 'o.order_date',
         'status' => 'ov.status',
+        'archive' => 'ov.archive',
         'customer_phone' => 'c.phone',
         'order_location' => 'o.location',
         'products' => 'ov.products'

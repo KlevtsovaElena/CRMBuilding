@@ -27,11 +27,15 @@
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container">
+                <div class="form-elements-container filters-orders">
                     <!-- поле поиска -->
-                    <input type="search" id="search" name="search" value="" placeholder="Поиск по №заказа">
+                    <div class="d-iblock">
+                        <div>Поиск</div>
+                        <input type="search" id="search" name="search" value="" placeholder="По №заказа">
+                    </div>
                     <!-- выбор статуса -->
-                    <div class="d-iblock">Статус
+                    <div class="d-iblock">
+                        <div>Статус</div>
                         <select id="status" name="status" value="">
 
                             <option value="">Все</option>
@@ -39,12 +43,13 @@
                             <option value="1">Просмотрен</option>
                             <option value="2">Подтверждён</option>
                             <option value="3">Отменён</option>
-                            <option value="4">Завершён</option>
+                            <option value="4">Доставлен</option>
 
                         </select>
                     </div>
                     <!-- выбор кол-во записей на листе -->
-                    <div class="d-iblock">Показывать по
+                    <div class="d-iblock">
+                        <div>Показывать по</div>
                         <select id="limit" name="limit" value="">
 
                             <option value="10">10</option>
@@ -54,7 +59,14 @@
 
                         </select>
                     </div>
-                    <br>
+                    <!-- показывать архивные -->
+                    <div class="archive-check">
+                        <div >
+                            <input type="checkbox" id="archive" name="archive" value="archive=0">
+                            <!-- <svg class="d-none" width="18px" height="18px" viewBox="5 5 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Check"> <path id="Vector" d="M6 12L10.2426 16.2426L18.727 7.75732" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> -->
+                        </div>
+                        <lable>Архивные</lable>
+                    </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
@@ -132,16 +144,27 @@ if (count($_GET) !== 0) {
         $offset = 0;
     }
 
+    if(isset($_GET['archive']) && $_GET['archive'] !== '') {
+        $archive = "archive=" . $_GET['archive'];
+    } else {
+        $archive = "";
+    }
+
 ?>
 
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container">
+                <div class="form-elements-container filters-orders">
                     <!-- поле поиска -->
-                    <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск по №заказа">
+                    <div class="d-iblock">
+                        <div>Поиск</div>
+                        <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="По №заказа">
+                    </div>
+                    
                     <!-- выбор статуса -->
-                    <div class="d-iblock">Статус
+                    <div class="d-iblock">
+                        <div>Статус</div>
                         <select id="status" name="status" value="">
 
                             <?php
@@ -152,7 +175,7 @@ if (count($_GET) !== 0) {
                                 <option value="1">Просмотрен</option>
                                 <option value="2">Подтверждён</option>
                                 <option value="3">Отменён</option>
-                                <option value="4">Завершён</option>
+                                <option value="4">Доставлен</option>
                                 
                             <?php
 
@@ -163,7 +186,7 @@ if (count($_GET) !== 0) {
                                 <option value="1"  <?php if ($_GET['status'] == 1) {echo 'selected';} ?> >Просмотрен</option>
                                 <option value="2"  <?php if ($_GET['status'] == 2) {echo 'selected';} ?> >Подтверждён</option>
                                 <option value="3"  <?php if ($_GET['status'] == 3) {echo 'selected';} ?> >Отменён</option>
-                                <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Завершён</option>
+                                <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Доставлен</option>
 
                             <?php }
                             ?> 
@@ -171,7 +194,8 @@ if (count($_GET) !== 0) {
                         </select>
                     </div>
                     <!-- выбор кол-во записей на листе -->
-                    <div class="d-iblock">Показывать по
+                    <div class="d-iblock">
+                        <div>Показывать по</div>
                         <select id="limit" name="limit" value="" required>
 
                         <?php
@@ -194,7 +218,15 @@ if (count($_GET) !== 0) {
 
                         </select>
                     </div>
-                    <br>
+                    <!-- показывать архивные -->
+                    <div class="archive-check">
+                        <div >
+
+                            <input type="checkbox" id="archive" name="archive" value="<?= $archive; ?>">
+                            <!-- <svg class="d-none" width="18px" height="18px" viewBox="5 5 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Check"> <path id="Vector" d="M6 12L10.2426 16.2426L18.727 7.75732" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> -->
+                        </div>
+                        <lable>Архивные</lable>
+                    </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
@@ -238,7 +270,7 @@ if (count($_GET) !== 0) {
             <!-- шаблон таблицы -->
             <template id="template-body-table">
 
-                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}">
+                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}" archive="${archive}">
 
                         <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
                         <td>${order_date}</td>
