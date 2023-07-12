@@ -30,7 +30,16 @@ let url = 'http://localhost/api/order-vendors/get-count-with-details.php?vendor_
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
 let statusEl = document.getElementById('status');
+let archiveCheckEl = document.querySelector('.archive-check');
+let archiveEl = archiveCheckEl.querySelector('input');
+
 let offsetEl = containerPagination.getAttribute('offset');
+
+
+
+
+
+
 
 let prevButton;
 let nextButton;
@@ -122,7 +131,11 @@ function getFilters() {
     if(searchEl.value.trim()) {
         params += "&search=order_id:" + searchEl.value;
     }
+    if(archiveEl.value) {
+        params += "&archive=" + archiveEl.value;
+    }
 
+console.log(params);
     return params;
 }
 
@@ -269,7 +282,9 @@ function renderListOrders(orders) {
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', "id")
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
-                                                        .replace('${complete_date}', '');
+                                                        .replace('${complete_date}', '')
+                                                        .replace('${archive}', orders['orders'][i]['archive']);
+                                                        
         
     }  
 
@@ -398,4 +413,15 @@ function showOrder(id) {
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
         document.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
 
+}
+
+
+archiveCheckEl.onclick = function(){
+    if(archiveEl.checked) {
+        console.log("нажат");
+        archiveEl.value = ""
+    } else {
+        console.log("не нажат");
+        archiveEl.value = "archive=0";  
+    }
 }

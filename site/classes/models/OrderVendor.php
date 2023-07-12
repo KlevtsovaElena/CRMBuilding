@@ -8,5 +8,6 @@
         public int $vendor_id;
         public ?array $products;
         public int $status;
+        public int $archive;
     }
 ?>

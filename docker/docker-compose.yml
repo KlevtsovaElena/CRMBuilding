@@ -18,13 +18,12 @@ services:
       dockerfile: Dockerfile-php
     volumes:
       - ./../site/:/var/www
-    env_file: .env
     environment:
-      MYSQL_HOST: ${MYSQL_HOST}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DB: ${MYSQL_DB}
-      MYSQL_CHARSET: ${MYSQL_CHARSET}
+      MYSQL_HOST: "mysql"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "admin"
+      MYSQL_DB: "crm-building"
+      MYSQL_CHARSET: "utf8"
     ports:
       - 9010:9000
 
@@ -35,8 +34,8 @@ services:
     volumes:
       - ./mysql/:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "crm-building"
     ports:
       - 3309:3306
 
