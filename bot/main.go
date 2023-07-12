@@ -13,8 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 // структура для приходящих сообщений и обычных кнопок
@@ -164,7 +162,7 @@ type Product struct {
 
 // переменные для подключения к боту
 var host string = "https://api.telegram.org/bot"
-var token string
+var token string = os.Getenv("BOT_TOKEN")
 
 // данные всеx пользователей
 var usersDB map[int]UserT
@@ -177,13 +175,6 @@ func main() {
 
 	//достаем юзеров из кэща
 	getUsers()
-
-	// достаём токен бота из .env файла
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	token = os.Getenv("BOT_TOKEN")
 
 	//обнуление последнего id сообщения
 	lastMessage := 0
