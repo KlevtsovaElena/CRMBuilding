@@ -27,6 +27,7 @@
     font-weight: 600;
     white-space: nowrap;
     border-radius: 2px;
+    cursor: pointer;
 }
 
 /* статус создан */
@@ -135,6 +136,25 @@
     left: 5px;
 }     */
 
+.change-status {
 
+}
+
+.change-order-select {
+    width: 65%;
+    min-width: unset;
+    max-width: unset;
+}
+
+th[data-id="status"] {
+    min-width: 140px;
+}
+.save-order, .reset-order {
+    width: 80px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+    vertical-align: middle;
+    cursor: pointer;
+}
 
 

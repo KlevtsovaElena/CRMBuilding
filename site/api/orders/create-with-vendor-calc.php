@@ -50,7 +50,7 @@
                         $newItem->products = $value;
                         $newItem->status = OrderVendorStatus::Created->value;
                         $newItem->vendor_id = $key;
-
+$newItem->archive = 0;
                         $this->orderVendorRepository->add((array) $newItem);
                     }
                 }

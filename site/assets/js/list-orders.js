@@ -35,11 +35,9 @@ let archiveEl = archiveCheckEl.querySelector('input');
 
 let offsetEl = containerPagination.getAttribute('offset');
 
-
-
-
-
-
+let changeOrderEl;
+let resetOrderEl;
+let saveOrderEl;
 
 let prevButton;
 let nextButton;
@@ -124,16 +122,24 @@ function getFilters() {
     // сбросим параметры строки запроса
     params = "";
 
-    if(statusEl.value) {
-        params += "&status=" + statusEl.value;
+    if(statusEl.value) { 
+        if(statusEl.value !== "archive=1") {
+            params += "&status=" + statusEl.value;
+            if(archiveEl.value) {
+                params += "&" + archiveEl.value;
+            }
+        } else if(statusEl.value === "archive=1") {
+            params += "&" + statusEl.value;
+        }
+    }  else if(archiveEl.value){
+        params += "&" + archiveEl.value;
     }
+
     // проверим значение поиска
     if(searchEl.value.trim()) {
         params += "&search=order_id:" + searchEl.value;
     }
-    if(archiveEl.value) {
-        params += "&archive=" + archiveEl.value;
-    }
+
 
 console.log(params);
     return params;
@@ -266,7 +272,13 @@ function renderListOrders(orders) {
         let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
         //преобразуем дату с сервера в дату, которая у пользователя
         let dateOrder = dateTimeOrder.toLocaleDateString();
-
+        let archiveStatus = "archive=" + orders['orders'][i]['archive'];
+        let archiveText = "";
+        if(orders['orders'][i]['archive'] == '1') {
+            archiveText = "Убрать из архива";
+        } else {
+            archiveText = "В архив";
+        }
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders['orders'][i]['order_id'])
                                                         .replace('${order_id}', orders['orders'][i]['order_id'])
@@ -283,13 +295,31 @@ function renderListOrders(orders) {
                                                         .replace('${customer_id}', "id")
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
                                                         .replace('${complete_date}', '')
-                                                        .replace('${archive}', orders['orders'][i]['archive']);
+                                                        .replace('${archive}', orders['orders'][i]['archive'])
+                                                        .replace('${archive_status}', archiveStatus)
+                                                        .replace('${archive_text}', archiveText);
                                                         
         
     }  
 
     info.innerText = "Всего " + totalOrdersCount + declinationWord(totalOrdersCount, [' запись', ' записи', ' записей']);
 
+    changeOrderEl = document.querySelectorAll('.list-orders_status');
+
+    resetOrderEl = document.querySelectorAll('.reset-order');
+    saveOrderEl = document.querySelectorAll('.save-order');
+
+    changeOrderEl.forEach(item => {
+        item.addEventListener('click', showChangeSelect);
+    })
+
+    resetOrderEl.forEach(item => {
+        item.addEventListener('click', resetChangeOrder);
+    })
+
+    saveOrderEl.forEach(item => {
+        item.addEventListener('click', saveChangeOrder);
+    })
 }
 
 
@@ -411,7 +441,7 @@ function showOrder(id) {
     history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-        document.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
+    window.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
 
 }
 
@@ -420,8 +450,109 @@ archiveCheckEl.onclick = function(){
     if(archiveEl.checked) {
         console.log("нажат");
         archiveEl.value = ""
+        console.log(archiveEl.value);
     } else {
         console.log("не нажат");
         archiveEl.value = "archive=0";  
+        console.log(archiveEl.value);
+
     }
+}
+
+/* ---------- ИЗМЕНЕНИЕ статуса---------- */
+
+// показать селекты
+function showChangeSelect() {
+
+    let rowOrder = event.target.closest('.list-orders__row');
+
+    // общий контейнер селекта
+    let changeStatus = rowOrder.querySelector('.change-status');
+
+
+    changeStatus.classList.remove('d-none');
+
+}
+
+// сбросить изменения без сохранения
+function resetChangeOrder() {
+    // вся строка заказа
+    let rowOrder = event.target.closest('.list-orders__row');
+
+    // общий контейнер селекта
+    let changeStatus = rowOrder.querySelector('.change-status');
+
+    // сам селект
+    let changeOrderSelect = rowOrder.querySelector('.change-order-select');
+
+    // иконка сохранить
+    let saveOrder = rowOrder.querySelector('.save-order');
+
+    // иконка сбросить
+    let resetOrder = rowOrder.querySelector('.reset-order');
+
+    changeStatus.classList.add('d-none');
+}
+
+// сохранить изменения
+function saveChangeOrder() {
+    let rowOrder = event.target.closest('.list-products__row');
+    let idProduct = rowOrder.getAttribute('product-id');
+    let changeOrderSelect = rowOrder.querySelectorAll('.change-order-select');
+    let changePrice = rowOrder.querySelectorAll('.change-price');
+
+
+    let savePrice = rowOrder.querySelector('.save-order');
+    let resetPrice = rowOrder.querySelector('.reset-order');
+
+    let obj = {};
+    changeOrderSelect.forEach(item => {
+        
+        if (item.value) {
+            obj[item.name] = item.value;
+        }
+
+    })
+
+    if (Object.keys(obj).length > 0) {
+
+        // если цена больше среднерыночной, то выходим
+        if (obj.price && obj.max_price) {
+            if (Number(obj.price) >= Number(obj.max_price)) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        } else if (obj.price && !obj.max_price) {
+            if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        } else if (!obj.price && obj.max_price) {
+            if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        }            
+
+        // если всё ок, то собираем данные и отправляем в БД
+        obj['id'] = idProduct;
+        let objJson = JSON.stringify(obj);
+
+        // отправка запроса на запись 
+        sendRequestPOST('http://localhost/api/products.php', objJson);
+
+        // перерисовка страницы
+        startRenderPage();
+    }
+
+    savePrice.style.display = 'none';
+    resetPrice.style.display = 'none';
+    changePriceInput.forEach(item => {
+        item.value = "";
+        item.setAttribute('type', 'hidden');
+    })
+
+    changePrice.forEach(item => {
+        item.classList.remove('d-none');
+    })
 }
