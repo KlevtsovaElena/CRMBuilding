@@ -73,5 +73,5 @@ services:
       task_start_hour: "13"
       task_start_minute: "47"
       bot_token: ${CURRENCY_BOT_TOKEN}
-      telegram_channel: "@stroybotchannel2"
+      telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"

@@ -9,8 +9,8 @@ import (
 	"strconv"
 )
 
-var channelName string = os.Getenv("telegram_channel")
-var token string = ""
+var channelName string = os.Getenv("TELEGRAM_CHANEL")
+var token string = os.Getenv("CURRENCY_BOT_TOKEN")
 
 type SendMessageResponseT struct {
 	Ok     bool `json:"ok"`
@@ -39,8 +39,6 @@ type PinMessageResponseT struct {
 }
 
 func SendMessage(text string) int {
-
-	var token string = os.Getenv("CURRENCY_BOT_TOKEN")
 
 	if len(channelName) == 0 {
 		fmt.Println("Не удалось отправить сообщение: не указано имя канала.")
