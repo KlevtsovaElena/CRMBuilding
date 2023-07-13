@@ -24,9 +24,13 @@ let offsetEl = containerPagination.getAttribute('offset');
 let prevButton;
 let nextButton;
 let totalPages;
+
 let changePriceEl;
+let changePriceInputEl;
 let resetPriceEl;
 let savePriceEl;
+let changeInputsEl;
+
 let brands = {};
 let categories = {};
 
@@ -237,8 +241,10 @@ function renderListProducts(totalProducts) {
     })
 
     changePriceEl = document.querySelectorAll('.change-price');
+    changePriceInputEl = document.querySelectorAll('.change-price-el');
     resetPriceEl = document.querySelectorAll('.reset-price');
     savePriceEl = document.querySelectorAll('.save-price');
+    changeInputsEl = document.querySelectorAll('.change-price-input');
 
     changePriceEl.forEach(item => {
         item.addEventListener('click', showChangeInput);
@@ -429,56 +435,69 @@ function addProduct() {
 
 // показать инпуты
 function showChangeInput() {
+    // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
     
-    let changePriceInput = rowProduct.querySelectorAll('.change-price-input');
-    let changePrice = rowProduct.querySelectorAll('.change-price');
-    let savePrice = rowProduct.querySelector('.save-price');
-    let resetPrice = rowProduct.querySelector('.reset-price');
-
-    savePrice.style.display = 'inline-block';
-    resetPrice.style.display = 'inline-block';
-
-    changePriceInput.forEach(item => {
-        item.setAttribute('type', 'text');
+    // скрываем все инпуты, которые были открыты 
+    changePriceInputEl.forEach(item => {
+        item.classList.add('d-none');
     })
+
+    // инпуты этого продукта
+    let changePriceInput = rowProduct.querySelectorAll('.change-price-el');
+    // показываем их
+    changePriceInput.forEach(item => {
+        item.classList.remove('d-none');
+    })
+
+
+    // показываем все div со старыми ценами
+    changePriceEl.forEach(item => {
+        item.classList.remove('d-none');
+    })
+
+    // divы со старыми ценами этого продукта
+    let changePrice = rowProduct.querySelectorAll('.change-price');
+    // скрываем их
     changePrice.forEach(item => {
         item.classList.add('d-none');
     })
+
 }
 
 // сбросить изменения без сохранения
 function resetChangePrice() {
-    let rowProduct = event.target.closest('.list-products__row');
-    let changePriceInput = rowProduct.querySelectorAll('.change-price-input');
-    let changePrice = rowProduct.querySelectorAll('.change-price');
-
-    let savePrice = rowProduct.querySelector('.save-price');
-    let resetPrice = rowProduct.querySelector('.reset-price');
-
-    savePrice.style.display = 'none';
-    resetPrice.style.display = 'none';
-
-    changePriceInput.forEach(item => {
+    // сбросим все значения всех инпутов
+    changeInputsEl.forEach(item => {
         item.value = "";
-        item.setAttribute('type', 'hidden');
+    });
+
+    // скрываем все инпуты, которые были открыты 
+    changePriceInputEl.forEach(item => {
+        item.classList.add('d-none');
     })
-    changePrice.forEach(item => {
+
+    // показываем все div со старыми ценами
+    changePriceEl.forEach(item => {
         item.classList.remove('d-none');
     })
 }
 
 // сохранить изменения
 function saveChangePrice() {
+    // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
+
+    // id продукта
     let idProduct = rowProduct.getAttribute('product-id');
+
+    // все инпуты этого продукта
     let changePriceInput = rowProduct.querySelectorAll('.change-price-input');
+
+    // все divs со старыми ценами продукта
     let changePrice = rowProduct.querySelectorAll('.change-price');
 
-
-    let savePrice = rowProduct.querySelector('.save-price');
-    let resetPrice = rowProduct.querySelector('.reset-price');
-
+    // собираем json для отправки на сервер
     let obj = {};
     changePriceInput.forEach(item => {
         
@@ -506,7 +525,7 @@ function saveChangePrice() {
                 alert("Цена товара должна быть меньше среднерыночной цены!")
                 return;
             };
-        }            
+        }        
 
         // если всё ок, то собираем данные и отправляем в БД
         obj['id'] = idProduct;
@@ -517,16 +536,10 @@ function saveChangePrice() {
 
         // перерисовка страницы
         startRenderPage();
+
+        return;
     }
 
-    savePrice.style.display = 'none';
-    resetPrice.style.display = 'none';
-    changePriceInput.forEach(item => {
-        item.value = "";
-        item.setAttribute('type', 'hidden');
-    })
+    resetChangePrice();
 
-    changePrice.forEach(item => {
-        item.classList.remove('d-none');
-    })
 }
