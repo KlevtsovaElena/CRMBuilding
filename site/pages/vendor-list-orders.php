@@ -80,8 +80,8 @@
                     <thead>
                         <tr role="row">
 
-                            <th data-id="order_id" data-sort="">№ заказа</th>
-                            <th data-id="order_date" data-sort="">Дата создания</th>
+                            <th data-id="order_id" data-sort="">№</th>
+                            <th data-id="order_date" data-sort="">Дата</th>
                             <th data-id="status" data-sort="">Статус</th>
                             <th data-id="customer_id">Клиент ID</th>
                             <th data-id="customer_phone" data-sort="">Телефон</th>
@@ -255,10 +255,10 @@ if (count($_GET) !== 0) {
                     <thead>
                         <tr role="row">
 
-                            <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№ заказа</th>
-                            <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
+                            <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
+                            <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
                             <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                            <th data-id="customer_id">Клиент ID</th>
+                            <th data-id="customer_id" data-sort="<?php if ($sortBy == 'customer_id')  {echo $mark; } ?>">Клиент ID</th>
                             <th data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
