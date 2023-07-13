@@ -59,6 +59,7 @@
                     'order_date' => $ordersVendorItem['order_date'],
                     'status' => $ordersVendorItem['status'],
                     'customer_phone' => $ordersVendorItem['customer_phone'],
+                    'customer_id' => $ordersVendorItem['customer_id'],
                     'order_location' => $ordersVendorItem['order_location'],
                     'archive' => $ordersVendorItem['archive'],
                 ];
