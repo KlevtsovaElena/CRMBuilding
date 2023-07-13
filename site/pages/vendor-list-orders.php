@@ -83,7 +83,7 @@
                             <th data-id="order_id" data-sort="">№</th>
                             <th data-id="order_date" data-sort="">Дата</th>
                             <th data-id="status" data-sort="">Статус</th>
-                            <th data-id="customer_id">Клиент ID</th>
+                            <th data-id="customer_id" data-sort="">Клиент ID</th>
                             <th data-id="customer_phone" data-sort="">Телефон</th>
                             <th data-id="products">Товары</th>
                             <th data-id="total_price">Сумма</th>
