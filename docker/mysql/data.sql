@@ -11,59 +11,62 @@ DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `brand_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `deleted` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `brands` (`id`, `brand_name`) VALUES
-(1,	'Форус'),
-(2,	'AZIA'),
-(3,	'КНАУФ'),
-(4,	'VERO'),
-(5,	'Maestro'),
-(6,	'Элерон'),
-(7,	'RED STONE VENTUM'),
-(8,	'Fixer'),
-(9,	'Fugen Knauf'),
-(10,	'Braus'),
-(11,	'Megamix'),
-(12,	'Hayat'),
-(13,	'ГФ-021');
+INSERT INTO `brands` (`id`, `brand_name`, `deleted`) VALUES
+(1,	'Форус',	0),
+(2,	'AZIA',	0),
+(3,	'КНАУФ',	0),
+(4,	'VERO',	0),
+(5,	'Maestro',	0),
+(6,	'Элерон',	0),
+(7,	'RED STONE VENTUM',	0),
+(8,	'Fixer',	0),
+(9,	'Fugen Knauf',	0),
+(10,	'Braus',	0),
+(11,	'Megamix',	0),
+(12,	'Hayat',	0),
+(13,	'ГФ-021',	0);
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `category_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `deleted` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `categories` (`id`, `category_name`) VALUES
-(1,	'Гипсокартон'),
-(2,	'Штукатурка'),
-(3,	'Шпаклевка'),
-(4,	'Грунтовка');
+INSERT INTO `categories` (`id`, `category_name`, `deleted`) VALUES
+(1,	'Гипсокартон',	0),
+(2,	'Штукатурка',	0),
+(3,	'Шпаклевка',	0),
+(4,	'Грунтовка',	0);
 
 DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `deleted` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `cities` (`id`, `name`) VALUES
-(1,	'Ташкент'),
-(2,	'Нурафшон'),
-(3,	'Бухара'),
-(4,	'Самарканд'),
-(5,	'Карши'),
-(6,	'Термез'),
-(7,	'Навои'),
-(8,	'Джизак'),
-(9,	'Гулистан'),
-(10,	'Андижан'),
-(11,	'Наманган'),
-(12,	'Фергана'),
-(13,	'Угренч'),
-(14,	'Нукус');
+INSERT INTO `cities` (`id`, `name`, `deleted`) VALUES
+(1,	'Ташкент',	0),
+(2,	'Нурафшон',	0),
+(3,	'Бухара',	0),
+(4,	'Самарканд',	0),
+(5,	'Карши',	0),
+(6,	'Термез',	0),
+(7,	'Навои',	0),
+(8,	'Джизак',	0),
+(9,	'Гулистан',	0),
+(10,	'Андижан',	0),
+(11,	'Наманган',	0),
+(12,	'Фергана',	0),
+(13,	'Угренч',	0),
+(14,	'Нукус',	0);
 
 DROP TABLE IF EXISTS `commissioners`;
 CREATE TABLE `commissioners` (
@@ -258,13 +261,14 @@ CREATE TABLE `vendors` (
   `is_active` tinyint NOT NULL,
   `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `temp_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `deleted` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`) VALUES
-(1,	'Поставщик',	4,	NULL,	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL),
-(2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	NULL,	1688481020,	NULL,	1,	NULL,	NULL),
-(3,	'Admin',	1,	NULL,	'admin@admin.admin',	NULL,	NULL,	NULL,	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL),
-(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	NULL,	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc');
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`, `deleted`) VALUES
+(1,	'Поставщик',	4,	'570540704',	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL,	0),
+(2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	NULL,	1688481020,	NULL,	1,	NULL,	NULL,	0),
+(3,	'Admin',	1,	'777777777',	'admin@admin.admin',	NULL,	NULL,	'{\"latitude\": 55.943706, \"longitude\": 36.043753}	',	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL,	0),
+(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	'{\"latitude\": 22.345737, \"longitude\": 15.488463}',	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc',	0);
 
--- 2023-07-12 07:27:59
+-- 2023-07-12 13:31:56

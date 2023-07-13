@@ -4,6 +4,7 @@
 
     use models\Vendor;
     use abstraction\BaseRepository;
+    use models\Coordinate; //Настя: добавила строки по координатам
     use utils\SqlHelper;
 
     class VendorRepository extends BaseRepository
@@ -11,7 +12,16 @@
         const TABLE_NAME = 'vendors';
         const CLASS_NAME = 'models\Vendor';
         
+        private CoordinateRepository $coordinateRepository; //Настя: добавила
+        
         const UPDATE_QUERY_HASH = 'UPDATE `%s` SET %s WHERE `hash_string`=:hash_string';
+
+        //Настя: добавила __construct для координат
+        public function __construct()
+        {
+            parent::__construct(); 
+            $this->coordinateRepository = new CoordinateRepository();
+        }
     
         public function getTableName() : string
         {
@@ -28,8 +38,15 @@
             $item = new Vendor();
             
             foreach(SqlHelper::filterParamsByNames($this->entityFields, $row) as $key => $value)
+            {
+                if ($key == 'coordinates') //Настя: добавила врутреннее условие для coordinates
+                {
+                    $item->$key = isset($value) ? $this->coordinateRepository->map(json_decode($value, true)) : new Coordinate();
+                    continue;
+                }
+            
                 $item->$key = $value;
-
+            }
             return $item;
         }
 
