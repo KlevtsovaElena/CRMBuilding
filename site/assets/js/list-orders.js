@@ -38,6 +38,7 @@ let offsetEl = containerPagination.getAttribute('offset');
 let changeOrderEl;
 let resetOrderEl;
 let saveOrderEl;
+let changeSelectEl;
 
 let prevButton;
 let nextButton;
@@ -306,7 +307,11 @@ function renderListOrders(orders) {
 
     info.innerText = "Всего " + totalOrdersCount + declinationWord(totalOrdersCount, [' запись', ' записи', ' записей']);
 
+    // здесь включаем прослушку элементов после отрисовки
+    // ДО отрисовки код не сработает, поэтому этот код внутри этой функции
     changeOrderEl = document.querySelectorAll('.list-orders_status');
+    changeSelectEl = document.querySelectorAll('.change-status');
+
 
     resetOrderEl = document.querySelectorAll('.reset-order');
     saveOrderEl = document.querySelectorAll('.save-order');
@@ -448,20 +453,15 @@ function showOrder(id) {
 }
 
 
+/* ---------- ИЗМЕНЕНИЕ статуса или архива---------- */
+// при нажатии на чекбокс, меняем value чекбокса
 archiveCheckEl.onclick = function(){
     if(archiveEl.checked) {
-        console.log("нажат");
         archiveEl.value = ""
-        console.log(archiveEl.value);
     } else {
-        console.log("не нажат");
         archiveEl.value = "archive=0";  
-        console.log(archiveEl.value);
-
     }
 }
-
-/* ---------- ИЗМЕНЕНИЕ статуса или архива---------- */
 
 // показать селекты
 function showChangeSelect() {
@@ -471,7 +471,12 @@ function showChangeSelect() {
     // общий контейнер селекта
     let changeStatus = rowOrder.querySelector('.change-status');
 
-    changeStatus.classList.remove('d-none');
+    // все остальные селекты скрыть
+    changeSelectEl.forEach(item => {
+        item.classList.add('d-none');
+    })
+
+    changeStatus.classList.toggle('d-none');
 
 }
 
