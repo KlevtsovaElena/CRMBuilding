@@ -52,7 +52,7 @@
 
 
     <!-- таблица заказа -->
-    <section class="orders" data-id= <?= $data['id'] ?> >
+    <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
             <thead id="new-order">
@@ -61,7 +61,7 @@
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <?= $date ?> </div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['vendor_location']['longitude']) ?> км</div> 
+                            <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км</div> 
                         </div> 
                     </th>
                     <th></th>
@@ -100,6 +100,8 @@
         </table>
     </section>
 
+    <!-- если эту страницу открывает НЕ администратор, то видны кнопки -->
+    <?php if(!isset($_GET['role']) || $_GET['role'] != 1) { ?>
     <!-- кнопки, на которые будет нажимать поставщик после просмотра заказа -->
     <section class="buttons">
 
@@ -131,7 +133,7 @@
         <?php } ?>
 
     </section>
-
+    <?php } ?>
 
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
