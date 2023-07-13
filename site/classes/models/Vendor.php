@@ -18,5 +18,6 @@
         public int $is_active;
         public ?string $password;
         public ?string $temp_password;
+        public int $deleted; //Настя: добавила для нового поля
     }
 ?>

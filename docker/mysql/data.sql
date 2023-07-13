@@ -42,8 +42,7 @@ INSERT INTO `categories` (`id`, `category_name`, `deleted`) VALUES
 (1,	'Гипсокартон',	0),
 (2,	'Штукатурка',	0),
 (3,	'Шпаклевка',	0),
-(4,	'Грунтовка',	0),
-(5,	'Новая',	NULL);
+(4,	'Грунтовка',	0);
 
 DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
@@ -267,9 +266,9 @@ CREATE TABLE `vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`, `deleted`) VALUES
-(1,	'Поставщик',	4,	NULL,	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL,	0),
+(1,	'Поставщик',	4,	'570540704',	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL,	0),
 (2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	NULL,	1688481020,	NULL,	1,	NULL,	NULL,	0),
-(3,	'Admin',	1,	NULL,	'admin@admin.admin',	NULL,	NULL,	NULL,	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL,	0),
-(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	NULL,	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc',	0);
+(3,	'Admin',	1,	'777777777',	'admin@admin.admin',	NULL,	NULL,	'{\"latitude\": 55.943706, \"longitude\": 36.043753}	',	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL,	0),
+(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	'{\"latitude\": 22.345737, \"longitude\": 15.488463}',	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc',	0);
 
 -- 2023-07-12 13:31:56
