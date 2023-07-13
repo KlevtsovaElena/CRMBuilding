@@ -78,8 +78,19 @@ function edit(id, section_name) {
             //переносим имеющееся  название внутрь инпута для редактирования
             input.value = editedValue;
 
-            //при изменении в инпуте
-            input.onchange = function() {
+            input.onclick = function() {
+
+                input.onblur = function() {
+                    //возвращаем обратно нередактируемую строку
+                    //убираем добавленный инпут
+                    nameElements[i].removeChild(input);
+                    //и возвращаем измененное значение в исходный нередактируемый элемент
+                    nameElements[i].innerText = editedValue;
+                }
+
+                //при изменении в инпуте
+                input.onchange = function() {
+
                 let changedValue = input.value;
                 let name = changedValue;
 
@@ -122,7 +133,10 @@ function edit(id, section_name) {
                 nameElements[i].removeChild(input);
                 //и возвращаем измененное значение в исходный нередактируемый элемент
                 nameElements[i].innerText = changedValue;
-            };
+        };
+            }
+
+            
            
         }
     }
@@ -138,11 +152,21 @@ function deleteOne(section_name, id) {
     // собираем ссылку для запроса
     link = 'http://localhost/api/'+ section_name + '.php';
 
-    // соберём json для передачи на сервер
-    obj = JSON.stringify({
-        'id': id,
-        'deleted': 1
-    });
+    if (section_name == 'admin-vendors') {
+        // соберём json для передачи на сервер
+        obj = JSON.stringify({
+            'id': id,
+            'deleted': 1,
+            'is_active': 0
+        });
+    } else {
+        // соберём json для передачи на сервер
+        obj = JSON.stringify({
+            'id': id,
+            'deleted': 1
+        });
+    }
+
     console.log(obj);
 
     //передаем на сервер в пост-запросе
@@ -151,10 +175,18 @@ function deleteOne(section_name, id) {
     //вынимаем информацию о номере текущей страницы
     let currentPage = document.getElementById('pages-info').getAttribute('data-current-page');
 
-    //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
-    history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&page=' + currentPage);
+    if (section_name == 'admin-vendors') {
+        //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
+        history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + currentPage);
 
-    document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value +  '&page=' + currentPage;
+        document.location.href = 'http://localhost/pages/admin-vendors.php?limit=' + limit.value + '&page=' + currentPage;
+    } else {
+        //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
+        history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&page=' + currentPage);
+
+        document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value +  '&page=' + currentPage;
+    }
+
 
 }
 
@@ -171,29 +203,43 @@ function apply(section_name) {
     if(searchQuery.trim()) {
         console.log(searchQuery);
 
-        let key = document.querySelector('.page-title').getAttribute('data-name');
+        //если мы на странице admin-vendors
+        if (section_name == 'admin-vendors') {
 
-        //вносим изменение в адресную строку страницы
-        history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
+            //вносим изменение в адресную строку страницы
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&search=name:' + searchQuery.trim());
 
-        document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
+            document.location.href = 'http://localhost/pages/admin-vendors.php?limit=' + limit.value + '&search=name:' +  searchQuery.trim();
+
+        } else {
+
+            let key = document.querySelector('.page-title').getAttribute('data-name');
+
+            //вносим изменение в адресную строку страницы
+            history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
+
+            document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
+        }
+
+        
         
     } else {
-        // соберём json для передачи на сервер
-        // let obj = JSON.stringify({
-        //     'limit': limit.value
-        // });
 
-        //let link = 'http://localhost/limit.php?limit=';
+    //если мы на странице admin-vendors
+    if (section_name == 'admin-vendors') {
 
-        //let result = sendRequestGET(link+limit.value);
-        //console.log(result);
+        //вносим изменение в адресную строку страницы
+        history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value);
 
-    //вносим изменение в адресную строку страницы
-    history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value);
+        document.location.href = 'http://localhost/pages/admin-vendors.php?limit=' + limit.value;
 
-    document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value;
+    } else {
 
+        //вносим изменение в адресную строку страницы
+        history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value);
+
+        document.location.href = 'http://localhost/pages/admin.php?section=' + section_name + '&limit=' + limit.value;
+    }
 }
 
         // let select = document.getElementById('limit');

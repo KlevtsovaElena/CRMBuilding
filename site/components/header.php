@@ -105,7 +105,7 @@
                     </a>
                 </li>
                 <li class="menu-left__item"   data-page-name = "/pages/admin.php?section=brands">
-                    <a href="./../pages/admin.php?section=vendors" class="menu-left__item-link">
+                    <a href="./../pages/admin-vendors.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>

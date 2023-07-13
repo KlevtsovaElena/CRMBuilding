@@ -224,50 +224,53 @@
                         $data = json_decode($dataJson, true);
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
                         $totalNumElements = 0; //для подсчета общего кол-ва записей
-                        for ($i = 0; $i < count($data); $i++) { 
-                            //проверка на то, чтобы выводилось не больше строк, чем есть в БД
-                            if(isset($data[$i]['id'])) { 
-                                $totalNumElements++; 
-                                //расфишровка статусов
-                                $status;
-                                if($data[$i]['status'] == 0) {
-                                    $status = 'Новый';
-                                }
-                                if($data[$i]['status'] == 1) {
-                                    $status = 'Просмотрен';
-                                }
-                                if($data[$i]['status'] == 2) {
-                                    $status = 'Подтвержден';
-                                }
-                                if($data[$i]['status'] == 3) {
-                                    $status = 'Отменен';
-                                }
-                                if($data[$i]['status'] == 4) {
-                                    $status = 'Завершен';
-                                }
-                                ?>
-                                <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                                <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                    <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
-                                    <td><?= $data[$i]['order_date'] ?></td>
-                                    <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                    <td>id</td>
-                                    <td><?= $data[$i]['customer_phone'] ?></td>
-                                    <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
-                                    <td class="list-orders_products">
-                                        <?php $totalPrice = 0;
-                                        for ($p = 0; $p < count($data[$i]['products']); $p++) { ?> 
-                                            <?= $data[$i]['products'][$p]['name'] ?> (<?= $data[$i]['products'][$p]['quantity'] ?>)<?php if($data[$i]['products'] > 1 && $p != (count($data[$i]['products']) - 1)) {?>, <?php } ?>
-                                            <!-- считаем общую стоимость по данному заказу -->
-                                            <?php $totalPrice += $data[$i]['products'][$p]['price'] * $data[$i]['products'][$p]['quantity'];
-                                        } ?>
-                                    </td>
-                                    <!-- выводим общую стоимость в нужном формате -->                                        
-                                    <td><?= number_format($totalPrice, 0, ',', ' '); ?> </td>
-                                    <td></td>
-                                </tr>
-                        <?php }
-                        } 
+                        if ($data) {
+                            for ($i = 0; $i < count($data); $i++) { 
+                                //проверка на то, чтобы выводилось не больше строк, чем есть в БД
+                                if(isset($data[$i]['id'])) { 
+                                    $totalNumElements++; 
+                                    //расфишровка статусов
+                                    $status;
+                                    if($data[$i]['status'] == 0) {
+                                        $status = 'Новый';
+                                    }
+                                    if($data[$i]['status'] == 1) {
+                                        $status = 'Просмотрен';
+                                    }
+                                    if($data[$i]['status'] == 2) {
+                                        $status = 'Подтвержден';
+                                    }
+                                    if($data[$i]['status'] == 3) {
+                                        $status = 'Отменен';
+                                    }
+                                    if($data[$i]['status'] == 4) {
+                                        $status = 'Завершен';
+                                    }
+                                    ?>
+                                    <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
+                                    <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
+                                        <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
+                                        <td><?= $data[$i]['order_date'] ?></td>
+                                        <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
+                                        <td>id</td>
+                                        <td><?= $data[$i]['customer_phone'] ?></td>
+                                        <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
+                                        <td class="list-orders_products">
+                                            <?php $totalPrice = 0;
+                                            for ($p = 0; $p < count($data[$i]['products']); $p++) { ?> 
+                                                <?= $data[$i]['products'][$p]['name'] ?> (<?= $data[$i]['products'][$p]['quantity'] ?>)<?php if($data[$i]['products'] > 1 && $p != (count($data[$i]['products']) - 1)) {?>, <?php } ?>
+                                                <!-- считаем общую стоимость по данному заказу -->
+                                                <?php $totalPrice += $data[$i]['products'][$p]['price'] * $data[$i]['products'][$p]['quantity'];
+                                            } ?>
+                                        </td>
+                                        <!-- выводим общую стоимость в нужном формате -->                                        
+                                        <td><?= number_format($totalPrice, 0, ',', ' '); ?> </td>
+                                        <td></td>
+                                    </tr>
+                            <?php }
+                            } 
+                        }
+                        
                     } ?>
 
                 </tr>

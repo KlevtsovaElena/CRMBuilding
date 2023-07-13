@@ -67,7 +67,7 @@
     <?php }
         //соберём данные для отображения в форме 
         $data = json_decode($dataJson, true); 
-        print_r($data);
+        //print_r($data);
     ?>
 
         <!-- далее отрисовываем всю страницу Категорий/Брендов/Городов или Поставщиков, все отличающиеся элементы заданы через переменные -->
@@ -159,8 +159,8 @@
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                     <td><?= ($num++) + $offset; ?></td>
                                     <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
-                                    <td onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">X</td>
-                                    <td><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
+                                    <td class="edit" onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                    <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                 </tr>
                             <?php }
                         } 
@@ -179,8 +179,8 @@
                                     <!-- <td><?= $i + 1; ?></td> -->
                                     <td><?= ($num++) + $offset; ?></td>
                                     <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
-                                    <td onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">X</td>
-                                    <td><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
+                                    <td class="edit"  onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                    <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                 </tr>
                             <?php }
                             } 
@@ -193,19 +193,22 @@
                         $data = json_decode($dataJson, true);
                         //отрисовываем список категорий или брендов, которые совпадают с поисковым запросом
                         $totalNumElements = 0;
-                        $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                        for ($i = 0; $i < count($data); $i++) { 
-                            if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
-                                $totalNumElements++; ?>
-                                <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                                <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                    <td><?= ($num++) + $offset; ?></td>
-                                    <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
-                                    <td onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">X</td>
-                                    <td><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
-                                </tr>
-                        <?php }
-                        } 
+                        if ($data) {
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                            for ($i = 0; $i < count($data); $i++) { 
+                                if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
+                                    $totalNumElements++; ?>
+                                    <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
+                                    <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
+                                        <td><?= ($num++) + $offset; ?></td>
+                                        <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
+                                        <td class="edit"  onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                        <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
+                                    </tr>
+                            <?php }
+                            } 
+                        }
+                        
                     } ?>
                 
                 </tbody>
