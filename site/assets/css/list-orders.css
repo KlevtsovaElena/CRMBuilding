@@ -146,4 +146,8 @@ th[data-id="status"] {
     cursor: pointer;
 }
 
-
+@media(max-width: 1024px) {
+    .filters-container-flex {
+        flex-wrap: wrap;
+    }
+}
