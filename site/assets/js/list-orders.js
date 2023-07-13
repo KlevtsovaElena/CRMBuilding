@@ -294,7 +294,7 @@ function renderListOrders(orders) {
                                                         .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
-                                                        .replace('${customer_id}', "id")
+                                                        .replace('${customer_id}', orders['orders'][i]['customer_id'])
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
                                                         .replace('${complete_date}', '')
                                                         .replace('${archive}', orders['orders'][i]['archive'])
