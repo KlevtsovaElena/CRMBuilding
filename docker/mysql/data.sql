@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `brand_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -48,7 +48,7 @@ DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -103,7 +103,7 @@ CREATE TABLE `order_vendors` (
   `vendor_id` int unsigned NOT NULL,
   `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `status` tinyint unsigned NOT NULL,
-  `archive` tinyint unsigned NOT NULL,
+  `archive` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -177,7 +177,7 @@ CREATE TABLE `products` (
   `price` int unsigned NOT NULL,
   `max_price` int unsigned NOT NULL,
   `unit_id` tinyint unsigned NOT NULL,
-  `deleted` tinyint unsigned NOT NULL,
+  `deleted` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -259,16 +259,15 @@ CREATE TABLE `vendors` (
   `date_reg` bigint NOT NULL,
   `hash_string` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL,
-  `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `temp_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`, `deleted`) VALUES
-(1,	'Поставщик',	4,	'570540704',	'ffff@gmail.hjhjh',	NULL,	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	NULL,	1688481000,	NULL,	1,	NULL,	NULL,	0),
-(2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	NULL,	1688481020,	NULL,	1,	NULL,	NULL,	0),
-(3,	'Admin',	1,	'777777777',	'admin@admin.admin',	NULL,	NULL,	'{\"latitude\": 55.943706, \"longitude\": 36.043753}	',	1,	'Администратор',	1688481020,	NULL,	1,	NULL,	NULL,	0),
-(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	NULL,	NULL,	'{\"latitude\": 22.345737, \"longitude\": 15.488463}',	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	NULL,	'crncN.50uAJwc',	0);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `deleted`) VALUES
+(1,	'Поставщик',	4,	'570540704',	'ffff@gmail.hjhjh',	'',	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	'',	1688481000,	'',	1,	'vendor',	0),
+(2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	'',	1688481020,	'',	1,	'vendor',	0),
+(3,	'Admin',	1,	'777777777',	'admin@admin.admin',	'',	NULL,	'{\"latitude\": 55.943706, \"longitude\": 36.043753}	',	1,	'Администратор',	1688481020,	'',	1,	'admin',	0),
+(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	'',	NULL,	'{\"latitude\": 22.345737, \"longitude\": 15.488463}',	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	0);
 
--- 2023-07-12 13:31:56
+-- 2023-07-14 18:23:35

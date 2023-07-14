@@ -16,8 +16,7 @@
         public int $date_reg;
         public ?string $hash_string;
         public int $is_active;
-        public ?string $password;
-        public ?string $temp_password;
+        public string $password;
         public int $deleted; //Настя: добавила для нового поля
     }
 ?>
