@@ -43,9 +43,7 @@
 }
 
 .form-filters input[type="search"] {
-    width: 220px;
-    margin-top: 20px;
-    margin-right: 10px;
+    width: 180px;
 }
 
 #list-products th:after {
@@ -114,4 +112,10 @@ td:nth-last-child(1) {
     display: inline-block;
     vertical-align: middle;
     cursor: pointer;
+}
+
+@media(max-width: 1024px) {
+    .filters-container-flex {
+        flex-wrap: wrap;
+    }
 }

@@ -43,7 +43,8 @@
                 <div class="form-elements-container filters-container-flex">
 
                     <!-- выбор категории -->
-                    <label>Категория
+                    <div class="d-iblock">
+                        <div>Категория</div>
                         <select id="category_id" name="category_id" value="">
                             
                             <option value="">Все</option>
@@ -52,10 +53,11 @@
                             <?php }; ?>
 
                         </select>
-                    </label>
+                    </div>
 
                     <!-- выбор бренда -->
-                    <label>Бренд
+                    <div class="d-iblock">
+                        <div>Бренд</div>
                         <select id="brand_id" name="brand_id" value="">
 
                             <option value="">Все</option>
@@ -64,10 +66,11 @@
                             <?php }; ?>
 
                         </select>
-                    </label>
+                    </div>
 
                     <!-- выбор кол-во записей на листе -->
-                    <div class="d-iblock">Показывать по
+                    <div class="d-iblock">
+                        <div>Показывать по</div>
                         <select id="limit" name="limit" value="" required>
                             
                             <option value="10">10</option>
@@ -78,11 +81,11 @@
                         </select>
                     </div>
                     
-                    <br>
-
                     <!-- поле поиска -->
-                    <input type="search" id="search" name="search" value="" placeholder="Поиск">
-                    
+                    <div class="d-iblock">
+                        <div>Поиск</div>
+                        <input type="search" id="search" name="search" value="" placeholder="Поиск">
+                    </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
                     
                 </div>
@@ -157,7 +160,8 @@ if (count($_GET) !== 0) {
         <div class="form-elements-container filters-container-flex">
             
             <!-- выбор категории -->
-            <label>Категория
+            <div class="d-iblock">
+                <div>Категория</div>
                 <select id="category_id" name="category_id" value="">
                     
                     <option value="">Все</option>
@@ -179,10 +183,11 @@ if (count($_GET) !== 0) {
                     }; ?>
 
                 </select>
-            </label>
+            </div>
 
             <!-- выбор бренда -->
-            <label>Бренд
+            <div class="d-iblock">
+                <div>Бренд</div>
                 <select id="brand_id" name="brand_id" value="">
 
                     <option value="">Все</option>
@@ -204,10 +209,11 @@ if (count($_GET) !== 0) {
                     }; ?>
 
                 </select>
-            </label>
+            </div>
 
             <!-- выбор кол-во записей на листе -->
-            <div class="d-iblock">Показывать по
+            <div class="d-iblock">
+                <div>Показывать по</div>
                 <select id="limit" name="limit" value="" required>
                         <?php
                         if (!isset($_GET['limit'])) {
@@ -228,11 +234,12 @@ if (count($_GET) !== 0) {
                         ?> 
                 </select>
             </div>
-            
-            <br>
 
             <!-- поле поиска -->
-            <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
+            <div class="d-iblock">
+                <div>Поиск</div>
+                <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
+            </div>
             
             <button class="btn btn-ok d-iblock">Применить</button>
             
@@ -280,7 +287,7 @@ if (count($_GET) !== 0) {
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
             <td>${brand_id}</td>
-            <td>${quantity_available} шт</td>
+            <td>${quantity_available} ${unit}</td>
             <td><div class="change-price" title="Изменить цены"  data-price-num="${price}">${price}</div>
                 <input type="text" name="price" class="change-price-el change-price-input d-none" placeholder="${price}" value="" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
             </td>

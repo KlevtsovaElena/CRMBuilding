@@ -473,7 +473,9 @@ function showChangeSelect() {
 
     // все остальные селекты скрыть
     changeSelectEl.forEach(item => {
-        item.classList.add('d-none');
+        if (item !== changeStatus) {
+            item.classList.add('d-none');
+        }
     })
 
     changeStatus.classList.toggle('d-none');

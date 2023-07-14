@@ -12,13 +12,14 @@ const headTableProducts = document.getElementById('list-products').querySelector
 
 // определим основные переменные
 let currentPage = 1;
-let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id + '&deleted=0';
+
+let url = 'http://localhost/api/products/products-with-count.php?deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
+let vendor_idEl = document.getElementById('vendor_id');
 let offsetEl = containerPagination.getAttribute('offset');
 
 let prevButton;
@@ -33,6 +34,7 @@ let changeInputsEl;
 
 let brands = {};
 let categories = {};
+let vendors = {};
 let units = {};
 
 let orderby = "";
@@ -51,20 +53,26 @@ let totalProductsCount;
 let totalProductsJson;
 
 let garbage;
+console.log(vendor_idEl);
 
-// закэшируем значения брендов и категорий
+// закэшируем значения брендов и категорий и поставщиков
 brand_idEl.querySelectorAll('option').forEach(item => {
     brands[item.value] = item.innerText;
 })
 category_idEl.querySelectorAll('option').forEach(item => {
     categories[item.value] = item.innerText;
 })
+vendor_idEl.querySelectorAll('option').forEach(item => {
+    vendors[item.value] = item.innerText;
+})
+
 // закэшируем значения единиц измерения (временно, пока нет апишки)
 let unitsJson = sendRequestGET('http://localhost/api/units.php');
 let unitsData = JSON.parse(unitsJson);
 unitsData.forEach(item => {
    units[item['id']] = item['name_short'];
 })
+
 // заполним страницу данными
 startRenderPage();
 
@@ -119,7 +127,7 @@ function getFilters() {
     // проверим значение бренда, категории и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
     // и добавляем в параметр строки запроса 
-    [brand_idEl, category_idEl, searchEl].forEach(item => {
+    [brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
                 params += "&search=name:" + item.value + ";description:" + item.value;
@@ -216,6 +224,7 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
+                                                        .replace('${vendor_id}',  vendors[totalProducts['products'][i]['vendor_id']])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
                                                         .replace('${brand_id}', brands[totalProducts['products'][i]['brand_id']])
@@ -419,10 +428,10 @@ function editProduct(id) {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
+    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
+    window.location.href = "http://localhost/pages/admin-edit-product.php?deleted=0&id=" + id + params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
@@ -430,10 +439,10 @@ function addProduct() {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
+    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
+    window.location.href = "http://localhost/pages/admin-add-product.php?deleted=0" + params; 
 }
 
 

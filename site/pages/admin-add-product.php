@@ -25,16 +25,28 @@
 
         $unitsJson = file_get_contents("http://nginx/api/units.php");
         $units = json_decode($unitsJson, true);
+
+        $vendorsJson = file_get_contents("http://nginx/api/vendors.php?role=2");
+        $vendors = json_decode($vendorsJson, true);
     ?>
                         
     <!-- Форма добавления товаров -->
-    <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">
-        
+    <form id="form-add-product" action="#" method="post" enctype="multipart/form-data">        
+       
         <div class="form-add-product__elements form-elements-container">
-            <!-- здесь храним id поставщика -->
-            <div class="form-add-product__elements-item">
-                <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
-                <div class="error-info d-none"></div>
+
+             <!-- наименование -->
+             <div class="form-add-product__elements-item">
+                <p>Поставщик</p>
+                <select id="vendor_id" name="vendor_id" value="" required>
+                    <option value="" selected hidden>Выберите поставщика...</option>
+
+                    <?php foreach($vendors as $vendor) { ?>
+                        <option value="<?= $vendor['id']; ?>"><?= $vendor['name']; ?></option>
+                    <?php }; ?>
+
+                </select>
+                <div class="error-info d-none"></div> 
             </div>
 
              <!-- наименование -->
