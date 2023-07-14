@@ -308,5 +308,13 @@ function applyInOrders() {
 
 }
 
+/* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
+function editVendor(id) {
 
+    let getParam = window.location.search;
+
+    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+    window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam; 
+    
+}
 

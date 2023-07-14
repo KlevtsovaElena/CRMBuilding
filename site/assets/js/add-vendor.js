@@ -64,7 +64,7 @@ function addVendor() {
                             <div class="vendor-info-text d-flex">
                                 <div class="copy-text">
                                     <p><i>Логин: ${response['login']} &nbsp&nbsp</i></p>
-                                    <p><i>Временный пароль: ${response['tempPass']}</i></p> 
+                                    <p><i>Пароль: ${response['pass']}</i></p> 
                                 </div>
                                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>                             
                             </div>`

@@ -258,7 +258,7 @@ if (count($_GET) !== 0) {
                             <th class="ta-center" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
                             <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
                             <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                            <th class="ta-center" data-id="customer_id" data-sort="<?php if ($sortBy == 'customer_id')  {echo $mark; } ?>">Клиент ID</th>
+                            <th class="ta-center" data-id="customer_id" data-sort="<?php if ($sortBy == 'customer_id')  {echo $mark; } ?>">ID</th>
                             <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
                             <th class="ta-center" data-id="products">Товары</th>
                             <th class="ta-center" data-id="total_price">Сумма</th>

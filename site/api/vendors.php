@@ -51,8 +51,8 @@
             // уникальный hash
             $post['hash_string'] = crypt($post['email'] . time(), 'hashbot');
 
-            // временный пароль для входа в crm
-            $post['temp_password'] = crypt($post['email'] . time()+10, 'crmpass');
+            // пароль для входа в crm
+            $post['password'] = crypt($post['email'] . time()+10, 'crmpass');
 
             // добавляем запись в базу
             $this->vendorRepository->add($post);
@@ -65,7 +65,7 @@
             $response = [
                 'linkBot' => $linkBot,
                 'login' => $post['email'],
-                'tempPass' => $post['temp_password'],
+                'pass' => $post['password'],
             ];
             echo json_encode($response, JSON_UNESCAPED_UNICODE);
         }
