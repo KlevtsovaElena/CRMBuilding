@@ -431,7 +431,7 @@ function editProduct(id) {
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-edit-product.php?deleted=0&id=" + id + params ; 
+    window.location.href = "http://localhost/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
