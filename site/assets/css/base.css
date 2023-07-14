@@ -176,6 +176,10 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 0 0 0.8px var(--shadow-form-elem-focus);
 }
 
+.ta-center {
+    text-align: center;
+}
+
 .d-block {
     display: block;
 }

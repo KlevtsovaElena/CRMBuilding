@@ -26,9 +26,11 @@
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php");
+        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php");
         $data = json_decode($dataJson, true); 
         //print_r($data);
+        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+        $totalEntries = $data['count'];
 
 
         if(isset($_GET['orderby'])) {
@@ -81,7 +83,10 @@
 
         </section>
 
-        <?php 
+        <?php
+        //теперь сокращаем выдачу данных в массиве до orders
+        $data = $data['orders'];
+        //print_r($data);
         //проверяем, выбран ли лимит на кол-во отображаемых элементов
         if (isset($_GET['limit'])) {
             //если выбрано отображать все
@@ -96,7 +101,7 @@
         //считаем и записываем в переменные общее кол-во страниц и оффсет
         $totalPages = ceil(count($data) / $limit);
         $offset = ($currentPage - 1) * $limit;
-        $totalNumElements = count($data); ?>
+    ?>
 
         <!-- таблица заказов -->
         <section class="orders">
@@ -105,14 +110,14 @@
                 <thead>
                     <tr role="row">
 
-                        <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
-                        <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
-                        <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                        <th data-id="customer_id">Клиент ID</th>
-                        <th data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
-                        <th data-id="products">Товары</th>
-                        <th data-id="total_price">Сумма</th>
-                        <th data-id="complete_date">Дата завершения</th>
+                        <th class="ta-center" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
+                        <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
+                        <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
+                        <th class="ta-center" data-id="customer_id">ID</th>
+                        <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
+                        <th class="ta-center" data-id="products">Товары</th>
+                        <th class="ta-center" data-id="total_price">Сумма</th>
+                        <th class="ta-center" data-id="complete_date">Дата завершения</th>
 
                     </tr>
                 </thead>
@@ -149,7 +154,7 @@
                                 <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <td><?= $data[$i]['order_date'] ?></td>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                <td>id</td>
+                                <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
                                 <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                 <td class="list-orders_products">
@@ -198,7 +203,7 @@
                                 <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                     <td><?= $data[$i]['order_date'] ?></td>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                    <td>id</td>
+                                    <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
                                     <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                     <td class="list-orders_products">
@@ -223,12 +228,10 @@
                         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?search=" . $_GET['search']);
                         $data = json_decode($dataJson, true);
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
-                        $totalNumElements = 0; //для подсчета общего кол-ва записей
                         if ($data) {
                             for ($i = 0; $i < count($data); $i++) { 
                                 //проверка на то, чтобы выводилось не больше строк, чем есть в БД
                                 if(isset($data[$i]['id'])) { 
-                                    $totalNumElements++; 
                                     //расфишровка статусов
                                     $status;
                                     if($data[$i]['status'] == 0) {
@@ -252,7 +255,7 @@
                                         <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                         <td><?= $data[$i]['order_date'] ?></td>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                        <td>id</td>
+                                        <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>
                                         <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                         <td class="list-orders_products">
@@ -279,7 +282,7 @@
         </table>
 
         <!-- внизу таблицы выдаем общее количество записей -->
-        <div class="info-table">Всего записей: <?= $totalNumElements ?></div>
+        <div class="info-table">Всего записей: <?= $totalEntries ?></div>
     </section>
 
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
