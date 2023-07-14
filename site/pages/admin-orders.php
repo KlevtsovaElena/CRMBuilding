@@ -29,8 +29,11 @@
         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php");
         $data = json_decode($dataJson, true); 
         //print_r($data);
+
         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
         $totalEntries = $data['count'];
+
+        
 
 
         if(isset($_GET['orderby'])) {
@@ -101,7 +104,7 @@
         //считаем и записываем в переменные общее кол-во страниц и оффсет
         $totalPages = ceil(count($data) / $limit);
         $offset = ($currentPage - 1) * $limit;
-    ?>
+?>
 
         <!-- таблица заказов -->
         <section class="orders">
@@ -152,7 +155,8 @@
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
-                                <td><?= $data[$i]['order_date'] ?></td>
+                                <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
+                                <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                 <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
@@ -200,8 +204,9 @@
                                     ?>
                                 <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
-                                    <td><?= $data[$i]['order_date'] ?></td>
+                                    <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
+                                    <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
+                                    <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                     <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
@@ -253,7 +258,8 @@
                                     <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                                     <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                         <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
-                                        <td><?= $data[$i]['order_date'] ?></td>
+                                        <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
+                                        <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                         <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>
