@@ -16,7 +16,7 @@
 
 <p class="page-title">СПИСОК ТОВАРОВ</p>
 
-<a href="javascript: addProductAdmin()" class="btn btn-ok d-iblock">+ Добавить товар</a>
+<a href="javascript: addProduct()" class="btn btn-ok d-iblock">+ Добавить товар</a>
 
 <!-- соберём данные для отображения в форме -->
 

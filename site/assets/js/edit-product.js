@@ -22,7 +22,6 @@ function editProduct() {
     if (!new_photo.value) {
         obj = JSON.stringify({
             'id': productId,
-            'vendor_id': vendor_id.value,
             'name':  nameProduct.value,
             'brand_id': brand_id.value,
             'category_id': category_id.value,
@@ -37,7 +36,6 @@ function editProduct() {
     } else {
         obj = JSON.stringify({
             'id': productId,
-            'vendor_id': vendor_id.value,
             'name':  nameProduct.value,
             'brand_id': brand_id.value,
             'category_id': category_id.value,
@@ -210,5 +208,9 @@ function deleteProductFromEditForm(id) {
     let params = paramsArr.join('&');
 
     // переход обратно на странницу списка товаров с прежними параметрами
-    window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
+    if (window.location.href.includes('vendor-edit-product')) {
+        window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
+    } else if (window.location.href.includes('admin-edit-product')) {
+        window.location.href = 'http://localhost/pages/admin-list-products.php?' + params;
+    }
 }

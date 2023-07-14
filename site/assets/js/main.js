@@ -53,6 +53,13 @@ function declinationWord(n, word) {
 
 /* ---------- ВЫДЕЛЕНИЕ АКТИВНОГО ПУНКТА МЕНЮ---------- */
 let pageName = window.location.pathname + window.location.search;
+
+if(pageName.includes('vendor-add-product') || pageName.includes('vendor-edit-product')) {
+    pageName = "/pages/vendor-list-products.php";
+} else if(pageName.includes('admin-add-product') || pageName.includes('admin-edit-product')) {
+    pageName = "/pages/admin-list-products.php";
+}
+
 let itemNav = document.querySelectorAll('[data-page-name]');
 
 itemNav.forEach( item => {

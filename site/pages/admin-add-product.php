@@ -146,7 +146,7 @@
 
         <div>
             <button class="btn btn-ok" onclick="addProduct()">Сохранить</button>
-            <a href="vendor-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
+            <a href="admin-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
         </div>
     </form>
 
