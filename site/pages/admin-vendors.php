@@ -210,7 +210,13 @@
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
                                 <td><?= $data[$i]['name'] ?></td>
-                                <td><?= $data[$i]['city_id'] ?></td>
+                                <?php
+                                //достаем название города через 2 бд и цикл 
+                                for ($c = 0; $c < count($cities); $c++) {
+                                    if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
+                                    <td><?= $cities[$c]['name'] ?></td>
+                                <?php } 
+                                }?>
                                 <td><?= $data[$i]['tg_id'] ?></td>
                                 <td><?= $data[$i]['tg_username'] ?></td>
                                 <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
@@ -250,7 +256,13 @@
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                     <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
                                     <td><?= $data[$i]['name'] ?></td>
-                                    <td><?= $data[$i]['city_id'] ?></td>
+                                    <?php 
+                                    //достаем название города через 2 бд и цикл
+                                    for ($c = 0; $c < count($cities); $c++) {
+                                        if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
+                                        <td><?= $cities[$c]['name'] ?></td>
+                                    <?php } 
+                                    }?>
                                     <td><?= $data[$i]['tg_id'] ?></td>
                                     <td><?= $data[$i]['tg_username'] ?></td>
                                     <!-- в отдельном цикле отрисовываем координаты поставщика  (пока что с проверкой на их наличие) -->
@@ -296,7 +308,13 @@
                                     <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                         <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
                                         <td><?= $data[$i]['name'] ?></td>
-                                        <td><?= $data[$i]['city_id'] ?></td>
+                                        <?php
+                                        //достаем название города через 2 бд и цикл 
+                                        for ($c = 0; $c < count($cities); $c++) {
+                                            if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
+                                            <td><?= $cities[$c]['name'] ?></td>
+                                        <?php } 
+                                        }?>
                                         <td><?= $data[$i]['tg_id'] ?></td>
                                         <td><?= $data[$i]['tg_username'] ?></td>
                                         <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
