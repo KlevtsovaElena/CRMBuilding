@@ -20,6 +20,17 @@ function sendRequestPOST(url, params) {
 
 }
 
+//функция для отправки запросов POST
+function sendRequestFormUrlPOST(url, params){
+
+    let requestObj = new XMLHttpRequest();
+    requestObj.open('POST', url, false);
+    requestObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    requestObj.send(params);
+    return requestObj.responseText;
+
+}
+
 //функция для отправки запросов DELETE
 function sendRequestDELETE(url) {
 
