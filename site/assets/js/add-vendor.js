@@ -1,4 +1,5 @@
 console.log('подключили add-vendor.js');
+
 // определим основные переменные
 const formAddVendor = document.querySelector('.form-add-vendor');
 const vendorInfo = document.querySelector('.vendor-info');
@@ -111,10 +112,10 @@ function validationAddVendor() {
 
 }
 
-function addVendorToggle() {
-    vendorInfo.innerHTML = "";
-    document.querySelector('.add-vendor').classList.toggle('d-none');
-}
+// function addVendorToggle() {
+//     vendorInfo.innerHTML = "";
+//     document.querySelector('.add-vendor').classList.toggle('d-none');
+// }
 
 function emailValidation(emailValue) {
     const EMAIL_REGEXP = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu;
@@ -148,4 +149,81 @@ function copyText() {
 
     }, 1500);
 
+}
+
+
+
+console.log("подключили edit-vendor.js");
+
+
+function editVendor(id) {
+    //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
+    event.preventDefault(); 
+
+    // очистим контенеры для вывода информации
+    vendorInfo.innerHTML = "";
+
+    hasError = validationAddVendor();
+
+    // если были ошибки, то выходим
+    console.log(hasError);
+    if (hasError) {
+        return;
+    }
+
+    // соберём json для передачи на сервер
+    let obj = JSON.stringify({
+        'id': id,
+        'name': nameVendor.value.trim(),
+        'city_id': cityId.value,
+        'comment': comment.value.trim(),
+        'phone': phone.value,
+        'email': email.value.trim(),
+        'is_active': is_active.value
+    });
+
+    // передаём данные на сервер
+    sendRequestPOST('http://localhost/api/vendors.php', obj);
+
+    // перезагрузим страницу
+    window.location.href = window.location.href;
+}
+
+
+
+function deleteVendorFromEditForm(id) {
+    
+    // запрашиваем подтверждение удаления
+    let isDelete = false;
+
+    isDelete = window.confirm('Вы действительно хотите удалить этого поставщика?');
+
+    if(!isDelete) {
+        return;
+    }
+
+
+    // соберём json
+    let obj = JSON.stringify({
+        'id': id,
+        'deleted':  1
+    });
+
+    // делаем запрос на удаление товара по id
+    sendRequestPOST('http://localhost/api/vendors.php', obj);
+
+
+    // делаем запрос на удаление товара по id
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+
+    alert("Поставщик удалён");
+
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    // переход обратно на странницу списка поставщиков с прежними параметрами
+    window.location.href = 'http://localhost/pages/admin-vendors.php?' + params;
+    
 }

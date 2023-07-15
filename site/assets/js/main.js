@@ -58,8 +58,9 @@ if(pageName.includes('vendor-add-product') || pageName.includes('vendor-edit-pro
     pageName = "/pages/vendor-list-products.php";
 } else if(pageName.includes('admin-add-product') || pageName.includes('admin-edit-product')) {
     pageName = "/pages/admin-list-products.php";
+} else if(pageName.includes('admin-add-vendor') || pageName.includes('admin-edit-vendor')) {
+    pageName = "/pages/admin-vendors.php";
 }
-
 let itemNav = document.querySelectorAll('[data-page-name]');
 
 itemNav.forEach( item => {
