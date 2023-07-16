@@ -38,6 +38,7 @@ function addVendor() {
         'phone': phone.value,
         'email': email.value.trim(),
         'is_active': is_active.value,
+        'coordinates': '{}',
         'role': 2 // соответствует роли поставщика
     });
 

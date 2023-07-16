@@ -43,11 +43,7 @@
                         'phone' => $vendor[0]->phone,
                         'email' => $vendor[0]->email,
                         'role' => $vendor[0]->role,
-                        'coordinates' => [
-                            'latitude' => $vendor[0]->coordinates->latitude,
-                            'longitude' => $vendor[0]->coordinates->longitude,
-                        ],
-                        'role' => $vendor[0]->role
+                        'coordinates' => $vendor[0]->coordinates
                     ],
                 ];
                 echo json_encode($response,  JSON_UNESCAPED_UNICODE);
