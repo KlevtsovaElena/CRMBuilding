@@ -17,6 +17,7 @@
         public ?string $hash_string;
         public int $is_active;
         public string $password;
+        public ?string $token;
         public int $deleted; //Настя: добавила для нового поля
     }
 ?>

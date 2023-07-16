@@ -48,11 +48,15 @@
             // дата регистрации
             $post['date_reg'] = time();
 
+            $timeToken = time();
+            $timeStr = (string)$timeToken;
+            $timeStr = base_convert($timeStr, 10, 16);
+
             // уникальный hash
-            $post['hash_string'] = crypt($post['email'] . time(), 'hashbot');
+            $post['hash_string'] = crypt($timeStr . $post['email'], 'hashbot');
 
             // пароль для входа в crm
-            $post['password'] = crypt($post['email'] . time()+10, 'crmpass');
+            $post['password'] = crypt($timeStr . $post['email'] . time()+10, 'crmpass');
 
             // добавляем запись в базу
             $this->vendorRepository->add($post);

@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `category_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT NULL,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -103,7 +103,7 @@ CREATE TABLE `order_vendors` (
   `vendor_id` int unsigned NOT NULL,
   `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `status` tinyint unsigned NOT NULL,
-  `archive` tinyint unsigned NOT NULL,
+  `archive` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -181,7 +181,7 @@ CREATE TABLE `products` (
   `price` int unsigned NOT NULL,
   `max_price` int unsigned NOT NULL,
   `unit_id` tinyint unsigned NOT NULL,
-  `deleted` tinyint unsigned NOT NULL,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -264,16 +264,16 @@ CREATE TABLE `vendors` (
   `hash_string` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL,
   `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `temp_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `token` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`, `deleted`) VALUES
-(5,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	NULL,	NULL,	NULL,	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	NULL,	0),
-(6,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	NULL,	0),
-(7,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	NULL,	NULL,	NULL,	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	NULL,	0),
-(8,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	NULL,	0),
-(9,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	NULL,	0);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `token`, `deleted`) VALUES
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'',	NULL,	'{}',	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	'',	0),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	'',	NULL,	'{}',	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	'',	0),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'',	NULL,	'{}',	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	'',	0),
+(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	'',	NULL,	'{}',	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	'',	0),
+(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	'',	NULL,	'{}',	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	'',	0);
 
--- 2023-07-16 11:54:13
+-- 2023-07-16 17:03:58

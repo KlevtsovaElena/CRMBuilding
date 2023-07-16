@@ -1,3 +1,11 @@
+<?php require('../handler/check-profile.php'); 
+if($role !== 2) {
+    setcookie('profile', '', -1, '/');
+    header('Location: http://localhost/pages/login.php');
+    exit(0);
+};
+?>
+
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
