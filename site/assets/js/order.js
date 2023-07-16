@@ -23,6 +23,19 @@ if (status == 0) {
     
         //передаем параметры на сервер в пост-запросе
         sendRequestPOST(link, obj);
+
+        //меняем на фронте цифру на счетчике 
+        let counter = document.getElementById('counter');
+
+        //достаем текущее значение
+        let currentNum = counter.innerHTML;
+        console.log(currentNum);
+
+        //отнимаем единицу
+        let newNum = parseInt(currentNum) - 1;
+        console.log(newNum);
+        //кладем в счетчик новое значение
+        counter.innerHTML = newNum;
     
         //console.log('статус заказа  с id ' + id + ' изменен на ' + 1);
     
