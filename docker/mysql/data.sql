@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `brand_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `category_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `deleted` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -48,7 +48,7 @@ DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -94,7 +94,7 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`) VALUES
 (5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch'),
-(19,	'Лол',	'',	'79167625303',	12,	892205925,	'rodionaka');
+(19,	'Лол',	'',	'+79167625303',	1,	892205925,	'rodionaka');
 
 DROP TABLE IF EXISTS `order_vendors`;
 CREATE TABLE `order_vendors` (
@@ -103,7 +103,7 @@ CREATE TABLE `order_vendors` (
   `vendor_id` int unsigned NOT NULL,
   `products` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `status` tinyint unsigned NOT NULL,
-  `archive` tinyint unsigned NOT NULL DEFAULT 0,
+  `archive` tinyint unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -125,7 +125,9 @@ INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`
 (15,	134,	1,	'{\"30\":11,\"15\":21,\"5\":31}',	0,	0),
 (16,	134,	3,	'{\"10\":11,\"15\":1,\"5\":31}',	1,	0),
 (17,	135,	1,	'{\"20\":11,\"20\":21,\"5\":31}',	0,	0),
-(18,	136,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	4,	0);
+(18,	136,	1,	'{\"10\":11,\"15\":1,\"5\":31}',	4,	0),
+(19,	137,	1,	'{\"43\":1,\"5\":10,\"6\":21,\"7\":1}',	0,	0),
+(20,	138,	1,	'{\"43\":1,\"5\":10,\"6\":42,\"7\":33}',	0,	0);
 
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
@@ -150,7 +152,9 @@ INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `products`, `location`)
 (133,	19,	1688314140,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
 (134,	19,	1688314200,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
 (135,	19,	1688314260,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
-(136,	19,	1688314320,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}');
+(136,	19,	1688314320,	'',	'{\"latitude\": 55.657087, \"longitude\": 37.569581}'),
+(137,	19,	1689341846,	'{\"43\":1,\"5\":10,\"6\":21,\"7\":1}',	'{\"latitude\":0,\"longitude\":0}'),
+(138,	19,	1689376004,	'{\"43\":1,\"5\":10,\"6\":42,\"7\":33}',	'{\"latitude\":0,\"longitude\":0}');
 
 DROP TABLE IF EXISTS `price_changes`;
 CREATE TABLE `price_changes` (
@@ -177,7 +181,7 @@ CREATE TABLE `products` (
   `price` int unsigned NOT NULL,
   `max_price` int unsigned NOT NULL,
   `unit_id` tinyint unsigned NOT NULL,
-  `deleted` tinyint unsigned NOT NULL DEFAULT 0,
+  `deleted` tinyint unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -259,15 +263,17 @@ CREATE TABLE `vendors` (
   `date_reg` bigint NOT NULL,
   `hash_string` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL,
-  `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `deleted` tinyint unsigned DEFAULT 0,
+  `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `temp_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `deleted`) VALUES
-(1,	'Поставщик',	4,	'570540704',	'ffff@gmail.hjhjh',	'',	NULL,	'{\"latitude\": 44.657107, \"longitude\": 32.569608}',	2,	'',	1688481000,	'',	1,	'vendor',	0),
-(2,	'ООО',	1,	'123213',	'test@vendor.ru',	'Vendor TG',	1111,	'{\"latitude\": 55.657107, \"longitude\": 37.569608}',	2,	'',	1688481020,	'',	1,	'vendor',	0),
-(3,	'Admin',	1,	'777777777',	'admin@admin.admin',	'',	NULL,	'{\"latitude\": 55.943706, \"longitude\": 36.043753}	',	1,	'Администратор',	1688481020,	'',	1,	'admin',	0),
-(4,	'Новый поставщик',	10,	'789456123',	'evchemez@mail.ru',	'',	NULL,	'{\"latitude\": 22.345737, \"longitude\": 15.488463}',	2,	'Комментарий',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	0);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `temp_password`, `deleted`) VALUES
+(5,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	NULL,	NULL,	NULL,	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	NULL,	0),
+(6,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	NULL,	0),
+(7,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	NULL,	NULL,	NULL,	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	NULL,	0),
+(8,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	NULL,	0),
+(9,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	NULL,	0);
 
--- 2023-07-14 18:23:35
+-- 2023-07-16 11:54:13
