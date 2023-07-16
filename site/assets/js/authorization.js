@@ -1,11 +1,12 @@
 console.log("Подключили auth");
 
-const login = document.getElementById('email');
-const pass = document.getElementById('password');
-const info_auth = document.querySelector('.info-auth');
+
 
 
 function logIn() {
+    const login = document.getElementById('email');
+    const pass = document.getElementById('password');
+    const info_auth = document.querySelector('.info-auth');
 
     // очистим информационное поле
     info_auth.innerText = "";
@@ -55,4 +56,36 @@ function logIn() {
 
     // и перейдём на страницу CRM
     window.location.href = 'http://localhost/index.php';
+}
+
+// /* ---------- ОТОБРАЗИТЬ В КРУЖКЕ ТОЛЬКО ПЕРВУЮ БУКВУ ИМЕНИ ---------- */
+
+// let profileAvatar = document.querySelector('.menu-top__profile-avatar');
+// let profileName = document.querySelector('.menu-top__profile-name').innerText;
+// profileAvatar.innerText = profileName.trim()[0];
+
+
+function logOut() {
+    
+    //берём токен из куки
+    const cookie = document.cookie.match(/profile=(.+?)(;|$)/);
+
+    //если токена нет, то рисуем форму Авторизации и выходим из функции
+    if (cookie == null || cookie == undefined || cookie == ""){
+        window.location.href = 'http://localhost/pages/login.php';
+        return;
+    }
+
+    //если токен есть , то передаём его на сервер
+    let params = "token=" + cookie[1];
+
+    //отправляем запрос на сервер
+    sendRequestFormUrlPOST("http://localhost/api/authorization/logout.php", params);
+
+    //удаляем токен из куки
+    document.cookie = "profile=''; path=/; max-age=-1";
+
+    //рисуем форму авторизации
+    window.location.href = 'http://localhost/pages/login.php';
+
 }

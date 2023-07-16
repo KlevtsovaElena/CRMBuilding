@@ -1,4 +1,5 @@
 <?php 
+
 // проверка куки
 // 1. если есть, но пустой - удаляем куки и переадресация на форму
 // 2. если куки есть и не пустой - отправляем на сервер для сравнения
@@ -6,8 +7,8 @@
 if(isset($_COOKIE['profile'])) {
     if(trim($_COOKIE['profile']) == '' ) {
         // 1.
-        setcookie('profile', '', time() - 3600);
-        header('Location: pages/login.php');
+        setcookie('profile', '', -1, '/');
+        header('Location: http://localhost/pages/login.php');
         exit(0);
     } else {
         // 2.
@@ -25,8 +26,8 @@ if(isset($_COOKIE['profile'])) {
         $response = json_decode($responseJson, true);
 
         if (!$response || ($response['success'] == false)) {
-            setcookie('profile', '', time() - 3600);
-            header('Location: pages/login.php');
+            setcookie('profile', '', -1, '/');
+            header('Location: http://localhost/pages/login.php');
             exit(0);
         } else if ($response['success'] == true) {
             $profile = $response['profile'];
@@ -37,8 +38,8 @@ if(isset($_COOKIE['profile'])) {
     }
 } else {
     // 3.
-    setcookie('profile', '', time() - 3600);
-    header('Location: pages/login.php');
+    setcookie('profile', '', -1, '/');
+    header('Location: http://localhost/pages/login.php');
     exit(0);
 }
 ?>

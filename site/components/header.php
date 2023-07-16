@@ -1,6 +1,6 @@
 <?php if (!isset($profile)) {
-    // если профиля нет, то проверку не прошли
-    header('Location: ../pages/login.php');
+    //  если профиля нет, то проверку не прошли
+    header('Location: http://localhost/pages/login.php');
 } ?>
 
 !DOCTYPE html>
@@ -36,10 +36,10 @@
                 <div class="menu-top__logo">StroiCRM</div>
                 <div class="menu-top__profile">
                     <div class="menu-top__profile-name">        
-                        Admin
+                        <?= $vendor_name; ?>
                     </div>
-                    <div class="menu-top__profile-avatar">A</div>
-                    <div class="logout">
+                    <div class="menu-top__profile-avatar"><?= mb_substr($vendor_name, 0, 1); ?></div>
+                    <div class="logout" onclick="logOut()">
                         
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -160,10 +160,10 @@
                 <div class="menu-top__logo">StroiCRM</div>
                 <div class="menu-top__profile">
                     <div class="menu-top__profile-name">        
-                        Поставщик
+                        <?= $vendor_name; ?>
                     </div>
-                    <div class="menu-top__profile-avatar">П</div>
-                    <div class="logout">
+                    <div class="menu-top__profile-avatar"><?= mb_substr($vendor_name, 0, 1); ?></div>
+                    <div class="logout"  onclick="logOut()">
                         
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>

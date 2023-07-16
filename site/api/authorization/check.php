@@ -53,30 +53,6 @@
                 echo json_encode($response,  JSON_UNESCAPED_UNICODE);
             }
 
-            // // если есть, то формируем и записываем токен и возвращаем его на фронт
-            // // сформируем токен
-            // $id = $vendor[0]->id;
-            // $timeToken = time();
-            // $timeStr = (string)$timeToken;
-            // $timeStr = base_convert($timeStr, 10, 16);
-            // $token = crypt($timeStr . $vendor[0]->hash_string, 'token');
-
-            // // подготовим данные
-            // $post=[];
-            // $post['id'] =  $id;
-            // $post['token'] = $token;
-
-            // // обновляем токен в базе
-            // $this->vendorRepository->updateById($post);
-
-            // // подготовим ответ
-            // $response = [
-            //     'success' => true,
-            //     'token' => $token,
-            //     'id' => $id,
-            // ];
-            // echo json_encode($response,  JSON_UNESCAPED_UNICODE);
-
         }
     }
 

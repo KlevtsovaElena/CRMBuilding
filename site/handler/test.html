@@ -1,0 +1,39 @@
+<script>
+
+    //берём токен из куки
+    const cookie = document.cookie.match(/profile=(.+?)(;|$)/);
+
+    // //если токена нет, то рисуем форму Авторизации и выходим из функции
+    // if (cookie == null || cookie == undefined || cookie == ""){
+    //     window.location.href = 'http://localhost/admin/login.php';
+    //     return;
+    // }
+
+    //если токен есть , то передаём его на сервер
+    let params = "token=" + cookie[1];
+
+    console.log(params);
+    //отправляем запрос на сервер
+    function sendRequestFormUrlPOST(url, params){
+
+let requestObj = new XMLHttpRequest();
+requestObj.open('POST', url, false);
+requestObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+requestObj.send(params);
+return requestObj.responseText;
+
+}
+
+
+
+    sendRequestFormUrlPOST("http://localhost/api/authorization/logout.php", params);
+
+    //удаляем токен из куки
+    // document.cookie = "profile=''; max-age=-1";
+
+    //рисуем форму авторизации
+    // window.location.href = 'http://localhost/admin/login.php';
+
+
+</script>
+
