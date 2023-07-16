@@ -9,8 +9,11 @@ console.log(status);
 // собираем ссылку для запросов
 link = 'http://localhost/api/ordervendors.php';
 
-//отслеживаем открытие страницы с заказом, чтобы поменять в БД статус заказа на "Просмотрен", если заказ новый
-if (status == 0) {
+//достаем из атрибута роль
+let role = document.getElementById('new-order').getAttribute('data-role');
+
+//отслеживаем открытие страницы с заказом, чтобы поменять в БД статус заказа на "Просмотрен", если заказ новый и если его открыл ПОСТАВЩИК
+if (status == 0 && role == 2) {
 
     document.addEventListener("DOMContentLoaded", () => {
 

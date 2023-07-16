@@ -1,10 +1,10 @@
 <?php require('../handler/check-profile.php'); 
-if($role !== 2) {
-    setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
-    exit(0);
-};
-?>
+// if($role !== 2) {
+//     setcookie('profile', '', -1, '/');
+//     header('Location: http://localhost/pages/login.php');
+//     exit(0);
+// };
+// ?>
 
 <?php 
     // собираем массив из подключаемых файлов css и js
@@ -63,7 +63,7 @@ if($role !== 2) {
     <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
-            <thead id="new-order">
+            <thead id="new-order" data-role="<?= $_GET['role'] ?>">
                 <tr role="row">
                     <th class="table-header">
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <?= $date ?> </div>
