@@ -48,11 +48,11 @@ function logIn() {
     }
 
     //если пользователь найден и логин/пароль верны
-    //получим токен, запишем в куки с бесконечным временем жизни
+    //получим токен, запишем в куки временем жизни 24часа
     if(response['success']) {
-        document.cookie = "profile=" + response['token'];
+        document.cookie = "profile=" + response['token'] + "; path=/";
     }
 
-    // // и перейдём на страницу кабинета
-    // window.location.href = 'http://localhost/admin/cabinet.php';
+    // и перейдём на страницу CRM
+    window.location.href = 'http://localhost/index.php';
 }

@@ -1,4 +1,9 @@
-</div>
+<!-- если профиля нет, то проверку не прошли -->
+<?php if (!isset($profile)) {
+    header('Location: ../pages/login.php');
+} ?>
+
+/div>
     </section>    
       
         

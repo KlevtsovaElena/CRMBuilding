@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<?php if (!isset($profile)) {
+    // если профиля нет, то проверку не прошли
+    header('Location: ../pages/login.php');
+} ?>
+
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,14 +23,11 @@
 <body>
 
 
-<!-- Проверяем есть ли в куки роль -->
-<!-- Если нет - то меню не рисуем -->
-<?php if (isset($_COOKIE['role'])) {
-    $role = $_COOKIE['role'];
-    if ($role == 1) {
-        $vendor_id = 3;
-?>
-    <!-- В куки role=1 -->
+<!-- Проверяем роль -->
+
+<?php if ($role == 1) { ?>
+
+    <!-- role=1 -->
     <!-- МЕНЮ АДМИНИСТРАТОРА -->
     <header>
 
@@ -147,11 +149,9 @@
 
     </header>
 
-<?php
-    } else if ($role == 2) {
-        $vendor_id = 1;
-?>
-    <!-- В куки role=2 -->
+<?php } else if($role == 2 ) { ?>
+
+    <!-- role=2 -->
     <!-- МЕНЮ ПОСТАВЩИКА -->
     <header>
 
@@ -249,7 +249,6 @@
 
 <?php
     }
-}
 ?>
 
     <section class="main-content">
