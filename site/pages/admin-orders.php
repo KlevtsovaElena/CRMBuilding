@@ -38,6 +38,10 @@ if($role !== 1) {
         $data = json_decode($dataJson, true); 
         //print_r($data);
 
+        //соберём данные отдельно по поставщикам для отображения их названия в форме 
+        $vendorsJson = file_get_contents("http://nginx/api/vendors.php");
+        $vendors = json_decode($vendorsJson, true);
+
         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
         $totalEntries = $data['count'];
 
@@ -142,6 +146,7 @@ if($role !== 1) {
 
                         <th class="ta-center" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
                         <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
+                        <th class="ta-center" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                         <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                         <th class="ta-center" data-id="customer_id">ID</th>
                         <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
@@ -184,6 +189,12 @@ if($role !== 1) {
                                 <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                 <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
+                                <?php //достаем название поставщика через 2 бд и цикл 
+                                    for ($p = 0; $p < count($vendors); $p++) {
+                                        if ($data[$i]['vendor_id'] == $vendors[$p]['id']) {?>
+                                            <td><?= $vendors[$p]['name'] ?></td>
+                                        <?php } 
+                                    }?>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                 <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
@@ -234,6 +245,12 @@ if($role !== 1) {
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                     <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                     <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
+                                    <?php //достаем название поставщика через 2 бд и цикл 
+                                    for ($p = 0; $p < count($vendors); $p++) {
+                                        if ($data[$i]['vendor_id'] == $vendors[$p]['id']) {?>
+                                            <td><?= $vendors[$p]['name'] ?></td>
+                                        <?php } 
+                                    }?>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                     <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
@@ -287,6 +304,12 @@ if($role !== 1) {
                                         <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                         <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                         <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
+                                        <?php //достаем название поставщика через 2 бд и цикл 
+                                            for ($p = 0; $p < count($vendors); $p++) {
+                                                if ($data[$i]['vendor_id'] == $vendors[$p]['id']) {?>
+                                                    <td><?= $vendors[$p]['name'] ?></td>
+                                                <?php } 
+                                            }?>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                         <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>

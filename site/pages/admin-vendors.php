@@ -121,9 +121,9 @@ if($role !== 1) {
                         <th data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th>
                         <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
                         <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
-                        <th data-id="tg_id" data-sort="<?php if ($sortBy == 'tg_id')  {echo $mark; } ?>">Телеграм ID</th>
+                        <!-- <th data-id="tg_id" data-sort="<?php if ($sortBy == 'tg_id')  {echo $mark; } ?>">Телеграм ID</th>
                         <th data-id="tg_username" data-sort="<?php if ($sortBy == 'tg_username')  {echo $mark; } ?>">Телеграм имя</th>
-                        <th data-id="coordinates" data-sort="<?php if ($sortBy == 'coordinates')  {echo $mark; } ?>">Координаты</th>
+                        <th data-id="coordinates" data-sort="<?php if ($sortBy == 'coordinates')  {echo $mark; } ?>">Координаты</th> -->
                         <th data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
                         <th data-id="email">Email</th>
                         <th data-id="comment">Комментарий</th>
@@ -161,15 +161,15 @@ if($role !== 1) {
                                     <td><?= $cities[$c]['name'] ?></td>
                                 <?php } 
                                 }?>
-                                <td><?= $data[$i]['tg_id'] ?></td>
-                                <td><?= $data[$i]['tg_username'] ?></td>
+                                <!-- <td><?= $data[$i]['tg_id'] ?></td>
+                                <td><?= $data[$i]['tg_username'] ?></td> -->
                                 <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
-                                <?php if ($data[$i]['coordinates']) { ?>
+                                <!-- <?php if ($data[$i]['coordinates']) { ?>
                                     <td class="list-orders_products">
                                         <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
                                     </td> 
                                 <?php } else {?>
-                                    <td></td> <?php } ?>
+                                    <td></td> <?php } ?> -->
                                 <td><?= $data[$i]['phone'] ?> </td>
                                 <td><?= $data[$i]['email'] ?> </td>
                                 <td><?= $data[$i]['comment'] ?></td>
@@ -207,15 +207,15 @@ if($role !== 1) {
                                         <td><?= $cities[$c]['name'] ?></td>
                                     <?php } 
                                     }?>
-                                    <td><?= $data[$i]['tg_id'] ?></td>
-                                    <td><?= $data[$i]['tg_username'] ?></td>
+                                    <!-- <td><?= $data[$i]['tg_id'] ?></td>
+                                    <td><?= $data[$i]['tg_username'] ?></td> -->
                                     <!-- в отдельном цикле отрисовываем координаты поставщика  (пока что с проверкой на их наличие) -->
-                                    <?php if ($data[$i]['coordinates']) { ?>
+                                    <!-- <?php if ($data[$i]['coordinates']) { ?>
                                         <td class="list-orders_products">
                                             <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
                                         </td> 
                                     <?php } else {?>
-                                        <td></td> <?php } ?>
+                                        <td></td> <?php } ?> -->
                                     <td><?= $data[$i]['phone'] ?> </td>
                                     <td><?= $data[$i]['email'] ?> </td>
                                     <td><?= $data[$i]['comment'] ?></td>
@@ -259,15 +259,15 @@ if($role !== 1) {
                                             <td><?= $cities[$c]['name'] ?></td>
                                         <?php } 
                                         }?>
-                                        <td><?= $data[$i]['tg_id'] ?></td>
-                                        <td><?= $data[$i]['tg_username'] ?></td>
+                                        <!-- <td><?= $data[$i]['tg_id'] ?></td>
+                                        <td><?= $data[$i]['tg_username'] ?></td> -->
                                         <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
-                                        <?php if ($data[$i]['coordinates']) { ?>
+                                        <!-- <?php if ($data[$i]['coordinates']) { ?>
                                             <td class="list-orders_products">
                                                 <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
                                             </td> 
                                         <?php } else {?>
-                                            <td></td> <?php } ?>
+                                            <td></td> <?php } ?> -->
                                         <td><?= $data[$i]['phone'] ?> </td>
                                         <td><?= $data[$i]['email'] ?> </td>
                                         <td><?= $data[$i]['comment'] ?></td>
