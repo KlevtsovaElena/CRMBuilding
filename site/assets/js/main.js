@@ -20,6 +20,17 @@ function sendRequestPOST(url, params) {
 
 }
 
+//функция для отправки запросов POST
+function sendRequestFormUrlPOST(url, params){
+
+    let requestObj = new XMLHttpRequest();
+    requestObj.open('POST', url, false);
+    requestObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    requestObj.send(params);
+    return requestObj.responseText;
+
+}
+
 //функция для отправки запросов DELETE
 function sendRequestDELETE(url) {
 
@@ -50,3 +61,22 @@ function declinationWord(n, word) {
     if (n1 == 1) { return word[0]; }
     return word[2];
 }
+
+/* ---------- ВЫДЕЛЕНИЕ АКТИВНОГО ПУНКТА МЕНЮ---------- */
+let pageName = window.location.pathname + window.location.search;
+
+if(pageName.includes('vendor-add-product') || pageName.includes('vendor-edit-product')) {
+    pageName = "/pages/vendor-list-products.php";
+} else if(pageName.includes('admin-add-product') || pageName.includes('admin-edit-product')) {
+    pageName = "/pages/admin-list-products.php";
+} else if(pageName.includes('admin-add-vendor') || pageName.includes('admin-edit-vendor')) {
+    pageName = "/pages/admin-vendors.php";
+}
+let itemNav = document.querySelectorAll('[data-page-name]');
+
+itemNav.forEach( item => {
+    if (pageName.includes(item.getAttribute('data-page-name'))) {
+        item.classList.add('active');
+    }
+})
+

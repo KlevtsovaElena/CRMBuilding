@@ -1,0 +1,13 @@
+
+.vendor-info {
+    margin-top: 20px;
+}
+
+.form-add-vendor__item {
+    margin-bottom: 10px;
+}
+
+.form-add-vendor__item p { 
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+}

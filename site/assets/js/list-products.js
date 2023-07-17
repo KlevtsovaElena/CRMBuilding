@@ -13,7 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id;
+let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id + '&deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -25,8 +25,15 @@ let prevButton;
 let nextButton;
 let totalPages;
 
+let changePriceEl;
+let changePriceInputEl;
+let resetPriceEl;
+let savePriceEl;
+let changeInputsEl;
+
 let brands = {};
 let categories = {};
+let units = {};
 
 let orderby = "";
 let filters = "";
@@ -52,7 +59,12 @@ brand_idEl.querySelectorAll('option').forEach(item => {
 category_idEl.querySelectorAll('option').forEach(item => {
     categories[item.value] = item.innerText;
 })
-
+// закэшируем значения единиц измерения (временно, пока нет апишки)
+let unitsJson = sendRequestGET('http://localhost/api/units.php');
+let unitsData = JSON.parse(unitsJson);
+unitsData.forEach(item => {
+   units[item['id']] = item['name_short'];
+})
 // заполним страницу данными
 startRenderPage();
 
@@ -209,10 +221,15 @@ function renderListProducts(totalProducts) {
                                                         .replace('${brand_id}', brands[totalProducts['products'][i]['brand_id']])
                                                         .replace('${category_id}', categories[totalProducts['products'][i]['category_id']])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
+                                                        .replace('${price}', totalProducts['products'][i]['price'])
                                                         .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${unit}', units[totalProducts['products'][i]['unit_id']])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'])
+                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
                                                         .replace('${max_price}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
     }
 
@@ -227,6 +244,24 @@ function renderListProducts(totalProducts) {
     // отслеживаем клик по корзине
     garbage.forEach(item => {
         item.addEventListener("click", deleteProduct);
+    })
+
+    changePriceEl = document.querySelectorAll('.change-price');
+    changePriceInputEl = document.querySelectorAll('.change-price-el');
+    resetPriceEl = document.querySelectorAll('.reset-price');
+    savePriceEl = document.querySelectorAll('.save-price');
+    changeInputsEl = document.querySelectorAll('.change-price-input');
+
+    changePriceEl.forEach(item => {
+        item.addEventListener('click', showChangeInput);
+    })
+
+    resetPriceEl.forEach(item => {
+        item.addEventListener('click', resetChangePrice);
+    })
+
+    savePriceEl.forEach(item => {
+        item.addEventListener('click', saveChangePrice);
     })
 
 }
@@ -361,8 +396,16 @@ function deleteProduct() {
     // найдём id товара по атрибуту product-id
     const productId = event.target.closest('.list-products__row').getAttribute('product-id');
 
+    // соберём json
+    let obj = JSON.stringify({
+        'id': productId,
+        'deleted':  1
+    });
+
     // делаем запрос на удаление товара по id
-    sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
+    sendRequestPOST('http://localhost/api/products.php', obj);
+
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
 
 
     // заполним страницу данными
@@ -371,13 +414,138 @@ function deleteProduct() {
 }
 
 
-/* ---------- ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА ДРУГУЮ СТРАНИЦУ---------- */
+/* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editProduct(id) {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + params);
+    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    document.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + params ; 
+    window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
+}
+
+/* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
+function addProduct() {
+
+    // заменяем в истории браузера стр на стр с get параметрами
+    // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
+    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
+
+    // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
+    window.location.href = "http://localhost/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
+}
+
+
+/* ---------- ИЗМЕНЕНИЕ ЦЕНЫ---------- */
+
+// показать инпуты
+function showChangeInput() {
+    // строка продукта
+    let rowProduct = event.target.closest('.list-products__row');
+    
+    // скрываем все инпуты, которые были открыты 
+    changePriceInputEl.forEach(item => {
+        item.classList.add('d-none');
+    })
+
+    // инпуты этого продукта
+    let changePriceInput = rowProduct.querySelectorAll('.change-price-el');
+    // показываем их
+    changePriceInput.forEach(item => {
+        item.classList.remove('d-none');
+    })
+
+
+    // показываем все div со старыми ценами
+    changePriceEl.forEach(item => {
+        item.classList.remove('d-none');
+    })
+
+    // divы со старыми ценами этого продукта
+    let changePrice = rowProduct.querySelectorAll('.change-price');
+    // скрываем их
+    changePrice.forEach(item => {
+        item.classList.add('d-none');
+    })
+
+}
+
+// сбросить изменения без сохранения
+function resetChangePrice() {
+    // сбросим все значения всех инпутов
+    changeInputsEl.forEach(item => {
+        item.value = "";
+    });
+
+    // скрываем все инпуты, которые были открыты 
+    changePriceInputEl.forEach(item => {
+        item.classList.add('d-none');
+    })
+
+    // показываем все div со старыми ценами
+    changePriceEl.forEach(item => {
+        item.classList.remove('d-none');
+    })
+}
+
+// сохранить изменения
+function saveChangePrice() {
+    // строка продукта
+    let rowProduct = event.target.closest('.list-products__row');
+
+    // id продукта
+    let idProduct = rowProduct.getAttribute('product-id');
+
+    // все инпуты этого продукта
+    let changePriceInput = rowProduct.querySelectorAll('.change-price-input');
+
+    // все divs со старыми ценами продукта
+    let changePrice = rowProduct.querySelectorAll('.change-price');
+
+    // собираем json для отправки на сервер
+    let obj = {};
+    changePriceInput.forEach(item => {
+        
+        if (item.value) {
+            obj[item.name] = item.value;
+        }
+
+    })
+
+    if (Object.keys(obj).length > 0) {
+
+        // если цена больше среднерыночной, то выходим
+        if (obj.price && obj.max_price) {
+            if (Number(obj.price) >= Number(obj.max_price)) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        } else if (obj.price && !obj.max_price) {
+            if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        } else if (!obj.price && obj.max_price) {
+            if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
+                alert("Цена товара должна быть меньше среднерыночной цены!")
+                return;
+            };
+        }        
+
+        // если всё ок, то собираем данные и отправляем в БД
+        obj['id'] = idProduct;
+        let objJson = JSON.stringify(obj);
+
+        // отправка запроса на запись 
+        sendRequestPOST('http://localhost/api/products.php', objJson);
+
+        // перерисовка страницы
+        startRenderPage();
+
+        return;
+    }
+
+    resetChangePrice();
+
 }

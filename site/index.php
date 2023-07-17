@@ -1,3 +1,6 @@
+<?php require('handler/check-profile.php'); ?>
+
+
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -8,14 +11,8 @@
     ];
 ?>
 
+<?php include('components/header.php'); ?>
 
+    <p class="page-title">Главная</p>
 
-<?php
-
-    include('components/header.php');
-
-    echo "<h1>Это страница входа в CRM. Здесь будет проверка залогинен товарищ или нет, и соответственно отрисован либо кабинет, либо форма авторизации</h1>
-            <h1>И здесь же будет прописана Домашняя страница кабинета. </h1>";
-    
-    include('components/footer.php');
-?>
+<?php include('components/footer.php'); ?>

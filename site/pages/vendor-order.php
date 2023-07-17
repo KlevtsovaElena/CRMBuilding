@@ -1,4 +1,13 @@
+<?php require('../handler/check-profile.php'); 
+// if($role !== 2) {
+//     setcookie('profile', '', -1, '/');
+//     header('Location: http://localhost/pages/login.php');
+//     exit(0);
+// };
+// ?>
+
 <?php 
+
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -18,11 +27,22 @@
         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
+        print_r($data);
 
-        //конвертация юникс времени в стандартное в формате d.m.Y (H:i)
-        $timestamp = $data['order_date'];
-        $date = date('d.m.Y (H:i)', $timestamp);
-        // print_r($date);
+        function convertUnixToLocalTime($unixTime) {
+
+            //задаем дефолтный часовой пояс или достаем из куки
+            $timeZone = 'UTC';
+            if(isset($_COOKIE['time_zone'])) {
+                $timeZone = $_COOKIE['time_zone'];
+            }
+            date_default_timezone_set("$timeZone");
+        
+            //конвертируем время в часовой пояс, указанный выше
+            $localTime = date('d.m.Y (H:i)', $unixTime);
+        
+            return $localTime;
+        }
 
         //функция для расчета расстояния в км по координатам
         function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2) {
@@ -52,16 +72,16 @@
 
 
     <!-- таблица заказа -->
-    <section class="orders" data-id= <?= $data['id'] ?> >
+    <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
-            <thead id="new-order">
+            <thead id="new-order" data-role="<?= $_GET['role'] ?>">
                 <tr role="row">
                     <th class="table-header">
-                        <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <?= $date ?> </div>
+                        <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['vendor_location']['longitude']) ?> км</div> 
+                            <div>До клиента: <?php if(!$data['vendor_location']) { ?> <?='локация поставщика отсутствует' ?> <?php } else { ?> <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км <?php } ?></div> 
                         </div> 
                     </th>
                     <th></th>
@@ -100,6 +120,8 @@
         </table>
     </section>
 
+    <!-- если эту страницу открывает НЕ администратор, то видны кнопки -->
+    <?php if(!isset($_GET['role']) || $_GET['role'] != 1) { ?>
     <!-- кнопки, на которые будет нажимать поставщик после просмотра заказа -->
     <section class="buttons">
 
@@ -131,7 +153,7 @@
         <?php } ?>
 
     </section>
-
+    <?php } ?>
 
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>

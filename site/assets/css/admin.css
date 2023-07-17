@@ -1,0 +1,25 @@
+
+.add-block {
+    margin-bottom: 20px;
+}
+
+.input-add {
+    width: 220px !important;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+
+.edit {
+    transform: rotate(90deg);
+    width: 20px;
+    cursor: pointer;
+}
+
+.delete-cell {
+    width: 30px !important;
+    min-width: unset !important;
+}
+
+.table-header {
+    min-width: unset !important;
+}

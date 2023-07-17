@@ -1,3 +1,11 @@
+<?php require('../handler/check-profile.php'); 
+if($role !== 2) {
+    setcookie('profile', '', -1, '/');
+    header('Location: http://localhost/pages/login.php');
+    exit(0);
+};
+?>
+
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -11,7 +19,7 @@
 ?>
 <?php include('./../components/header.php'); ?>
                 
-    <p class="page-title">Заказы</p>
+    <p class="page-title">ЗАКАЗЫ</p>
 
     <!-- здесь храним id поставщика -->
     <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
@@ -27,12 +35,31 @@
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container">
+                <div class="form-elements-container filters-container-flex">
                     <!-- поле поиска -->
-                    <input type="search" id="search" name="search" value="" placeholder="Поиск по №заказа">
+                    <div class="d-iblock">
+                        <div>Поиск</div>
+                        <input type="search" id="search" name="search" value="" placeholder="По №заказа">
+                    </div>
+                    <!-- выбор статуса -->
+                    <div class="d-iblock">
+                        <div>Статус</div>
+                        <select id="status" name="status" value="">
+
+                            <option value="">Все</option>
+                            <option value="0">Новый</option>
+                            <option value="1">Просмотрен</option>
+                            <option value="2">Подтверждён</option>
+                            <option value="3">Отменён</option>
+                            <option value="4">Доставлен</option>
+                            <option value="archive=1">Только архивные</option>
+
+                        </select>
+                    </div>
                     <!-- выбор кол-во записей на листе -->
-                    <div class="d-iblock">Показывать по
-                        <select id="limit" name="limit" value="" required>
+                    <div class="d-iblock">
+                        <div>Показывать по</div>
+                        <select id="limit" name="limit" value="">
 
                             <option value="10">10</option>
                             <option value="20">20</option>
@@ -41,7 +68,14 @@
 
                         </select>
                     </div>
-                    <br>
+                    <!-- показывать архивные -->
+                    <div class="archive-check">
+                        <div >
+                            <input type="checkbox" id="archive" name="archive" value="archive=0">
+                            <!-- <svg class="d-none" width="18px" height="18px" viewBox="5 5 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Check"> <path id="Vector" d="M6 12L10.2426 16.2426L18.727 7.75732" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> -->
+                        </div>
+                        <lable>Архивные</lable>
+                    </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
@@ -54,12 +88,14 @@
                     <thead>
                         <tr role="row">
 
-                            <th data-id="order_id" data-sort="">№ заказа</th>
-                            <th data-id="order_date" data-sort="">Дата создания</th>
-                            <th data-id="status" data-sort="">Статус</th>
-                            <th data-id="products">Товары</th>
-                            <th data-id="total_price">Сумма</th>
-                            <th data-id="complete_date">Дата завершения</th>
+                            <th class="ta-center" data-id="order_id" data-sort="">№</th>
+                            <th class="ta-center" data-id="order_date" data-sort="">Дата</th>
+                            <th class="ta-center" data-id="status" data-sort="">Статус</th>
+                            <th class="ta-center" data-id="customer_id" data-sort="">ID</th>
+                            <th class="ta-center" data-id="customer_phone" data-sort="">Телефон</th>
+                            <th class="ta-center" data-id="products">Товары</th>
+                            <th class="ta-center" data-id="total_price">Сумма</th>
+                            <!-- <th data-id="complete_date">Дата завершения</th> -->
 
                         </tr>
                     </thead>
@@ -94,13 +130,22 @@ if (count($_GET) !== 0) {
         $searchText = "";
     }
 
+    if(isset($_GET['status'])) {
+        $status = $_GET['status'];
+    } else {
+        $status = "";
+    }
+
+
     if(isset($_GET['orderby'])) {
-        $orderBy = explode(":", $_GET['orderby']);
+        $orderByArray = explode(";", $_GET['orderby']);
+        $orderBy = explode(":", $orderByArray[0]);
         $sortBy = $orderBy[0];
         $mark = $orderBy[1];
     } else {
         $sortBy = "";
     }
+
 
     if(isset($_GET['offset']) && $_GET['offset'] !== '') {
         $offset = $_GET['offset'];
@@ -108,16 +153,74 @@ if (count($_GET) !== 0) {
         $offset = 0;
     }
 
+    if(isset($_GET['archive']) && $_GET['archive'] !== '') {
+        $archive = $_GET['archive'];
+    } else {
+        $archive = "";
+    }
+
 ?>
 
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container">
+                <div class="form-elements-container filters-container-flex">
                     <!-- поле поиска -->
-                    <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск по №заказа">
+                    <div class="d-iblock">
+                        <div>Поиск</div>
+                        <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="По №заказа">
+                    </div>
+                    
+                    <!-- выбор статуса -->
+                    <div class="d-iblock">
+                        <div>Статус</div>
+                        <select id="status" name="status" value="">
+
+                            <?php
+                            if (!isset($_GET['status']) && !isset($_GET['archive'])) {
+                            ?>
+                                <option value="">Все</option>
+                                <option value="0">Новый</option>
+                                <option value="1">Просмотрен</option>
+                                <option value="2">Подтверждён</option>
+                                <option value="3">Отменён</option>
+                                <option value="4">Доставлен</option>
+                                <option value="archive=1">Только архивные</option>
+
+                                
+                            <?php
+
+                            } else if (isset($_GET['status'])) {    
+                                ?>
+                                <option value="">Все</option>
+                                <option value="0"  <?php if ($_GET['status'] == 0) {echo 'selected';} ?> >Новый</option>
+                                <option value="1"  <?php if ($_GET['status'] == 1) {echo 'selected';} ?> >Просмотрен</option>
+                                <option value="2"  <?php if ($_GET['status'] == 2) {echo 'selected';} ?> >Подтверждён</option>
+                                <option value="3"  <?php if ($_GET['status'] == 3) {echo 'selected';} ?> >Отменён</option>
+                                <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Доставлен</option>
+                                <option value="archive=1">Только архивные</option>
+
+
+                            <?php 
+                            } else if (isset($_GET['archive'])) {
+                            ?>
+                                <option value="">Все</option>
+                                <option value="0">Новый</option>
+                                <option value="1">Просмотрен</option>
+                                <option value="2">Подтверждён</option>
+                                <option value="3">Отменён</option>
+                                <option value="4">Доставлен</option>
+                                <option value="archive=1" <?php if ($_GET['archive'] == '1') {echo 'selected';} ?>>Только архивные</option>
+
+
+                            <?php }
+                            ?> 
+
+                        </select>
+                    </div>
                     <!-- выбор кол-во записей на листе -->
-                    <div class="d-iblock">Показывать по
+                    <div class="d-iblock">
+                        <div>Показывать по</div>
                         <select id="limit" name="limit" value="" required>
 
                         <?php
@@ -140,7 +243,14 @@ if (count($_GET) !== 0) {
 
                         </select>
                     </div>
-                    <br>
+                    <!-- показывать архивные -->
+                    <div class="archive-check">
+                        <div >
+                            <input type="checkbox" id="archive" name="archive" <?php if($archive == 0 || $archive == 1) {echo "value='archive=0'";} else {echo "value='' checked";} ?>>
+                            <!-- <svg class="d-none" width="18px" height="18px" viewBox="5 5 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Check"> <path id="Vector" d="M6 12L10.2426 16.2426L18.727 7.75732" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> -->
+                        </div>
+                        <lable>Архивные</lable>
+                    </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
 
                 </div>
@@ -153,12 +263,14 @@ if (count($_GET) !== 0) {
                     <thead>
                         <tr role="row">
 
-                            <th data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№ заказа</th>
-                            <th data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата создания</th>
-                            <th data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                            <th data-id="products">Товары</th>
-                            <th data-id="total_price">Сумма</th>
-                            <th data-id="complete_date">Дата завершения</th>
+                            <th class="ta-center" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
+                            <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
+                            <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
+                            <th class="ta-center" data-id="customer_id" data-sort="<?php if ($sortBy == 'customer_id')  {echo $mark; } ?>">ID</th>
+                            <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
+                            <th class="ta-center" data-id="products">Товары</th>
+                            <th class="ta-center" data-id="total_price">Сумма</th>
+                            <!-- <th data-id="complete_date">Дата завершения</th> -->
 
                         </tr>
                     </thead>
@@ -182,11 +294,28 @@ if (count($_GET) !== 0) {
             <!-- шаблон таблицы -->
             <template id="template-body-table">
 
-                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}">
+                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}" archive="${archive}">
 
                         <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
                         <td>${order_date}</td>
-                        <td><a href="javascript: showOrder(${id})" class="list-orders_status d-block status${status}">${status}</a></td>
+                        <td>
+                            <div class="list-orders_status d-block status${status}" title="Изменить статус">${status}</div>
+                            <div class="change-status d-none">
+                                <select  class="change-order-select" name="change-order" value="">
+                            
+                                    <option value="status=1">Просмотрен</option>
+                                    <option value="status=2">Подтверждён</option>
+                                    <option value="status=3">Отменён</option>
+                                    <option value="status=4">Доставлен</option>
+                                    <option value="${archive_status}">${archive_text}</option>
+
+                                </select>
+                                <span class="save-order" title="Сохранить изменения"><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1716 1C18.702 1 19.2107 1.21071 19.5858 1.58579L22.4142 4.41421C22.7893 4.78929 23 5.29799 23 5.82843V20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20V4C1 2.34315 2.34315 1 4 1H18.1716ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21L5 21L5 15C5 13.3431 6.34315 12 8 12L16 12C17.6569 12 19 13.3431 19 15V21H20C20.5523 21 21 20.5523 21 20V6.82843C21 6.29799 20.7893 5.78929 20.4142 5.41421L18.5858 3.58579C18.2107 3.21071 17.702 3 17.1716 3H17V5C17 6.65685 15.6569 8 14 8H10C8.34315 8 7 6.65685 7 5V3H4ZM17 21V15C17 14.4477 16.5523 14 16 14L8 14C7.44772 14 7 14.4477 7 15L7 21L17 21ZM9 3H15V5C15 5.55228 14.5523 6 14 6H10C9.44772 6 9 5.55228 9 5V3Z" fill="#009900"></path> </g></svg></span>
+                                <span class="reset-order" title="Сбросить изменения"><svg width="25px" height="25px" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.56189 13.5L4.14285 13.9294L4.5724 14.3486L4.99144 13.9189L4.56189 13.5ZM9.92427 15.9243L15.9243 9.92427L15.0757 9.07574L9.07574 15.0757L9.92427 15.9243ZM9.07574 9.92426L15.0757 15.9243L15.9243 15.0757L9.92426 9.07574L9.07574 9.92426ZM19.9 12.5C19.9 16.5869 16.5869 19.9 12.5 19.9V21.1C17.2496 21.1 21.1 17.2496 21.1 12.5H19.9ZM5.1 12.5C5.1 8.41309 8.41309 5.1 12.5 5.1V3.9C7.75035 3.9 3.9 7.75035 3.9 12.5H5.1ZM12.5 5.1C16.5869 5.1 19.9 8.41309 19.9 12.5H21.1C21.1 7.75035 17.2496 3.9 12.5 3.9V5.1ZM5.15728 13.4258C5.1195 13.1227 5.1 12.8138 5.1 12.5H3.9C3.9 12.8635 3.92259 13.2221 3.9665 13.5742L5.15728 13.4258ZM12.5 19.9C9.9571 19.9 7.71347 18.6179 6.38048 16.6621L5.38888 17.3379C6.93584 19.6076 9.54355 21.1 12.5 21.1V19.9ZM4.99144 13.9189L7.42955 11.4189L6.57045 10.5811L4.13235 13.0811L4.99144 13.9189ZM4.98094 13.0706L2.41905 10.5706L1.58095 11.4294L4.14285 13.9294L4.98094 13.0706Z" fill="#444444"></path> </g></svg></span>
+                            </div>
+                        </td>
+                        <td  class="ta-center">${customer_id}</td>
+                        <td>${customer_phone}</td>
                         <td class="list-orders_products">${products}</td>
                         <td>${total_price}</td>
                         <td>${complete_date}</td>

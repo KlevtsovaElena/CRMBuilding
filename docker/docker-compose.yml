@@ -2,28 +2,30 @@ version: '3.3'
 
 services:
   nginx:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-nginx
     volumes:
       - ./../site/:/var/www
     depends_on:
       - php
-    ports: 
+    ports:
       - 80:80
 
   php:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-php
     volumes:
       - ./../site/:/var/www
+    env_file:
+      - .env
     environment:
-      MYSQL_HOST: "mysql"
-      MYSQL_USER: "root"
-      MYSQL_PASSWORD: "admin"
-      MYSQL_DB: "crm-building"
-      MYSQL_CHARSET: "utf8"
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_CHARSET: ${MYSQL_CHARSET}
     ports:
       - 9010:9000
 
@@ -34,8 +36,8 @@ services:
     volumes:
       - ./mysql/:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: "admin"
-      MYSQL_DATABASE: "crm-building"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
     ports:
       - 3309:3306
 
@@ -50,20 +52,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-bot
+    env_file:
+      - .env
+    environment:
+      bot_token: ${BOT_TOKEN}
     volumes:
       - ./../bot/:/app/
     ports:
       - 5001:8080
-  
+
   currency-service:
     build:
       context: .
       dockerfile: Dockerfile-currency-service
+    env_file:
+      - .env
     volumes:
       - ./../currency-service/:/app/
     environment:
-      task_start_hour: "12"
-      task_start_minute: "8"
-      telegram_channel: "@stroybotchannel2"
-      telegram_token: "6366934096:AAFfgYzXMQWi8wYuO-5LKKI_pO_v7qXJBqU"
+      task_start_hour: "13"
+      task_start_minute: "47"
+      bot_token: ${CURRENCY_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"

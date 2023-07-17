@@ -6,7 +6,7 @@ let orderStatus = {
     "1": "Просмотрен",
     "2": "Подтверждён",
     "3": "Отменён",
-    "4": "Звершён"
+    "4": "Доставлен"
 }
 
 // найдём шаблон и контейнер для отрисовки заказов
@@ -29,7 +29,16 @@ let url = 'http://localhost/api/order-vendors/get-count-with-details.php?vendor_
 
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
+let statusEl = document.getElementById('status');
+let archiveCheckEl = document.querySelector('.archive-check');
+let archiveEl = archiveCheckEl.querySelector('input');
+
 let offsetEl = containerPagination.getAttribute('offset');
+
+let changeOrderEl;
+let resetOrderEl;
+let saveOrderEl;
+let changeSelectEl;
 
 let prevButton;
 let nextButton;
@@ -76,7 +85,6 @@ function startRenderPage() {
 /* ---------- СБОР ПАРАМЕТРОВ запроса---------- */
 function getParams() {
 
-    paramsTest = "";
     // сначала фильтры 
     filters = getFilters();
 
@@ -115,11 +123,26 @@ function getFilters() {
     // сбросим параметры строки запроса
     params = "";
 
+    if(statusEl.value) { 
+        if(statusEl.value !== "archive=1") {
+            params += "&status=" + statusEl.value;
+            if(archiveEl.value) {
+                params += "&" + archiveEl.value;
+            }
+        } else if(statusEl.value === "archive=1") {
+            params += "&" + statusEl.value;
+        }
+    }  else if(archiveEl.value){
+        params += "&" + archiveEl.value;
+    }
+
     // проверим значение поиска
     if(searchEl.value.trim()) {
         params += "&search=order_id:" + searchEl.value;
     }
 
+
+console.log(params);
     return params;
 }
 
@@ -145,7 +168,7 @@ function changeData() {
         params = filters + orderby + "&limit=" + limit + "&offset=" + offset;
 
         // 5. делаем снова запрос на получение другого куска данных
-        getOrdersData(params, paramsTest);
+        getOrdersData(params);
 
 }
 
@@ -250,7 +273,15 @@ function renderListOrders(orders) {
         let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
         //преобразуем дату с сервера в дату, которая у пользователя
         let dateOrder = dateTimeOrder.toLocaleDateString();
-
+        let archiveStatus = "";
+        let archiveText = "";
+        if(orders['orders'][i]['archive'] == '1') {
+            archiveStatus = "archive=0";
+            archiveText = "Убрать из архива";
+        } else {
+            archiveStatus = "archive=1";
+            archiveText = "В архив";
+        }
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders['orders'][i]['order_id'])
                                                         .replace('${order_id}', orders['orders'][i]['order_id'])
@@ -263,13 +294,39 @@ function renderListOrders(orders) {
                                                         .replace('${status}', orderStatus[orders['orders'][i]['status']])
                                                         .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
+                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
+                                                        .replace('${customer_id}', orders['orders'][i]['customer_id'])
                                                         .replace('${total_price}', totalPrice.toLocaleString('ru'))
-                                                        .replace('${complete_date}', '');
+                                                        .replace('${complete_date}', '')
+                                                        .replace('${archive}', orders['orders'][i]['archive'])
+                                                        .replace('${archive_status}', archiveStatus)
+                                                        .replace('${archive_text}', archiveText);
+                                                        
         
     }  
 
     info.innerText = "Всего " + totalOrdersCount + declinationWord(totalOrdersCount, [' запись', ' записи', ' записей']);
 
+    // здесь включаем прослушку элементов после отрисовки
+    // ДО отрисовки код не сработает, поэтому этот код внутри этой функции
+    changeOrderEl = document.querySelectorAll('.list-orders_status');
+    changeSelectEl = document.querySelectorAll('.change-status');
+
+
+    resetOrderEl = document.querySelectorAll('.reset-order');
+    saveOrderEl = document.querySelectorAll('.save-order');
+
+    changeOrderEl.forEach(item => {
+        item.addEventListener('click', showChangeSelect);
+    })
+
+    resetOrderEl.forEach(item => {
+        item.addEventListener('click', resetChangeOrder);
+    })
+
+    saveOrderEl.forEach(item => {
+        item.addEventListener('click', saveChangeOrder);
+    })
 }
 
 
@@ -391,6 +448,70 @@ function showOrder(id) {
     history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-        document.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
+    window.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
+
+}
+
+
+/* ---------- ИЗМЕНЕНИЕ статуса или архива---------- */
+// при нажатии на чекбокс, меняем value чекбокса
+archiveCheckEl.onclick = function(){
+    if(archiveEl.checked) {
+        archiveEl.value = ""
+    } else {
+        archiveEl.value = "archive=0";  
+    }
+}
+
+// показать селекты
+function showChangeSelect() {
+
+    let rowOrder = event.target.closest('.list-orders__row');
+
+    // общий контейнер селекта
+    let changeStatus = rowOrder.querySelector('.change-status');
+
+    // все остальные селекты скрыть
+    changeSelectEl.forEach(item => {
+        if (item !== changeStatus) {
+            item.classList.add('d-none');
+        }
+    })
+
+    changeStatus.classList.toggle('d-none');
+
+}
+
+// сбросить изменения без сохранения
+function resetChangeOrder() {
+    // вся строка заказа
+    let rowOrder = event.target.closest('.list-orders__row');
+
+    // общий контейнер селекта
+    let changeStatus = rowOrder.querySelector('.change-status');
+
+    changeStatus.classList.add('d-none');
+}
+
+// сохранить изменения
+function saveChangeOrder() {
+    // вся строка заказа
+    let rowOrder = event.target.closest('.list-orders__row');
+
+    // сам селект
+    let changeOrderSelect = rowOrder.querySelector('.change-order-select');
+
+    // id заказа, который надо изменить
+    let idOrder = rowOrder.getAttribute('order-id');
+
+    let obj = {};
+    obj['id'] = idOrder;
+    obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
+    let objJson = JSON.stringify(obj);
+
+    sendRequestPOST('http://localhost/api/ordervendors.php', objJson);
+
+    // перерисовка страницы
+    startRenderPage();
 
 }

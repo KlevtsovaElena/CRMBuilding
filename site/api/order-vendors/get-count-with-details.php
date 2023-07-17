@@ -50,7 +50,6 @@
 
             foreach ($orderVendorsDetails as $ordersVendorItem) 
             {
-                $totalPrice = 0;
 
                 $newArrayItem = [
                     'id' => $ordersVendorItem['id'],
@@ -60,7 +59,9 @@
                     'order_date' => $ordersVendorItem['order_date'],
                     'status' => $ordersVendorItem['status'],
                     'customer_phone' => $ordersVendorItem['customer_phone'],
+                    'customer_id' => $ordersVendorItem['customer_id'],
                     'order_location' => $ordersVendorItem['order_location'],
+                    'archive' => $ordersVendorItem['archive'],
                 ];
 
                 if (isset($ordersVendorItem['products'])) 
@@ -79,14 +80,13 @@
                                 $newProduct['name'] = $product->name;
                                 $newProduct['price'] = $product->price;
                                 $newProduct['available'] = $product->quantity_available;
-                                $totalPrice += $newProduct['price'] * $vendorProductCount;
                                 break;
                             }
                         }
                         $newArrayItem['products'][] = $newProduct;
                     }
                 }
-                $newArrayItem['order_price'] =  $totalPrice;
+
                 $result[] = $newArrayItem;
             }
 

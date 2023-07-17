@@ -5,5 +5,6 @@
     {
         public int $id;
         public string $category_name;
+        public int $deleted; //Настя: добавила для нового поля
     }
 ?>

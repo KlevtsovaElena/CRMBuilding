@@ -21,30 +21,30 @@ function editProduct() {
     // соберём json для передачи на сервер
     if (!new_photo.value) {
         obj = JSON.stringify({
-            id: productId,
-            vendor_id: vendor_id.value,
+            'id': productId,
             'name':  nameProduct.value,
-            brand_id: brand_id.value,
-            category_id: category_id.value,
-            description: description.value,
-            article: article.value,
-            quantity_available: quantity_available.value,
-            price: price.value,
-            max_price: max_price.value,
-            photo: photo.value
+            'brand_id': brand_id.value,
+            'category_id': category_id.value,
+            'description': description.value,
+            'article': article.value,
+            'quantity_available': quantity_available.value,
+            'price': price.value,
+            'max_price': max_price.value,
+            'unit_id': unit_id.value,
+            'photo': photo.value
         });
     } else {
         obj = JSON.stringify({
-            id: productId,
-            vendor_id: vendor_id.value,
+            'id': productId,
             'name':  nameProduct.value,
-            brand_id: brand_id.value,
-            category_id: category_id.value,
-            description: description.value,
-            article: article.value,
-            quantity_available: quantity_available.value,
-            price: price.value,
-            max_price: max_price.value,
+            'brand_id': brand_id.value,
+            'category_id': category_id.value,
+            'description': description.value,
+            'article': article.value,
+            'quantity_available': quantity_available.value,
+            'price': price.value,
+            'max_price': max_price.value,
+            'unit_id': unit_id.value,
             photoFileData,
             photoFileName
         });
@@ -67,7 +67,7 @@ function validationEdit() {
     } else {priceValue = 0;}
 
    // валидация полей (кроме vendorId)
-   [nameProduct, brand_id, category_id, description, article, 
+   [nameProduct, brand_id, category_id, unit_id, 
     quantity_available, price, max_price].forEach(item => {
 
         console.log(item.getAttribute('name') + "    " + item.value);
@@ -82,7 +82,7 @@ function validationEdit() {
             errorInfoContainer.classList.remove('d-none');
             hasError = true;
             
-        } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available") || (item.id === "article")) {
+        } else if ((item.id === "price") || (item.id === "max_price") || (item.id === "quantity_available")) {
 
             // не пустое поле и числовое значение д.б. >= 0
             if (!(Number(item.value) >= 0)) {
@@ -187,8 +187,18 @@ function deleteProductFromEditForm(id) {
     // если подтвердили удаление
     console.log("удаляем");
 
+    // соберём json
+    let obj = JSON.stringify({
+        'id': id,
+        'deleted':  1
+    });
+
     // делаем запрос на удаление товара по id
-    sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    sendRequestPOST('http://localhost/api/products.php', obj);
+
+
+    // делаем запрос на удаление товара по id
+    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
 
     alert("Товар удалён");
 
@@ -198,5 +208,9 @@ function deleteProductFromEditForm(id) {
     let params = paramsArr.join('&');
 
     // переход обратно на странницу списка товаров с прежними параметрами
-    window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
+    if (window.location.href.includes('vendor-edit-product')) {
+        window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
+    } else if (window.location.href.includes('admin-edit-product')) {
+        window.location.href = 'http://localhost/pages/admin-list-products.php?' + params;
+    }
 }

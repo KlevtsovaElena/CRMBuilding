@@ -43,9 +43,7 @@
 }
 
 .form-filters input[type="search"] {
-    width: 220px;
-    margin-top: 20px;
-    margin-right: 10px;
+    width: 180px;
 }
 
 #list-products th:after {
@@ -83,7 +81,7 @@
     cursor: pointer;
     transition: all var(--speed-transition);
     position: absolute;
-    top: calc(50% - 10px);
+    top: calc(50% - 12px);
     right: 0.5rem;
 }
 
@@ -95,4 +93,29 @@
 td:nth-last-child(1) {
     padding-right: 30px;
     position: relative;
+    min-width: 140px;
+}
+
+.change-price {
+    width: 80px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+}
+
+.change-price-input {
+    width: 80px;
+    min-width: unset;
+    max-width: unset;
+}
+
+.save-price, .reset-price {
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+@media(max-width: 1024px) {
+    .filters-container-flex {
+        flex-wrap: wrap;
+    }
 }

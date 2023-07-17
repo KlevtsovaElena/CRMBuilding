@@ -9,8 +9,11 @@ console.log(status);
 // собираем ссылку для запросов
 link = 'http://localhost/api/ordervendors.php';
 
-//отслеживаем открытие страницы с заказом, чтобы поменять в БД статус заказа на "Просмотрен", если заказ новый
-if (status == 0) {
+//достаем из атрибута роль
+let role = document.getElementById('new-order').getAttribute('data-role');
+
+//отслеживаем открытие страницы с заказом, чтобы поменять в БД статус заказа на "Просмотрен", если заказ новый и если его открыл ПОСТАВЩИК
+if (status == 0 && role == 2) {
 
     document.addEventListener("DOMContentLoaded", () => {
 
@@ -23,6 +26,19 @@ if (status == 0) {
     
         //передаем параметры на сервер в пост-запросе
         sendRequestPOST(link, obj);
+
+        //меняем на фронте цифру на счетчике 
+        let counter = document.getElementById('counter');
+
+        //достаем текущее значение
+        let currentNum = counter.innerHTML;
+        console.log(currentNum);
+
+        //отнимаем единицу
+        let newNum = parseInt(currentNum) - 1;
+        console.log(newNum);
+        //кладем в счетчик новое значение
+        counter.innerHTML = newNum;
     
         //console.log('статус заказа  с id ' + id + ' изменен на ' + 1);
     
@@ -131,3 +147,8 @@ function customerOutOfReach() {
 function backToAllOrders() {
     window.location.href = '/pages/vendor-list-orders.php';
 }
+
+//записываем в куки локальный часовой пояс
+let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+document.cookie = 'time_zone=' + timeZone;
+console.log(document.cookie);

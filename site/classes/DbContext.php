@@ -11,7 +11,7 @@
             return static::$connection;
         }
 
-        private static function createConnection() : PDO 
+        private static function createConnection() : PDO
         {
             $host = $_ENV['MYSQL_HOST'];
             $database = $_ENV['MYSQL_DB'];
