@@ -147,3 +147,8 @@ function customerOutOfReach() {
 function backToAllOrders() {
     window.location.href = '/pages/vendor-list-orders.php';
 }
+
+//записываем в куки локальный часовой пояс
+let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+document.cookie = 'time_zone=' + timeZone;
+console.log(document.cookie);

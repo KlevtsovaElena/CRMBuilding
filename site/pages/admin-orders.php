@@ -56,6 +56,25 @@ if($role !== 1) {
         }
     ?>
 
+    <?php
+        function convertUnixToLocalTime($unixTime) {
+            
+            //задаем дефолтный часовой пояс или достаем из куки
+            $timeZone = 'UTC';
+            if(isset($_COOKIE['time_zone'])) {
+                $timeZone = $_COOKIE['time_zone'];
+            }
+
+            date_default_timezone_set("$timeZone");
+        
+            //конвертируем время в часовой пояс, указанный выше
+            $localTime = date('d.m.Y H:i', $unixTime);
+        
+            return $localTime;
+        }
+
+    ?>
+
         <!-- далее отрисовываем всю страницу -->
         <p class="page-title">Заказы</p>
 
@@ -164,7 +183,7 @@ if($role !== 1) {
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
-                                <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
+                                <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                 <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
@@ -214,7 +233,7 @@ if($role !== 1) {
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                     <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
-                                    <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
+                                    <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                     <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
@@ -267,7 +286,7 @@ if($role !== 1) {
                                     <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                         <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                         <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
-                                        <td><?= $date = date('d.m.Y H:i', $data[$i]['order_date']); ?></td>
+                                        <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                         <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>

@@ -318,3 +318,7 @@ function editVendor(id) {
     
 }
 
+//записываем в куки локальный часовой пояс
+let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+document.cookie = 'time_zone=' + timeZone;
+console.log(document.cookie);

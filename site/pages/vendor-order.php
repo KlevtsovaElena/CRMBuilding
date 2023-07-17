@@ -7,6 +7,7 @@
 // ?>
 
 <?php 
+
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -27,10 +28,20 @@
         $data = json_decode($dataJson, true);
         $data = $data[0];
 
-        //конвертация юникс времени в стандартное в формате d.m.Y (H:i)
-        $timestamp = $data['order_date'];
-        $date = date('d.m.Y (H:i)', $timestamp);
-        // print_r($date);
+        function convertUnixToLocalTime($unixTime) {
+
+            //задаем дефолтный часовой пояс или достаем из куки
+            $timeZone = 'UTC';
+            if(isset($_COOKIE['time_zone'])) {
+                $timeZone = $_COOKIE['time_zone'];
+            }
+            date_default_timezone_set("$timeZone");
+        
+            //конвертируем время в часовой пояс, указанный выше
+            $localTime = date('d.m.Y (H:i)', $unixTime);
+        
+            return $localTime;
+        }
 
         //функция для расчета расстояния в км по координатам
         function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2) {
@@ -66,7 +77,7 @@
             <thead id="new-order" data-role="<?= $_GET['role'] ?>">
                 <tr role="row">
                     <th class="table-header">
-                        <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <?= $date ?> </div>
+                        <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
                             <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км</div> 
