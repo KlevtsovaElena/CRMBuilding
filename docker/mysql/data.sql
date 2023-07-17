@@ -270,10 +270,10 @@ CREATE TABLE `vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `token`, `deleted`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'',	NULL,	'{}',	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	'',	0),
-(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	'',	NULL,	'{}',	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	'',	0),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'',	NULL,	'{}',	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	'',	0),
-(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	'',	NULL,	'{}',	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	'',	0),
-(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	'',	NULL,	'{}',	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	'',	0);
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	NULL,	NULL,	NULL,	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	'',	0),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	'',	0),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	NULL,	NULL,	NULL,	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	'',	0),
+(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	'',	0),
+(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	'toT8NRYasABqk',	0);
 
--- 2023-07-16 17:03:58
+-- 2023-07-17 10:47:57

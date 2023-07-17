@@ -91,7 +91,13 @@ if($role !== 1) {
 
             <!-- координаты -->
             <div class="form-add-vendor__item">
-                <p>Координаты: <?php echo $vendor['coordinates']['latitude'] . ', ' . $vendor['coordinates']['longitude']; ?></p>
+                <p>Координаты: 
+                    <?php 
+                    if(isset($vendor['coordinates']['latitude']) && isset($vendor['coordinates']['longitude']))  {
+                        echo $vendor['coordinates']['latitude'] . ', ' . $vendor['coordinates']['longitude']; 
+                    } else {
+                        echo "не указаны";
+                    }?></p>
             </div> 
 
             <!-- пароль -->
