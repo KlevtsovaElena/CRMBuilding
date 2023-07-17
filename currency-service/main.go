@@ -30,7 +30,14 @@ func process() {
 		return
 	}
 
-	messageId := utils.SendMessage("Лучший курс USD на " + time.Now().Format("02.01.2006") + ". Покупка: " + buyBankName + " - " + buyBankValue + ". Продажа: " + sellBankName + " - " + sellBankValue + ".")
+	cbValue, cbError := utils.GetCentralBankWithValue()
+
+	if cbError != nil {
+		fmt.Print("Произошла ошибка при получении данных о центральном банке")
+		return
+	}
+
+	messageId := utils.SendMessage("Курс ЦБ на " + time.Now().Format("02.01.2006") + " " + cbValue + " сум." + "\nЛучшие условия в Ташкенте\nПокупка: " + buyBankName + " - " + buyBankValue + ".\nПродажа: " + sellBankName + " - " + sellBankValue + ".")
 
 	if messageId != -1 {
 		utils.UnpinAllMessages()

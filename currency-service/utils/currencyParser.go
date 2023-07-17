@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-var url = "https://bank.uz/currency"
+var urlstring = "https://bank.uz/currency"
 
 func getPageContent() (string, error) {
-	response, error := http.Get(url)
+	response, error := http.Get(urlstring)
 
 	if error != nil {
 		return "", error
@@ -106,4 +106,46 @@ func GetSellBankWithValue() (string, string, error) {
 	buyBlock := strings.Split(pageContent, "<div class=\"bc-inner-blocks-right\">")
 
 	return getBankNameWithValue(buyBlock)
+}
+
+func GetCentralBankWithValue() (string, error) {
+	pageContent, err := getPageContent()
+
+	if err != nil {
+		return "", err
+	}
+
+	diagramBlock := strings.Split(pageContent, "<div class=\"top-diogram\">")
+
+	if len(diagramBlock) < 2 {
+		return "", errors.New("Block not found.")
+	}
+
+	rows := strings.Split(diagramBlock[1], "<li class=\"nav-item\">")
+
+	if len(rows) < 2 {
+		return "", errors.New("Row in block not found.")
+	}
+
+	usdRowElement := "<span class=\"medium-text\">USD</span>"
+	usdValueElement := "<span class=\"medium-text\">"
+
+	for _, element := range rows {
+		indexUsd := strings.Index(element, usdRowElement)
+		if indexUsd >= 0 {
+			subString := element[(indexUsd + len(usdRowElement)):]
+
+			subStringRows := strings.Split(subString, usdValueElement)
+
+			if len(subStringRows) > 1 {
+				endIndex := strings.Index(subStringRows[1], "</span")
+
+				if endIndex >= 0 {
+					return strings.TrimSpace(subStringRows[1][:endIndex]), nil
+				}
+			}
+		}
+	}
+
+	return "", errors.New("Central bank USD value not found.")
 }
