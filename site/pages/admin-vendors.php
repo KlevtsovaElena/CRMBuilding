@@ -34,12 +34,13 @@ if($role !== 1) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents("http://nginx/api/vendors.php");
+        $dataJson = file_get_contents("http://nginx/api/vendors.php?deleted=0");
         $data = json_decode($dataJson, true); 
         //print_r($data);
 
-        $citiesJson = file_get_contents("http://nginx/api/cities.php");
+        $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0");
         $cities = json_decode($citiesJson, true);
+        //print_r($cities);
 
         if(isset($_GET['orderby'])) {
             $orderByArray = explode(";", $_GET['orderby']);
@@ -119,15 +120,11 @@ if($role !== 1) {
                     <tr role="row">
 
                         <th data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th>
-                        <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
                         <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
-                        <!-- <th data-id="tg_id" data-sort="<?php if ($sortBy == 'tg_id')  {echo $mark; } ?>">Телеграм ID</th>
-                        <th data-id="tg_username" data-sort="<?php if ($sortBy == 'tg_username')  {echo $mark; } ?>">Телеграм имя</th>
-                        <th data-id="coordinates" data-sort="<?php if ($sortBy == 'coordinates')  {echo $mark; } ?>">Координаты</th> -->
-                        <th data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
-                        <th data-id="email">Email</th>
-                        <th data-id="comment">Комментарий</th>
+                        <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
                         <th data-id="total_price" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
+                        <th data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
+                        <th data-id="email">Email</th>                       
                         <th></th>
                     </tr>
                 </thead>
@@ -138,9 +135,10 @@ if($role !== 1) {
                     <?php //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //отрисовываем строки в цикле от начальной до конечной цифры оффсетного значения
+                        $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                         for ($i = $offset; $i < $limit + $offset; $i++) {
-                            //проверка на то, чтобы выводилось не больше строк, чем есть в БД, и что не удален
-                            if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) {
+                            //проверка на то, чтобы выводилось не больше строк, чем есть в БД
+                            if(isset($data[$i]['id'])) {
                                 //расфишровка статусов
                                 $status;
                                 if($data[$i]['is_active'] == 1) {
@@ -152,8 +150,7 @@ if($role !== 1) {
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
-                                <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                <td><a href="#"><strong><?= $num++; ?></strong></a></td>
                                 <?php
                                 //достаем название города через 2 бд и цикл 
                                 for ($c = 0; $c < count($cities); $c++) {
@@ -161,20 +158,11 @@ if($role !== 1) {
                                     <td><?= $cities[$c]['name'] ?></td>
                                 <?php } 
                                 }?>
-                                <!-- <td><?= $data[$i]['tg_id'] ?></td>
-                                <td><?= $data[$i]['tg_username'] ?></td> -->
-                                <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
-                                <!-- <?php if ($data[$i]['coordinates']) { ?>
-                                    <td class="list-orders_products">
-                                        <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
-                                    </td> 
-                                <?php } else {?>
-                                    <td></td> <?php } ?> -->
+                                <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                <td><?= $status ?></td>
                                 <td><?= $data[$i]['phone'] ?> </td>
                                 <td><?= $data[$i]['email'] ?> </td>
-                                <td><?= $data[$i]['comment'] ?></td>
-                                <td><?= $status ?></td>
-                                <td><svg onclick="deleteOne('admin-vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
+                                <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                             </tr>
                             <?php }
                         } 
@@ -184,8 +172,9 @@ if($role !== 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //отрисовываем строки в цикле по заданному лимиту отображаемых элементов на 1 странице
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             for ($i = 0; $i < $limit; $i++) {
-                                //проверка на то, чтобы выводилось не больше строк, чем есть в БД, и что не удален
+                                //проверка на то, чтобы выводилось не больше строк, чем есть в БД
                                 if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
                                     //расфишровка статусов
                                     $status;
@@ -198,8 +187,7 @@ if($role !== 1) {
                                     ?>
                                 <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                    <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
-                                    <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                    <td><a href="#"><strong><?= $num++; ?></strong></a></td>
                                     <?php 
                                     //достаем название города через 2 бд и цикл
                                     for ($c = 0; $c < count($cities); $c++) {
@@ -207,20 +195,11 @@ if($role !== 1) {
                                         <td><?= $cities[$c]['name'] ?></td>
                                     <?php } 
                                     }?>
-                                    <!-- <td><?= $data[$i]['tg_id'] ?></td>
-                                    <td><?= $data[$i]['tg_username'] ?></td> -->
-                                    <!-- в отдельном цикле отрисовываем координаты поставщика  (пока что с проверкой на их наличие) -->
-                                    <!-- <?php if ($data[$i]['coordinates']) { ?>
-                                        <td class="list-orders_products">
-                                            <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
-                                        </td> 
-                                    <?php } else {?>
-                                        <td></td> <?php } ?> -->
+                                    <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                    <td><?= $status ?></td>
                                     <td><?= $data[$i]['phone'] ?> </td>
                                     <td><?= $data[$i]['email'] ?> </td>
-                                    <td><?= $data[$i]['comment'] ?></td>
-                                    <td><?= $status ?></td>
-                                    <td><svg onclick="deleteOne('admin-vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
+                                    <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                 </tr>
                             <?php }
                             } 
@@ -235,6 +214,7 @@ if($role !== 1) {
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
                         $totalNumElements = 0; //для подсчета общего кол-ва записей
                         if ($data) {
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             for ($i = 0; $i < count($data); $i++) { 
                                 //проверка на то, чтобы выводилось не больше строк, чем есть в БД, и что не удален
                                 if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
@@ -250,8 +230,7 @@ if($role !== 1) {
                                     ?>
                                     <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                                     <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                        <td><a href="#"><strong><?= $data[$i]['id'] ?></strong></a></td>
-                                        <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                        <td><a href="#"><strong><?= $num++; ?></strong></a></td>
                                         <?php
                                         //достаем название города через 2 бд и цикл 
                                         for ($c = 0; $c < count($cities); $c++) {
@@ -259,19 +238,11 @@ if($role !== 1) {
                                             <td><?= $cities[$c]['name'] ?></td>
                                         <?php } 
                                         }?>
-                                        <!-- <td><?= $data[$i]['tg_id'] ?></td>
-                                        <td><?= $data[$i]['tg_username'] ?></td> -->
-                                        <!-- в отдельном цикле отрисовываем координаты поставщика (пока что с проверкой на их наличие) -->
-                                        <!-- <?php if ($data[$i]['coordinates']) { ?>
-                                            <td class="list-orders_products">
-                                                <?= $data[$i]['coordinates']['latitude'] ?>, <?= $data[$i]['coordinates']['longitude'] ?>
-                                            </td> 
-                                        <?php } else {?>
-                                            <td></td> <?php } ?> -->
+                                        <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
+                                        <td><?= $status ?></td>
                                         <td><?= $data[$i]['phone'] ?> </td>
                                         <td><?= $data[$i]['email'] ?> </td>
-                                        <td><?= $data[$i]['comment'] ?></td>
-                                        <td><?= $status ?></td>
+                                        <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                     </tr>
                             <?php }
                             } 
