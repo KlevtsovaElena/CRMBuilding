@@ -32,7 +32,9 @@ class OrderVendorRepository extends BaseRepository
                                         c.`phone` as `customer_phone`,
                                         o.`customer_id` as `customer_id`,
                                         o.`location` as `order_location`,
-                                        ov.`products` as `products`
+                                        ov.`products` as `products`,
+                                        ov.`total_price` as `total_price`,
+                                        ov.`distance` as `distance`
                                     FROM order_vendors ov
                                     INNER JOIN vendors v
                                     ON v.id = ov.vendor_id
@@ -53,7 +55,9 @@ class OrderVendorRepository extends BaseRepository
         'customer_phone' => 'c.phone',
         'customer_id' => 'o.customer_id',
         'order_location' => 'o.location',
-        'products' => 'ov.products'
+        'products' => 'ov.products',
+        'total_price' => 'ov.total_price',
+        'distance' => 'ov.distance'
     ];
 
     public function getTableName(): string
@@ -135,7 +139,7 @@ class OrderVendorRepository extends BaseRepository
         return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
     }
 
-// ЛЕНА добавила только этот метод сюда
+    // ЛЕНА добавила только этот метод сюда
     public function getCountWithDetails(array $inputParams): int
     {
         // Параметры однозначного совпадения (WHERE)
@@ -156,16 +160,16 @@ class OrderVendorRepository extends BaseRepository
         $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
 
         // Формируем результирующую строку запроса
-        $query = sprintf(static::GET_COUNT_WITH_DETAILS,  implode(' ', [$whereString, $searchString]));
+        $query = sprintf(static::GET_COUNT_WITH_DETAILS, implode(' ', [$whereString, $searchString]));
 
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute(array_merge($whereParams, $formattedSearchParams));
 
-        
-                    if (!$data = $statement->fetch())
-                        return 0;
-        
-                    return $data['count'];
+
+        if (!$data = $statement->fetch())
+            return 0;
+
+        return $data['count'];
     }
 }
 ?>

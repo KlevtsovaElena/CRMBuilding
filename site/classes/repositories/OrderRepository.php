@@ -38,7 +38,7 @@
             {
                 if ($key == 'location')
                 {
-                    $item->$key = isset($value) ? $this->coordinateRepository->map(json_decode($value, true)) : new Coordinate();
+                    $item->$key = isset($value) && strlen($value) > 0 ? $this->coordinateRepository->map(json_decode($value, true)) : new Coordinate();
                     continue;
                 }
 
