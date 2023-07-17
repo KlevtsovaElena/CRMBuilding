@@ -154,7 +154,13 @@ if($role !== 1) {
                     //считаем и записываем в переменные общее кол-во страниц, оффсет и сколько всего элементов в списке
                     $totalPages = ceil(count($data) / $limit);
                     $offset = ($currentPage - 1) * $limit;
-                    $totalNumElements = count($data);
+                    // $totalNumElements = count($data); //ВЕРНУТЬ, КОГДА БУДЕТ НАСТРОЕНА АПИШКА ПО СОФТ-ДЕЛИТУ!!!
+                    $totalNumElements = 0;
+                    for ($d = 0; $d < count($data); $d++) {
+                        if($data[$d]['deleted'] == 0) {
+                            $totalNumElements++;
+                        }
+                    }
 
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
