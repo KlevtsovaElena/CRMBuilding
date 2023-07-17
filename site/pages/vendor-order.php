@@ -27,6 +27,7 @@
         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
+        print_r($data);
 
         function convertUnixToLocalTime($unixTime) {
 
@@ -80,7 +81,7 @@
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км</div> 
+                            <div>До клиента: <?php if(!$data['vendor_location']) { ?> <?='локация поставщика отсутствует' ?> <?php } else { ?> <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км <?php } ?></div> 
                         </div> 
                     </th>
                     <th></th>
