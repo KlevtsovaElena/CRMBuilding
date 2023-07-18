@@ -148,7 +148,6 @@ if($role !== 1) {
                         <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
                         <th class="ta-center" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                         <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                        <th class="ta-center" data-id="customer_id">ID</th>
                         <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
                         <th class="ta-center" data-id="products">Товары</th>
                         <th class="ta-center" data-id="total_price">Сумма</th>
@@ -196,7 +195,6 @@ if($role !== 1) {
                                         <?php } 
                                     }?>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
                                 <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                 <td class="list-orders_products">
@@ -252,7 +250,6 @@ if($role !== 1) {
                                         <?php } 
                                     }?>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                    <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
                                     <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                     <td class="list-orders_products">
@@ -311,7 +308,6 @@ if($role !== 1) {
                                                 <?php } 
                                             }?>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                        <td class="ta-center"><?= $data[$i]['customer_id'] ?></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>
                                         <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                         <td class="list-orders_products">
