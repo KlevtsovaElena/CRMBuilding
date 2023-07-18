@@ -84,6 +84,7 @@ function validationAdd() {
                 // пустое поле
                 if (item.id === "new_photo") {
                     choiceImage.classList.add('error');
+                    hasError = true;
                 } else {
                     item.classList.add('error');   
                     errorInfoContainer.innerText = "Заполните данные!";
