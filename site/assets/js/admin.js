@@ -149,6 +149,13 @@ function deleteOne(section_name, id) {
     //отправка запроса на удаление (жесткое)
     // sendRequestDELETE('http://localhost/api/'+ section_name +'.php?id=' + id);
 
+    let isDelete = window.confirm('Вы действительно хотите удалить этот элемент?');
+
+    if(!isDelete) {
+        console.log("не удалять");
+        return;
+    }
+
     // собираем ссылку для запроса
     link = 'http://localhost/api/'+ section_name + '.php';
 
