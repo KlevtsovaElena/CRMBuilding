@@ -230,7 +230,7 @@ function renderListOrders(orders) {
     for (let i = 0; i < records; i++) {
 
         let products = "";
-        let totalPrice = 0; 
+
         let productName = "";
         
         // соберём данные заказанных товаров и общую стоимость заказа
@@ -259,7 +259,7 @@ function renderListOrders(orders) {
             
             products += orders['orders'][i]['products'][j]['name'] + " (" + 
                             (orders['orders'][i]['products'][j]['quantity']) + '), ';
-                            totalPrice += orders['orders'][i]['products'][j]['quantity'] * orders['orders'][i]['products'][j]['price'];
+
                             
         }
 
@@ -296,8 +296,8 @@ function renderListOrders(orders) {
                                                         .replace('${products}', products)
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])
-                                                        .replace('${total_price}', totalPrice.toLocaleString('ru'))
-                                                        .replace('${complete_date}', '')
+                                                        .replace('${total_price}',  orders['orders'][i]['total_price'].toLocaleString('ru'))
+                                                        .replace('${distance}',  orders['orders'][i]['distance'])
                                                         .replace('${archive}', orders['orders'][i]['archive'])
                                                         .replace('${archive_status}', archiveStatus)
                                                         .replace('${archive_text}', archiveText);
@@ -509,9 +509,35 @@ function saveChangeOrder() {
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
     let objJson = JSON.stringify(obj);
 
+    // меняем статус в базе
     sendRequestPOST('http://localhost/api/ordervendors.php', objJson);
+
+    // если статус был 0, то пересчитаем кол-во новых заказов и отрисуем новую цифру
+    if (rowOrder.classList.contains('row-status0')) {
+        console.log("newchange");
+        changeCountNewOrders();
+    } 
 
     // перерисовка страницы
     startRenderPage();
+
+}
+
+// получение кол-ва новых заказов и отрисовка
+function changeCountNewOrders() {
+    // делаем запрос на получение количества новых заказов поставщика
+    let countNewOrders = sendRequestGET('http://localhost/api/order-vendors/get-count.php?status=0&vendor_id=' + vendor_id);
+    countNewOrders = JSON.parse(countNewOrders);
+
+    let newOrdersContainer = document.getElementById('counter');
+
+    // если новых заказов нет, то скрываем кружок
+    if (countNewOrders['count'] == 0) {
+        newOrdersContainer.classList.add('d-none');
+    } else {
+        // иначе перерисуем кол-во заказов в кружочке
+        newOrdersContainer.innerText = countNewOrders['count'];
+        newOrdersContainer.classList.remove('d-none');
+    }
 
 }

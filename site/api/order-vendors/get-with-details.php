@@ -49,6 +49,9 @@
                     'status' => $ordersVendorItem['status'],
                     'customer_phone' => $ordersVendorItem['customer_phone'],
                     'order_location' => $ordersVendorItem['order_location'],
+                    'archive' => $ordersVendorItem['archive'],
+                    'total_price' => $ordersVendorItem['total_price'],
+                    'distance' => $ordersVendorItem['distance']
                 ];
 
                 if (isset($ordersVendorItem['products'])) 

@@ -9,5 +9,7 @@
         public ?array $products;
         public int $status;
         public int $archive;
+        public int $total_price;
+        public float $distance;
     }
 ?>

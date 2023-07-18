@@ -152,7 +152,7 @@ function deleteOne(section_name, id) {
     // собираем ссылку для запроса
     link = 'http://localhost/api/'+ section_name + '.php';
 
-    if (section_name == 'admin-vendors') {
+    if (section_name == 'vendors') {
         // соберём json для передачи на сервер
         obj = JSON.stringify({
             'id': id,
@@ -175,7 +175,7 @@ function deleteOne(section_name, id) {
     //вынимаем информацию о номере текущей страницы
     let currentPage = document.getElementById('pages-info').getAttribute('data-current-page');
 
-    if (section_name == 'admin-vendors') {
+    if (section_name == 'vendors') {
         //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
         history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + currentPage);
 
