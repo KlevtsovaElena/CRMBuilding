@@ -230,7 +230,7 @@ function renderListOrders(orders) {
     for (let i = 0; i < records; i++) {
 
         let products = "";
-        let totalPrice = 0; 
+
         let productName = "";
         
         // соберём данные заказанных товаров и общую стоимость заказа
@@ -259,7 +259,7 @@ function renderListOrders(orders) {
             
             products += orders['orders'][i]['products'][j]['name'] + " (" + 
                             (orders['orders'][i]['products'][j]['quantity']) + '), ';
-                            totalPrice += orders['orders'][i]['products'][j]['quantity'] * orders['orders'][i]['products'][j]['price'];
+
                             
         }
 
@@ -296,8 +296,8 @@ function renderListOrders(orders) {
                                                         .replace('${products}', products)
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])
-                                                        .replace('${total_price}', totalPrice.toLocaleString('ru'))
-                                                        .replace('${complete_date}', '')
+                                                        .replace('${total_price}',  orders['orders'][i]['total_price'].toLocaleString('ru'))
+                                                        .replace('${distance}',  orders['orders'][i]['distance'])
                                                         .replace('${archive}', orders['orders'][i]['archive'])
                                                         .replace('${archive_status}', archiveStatus)
                                                         .replace('${archive_text}', archiveText);
