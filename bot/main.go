@@ -434,7 +434,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php")
+			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -541,7 +541,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/categories.php")
+			resp, err := http.Get("http://nginx:80/api/categories.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -588,7 +588,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user.Step = 6
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/brands.php")
+			resp, err := http.Get("http://nginx:80/api/brands.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -631,7 +631,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс для отображения выбранных товаров по фильтрам
 		case usersDB[chatId].Step == 7:
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/products.php?brand_id=" + button)
+			resp, err := http.Get("http://nginx:80/api/products.php?delted=0&brand_id=" + button)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -720,7 +720,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				fmt.Println(ID)
 				// Создаем GET-запрос
-				resp, err := http.Get("http://nginx:80/api/products.php?id=" + strconv.Itoa(ID))
+				resp, err := http.Get("http://nginx:80/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -884,7 +884,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			// обнуляем корзину
-			user.Cart = make(map[int]int)
+			user = UserT{Cart: map[int]int{}}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа", keyboard)
