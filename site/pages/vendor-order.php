@@ -75,7 +75,7 @@
     <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
-            <thead id="new-order" data-role="<?= $_GET['role'] ?>">
+            <thead id="new-order" data-role="<?= $role ?>">
                 <tr role="row">
                     <th class="table-header">
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
