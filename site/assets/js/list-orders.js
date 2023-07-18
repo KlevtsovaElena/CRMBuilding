@@ -509,9 +509,35 @@ function saveChangeOrder() {
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
     let objJson = JSON.stringify(obj);
 
+    // меняем статус в базе
     sendRequestPOST('http://localhost/api/ordervendors.php', objJson);
+
+    // если статус был 0, то пересчитаем кол-во новых заказов и отрисуем новую цифру
+    if (rowOrder.classList.contains('row-status0')) {
+        console.log("newchange");
+        changeCountNewOrders();
+    } 
 
     // перерисовка страницы
     startRenderPage();
+
+}
+
+// получение кол-ва новых заказов и отрисовка
+function changeCountNewOrders() {
+    // делаем запрос на получение количества новых заказов поставщика
+    let countNewOrders = sendRequestGET('http://localhost/api/order-vendors/get-count.php?status=0&vendor_id=' + vendor_id);
+    countNewOrders = JSON.parse(countNewOrders);
+
+    let newOrdersContainer = document.getElementById('counter');
+
+    // если новых заказов нет, то скрываем кружок
+    if (countNewOrders['count'] == 0) {
+        newOrdersContainer.classList.add('d-none');
+    } else {
+        // иначе перерисуем кол-во заказов в кружочке
+        newOrdersContainer.innerText = countNewOrders['count'];
+        newOrdersContainer.classList.remove('d-none');
+    }
 
 }
