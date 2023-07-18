@@ -110,6 +110,7 @@ type UserT struct {
 	PhoneNumber string      `json:"phone"`
 	City        int         `json:"city_id"`
 	Cart        map[int]int `json:"cart"`
+	Category_id string
 }
 
 // структура заказа
@@ -434,7 +435,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php")
+			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -541,7 +542,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/categories.php")
+			resp, err := http.Get("http://nginx:80/api/categories.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -558,7 +559,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				button := []map[string]interface{}{
 					{
 						"text":          category.CategoryName,
-						"callback_data": category.CategoryName,
+						"callback_data": category.ID,
 					},
 				}
 				buttons = append(buttons, button)
@@ -586,9 +587,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			user.Step = 6
+			user.Category_id = button
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/brands.php")
+			resp, err := http.Get("http://nginx:80/api/brands.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -599,6 +601,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
+
+			// if json.NewDecoder(resp.Body).Decode(&brands) == nil {
+			// 	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			// 	sendMessage(chatId, "Товаров по такой категории ил бренду нет", nil)
+			// 	user.Step += 1
+			// 	usersDB[chatId] = user
+			// 	break
+			// }
 
 			// Используем полученные данные и подставляем их в кнопки
 			for _, brand := range brands {
@@ -630,8 +640,11 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 		// кейс для отображения выбранных товаров по фильтрам
 		case usersDB[chatId].Step == 7:
+
+			user := usersDB[chatId]
+
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/products.php?brand_id=" + button)
+			resp, err := http.Get("http://nginx:80/api/products.php?deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -640,7 +653,21 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			var product []Product
 			err = json.NewDecoder(resp.Body).Decode(&product)
 			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
+
+				buttons := [][]map[string]interface{}{
+					{{"text": "Назад", "callback_data": "backToGoods"}},
+				}
+
+				// Создаем объект инлайн клавиатуры
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
+				user.Step = 5
+				usersDB[chatId] = user
+				break
 			}
 
 			// Используем полученные данные
@@ -703,7 +730,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// перезаписываем шаг
-			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -720,7 +746,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				fmt.Println(ID)
 				// Создаем GET-запрос
-				resp, err := http.Get("http://nginx:80/api/products.php?id=" + strconv.Itoa(ID))
+				resp, err := http.Get("http://nginx:80/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -884,7 +910,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			// обнуляем корзину
-			user.Cart = make(map[int]int)
+			user = UserT{Cart: map[int]int{}}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа", keyboard)
