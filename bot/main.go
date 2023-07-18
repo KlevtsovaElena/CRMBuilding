@@ -309,22 +309,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		user.PhoneNumber = phone
 		user.City, _ = strconv.Atoi(button)
 		user.Cart = make(map[int]int)
-		// Создаем тело запроса в виде строки JSON
-		requestBody := `{"first_name":"` + firstName + `", "last_name":"` + lastName + `", "phone":"` + phone + `", "city_id":` + button + `, "tg_username":"` + username + `", "tg_id":` + strconv.Itoa(id) + `}`
-		fmt.Println(requestBody)
-
-		sendPost(requestBody, "http://nginx:80/api/customers.php")
 
 		user.IsProvider = isProvider
 		user.Step = 1
 
 		usersDB[chatId] = user
 
-	} else {
-		// Создаем тело запроса в виде строки JSON
-		requestBody := `{"tg_id":` + strconv.Itoa(id) + `, "city_id": ` + button + `}`
-
-		sendPost(requestBody, "http://nginx:80/api/customers.php")
 	}
 
 	file, _ := os.Create("db.json")
@@ -601,14 +591,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			if err != nil {
 				log.Fatal("Ошибка при декодировании JSON:", err)
 			}
-
-			// if json.NewDecoder(resp.Body).Decode(&brands) == nil {
-			// 	// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			// 	sendMessage(chatId, "Товаров по такой категории ил бренду нет", nil)
-			// 	user.Step += 1
-			// 	usersDB[chatId] = user
-			// 	break
-			// }
 
 			// Используем полученные данные и подставляем их в кнопки
 			for _, brand := range brands {
