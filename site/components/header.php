@@ -136,7 +136,7 @@
                             </g>
                         </svg>
                         <?php 
-                            //собираем данные по заказам поставщика
+                            //собираем данные по заказам поставщиков
                             $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php");
                             $orderVendors = json_decode($dataJson, true); 
 
@@ -200,7 +200,7 @@
                             <g id="SVGRepo_iconCarrier"> <title>house-solid</title> <path class="clr-i-solid clr-i-solid-path-1" d="M33,19a1,1,0,0,1-.71-.29L18,4.41,3.71,18.71a1,1,0,0,1-1.41-1.41l15-15a1,1,0,0,1,1.41,0l15,15A1,1,0,0,1,33,19Z"/>
                             <path class="clr-i-solid clr-i-solid-path-2" d="M18,7.79,6,19.83V32a2,2,0,0,0,2,2h7V24h6V34h7a2,2,0,0,0,2-2V19.76Z"/> <rect x="0" y="0" width="36" height="36" fill-opacity="0"/> </g> 
                         </svg>
-                        <span>Главная</span>
+                        <span id="header-main" data-vendor="">Главная</span>
                     </a>
                 </li>
                 <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
@@ -233,9 +233,11 @@
                             </g>
                         </svg>
                         <?php 
-                            //собираем данные по заказам поставщика
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php");
-                            $orderVendors = json_decode($dataJson, true); 
+
+                            //собираем данные по заказам КОНКРЕТНОГО поставщика
+                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?vendor_id=" . $vendor_id);
+                            $orderVendors = json_decode($dataJson, true);
+                            //print_r($orderVendors);
 
                             //считаем только новые заказы
                             $numNew = 0;

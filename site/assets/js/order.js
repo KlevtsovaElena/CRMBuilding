@@ -37,8 +37,17 @@ if (status == 0 && role == 2) {
         //отнимаем единицу
         let newNum = parseInt(currentNum) - 1;
         console.log(newNum);
-        //кладем в счетчик новое значение
-        counter.innerHTML = newNum;
+        
+        //если число больше 0
+        if(newNum > 0) {
+            //кладем в счетчик новое значение
+            counter.innerHTML = newNum;
+        //если новых заказов 0
+        } else {
+            console.log('новых заказов нет');
+            counter.classList.toggle('d-none');
+        }
+        
     
         //console.log('статус заказа  с id ' + id + ' изменен на ' + 1);
     
