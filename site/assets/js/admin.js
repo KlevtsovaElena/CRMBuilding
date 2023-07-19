@@ -315,13 +315,57 @@ function applyInOrders() {
 
 }
 
+//функция по чекбоксам со статусом города
+function checkboxChanged(id) {
+
+    //выдаем поп-ап с подтверждением действия
+    let isChecked = window.confirm('Вы действительно хотите изменить статус города?');
+
+    if(!isChecked) {
+        console.log("не менять");
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 0
+        });
+    }
+
+    console.log(obj);
+
+    let link = 'http://localhost/api/cities.php';
+
+    //передаем на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+}
+
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editVendor(id) {
 
-    let getParam = window.location.search;
+let getParam = window.location.search;
 
-    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
+// при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
     
 }
 
