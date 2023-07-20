@@ -40,7 +40,7 @@ if($role !== 1) {
                     <option value="" selected hidden></option>
 
                     <?php 
-                    $citiesJson = file_get_contents("http://nginx/api/cities.php");
+                    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0");
                     $cities = json_decode($citiesJson, true);
 
                     foreach($cities as $city) { ?>
