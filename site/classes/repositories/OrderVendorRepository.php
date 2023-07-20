@@ -16,7 +16,9 @@ class OrderVendorRepository extends BaseRepository
                                         FROM order_vendors ov
                                         INNER JOIN vendors v
                                         ON v.id = ov.vendor_id
-                                        INNER JOIN orders o
+                                        LEFT JOIN cities cit
+                                        ON cit.id = v.city_id
+                                        RIGHT JOIN orders o
                                         ON o.id = ov.order_id
                                         INNER JOIN customers c
                                         ON c.id = o.customer_id 
@@ -25,7 +27,9 @@ class OrderVendorRepository extends BaseRepository
     const GET_WITH_DETAILS = 'SELECT ov.`id` as `id`,
                                         ov.`order_id` as `order_id`,
                                         ov.`vendor_id` as `vendor_id`,
+                                        v.`name` as `vendor_name`,
                                         v.`coordinates` as `vendor_location`,
+                                        cit.`name` as `vendor_city`,
                                         o.`order_date` as `order_date`,
                                         ov.`status` as `status`,
                                         ov.`archive` as `archive`,
@@ -38,7 +42,9 @@ class OrderVendorRepository extends BaseRepository
                                     FROM order_vendors ov
                                     INNER JOIN vendors v
                                     ON v.id = ov.vendor_id
-                                    INNER JOIN orders o
+                                    LEFT JOIN cities cit
+                                    ON cit.id = v.city_id
+                                    RIGHT JOIN orders o
                                     ON o.id = ov.order_id
                                     INNER JOIN customers c
                                     ON c.id = o.customer_id 
@@ -48,7 +54,9 @@ class OrderVendorRepository extends BaseRepository
         'id' => 'ov.id',
         'order_id' => 'ov.order_id',
         'vendor_id' => 'ov.vendor_id',
+        'vendor_name' => 'v.name',
         'vendor_location' => 'v.coordinates',
+        'vendor_city' => 'cit.name',
         'order_date' => 'o.order_date',
         'status' => 'ov.status',
         'archive' => 'ov.archive',
