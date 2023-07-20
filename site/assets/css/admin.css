@@ -1,4 +1,11 @@
 
+input[type="checkbox"] {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+    min-width: unset;
+}
+
 .add-block {
     margin-bottom: 20px;
 }

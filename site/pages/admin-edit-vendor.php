@@ -24,10 +24,10 @@ if($role !== 1) {
 <?php 
     $id = $_GET['id']; 
 
-    $vendorJson = file_get_contents("http://nginx/api/vendors.php?id=" . $id);
+    $vendorJson = file_get_contents("http://nginx/api/vendors.php?deleted=0&id=" . $id);
     $vendor = json_decode($vendorJson, true);
 
-    $citiesJson = file_get_contents("http://nginx/api/cities.php");
+    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0");
     $cities = json_decode($citiesJson, true);
 
 ?>
