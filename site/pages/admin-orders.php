@@ -147,6 +147,7 @@ if($role !== 1) {
                         <th class="ta-center" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
                         <th class="ta-center" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
                         <th class="ta-center" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
+                        <th class="ta-center" data-id="vendor_city" data-sort="<?php if ($sortBy == 'vendor_city')  {echo $mark; } ?>">Город</th>
                         <th class="ta-center" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                         <th class="ta-center" data-id="customer_phone" data-sort="<?php if ($sortBy == 'customer_phone')  {echo $mark; } ?>">Телефон</th>
                         <th class="ta-center" data-id="products">Товары</th>
@@ -194,6 +195,7 @@ if($role !== 1) {
                                             <td><?= $vendors[$p]['name'] ?></td>
                                         <?php } 
                                     }?>
+                                <td><?= $data[$i]['vendor_city'] ?></td>
                                 <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                 <td><?= $data[$i]['customer_phone'] ?></td>
                                 <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
@@ -249,6 +251,7 @@ if($role !== 1) {
                                             <td><?= $vendors[$p]['name'] ?></td>
                                         <?php } 
                                     }?>
+                                    <td><?= $data[$i]['vendor_city'] ?></td>
                                     <td><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1" class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                     <td><?= $data[$i]['customer_phone'] ?></td>
                                     <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
@@ -307,6 +310,7 @@ if($role !== 1) {
                                                     <td><?= $vendors[$p]['name'] ?></td>
                                                 <?php } 
                                             }?>
+                                        <td><?= $data[$i]['vendor_city'] ?></td>
                                         <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
                                         <td><?= $data[$i]['customer_phone'] ?></td>
                                         <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
