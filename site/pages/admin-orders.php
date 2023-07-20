@@ -260,11 +260,13 @@ if($role !== 1) {
                         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?search=" . $_GET['search']);
                         $data = json_decode($dataJson, true);
                         $data = $data['orders'];
+                        $totalEntries = 0;
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
                         if ($data) {
                             for ($i = 0; $i < count($data); $i++) { 
                                 //проверка на то, чтобы выводилось не больше строк, чем есть в БД
                                 if(isset($data[$i]['id'])) { 
+                                    $totalEntries += 1;
                                     //расфишровка статусов
                                     $status;
                                     if($data[$i]['status'] == 0) {
