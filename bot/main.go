@@ -425,7 +425,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0")
+			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -1375,7 +1375,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "city" {
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php")
+			resp, err := http.Get("http://nginx:80/api/cities.php&deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
