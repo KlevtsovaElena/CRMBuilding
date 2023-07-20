@@ -29,10 +29,10 @@ if($role !== 2) {
 <!-- соберём данные для отображения в форме -->
 
 <?php
-    $brandsJson = file_get_contents("http://nginx/api/brands.php");
+    $brandsJson = file_get_contents("http://nginx/api/brands.php?deleted=0");
     $brands = json_decode($brandsJson, true);
 
-    $categoriesJson = file_get_contents("http://nginx/api/categories.php");
+    $categoriesJson = file_get_contents("http://nginx/api/categories.php?deleted=0");
     $categories = json_decode($categoriesJson, true);
 ?>
 
