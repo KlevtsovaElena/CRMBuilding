@@ -68,7 +68,7 @@ if($role !== 1) {
             date_default_timezone_set("$timeZone");
         
             //конвертируем время в часовой пояс, указанный выше
-            $localTime = date('d.m.Y H:i', $unixTime);
+            $localTime = date('d.m.Y', $unixTime);
         
             return $localTime;
         }
