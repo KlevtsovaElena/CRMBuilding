@@ -190,6 +190,7 @@ function editVendor(id) {
 }
 
 
+// удаление поставщика админом
 
 function deleteVendorFromEditForm(id) {
     
@@ -206,14 +207,15 @@ function deleteVendorFromEditForm(id) {
     // соберём json
     let obj = JSON.stringify({
         'id': id,
+        'is_active': 0,
         'deleted':  1
     });
 
-    // делаем запрос на удаление товара по id
-    sendRequestPOST('http://localhost/api/vendors.php', obj);
+    // делаем запрос на удаление поставщика по id
+    sendRequestPOST('http://localhost/api/vendors/delete-vendor-with-products.php', obj);
 
 
-    // делаем запрос на удаление товара по id
+    // делаем запрос на удаление поставщика по id
     // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
 
     alert("Поставщик удалён");
