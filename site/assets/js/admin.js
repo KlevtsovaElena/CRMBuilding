@@ -123,6 +123,16 @@ function edit(id, section_name) {
                 //при изменении в инпуте
                 input.onchange = function() {
 
+                    //console.log('onchange срабатывает');
+
+                    //запрос подтверждения
+                    let yes = window.confirm('Вы действительно хотите изменить этот элемент?');
+
+                    if(!yes) {
+                        console.log("не изменять");
+                        return;
+                    }
+
                     //копируем измененное значение
                     changedValue = inputBlock.querySelector('input').value;
                     if (changedValue.trim() === editedValue) {
