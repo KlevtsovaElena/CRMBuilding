@@ -22,6 +22,11 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
+.cancel {
+    width: 20px;
+    cursor: pointer;
+}
+
 .delete-cell {
     width: 30px !important;
     min-width: unset !important;
