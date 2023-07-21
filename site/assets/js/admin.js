@@ -55,8 +55,194 @@ function addNew(section_name) {
     
 }
 
-//функция активации редактируемого инпута для названия
 function edit(id, section_name) {
+
+    //достаем массив всех элементов, содержащих редактируемое название
+    let nameElements = document.querySelectorAll('.list-orders_status');
+    //console.log(nameElements);
+
+    //переменная для обновленного значения
+    let changedValue = '';
+
+    //переменная для исходного значения
+    let editedValue = '';
+
+    //меняем поле с названием на редактируемый инпут
+    for (let i = 0; i < nameElements.length; i++) {
+        //ищем среди них то, у котого атрибут совпадает с нужным id
+        if (nameElements[i].getAttribute('data-id') == id) {
+
+            //копируем из нередактируемого поля текстовое значение, которое будет редактироваться в инпуте
+            editedValue = nameElements[i].innerHTML;
+            console.log(editedValue);
+            //скрываем нередактируемое поле
+            nameElements[i].classList.add('d-none');
+            //достаем инпут, который надо сделать видимым
+            let inputBlock = document.querySelectorAll('.input')[i];
+            console.log(inputBlock);
+            //открываем инпут
+            inputBlock.classList.remove('d-none');
+            //кладем внутрь инпута значение, которое будем редактировать
+            inputBlock.querySelector('input').value = editedValue;
+            input = inputBlock.querySelector('input');
+
+            //скрываем блок с карандашом
+            document.getElementsByClassName('edit')[i].classList.add('d-none');
+            //открываем блок с отменой
+            document.getElementsByClassName('cancel')[i].classList.remove('d-none');
+
+            
+            //при хотя бы одном клике по открывшемуся инпуту
+            input.onclick = function() {
+
+                //1) вариант, когда только кликнули, но ничего не изменили в инпуте и ушли с него
+                //если после этого кликнули по любому другому месту, кроме инпута
+                input.onblur = function() {
+                    //исключение - если кликнули по крестику отмены редактирования
+                    document.onmousedown = function (e) {
+                        if (e.target.className === "cancel") {
+                            console.log('отловлено нажатие');
+                            document.getElementsByClassName('edit')[i].onmousedown = cancel(id, editedValue);
+                            return;
+                        } 
+                    };
+
+                    console.log('onblur срабатывает');
+                    //скрываем инпут
+                    inputBlock.classList.add('d-none');
+                    //возвращаем нередактируемое поле
+                    nameElements[i].classList.remove('d-none');
+                    //возвращаем блок с карандашом
+                    document.getElementsByClassName('edit')[i].classList.remove('d-none');
+                    //скрываем блок с отменой
+                    document.getElementsByClassName('cancel')[i].classList.add('d-none');
+
+                }
+
+                //2) вариант, когда кликнули и внесли изменения в инпут
+                //при изменении в инпуте
+                input.onchange = function() {
+
+                    //console.log('onchange срабатывает');
+
+                    //запрос подтверждения
+                    let yes = window.confirm('Вы действительно хотите изменить этот элемент?');
+
+                    if(!yes) {
+                        console.log("не изменять");
+                        return;
+                    }
+
+                    //копируем измененное значение
+                    changedValue = inputBlock.querySelector('input').value;
+                    if (changedValue.trim() === editedValue) {
+                        console.log('значение не было обновлено');
+                        return;
+                    } 
+                    if (changedValue.trim() === '') {
+                        alert('Поле не может быть пустым');
+                        return;
+                    }
+                    console.log(changedValue);
+
+                    // собираем ссылку для запроса
+                    link = 'http://localhost/api/'+ section_name + '.php';
+
+                    // соберём json для передачи на сервер
+                    //для категорий
+                    if(section_name == 'categories') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'category_name': changedValue
+                        });
+                    }
+
+                    //для брендов
+                    if (section_name == 'brands') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'brand_name': changedValue
+                        });
+                    }
+
+                    //для городов
+                    if (section_name == 'cities') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'name': changedValue
+                        });
+                    }
+
+                    console.log(obj);
+
+                    //передаем на сервер в пост-запросе
+                    sendRequestPOST(link, obj);
+
+                    //убираем инпут
+                    inputBlock.classList.add('d-none');
+                    //возвращаем нередактируемое поле
+                    nameElements[i].classList.remove('d-none');
+                    //и возвращаем измененное значение в исходный нередактируемый элемент
+                    nameElements[i].innerHTML = changedValue;
+                    //возвращаем блок с карандашом
+                    document.getElementsByClassName('edit')[i].classList.remove('d-none');
+                    //скрываем блок с отменой
+                    document.getElementsByClassName('cancel')[i].classList.add('d-none');
+
+                    //если значение поменялось, заносим его в дата-атрибут, чтобы достать в функции cancel
+                    if (changedValue.trim() != '' && changedValue.trim() !== editedValue) {
+                        //console.log(nameElements[i]);
+                        nameElements[i].setAttribute('data-new-name', changedValue);
+                        //console.log(nameElements[i].getAttribute('data-new-name'));
+                    }
+
+                }
+                
+            
+            }
+        }
+
+
+    }
+}
+
+//функция отмены редактирования (по нажатию на крестик)
+function cancel(id, name) {
+    
+    //достаем массив всех элементов, содержащих редактируемое название
+    let nameElements = document.querySelectorAll('.list-orders_status');
+    console.log(nameElements);
+
+    //меняем редактируемый инпут на поле с названием
+    for (let i = 0; i < nameElements.length; i++) {
+        if (nameElements[i].getAttribute('data-id') == id) {
+
+            //если назначен дата-атрибут с измененным названием, достаем его
+            if(nameElements[i].getAttribute('data-new-name')) {
+                name = nameElements[i].getAttribute('data-new-name');
+            }
+
+            //достаем инпут, который надо скрыть
+            let inputBlock = document.querySelectorAll('.input')[i];
+            console.log(inputBlock);
+            console.log(nameElements[i]);
+
+            //скрываем инпут и возвращаем нередактируемое поле с названием
+            inputBlock.classList.add('d-none');
+            nameElements[i].classList.remove('d-none');
+            //возвращаем в него изначальное название до редактирования
+            nameElements[i].innerHTML = name;
+            //скрываем блок с отменой
+            document.getElementsByClassName('cancel')[i].classList.add('d-none');
+            //открываем блок с карандашом
+            document.getElementsByClassName('edit')[i].classList.remove('d-none');
+            
+        }
+    }
+}
+
+//функция активации редактируемого инпута для названия
+function xxx(id, section_name) {
 
     //достаем массив всех элементов, содержащих редактируемое название
     let nameElements = document.querySelectorAll('.list-orders_status');
@@ -65,11 +251,17 @@ function edit(id, section_name) {
     //меняем поле с названием на редактируемый инпут
     for (let i = 0; i < nameElements.length; i++) {
         if (nameElements[i].getAttribute('data-id') == id) {
+
+            //убираем карандаш у нужной строки
+            document.getElementsByClassName('edit')[i].innerHTML = '';
+            //убираем онклик с того места, где был карандаш
+            //document.getElementsByClassName('edit')[i].onclick = null;
+            //делаем обычный курсор в том месте, где был карандаш
+            document.getElementsByClassName('edit')[i].style.cursor = 'default';
             //вынимаем текстовое значение, которое будет редактироваться
             let editedValue = nameElements[i].innerHTML;
             //очищаем поле, откуда взяли название
             nameElements[i].innerText = '';
-            console.log(editedValue);
             //создаем инпут
             let input = document.createElement('input');
             input.type = 'text';
@@ -77,6 +269,54 @@ function edit(id, section_name) {
             nameElements[i].appendChild(input);
             //переносим имеющееся  название внутрь инпута для редактирования
             input.value = editedValue;
+            console.log(editedValue);
+            
+
+            nameElements[i].childNodes[0].setAttribute('created', 1);
+            console.log(nameElements[i].childNodes[0].getAttribute('created'));
+            //если совершено скликивание даже без клика по инпуту
+
+            // if (nameElements[i].childNodes[0].getAttribute('created')) {
+            //     document.addEventListener( 'click', (e) => {
+
+            //         if(e.target !== nameElements[i].childNodes[0]) {
+            //             console.log(nameElements[i].childNodes[0].getAttribute('created'));
+            //             console.log('клик мимо инпута');
+            //         }
+            //         const withinBoundaries = e.composedPath().includes(input);
+                 
+                        // console.log(nameElements[i].childNodes[0].getAttribute('created'));
+                        // console.log('клик мимо инпута');
+                        // //возвращаем обратно нередактируемую строку
+                        // //убираем добавленный инпут
+                        // nameElements[i].removeChild(input);
+                        // //и возвращаем измененное значение в исходный нередактируемый элемент
+                        // nameElements[i].innerText = editedValue;
+                        // //возвращаем карандаш у нужной строки
+                        // document.getElementsByClassName('edit')[i].innerHTML = '&#9998;';
+                        // //возвращаем указующий курсор в том месте, где был карандаш
+                        // document.getElementsByClassName('edit')[i].style.cursor = 'pointer';
+
+            //     })
+            // }
+
+            //document.addEventListener( 'click', (e) => {
+                //const withinBoundaries = e.composedPath().includes(input);
+             
+                // if (nameElements[i].childNodes[0].getAttribute('created') && event.target !== input) {
+                //     console.log(nameElements[i].childNodes[0].getAttribute('created'));
+                //     console.log('клик мимо инпута');
+                //     //возвращаем обратно нередактируемую строку
+                //     //убираем добавленный инпут
+                //     nameElements[i].removeChild(input);
+                //     //и возвращаем измененное значение в исходный нередактируемый элемент
+                //     nameElements[i].innerText = editedValue;
+                //     //возвращаем карандаш у нужной строки
+                //     document.getElementsByClassName('edit')[i].innerHTML = '&#9998;';
+                //     //возвращаем указующий курсор в том месте, где был карандаш
+                //     document.getElementsByClassName('edit')[i].style.cursor = 'pointer';
+                // }
+            //})
 
             input.onclick = function() {
 
@@ -86,54 +326,64 @@ function edit(id, section_name) {
                     nameElements[i].removeChild(input);
                     //и возвращаем измененное значение в исходный нередактируемый элемент
                     nameElements[i].innerText = editedValue;
+                    //возвращаем карандаш у нужной строки
+                    document.getElementsByClassName('edit')[i].innerHTML = '&#9998;';
+                    //возвращаем указующий курсор в том месте, где был карандаш
+                    document.getElementsByClassName('edit')[i].style.cursor = 'pointer';
+                    //возвращаем онклик
+                    //document.getElementsByClassName('edit')[i].onclick = edit(id, section_name);
                 }
 
                 //при изменении в инпуте
                 input.onchange = function() {
 
-                let changedValue = input.value;
-                let name = changedValue;
+                    let changedValue = input.value;
+                    let name = changedValue;
 
-                // собираем ссылку для запроса
-                link = 'http://localhost/api/'+ section_name + '.php';
+                    // собираем ссылку для запроса
+                    link = 'http://localhost/api/'+ section_name + '.php';
 
-                // соберём json для передачи на сервер
-                //для категорий
-                if(section_name == 'categories') {
-                    obj = JSON.stringify({
-                        'id': id,
-                        'category_name': name
-                    });
+                    // соберём json для передачи на сервер
+                    //для категорий
+                    if(section_name == 'categories') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'category_name': name
+                        });
+                        console.log(obj);
+                    }
+
+                    //для брендов
+                    if (section_name == 'brands') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'brand_name': name
+                        });
+                    }
+
+                    //для городов или поставщиков
+                    if (section_name == 'cities' || section_name == 'vendors') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'name': name
+                        });
+                    }
+
                     console.log(obj);
-                }
 
-                //для брендов
-                if (section_name == 'brands') {
-                    obj = JSON.stringify({
-                        'id': id,
-                        'brand_name': name
-                    });
-                }
+                    //передаем на сервер в пост-запросе
+                    sendRequestPOST(link, obj);
 
-                //для городов или поставщиков
-                if (section_name == 'cities' || section_name == 'vendors') {
-                    obj = JSON.stringify({
-                        'id': id,
-                        'name': name
-                    });
-                }
-
-                console.log(obj);
-
-                //передаем на сервер в пост-запросе
-                sendRequestPOST(link, obj);
-
-                //возвращаем обратно нередактируемую строку
-                //убираем добавленный инпут
-                nameElements[i].removeChild(input);
-                //и возвращаем измененное значение в исходный нередактируемый элемент
-                nameElements[i].innerText = changedValue;
-        };
+                    //возвращаем обратно нередактируемую строку
+                    //убираем добавленный инпут
+                    nameElements[i].removeChild(input);
+                    //и возвращаем измененное значение в исходный нередактируемый элемент
+                    nameElements[i].innerText = changedValue;
+                    //возвращаем карандаш у нужной строки
+                    document.getElementsByClassName('edit')[i].innerHTML = '&#9998;';
+                    //возвращаем указующий курсор в том месте, где был карандаш
+                    document.getElementsByClassName('edit')[i].style.cursor = 'pointer';
+                };
             }
 
             
@@ -315,13 +565,57 @@ function applyInOrders() {
 
 }
 
+//функция по чекбоксам со статусом города
+function checkboxChanged(id) {
+
+    //выдаем поп-ап с подтверждением действия
+    let isChecked = window.confirm('Вы действительно хотите изменить статус города?');
+
+    if(!isChecked) {
+        console.log("не менять");
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 0
+        });
+    }
+
+    console.log(obj);
+
+    let link = 'http://localhost/api/cities.php';
+
+    //передаем на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+}
+
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editVendor(id) {
 
-    let getParam = window.location.search;
+let getParam = window.location.search;
 
-    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
+// при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
     
 }
 

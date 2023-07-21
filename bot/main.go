@@ -425,7 +425,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0")
+			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -657,11 +657,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				// Создаем объект инлайн клавиатуры
 				buttons := [][]map[string]interface{}{
 					{
+						{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(product.ID)},
+						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(product.ID)},
+						{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(product.ID)},
+					},
+					{
 						{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
 						{"text": "0", "callback_data": "quantity"},
 						{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
 					},
-					{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(product.ID)}},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
@@ -919,11 +923,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
+							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
+							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)},
+							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
+						},
+						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
 							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)}},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 					}
 
@@ -954,11 +962,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
+						{"text": "➖ 1", "callback_data": "minusone:" + productStr},
+						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+						{"text": "➕ 1", "callback_data": "addone:" + productStr},
+					},
+					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
 						{"text": "1", "callback_data": "quantity"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr}},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
@@ -993,11 +1005,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
+							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
+							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)},
+							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
+						},
+						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
 							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)}},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 					}
 
@@ -1028,11 +1044,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
 					{
+						{"text": "➖ 1", "callback_data": "minusone:" + productStr},
+						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+						{"text": "➕ 1", "callback_data": "addone:" + productStr},
+					},
+					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
 						{"text": "10", "callback_data": "quantity"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr}},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 				}
 
@@ -1068,11 +1088,61 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
+							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
+							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+							{"text": "➕ 1", "callback_data": "addone:" + productStr},
+						},
+						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
 							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
-						{{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr}},
+						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+					}
+
+					inlineKeyboard := map[string]interface{}{
+						"inline_keyboard": buttons,
+					}
+
+					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+					http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
+					if usersDB[chatId].Cart[productID] == 0 {
+						delete(usersDB[chatId].Cart, productID)
+					}
+					break
+				}
+			}
+		}
+
+		// кейс для - в карточке товаров
+		if strings.SplitN(button, ":", 2)[0] == "minusone" {
+			user := usersDB[chatId]
+			productStr := strings.Split(button, ":")[1]
+			productID, _ := strconv.Atoi(productStr)
+			quantity := 1
+
+			for ID := range usersDB[chatId].Cart {
+				if ID == productID {
+					// Если товар найден, уменьшаем его количество
+					if user.Cart[ID] <= quantity {
+						user.Cart[ID] = 0
+					} else {
+						user.Cart[ID] -= quantity
+					}
+					usersDB[chatId] = user
+					// Создаем новую инлайн клавиатуру с обновленным числом
+					buttons := [][]map[string]interface{}{
+						{
+							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
+							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+							{"text": "➕ 1", "callback_data": "addone:" + productStr},
+						},
+						{
+							{"text": "➖ 10", "callback_data": "minus:" + productStr},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
+							{"text": "➕ 10", "callback_data": "add:" + productStr},
+						},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
 					}
 
@@ -1305,7 +1375,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "city" {
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php")
+			resp, err := http.Get("http://nginx:80/api/cities.php&deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
