@@ -27,7 +27,7 @@ if($role !== 1) {
     $vendorJson = file_get_contents("http://nginx/api/vendors.php?deleted=0&id=" . $id);
     $vendor = json_decode($vendorJson, true);
 
-    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0");
+    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0&is_active=1");
     $cities = json_decode($citiesJson, true);
 
 ?>
@@ -48,6 +48,7 @@ if($role !== 1) {
             <div class="form-add-vendor__item">
                 <p>Город</p>
                 <select id="city_id" name="city_id" value="" required>
+                    <option value="" selected hidden>Выберите город...</option>
                     <?php 
                     foreach($cities as $city) { 
                         if ($city['id'] === $vendor['city_id']) {?>

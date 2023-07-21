@@ -92,7 +92,7 @@ if($role !== 1) {
                 <div class="form-add-product__elements-item">
                     <p>Категория</p>
                     <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
-
+                        <option value="" selected hidden>Выберите категорию...</option>
                         <?php foreach($categories as $category) { 
                             if ($category['id'] === $product['category_id']) {
                             ?>
@@ -110,7 +110,7 @@ if($role !== 1) {
                 <div class="form-add-product__elements-item">
                     <p>Бренд</p>
                     <select id="brand_id" name="brand_id" value="<?= $product['brand_id']; ?>" required>
-
+                        <option value="" selected hidden>Выберите бренд...</option>
                         <?php foreach($brands as $brand) { 
                             if ($brand['id'] === $product['brand_id']) {
                             ?>

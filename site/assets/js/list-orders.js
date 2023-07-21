@@ -271,6 +271,7 @@ function renderListOrders(orders) {
         let dateTimeOrder = new Date(orders['orders'][i]['order_date'] * 1000);
         //.slice(0, -3) просто обрезает 3 последних символа. Таким образом, получаем время без секунд
         let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
+
         //преобразуем дату с сервера в дату, которая у пользователя
         let dateOrder = dateTimeOrder.toLocaleDateString();
         let archiveStatus = "";
@@ -282,6 +283,7 @@ function renderListOrders(orders) {
             archiveStatus = "archive=1";
             archiveText = "В архив";
         }
+
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders['orders'][i]['order_id'])
                                                         .replace('${order_id}', orders['orders'][i]['order_id'])
@@ -292,7 +294,8 @@ function renderListOrders(orders) {
                                                         .replace('${status}', orders['orders'][i]['status'])
                                                         .replace('${status}', orders['orders'][i]['status'])
                                                         .replace('${status}', orderStatus[orders['orders'][i]['status']])
-                                                        .replace('${order_date}', dateOrder + ' ' + timeOrder)
+                                                        .replace('${order_date}', dateOrder)
+                                                        // .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])

@@ -319,8 +319,8 @@ if (count($_GET) !== 0) {
                         <!-- <td  class="ta-center">${customer_id}</td> -->
                         <td>${customer_phone}</td>
                         <td class="list-orders_products">${products}</td>
-                        <td>${total_price}</td>
-                        <td>${distance}</td>
+                        <td class="ta-center">${total_price}</td>
+                        <td class="ta-center">${distance}</td>
                        
 
                     </tr>
