@@ -2,7 +2,6 @@
     include($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
     use abstraction\BaseController as BaseController;
-    use models\Vendors;
     use repositories\VendorRepository;
 
     class CheckController extends BaseController
