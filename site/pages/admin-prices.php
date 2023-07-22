@@ -17,7 +17,9 @@ if($role !== 1) {
 ?>
 <?php include('./../components/header.php'); ?>
 
-<!-- ЗДЕСЬ БУДЕТ ОСНОВНОЙ КОД СТРАНИЦЫ -->
+    <p class="page-title">Цены</p>
+
+    <!-- ЗДЕСЬ БУДЕТ ОСНОВНОЙ КОД СТРАНИЦЫ -->
 
 
 <?php include('./../components/footer.php'); ?>
