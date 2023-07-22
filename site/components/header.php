@@ -66,7 +66,7 @@
                         <span>Главная</span>
                     </a>
                 </li> -->
-                <li class="menu-left__item"   data-page-name = "/pages/admin-vendors.php">
+                <li class="menu-left__item"   data-page-name = "#">
                     <a href="#" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -104,7 +104,7 @@
                         <span>Поставщики</span>
                     </a>
                 </li>
-                <li class="menu-left__item"   data-page-name = "/pages/admin-vendors.php">
+                <li class="menu-left__item"   data-page-name = "/pages/admin-prices.php">
                     <a href="./../pages/admin-prices.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -114,7 +114,7 @@
                         <span>Цены</span>
                     </a>
                 </li>
-                <li class="menu-left__item"   data-page-name = "/pages/admin-vendors.php">
+                <li class="menu-left__item"   data-page-name = "/pages/admin-analytics.php">
                     <a href="./../pages/admin-analytics.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -226,7 +226,7 @@
                         <span>Добавить товар</span>
                     </a>
                 </li> -->
-                <li class="menu-left__item" data-page-name = "/pages/vendor-list-products.php">
+                <li class="menu-left__item" data-page-name = "/pages/vendor-finances.php">
                     <a href="./../pages/vendor-finances.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -234,6 +234,17 @@
                             <g id="SVGRepo_iconCarrier"> <title>list</title> <path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
                         </svg>
                         <span>Финансы</span>
+                    </a>
+                </li>
+                <li class="menu-left__item" data-page-name = "/pages/vendor-my-info.php">
+                    <a href="./../pages/vendor-my-info.php" class="menu-left__item-link">
+                        <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"> <title>house-solid</title> <path class="clr-i-solid clr-i-solid-path-1" d="M33,19a1,1,0,0,1-.71-.29L18,4.41,3.71,18.71a1,1,0,0,1-1.41-1.41l15-15a1,1,0,0,1,1.41,0l15,15A1,1,0,0,1,33,19Z"/>
+                            <path class="clr-i-solid clr-i-solid-path-2" d="M18,7.79,6,19.83V32a2,2,0,0,0,2,2h7V24h6V34h7a2,2,0,0,0,2-2V19.76Z"/> <rect x="0" y="0" width="36" height="36" fill-opacity="0"/> </g> 
+                        </svg>
+                        <span id="header-main" data-vendor="">Мои данные</span>
                     </a>
                 </li>
                 <li class="menu-left__item"  data-page-name = "/pages/vendor-list-orders.php">
