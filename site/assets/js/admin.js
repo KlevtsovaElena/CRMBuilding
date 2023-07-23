@@ -407,7 +407,13 @@ function deleteOne(section_name, id) {
     }
 
     // собираем ссылку для запроса
-    link = 'http://localhost/api/'+ section_name + '.php';
+    //для удаления поставщиков персональная апишка, чтобы вместе с поставщиком скрывались его товары
+    if (section_name == 'vendors') {
+        link = 'http://localhost/api/vendors/delete-vendor-with-products.php';
+    } else {
+        link = 'http://localhost/api/'+ section_name + '.php';
+    }
+    
 
     if (section_name == 'vendors') {
         // соберём json для передачи на сервер

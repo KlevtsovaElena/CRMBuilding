@@ -78,10 +78,30 @@ function confirmOrder() {
         confirmDelivery();
     };
 
+    //достаем координаты клиента из дата-атрибута
+    let clientLatitude = document.getElementById('new-order').getAttribute('data-client-latitude');
+    let clientLongitude = document.getElementById('new-order').getAttribute('data-client-longitude');
+    let vendor_id = document.getElementById('new-order').getAttribute('data-vendor-id');
+    console.log(clientLatitude);
+    console.log(clientLongitude);
+    //отрисовываем кнопку "Отправить себе координаты" с соответствующей функцией по клику на нее
+    //для этого под уже имеющейся кнопкой подтверждения доставки
+    let btn2 = document.getElementById('cancel-order');
+    console.log(btn2);
+    //рисуем кнопку "Отправить себе координаты"
+    btn2.insertAdjacentHTML("afterend", `<button id="send-location" class="btn btn-ok d-iblock">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>`);
+
+    //и вешаем на нее онклик с координатами клиента
+    let addedBtn = document.getElementById('send-location');
+    addedBtn.onclick = function(){
+        sendLocation(clientLatitude, clientLongitude, vendor_id);
+        console.log('sending location works');
+    };
+
     // если до подтверждения статус был "отменен", 
     if(status == 3) {
         //возвращаем кнопку "Отменить" для возможности отмены заказа
-        btn.insertAdjacentHTML("afterend", `<button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>`);
+        btn.insertAdjacentHTML("afterend", `<button id="cancel-order" class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>`);
     }
 
     //в случае, если статус до подтверждения был "новый" или "просмотрен"
@@ -155,6 +175,12 @@ function customerOutOfReach() {
 //функция для возвращения на страницу всех заказов
 function backToAllOrders() {
     window.location.href = '/pages/vendor-list-orders.php';
+}
+
+//функция отправки координат клиента в телеграм поставщика
+function sendLocation(latitude, longitude, id) {
+    //let clientLocation = location;
+    console.log(latitude, longitude, id);
 }
 
 //записываем в куки локальный часовой пояс
