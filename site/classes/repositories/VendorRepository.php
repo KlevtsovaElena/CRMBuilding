@@ -17,6 +17,50 @@ class VendorRepository extends BaseRepository
 
     const UPDATE_QUERY_HASH = 'UPDATE `%s` SET %s WHERE `hash_string`=:hash_string';
 
+    const GET_WITH_DETAILS = 'SELECT v.`id` as `id`,
+                                    v.`name` as `name`,
+                                    v.`city_id` as `city_id`,
+                                    c.`name` as `city_name`,
+                                    v.`phone` as `phone`,
+                                    v.`email` as `email`,
+                                    v.`tg_username` as `tg_username`,
+                                    v.`tg_id` as `tg_id`,
+                                    v.`coordinates` as `coordinates`,
+                                    v.`role` as `role`,
+                                    v.`comment` as `comment`,
+                                    v.`date_reg` as `date_reg`,
+                                    v.`hash_string` as `hash_string`,
+                                    v.`is_active` as `is_active`,
+                                    v.`password` as `password`,
+                                    v.`token` as `token`,
+                                    v.`deleted` as `deleted`,
+                                    c.`deleted` as `city_deleted`
+                                FROM vendors v
+                                    INNER JOIN cities c ON
+                                    c.`id` = v.`city_id`
+                                    %s';
+
+    private static array $vendorDetailsAccosiations = [
+        'id' => 'v.id',
+        'name' => 'v.name',
+        'city_id' => 'v.city_id',
+        'city_name' => 'c.name',
+        'phone' => 'v.phone',
+        'email' => 'v.email',
+        'tg_username' => 'v.tg_username',
+        'tg_id' => 'v.tg_id',
+        'coordinates' => 'v.coordinates',
+        'role' => 'v.role',
+        'comment' => 'v.comment',
+        'date_reg' => 'v.date_reg',
+        'hash_string' => 'v.hash_string',
+        'is_active' => 'v.is_active',
+        'password' => 'v.password',
+        'token' => 'v.token',
+        'deleted' => 'v.deleted',
+        'city_deleted' => 'c.deleted'
+    ];
+
     //Настя: добавила __construct для координат
     public function __construct()
     {
@@ -66,5 +110,57 @@ class VendorRepository extends BaseRepository
         $statement->execute($objectParams);
     }
 
+    public function mapWithDetails(array $row): array
+    {
+        $item = [];
+        foreach ($row as $key => $value) {
+            if ($key == 'coordinates') {
+                $item[$key] = isset($value) ? json_decode($value, true) : [];
+                continue;
+            }
+
+            $item[$key] = $value;
+        }
+
+        return $item;
+    }
+
+    public function getWithDetails(array $inputParams): array
+    {
+       // Параметры однозначного совпадения (WHERE)
+       $whereParams = SqlHelper::filterParamsWithReplace(static::$vendorDetailsAccosiations, $inputParams);
+
+       // Все переданные параметры для поиска (не зависимо от полей объекта)
+       $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+       // Параметры подходящие к нашему объекту
+       $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$vendorDetailsAccosiations, $allSearchParams);
+       // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+       $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+       // Часть WHERE строки запроса
+       $whereString = SqlHelper::getWhereString($whereParams);
+       // Вторая часть WHERE (для поиска 'LIKE')
+       $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+       // Получаем все параметры для сортировки
+       $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+       // Отбираем только подходящие для объекта
+       $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$vendorDetailsAccosiations, $allOrderByParams);
+       // Получаем часть строки запроса с сортировкой
+       $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+       // Получаем часть строки запроса с лимитом и оффсетом
+       $limitString = SqlHelper::getLimitString($inputParams);
+
+       $query = sprintf(static::GET_WITH_DETAILS, implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
+
+       $whereParams = SqlHelper::convertToSqlParam($whereParams);
+       $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+       $statement = \DbContext::getConnection()->prepare($query);
+       $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+       return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
 }
 ?>
