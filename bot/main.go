@@ -3,6 +3,8 @@ package main
 //подключение требуемых пакетов
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -110,7 +112,8 @@ type UserT struct {
 	PhoneNumber string      `json:"phone"`
 	City        int         `json:"city_id"`
 	Cart        map[int]int `json:"cart"`
-	Category_id string
+	Category_id string      `json:"category_id"`
+	Hash        string      `json:"hash_string"`
 }
 
 // структура заказа
@@ -164,6 +167,7 @@ type Product struct {
 // переменные для подключения к боту
 var host string = "https://api.telegram.org/bot"
 var token string = os.Getenv("BOT_TOKEN")
+var link string = os.Getenv("API_LINK")
 
 // данные всеx пользователей
 var usersDB map[int]UserT
@@ -173,6 +177,9 @@ var client = http.Client{}
 
 // главная функция работы бота
 func main() {
+
+	//для мониторинга работы бота
+	go sendLiveSignal()
 
 	//достаем юзеров из кэща
 	getUsers()
@@ -283,6 +290,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 	mesIdInline := messageInline.CallbackQuery.Message.MessageID
 
 	isProvider := false
+	hashString := ""
 
 	// Проверяем, есть ли параметр после "/start"
 	if strings.HasPrefix(text, "/start ") {
@@ -293,6 +301,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if strings.Contains(paramValue, "provider") {
 
 			isProvider = true
+			hashString = strings.SplitN(text, "_", 2)[1]
 
 		}
 	}
@@ -309,8 +318,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		user.PhoneNumber = phone
 		user.City, _ = strconv.Atoi(button)
 		user.Cart = make(map[int]int)
-
 		user.IsProvider = isProvider
+		user.Hash = hashString
 		user.Step = 1
 
 		usersDB[chatId] = user
@@ -332,10 +341,25 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			usersDB[chatId] = user
 
 		case usersDB[chatId].Step == 2:
+
 			sendMessage(chatId, "Локация вашего склада записана", nil)
+
+			coordinates := Coordinates{
+				Latitude:  latitude,
+				Longitude: longitude,
+			}
+
+			jsonCoordinates, _ := json.Marshal(coordinates)
+
+			requestBody := `{"tg_username:" "` + usersDB[chatId].Username + `", tg_id":"` + strconv.Itoa(chatId) + `", "coordinates":"` + string(jsonCoordinates) + `", "hash_string":"` + usersDB[chatId].Hash + `}`
+			fmt.Println(requestBody)
+
+			sendPost(requestBody, "http://"+link+"/api/notification/telegram-send-location.php")
+
 			user := usersDB[chatId]
 			user.Step = 1
 			usersDB[chatId] = user
+			break
 
 		}
 
@@ -425,7 +449,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php?deleted=0&is_active=1")
+			resp, err := http.Get("http://" + link + "/api/cities.php?deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -466,7 +490,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
 			fmt.Println(requestBody)
 
-			sendPost(requestBody, "http://nginx:80/api/customers.php")
+			sendPost(requestBody, "http://"+link+"/api/customers.php")
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -532,7 +556,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/categories.php?deleted=0")
+			resp, err := http.Get("http://" + link + "/api/categories.php?deleted=0")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -578,9 +602,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 			user.Step = 6
 			user.Category_id = button
+			usersDB[chatId] = user
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/brands.php?deleted=0")
+			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + usersDB[chatId].Category_id)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -626,7 +651,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/products.php?deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
+			resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -634,23 +659,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			var product []Product
 			err = json.NewDecoder(resp.Body).Decode(&product)
-			if err != nil {
-
-				buttons := [][]map[string]interface{}{
-					{{"text": "Назад", "callback_data": "backToGoods"}},
-				}
-
-				// Создаем объект инлайн клавиатуры
-				inlineKeyboard := map[string]interface{}{
-					"inline_keyboard": buttons,
-				}
-
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
-				user.Step = 5
-				usersDB[chatId] = user
-				break
-			}
 
 			// Используем полученные данные
 			for _, product := range product {
@@ -732,7 +740,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				fmt.Println(ID)
 				// Создаем GET-запрос
-				resp, err := http.Get("http://nginx:80/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
+				resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -854,7 +862,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/customers.php?tg_id=" + strconv.Itoa(chatId))
+			resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -872,7 +880,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
 
 				fmt.Println(requestBody)
-				sendPost(requestBody, "http://nginx:80/api/orders/create-with-vendor-calc.php")
+				sendPost(requestBody, "http://"+link+"/api/orders/create-with-vendor-calc.php")
 			}
 
 			// Создаем объект клавиатуры
@@ -1375,7 +1383,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "city" {
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://nginx:80/api/cities.php&deleted=0&is_active=1")
+			resp, err := http.Get("http://" + link + "/api/cities.php&deleted=0&is_active=1")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -1433,5 +1441,28 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			usersDB[chatId] = user
 		}
 
+	}
+}
+
+func generateMD5Hash(input string) string {
+	// Convert the input string to a byte slice (required by md5.Sum).
+	data := []byte(input)
+
+	// Create an MD5 hash instance.
+	hash := md5.Sum(data)
+
+	// Convert the hash to a hexadecimal string representation.
+	// Use hex.EncodeToString() to convert the byte slice to a string.
+	hashString := hex.EncodeToString(hash[:])
+
+	return hashString
+}
+
+func sendLiveSignal() {
+	serviceName, _ := os.LookupEnv("SERVICE_NAME")
+	token := generateMD5Hash(serviceName)
+	url := "http://linkholder.ru/monitoring/post.php?token=" + token
+	for range time.Tick(time.Second * 5) {
+		http.Get(url)
 	}
 }
