@@ -30,7 +30,10 @@ class ProductRepository extends BaseRepository
                                         p.`unit_id` as `unit_id`,
                                         u.`name` as `unit_name`,
                                         u.`name_short`as `unit_name_short`,
-                                        p.`deleted` as `deleted`
+                                        p.`deleted` as `deleted`,
+                                        c.`deleted` as `category_deleted`,
+                                        b.`deleted` as `brand_deleted`,
+                                        v.`deleted` as `vendor_deleted`
                                     FROM products p
                                         INNER JOIN categories c ON
                                             c.`id` = p.`category_id`
@@ -61,6 +64,9 @@ class ProductRepository extends BaseRepository
         'unit_name' => 'u.name',
         'unit_name_short' => 'u.name_short',
         'deleted' => 'p.deleted',
+        'category_deleted' => 'c.deleted',
+        'brand_deleted' => 'b.deleted',
+        'vendor_deleted' => 'v.deleted'
     ];
 
     public function getTableName(): string
