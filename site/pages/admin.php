@@ -168,6 +168,7 @@ if($role !== 1) {
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                     <td><?= ($num++) + $offset; ?></td>
                                     <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
+                                    <td class="input d-none"><input></td>
                                     <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                         <label>
                                             <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
@@ -175,6 +176,7 @@ if($role !== 1) {
                                         </label>
                                     </td> <?php } ?>
                                     <td class="edit" onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                    <td class="cancel d-none" onclick="cancel(<?= $data[$i]['id'] ?>, '<?= $data[$i][$keyName] ?>')">&#128473;</td>
                                     <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                 </tr>
                             <?php }
@@ -194,6 +196,7 @@ if($role !== 1) {
                                     <!-- <td><?= $i + 1; ?></td> -->
                                     <td><?= ($num++) + $offset; ?></td>
                                     <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
+                                    <td class="input d-none"><input></td>
                                     <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                             <label>
                                             <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
@@ -201,6 +204,7 @@ if($role !== 1) {
                                             </label>
                                     </td> <?php } ?>
                                     <td class="edit"  onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                    <td class="cancel d-none" onclick="cancel(<?= $data[$i]['id'] ?>, '<?= $data[$i][$keyName] ?>')">&#128473;</td>
                                     <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                 </tr>
                             <?php }
@@ -223,6 +227,7 @@ if($role !== 1) {
                                     <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                         <td><?= ($num++) + $offset; ?></td>
                                         <td class="list-orders_status" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]["$keyName"] ?></td>
+                                        <td class="input d-none"><input></td>
                                         <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                             <label>
                                             <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
@@ -230,6 +235,7 @@ if($role !== 1) {
                                             </label>
                                         </td> <?php } ?>
                                         <td class="edit"  onclick="edit(<?= $data[$i]['id'] ?>, '<?= $_GET['section'] ?>')">&#9998;</td>
+                                        <td class="cancel d-none" onclick="cancel(<?= $data[$i]['id'] ?>, '<?= $data[$i][$keyName] ?>')">&#128473;</td>
                                         <td class="delete-cell"><svg onclick="deleteOne('<?= $_GET['section'] ?>', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                                     </tr>
                             <?php }

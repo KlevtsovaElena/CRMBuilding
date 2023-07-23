@@ -2,7 +2,6 @@
     include($_SERVER['DOCUMENT_ROOT'] . '/classes/autoloader.php');
 
     use abstraction\BaseController as BaseController;
-    use models\Vendors;
     use repositories\VendorRepository;
 
     class CheckController extends BaseController
@@ -40,6 +39,8 @@
                         'id' => $vendor[0]->id,
                         'name' => $vendor[0]->name,
                         'city_id' => $vendor[0]->city_id,
+                        'tg_id' => $vendor[0]->tg_id,
+                        'hash_string' => $vendor[0]->hash_string,
                         'phone' => $vendor[0]->phone,
                         'email' => $vendor[0]->email,
                         'role' => $vendor[0]->role,

@@ -57,6 +57,7 @@ services:
     environment:
       bot_token: ${BOT_TOKEN}
       SERVICE_NAME: ${SERVICE_NAME}
+      API_LINK: ${API_LINK}
     volumes:
       - ./../bot/:/app/
     ports:

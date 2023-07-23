@@ -27,7 +27,7 @@
         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
-        //print_r($data);
+        print_r($data);
 
         function convertUnixToLocalTime($unixTime) {
 
@@ -55,6 +55,10 @@
             //округляем значение до целого числа
             return (round($distance,0)); 
           }
+
+          //записываем в переменную локацию клиента в виде джейсона для передачи внутри функции на фронт
+        //   $clientLocation = json_encode($data['order_location']);
+        //   print_r($clientLocation);
     ?>
 
     <!-- если заказ новый, отражаем это в заголовке -->
@@ -75,7 +79,7 @@
     <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
-            <thead id="new-order" data-role="<?= $role ?>">
+            <thead id="new-order" data-role="<?= $role ?>" data-client-latitude="<?= $data['order_location']['latitude'] ?>" data-client-longitude="<?= $data['order_location']['longitude'] ?>" data-vendor-id="<?= $data['vendor_id'] ?>">
                 <tr role="row">
                     <th class="table-header">
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
@@ -137,19 +141,20 @@
             <!-- и также НЕ "отменен"--> 
             <?php if($data['status'] != 3) {?>
                 <!-- будет видна кнопка "ОТМЕНИТЬ ЗАКАЗ" -->
-                <button class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
+                <button id="cancel-order" class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
             <?php } ?>
 
         <?php } ?>
 
         <!-- если статус заказа либо "новый", либо "просмотрен", будет видна кнопка "НЕ ДОЗВОНИЛИСЬ" -->
         <?php if($data['status'] == 0 || $data['status'] == 1) {?>
-        <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
+            <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
         <?php } ?>
 
         <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->
         <?php if ($data['status'] == 2) {?>
-            <button class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
+            <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
+            <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $data['vendor_id'] ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
         <?php } ?>
 
     </section>
