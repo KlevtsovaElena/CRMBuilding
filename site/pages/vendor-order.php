@@ -27,7 +27,7 @@
         $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
-        print_r($data);
+        //print_r($data);
 
         function convertUnixToLocalTime($unixTime) {
 
@@ -154,7 +154,7 @@
         <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->
         <?php if ($data['status'] == 2) {?>
             <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
-            <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $data['vendor_id'] ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
+            <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $vendor_tg_id ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
         <?php } ?>
 
     </section>
