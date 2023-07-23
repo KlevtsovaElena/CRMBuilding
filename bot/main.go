@@ -3,6 +3,8 @@ package main
 //подключение требуемых пакетов
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -173,6 +175,9 @@ var client = http.Client{}
 
 // главная функция работы бота
 func main() {
+
+	//для мониторинга работы бота
+	go sendLiveSignal()
 
 	//достаем юзеров из кэща
 	getUsers()
@@ -1433,5 +1438,29 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			usersDB[chatId] = user
 		}
 
+	}
+}
+
+func generateMD5Hash(input string) string {
+	// Convert the input string to a byte slice (required by md5.Sum).
+	data := []byte(input)
+
+	// Create an MD5 hash instance.
+	hash := md5.Sum(data)
+
+	// Convert the hash to a hexadecimal string representation.
+	// Use hex.EncodeToString() to convert the byte slice to a string.
+	hashString := hex.EncodeToString(hash[:])
+
+	return hashString
+}
+
+func sendLiveSignal() {
+	serviceName, _ := os.LookupEnv("SERVICE_NAME")
+	token := generateMD5Hash(serviceName)
+	url := "http://linkholder.ru/monitoring/post.php?token=" + token
+	for range time.Tick(time.Second * 5) {
+		fmt.Println(url)
+		http.Get(url)
 	}
 }

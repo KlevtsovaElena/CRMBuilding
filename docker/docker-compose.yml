@@ -56,6 +56,7 @@ services:
       - .env
     environment:
       bot_token: ${BOT_TOKEN}
+      SERVICE_NAME: ${SERVICE_NAME}
     volumes:
       - ./../bot/:/app/
     ports:
@@ -70,8 +71,8 @@ services:
     volumes:
       - ./../currency-service/:/app/
     environment:
-      task_start_hour: "13"
-      task_start_minute: "47"
+      task_start_hour: "7"
+      task_start_minute: "30"
       bot_token: ${CURRENCY_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"
