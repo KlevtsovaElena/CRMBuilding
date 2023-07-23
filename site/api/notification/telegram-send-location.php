@@ -14,8 +14,6 @@ class TelegramSendLocationController extends BaseController
         
         file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendlocation?chat_id='. urlencode($post['chat_id']) . '&latitude=' .
             urlencode($post['latitude']) . '&longitude=' . urlencode($post['longitude']));
-
-            echo 1;
     }
 }
 
