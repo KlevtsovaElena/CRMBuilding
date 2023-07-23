@@ -16,7 +16,7 @@
         protected function onGet()
         {
             $count = $this->productRepository->getCountWithoutLimit($_GET);
-            $products = $this->productRepository->get($_GET);
+            $products = $this->productRepository->getWithDetails($_GET);
 
             if (isset($_GET['id']) && $products)
                 $products = [$products];
