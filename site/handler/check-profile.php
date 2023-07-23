@@ -34,6 +34,8 @@ if(isset($_COOKIE['profile'])) {
             $vendor_id = $profile['id'];
             $vendor_name = $profile['name'];
             $role = $profile['role'];
+            $vendor_tg_id = $profile['tg_id'];
+            $vendor_hash_string = $profile['hash_string'];
         }
     }
 } else {

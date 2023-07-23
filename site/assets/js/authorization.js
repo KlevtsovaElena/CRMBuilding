@@ -1,8 +1,17 @@
 console.log("Подключили auth");
 
+/* ---------- ВХОД ПО ENTER ---------- */
+let inputBox = document.querySelectorAll('input');
+inputBox.forEach (item => {
+    item.addEventListener('keypress', (e) => {
+        if(e.key == 'Enter') {
+            logIn();
+        }
+       
+    }) 
+})
 
-
-
+/* ---------- ВХОД В АККАУНТ ---------- */
 function logIn() {
     const login = document.getElementById('email');
     const pass = document.getElementById('password');
@@ -64,7 +73,7 @@ function logIn() {
 // let profileName = document.querySelector('.menu-top__profile-name').innerText;
 // profileAvatar.innerText = profileName.trim()[0];
 
-
+/* ---------- ВЫХОД ИЗ АККАУНТА ---------- */
 function logOut() {
     
     //берём токен из куки
