@@ -237,12 +237,11 @@ func getUsers() {
 }
 
 // функция для отправки POST запроса
-func sendPost(requestBody string, url string) {
+func sendPost(requestBody string, url string) ([]byte, error) {
 	// Создаем новый POST-запрос
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
 	if err != nil {
-		fmt.Println("Ошибка при создании запроса:", err)
-		return
+		return nil, fmt.Errorf("Ошибка при создании запроса: %v", err)
 	}
 
 	// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
@@ -252,10 +251,22 @@ func sendPost(requestBody string, url string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Ошибка при выполнении запроса:", err)
-		return
+		return nil, fmt.Errorf("Ошибка при выполнении запроса: %v", err)
 	}
 	defer resp.Body.Close()
+
+	// Проверяем код состояния HTTP-ответа
+	if resp.StatusCode == http.StatusOK {
+		// Успешный запрос, читаем тело ответа
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("Ошибка при чтении тела ответа: %v", err)
+		}
+		return body, nil
+	} else {
+		// Обработка ошибки при некорректном статусе HTTP-ответа
+		return nil, fmt.Errorf("Некорректный код состояния HTTP: %s", resp.Status)
+	}
 }
 
 // функция для отправки сообщения пользователю
@@ -351,10 +362,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
-			requestBody := `{"tg_username:" "` + usersDB[chatId].Username + `", tg_id":"` + strconv.Itoa(chatId) + `", "coordinates":"` + string(jsonCoordinates) + `", "hash_string":"` + usersDB[chatId].Hash + `}`
+			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
 			fmt.Println(requestBody)
 
-			sendPost(requestBody, "http://"+link+"/api/notification/telegram-send-location.php")
+			responce, err := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+			if err != nil {
+				// Обработка ошибки, если она есть
+				fmt.Println("Ошибка при отправке POST-запроса:", err)
+				return
+			}
+
+			// Используйте переменную response для обработки ответа
+			fmt.Println("Ответ сервера:", string(responce))
 
 			user := usersDB[chatId]
 			user.Step = 1
