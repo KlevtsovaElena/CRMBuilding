@@ -44,21 +44,6 @@
             return $localTime;
         }
 
-        //функция для расчета расстояния в км по координатам
-        function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2) {
-            $theta = $longitude1 - $longitude2; 
-            $distance = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta))); 
-            $distance = acos($distance); 
-            $distance = rad2deg($distance); 
-            $distance = $distance * 1.609344; 
-
-            //округляем значение до целого числа
-            return (round($distance,0)); 
-          }
-
-          //записываем в переменную локацию клиента в виде джейсона для передачи внутри функции на фронт
-        //   $clientLocation = json_encode($data['order_location']);
-        //   print_r($clientLocation);
     ?>
 
     <!-- если заказ новый, отражаем это в заголовке -->
@@ -85,7 +70,7 @@
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?php if(!$data['vendor_location']) { ?> <?='локация поставщика отсутствует' ?> <?php } else { ?> <?= getDistanceBetweenPointsNew($data['vendor_location']['latitude'], $data['vendor_location']['longitude'], $data['order_location']['latitude'], $data['order_location']['longitude']) ?> км <?php } ?></div> 
+                            <div>До клиента: <?php if(!$data['vendor_location']) { ?> <?='локация поставщика отсутствует' ?> <?php } else { ?> <?= $data['distance'] ?> км <?php } ?></div> 
                         </div> 
                     </th>
                     <th></th>
