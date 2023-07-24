@@ -13,7 +13,8 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/products/products-with-count.php?vendor_id=' + vendor_id + '&deleted=0';
+
+let url = 'http://localhost/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&vendor_id=' + vendor_id;
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
