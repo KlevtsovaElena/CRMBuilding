@@ -11,7 +11,7 @@ function addNew(section_name) {
     if(name.trim()) {
 
         // собираем ссылку для запроса
-        link = 'http://localhost/api/'+ section_name + '.php';
+        let link = 'http://localhost/api/'+ section_name + '.php';
 
         // соберём json для передачи на сервер
         //для категорий
@@ -541,32 +541,102 @@ function applyInOrders() {
     //лимит задан всегда, поэтому проверяем только наличие поискового запроса
     //получим введенное в поиск значение
     let searchQuery = document.getElementById('search').value;
+    let dataSearch = searchQuery.trim();
 
     // проверим значение поиска
-    if(searchQuery.trim()) {
-        console.log(searchQuery);
+    // if(searchQuery.trim()) {
+    //     console.log(searchQuery);
 
-        //вносим изменение в адресную строку страницы
-        history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&search=order_id:' + searchQuery.trim());
+    //     //вносим изменение в адресную строку страницы
+    //     history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&search=order_id:' + searchQuery.trim());
 
-        document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&search=order_id:' + searchQuery.trim();
+    //     document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&search=order_id:' + searchQuery.trim();
         
-    } else {
-        // соберём json для передачи на сервер
-        // let obj = JSON.stringify({
-        //     'limit': limit.value
-        // });
+    // } else {
 
-        //let link = 'http://localhost/limit.php?limit=';
+    // //вносим изменение в адресную строку страницы
+    // history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value);
 
-        //let result = sendRequestGET(link+limit.value);
-        //console.log(result);
+    // document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value;
 
-    //вносим изменение в адресную строку страницы
-    history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value);
+    // }
 
-    document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value;
 
+    // получим значение атрибута data-sort
+    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
+    console.log(allTitlesElems);
+
+    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
+    let dataSort = '';
+    //переменная для ключа, соответствующего названию сортируемого поля в БД
+    let key = '';
+
+    //в цикле вынимаем эти два элемента
+    for (let i = 0; i < allTitlesElems.length; i++) {
+        if (allTitlesElems[i].getAttribute('data-sort')) {
+            //вынимаем заданное значение ключа
+            dataSort = allTitlesElems[i].getAttribute('data-sort');
+            console.log(dataSort);
+            //вынимаем ключ
+            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
+            console.log(key);
+        }
+    }
+
+    // получим значение атрибута data-limit, содержащего уже заданный лимит кол-ва отображаемых на стр. записей
+    // let dataLimit = document.getElementById('list-orders').getAttribute('data-limit');
+    // console.log(dataLimit);
+
+    // получим значение атрибута data-page, содержащего номер текущей страницы
+    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
+    console.log(dataPage);
+
+    //если активировано значение asc
+    if (dataSort && dataSort === "asc") {
+        
+        //передаем его в адресную строку как гет-параметр
+        //вносим изменение в адресную строку страницы
+        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
+        //если в гет-параметрах нет ни поиска, ни страницы
+        if (!dataSearch && !dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc';
+        //если в гет-параметрах уже есть поиск, но не страница
+        } else if (dataSearch && !dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=' + dataSearch + '&orderby=' + key + ':asc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=' + dataSearch + '&orderby=' + key + ':asc';
+        //если в гет-параметрах уже есть страница, но не поиск
+        } else if (!dataSearch && dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc';
+        //если в гет-параметрах уже есть и страница, и поиск
+        } else if (dataSearch && dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
+        }
+    //если активировано значение desc
+    } else if (dataSort === "desc") {
+
+        //передаем его в адресную строку как гет-параметр
+        //вносим изменение в адресную строку страницы
+        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
+        //если в гет-параметрах нет ни поиска, ни страницы
+        if (!dataSearch && !dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc';
+        //если в гет-параметрах уже есть поиск, но не страница
+        } else if (dataSearch && !dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=' + dataSearch + '&orderby=' + key + ':desc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=' + dataSearch + '&orderby=' + key + ':desc';
+        //если в гет-параметрах уже есть страница, но не поиск
+        } else if (!dataSearch && dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
+        //если в гет-параметрах уже есть и страница, и поиск
+        } else if (dataSearch && dataPage) {
+            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
+            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
+        }
     }
 
 }
