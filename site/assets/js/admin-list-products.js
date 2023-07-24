@@ -13,7 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 
-let url = 'http://localhost/api/products/products-with-count.php?deleted=0';
+let url = 'http://localhost/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -55,23 +55,23 @@ let totalProductsJson;
 let garbage;
 console.log(vendor_idEl);
 
-// закэшируем значения брендов и категорий и поставщиков
-brand_idEl.querySelectorAll('option').forEach(item => {
-    brands[item.value] = item.innerText;
-})
-category_idEl.querySelectorAll('option').forEach(item => {
-    categories[item.value] = item.innerText;
-})
-vendor_idEl.querySelectorAll('option').forEach(item => {
-    vendors[item.value] = item.innerText;
-})
+// // закэшируем значения брендов и категорий и поставщиков
+// brand_idEl.querySelectorAll('option').forEach(item => {
+//     brands[item.value] = item.innerText;
+// })
+// category_idEl.querySelectorAll('option').forEach(item => {
+//     categories[item.value] = item.innerText;
+// })
+// vendor_idEl.querySelectorAll('option').forEach(item => {
+//     vendors[item.value] = item.innerText;
+// })
 
-// закэшируем значения единиц измерения (временно, пока нет апишки)
-let unitsJson = sendRequestGET('http://localhost/api/units.php');
-let unitsData = JSON.parse(unitsJson);
-unitsData.forEach(item => {
-   units[item['id']] = item['name_short'];
-})
+// // закэшируем значения единиц измерения (временно, пока нет апишки)
+// let unitsJson = sendRequestGET('http://localhost/api/units.php');
+// let unitsData = JSON.parse(unitsJson);
+// unitsData.forEach(item => {
+//    units[item['id']] = item['name_short'];
+// })
 
 // заполним страницу данными
 startRenderPage();
@@ -224,16 +224,16 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
-                                                        .replace('${vendor_id}',  vendors[totalProducts['products'][i]['vendor_id']])
+                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_name'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
-                                                        .replace('${brand_id}', brands[totalProducts['products'][i]['brand_id']])
-                                                        .replace('${category_id}', categories[totalProducts['products'][i]['category_id']])
+                                                        .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
+                                                        .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                         .replace('${price}', totalProducts['products'][i]['price'])
                                                         .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                         .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
-                                                        .replace('${unit}', units[totalProducts['products'][i]['unit_id']])
+                                                        .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])

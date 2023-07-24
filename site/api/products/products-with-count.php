@@ -15,8 +15,8 @@
 
         protected function onGet()
         {
-            $count = $this->productRepository->getCountWithoutLimit($_GET);
-            $products = $this->productRepository->get($_GET);
+            $count = $this->productRepository->getCountWithDetails($_GET);
+            $products = $this->productRepository->getWithDetails($_GET);
 
             if (isset($_GET['id']) && $products)
                 $products = [$products];
@@ -24,7 +24,8 @@
             echo json_encode([
                 "count" => $count,
                 "products" => $products ?? []
-            ]);
+            ],
+            JSON_UNESCAPED_UNICODE);
         }
     }
 

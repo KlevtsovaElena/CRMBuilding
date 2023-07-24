@@ -35,6 +35,28 @@ class VendorsController extends BaseController
         // редактирование по hash (tg_id и очистка хэша)
         if (isset($post['hash_string'])) {
             try {
+                if (isset($post['tg_id'])) {
+                    $vendorsWithEmail = $this->vendorRepository->get([
+                        'tg_id' => $post['tg_id']
+                    ]);
+
+                    if ($vendorsWithEmail != null && count($vendorsWithEmail) > 0)
+                    {
+                        $response = [
+                            'ok' => false,
+                            'error' => 'Поставщик с таким telegram id уже зарегистрирован.'
+                        ];
+
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+
+                $response = [
+                    'ok' => false,
+                    'error' => 'Приглашение недействительно.'
+                ];
+
                 DbContext::getConnection()->beginTransaction();
                 $this->vendorRepository->updateByHash($post);
                 $vendors = $this->vendorRepository->get([
@@ -46,9 +68,16 @@ class VendorsController extends BaseController
                         'id' => $vendors[0]->id,
                         'hash_string' => null
                     ]);
+
+                    $response = [
+                        'ok' => true,
+                        'payLoad' => $vendors[0]->id
+                    ];
                 }
 
                 \DbContext::getConnection()->commit();
+
+                echo json_encode($response);
                 return;
             } catch (Exception $e) {
                 \DbContext::getConnection()->rollBack();

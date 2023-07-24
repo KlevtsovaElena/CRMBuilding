@@ -11,3 +11,9 @@
     font-size: 0.9rem;
     margin-bottom: 3px;
 }
+
+.vendor-info-error {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
