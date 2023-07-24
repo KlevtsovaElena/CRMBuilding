@@ -4,7 +4,7 @@ console.log('подключили add-vendor.js');
 const formAddVendor = document.querySelector('.form-add-vendor');
 const vendorInfo = document.querySelector('.vendor-info');
 const copyBtn = document.querySelectorAll('.copy-result');
-
+let errorVendor = document.querySelector('.vendor-info-error');
 console.log(copyBtn);
 
 // запишем значения полей формы в переменные
@@ -21,6 +21,7 @@ function addVendor() {
 
     // очистим контенеры для вывода информации
     vendorInfo.innerHTML = "";
+    errorVendor.innerText = "";
 
     hasError = validationAddVendor();
 
@@ -47,6 +48,10 @@ function addVendor() {
     // получаем ответ с сервера
     if (responseJson) {
        response = JSON.parse(responseJson);
+       if (response['error']) {
+        errorVendor.innerText = response['error'];
+        return;
+       }
     } else {
         return;
     }

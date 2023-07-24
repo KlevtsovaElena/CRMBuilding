@@ -82,7 +82,7 @@ if($role !== 1) {
             <div>
                 <button class="btn btn-ok" onclick="addVendor()">Сохранить</button>
             </div>
-
+            <div class="vendor-info-error"></div>           
         </form>
         <div class="vendor-info"></div>
     </section>                    
