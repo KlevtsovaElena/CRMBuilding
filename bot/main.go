@@ -114,6 +114,14 @@ type UserT struct {
 	Cart        map[int]int `json:"cart"`
 	Category_id string      `json:"category_id"`
 	Hash        string      `json:"hash_string"`
+	Vendor_id   int         `json:"vendor_ids"`
+}
+
+// структура ответа от сервера
+type ServerResponce struct {
+	OK      bool   `json:"ok"`
+	PayLoad int    `json:"payLoad"`
+	Error   string `json:"error"`
 }
 
 // структура заказа
@@ -346,10 +354,42 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		switch {
 
 		case usersDB[chatId].Step == 1:
-			sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
-			user := usersDB[chatId]
-			user.Step += 1
-			usersDB[chatId] = user
+
+			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
+
+			response, _ := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+
+			// Используйте переменную response для обработки ответа
+			fmt.Println("Ответ сервера:", string(response))
+
+			//посмотреть данные
+			fmt.Println(string(response))
+
+			//парсим данные из json
+			var serverResr ServerResponce
+			json.Unmarshal(response, &serverResr)
+
+			status := serverResr.OK
+			payLoad := serverResr.PayLoad
+			serverMessage := serverResr.Error
+
+			if status {
+
+				sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
+				user := usersDB[chatId]
+				user.Vendor_id = payLoad
+				user.Step += 1
+				usersDB[chatId] = user
+
+			} else if serverMessage == "Поставщик с таким telegram id уже зарегистрирован" {
+
+				sendMessage(chatId, serverMessage, nil)
+
+			} else {
+
+				sendMessage(chatId, serverMessage, nil)
+
+			}
 
 		case usersDB[chatId].Step == 2:
 
@@ -362,18 +402,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
-			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
+			requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
 			fmt.Println(requestBody)
 
-			responce, err := sendPost(requestBody, "http://"+link+"/api/vendors.php")
-			if err != nil {
-				// Обработка ошибки, если она есть
-				fmt.Println("Ошибка при отправке POST-запроса:", err)
-				return
-			}
-
-			// Используйте переменную response для обработки ответа
-			fmt.Println("Ответ сервера:", string(responce))
+			sendPost(requestBody, "http://"+link+"/api/vendors.php")
 
 			user := usersDB[chatId]
 			user.Step = 1
