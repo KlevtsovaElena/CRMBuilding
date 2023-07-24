@@ -202,7 +202,6 @@ class ProductRepository extends BaseRepository
         // Формируем результирующую строку запроса
         $query = sprintf(static::GET_COUNT_WITH_DETAILS, implode(' ', [$whereString, $searchString]));
 
-        echo $query;
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute(array_merge($whereParams, $formattedSearchParams));
 

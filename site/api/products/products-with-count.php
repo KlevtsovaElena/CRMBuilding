@@ -24,7 +24,8 @@
             echo json_encode([
                 "count" => $count,
                 "products" => $products ?? []
-            ]);
+            ],
+            JSON_UNESCAPED_UNICODE);
         }
     }
 
