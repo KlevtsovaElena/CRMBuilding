@@ -34,7 +34,7 @@ if($role !== 1) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents("http://nginx/api/vendors.php?deleted=0");
+        $dataJson = file_get_contents("http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0");
         $data = json_decode($dataJson, true); 
         //print_r($data);
 
@@ -155,13 +155,7 @@ if($role !== 1) {
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <td><a href="#"><strong><?= $num++; ?></strong></a></td>
-                                <?php
-                                //достаем название города через 2 бд и цикл 
-                                for ($c = 0; $c < count($cities); $c++) {
-                                    if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
-                                    <td><?= $cities[$c]['name'] ?></td>
-                                <?php } 
-                                }?>
+                                <td><?= $data[$i]['city_name'] ?></td>
                                 <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
                                 <td><?= $status ?></td>
                                 <td><?= $data[$i]['phone'] ?> </td>
@@ -196,13 +190,7 @@ if($role !== 1) {
                                 <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                                 <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                     <td><a href="#"><strong><?= $num++; ?></strong></a></td>
-                                    <?php 
-                                    //достаем название города через 2 бд и цикл
-                                    for ($c = 0; $c < count($cities); $c++) {
-                                        if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
-                                        <td><?= $cities[$c]['name'] ?></td>
-                                    <?php } 
-                                    }?>
+                                    <td><?= $data[$i]['city_name'] ?></td>
                                     <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
                                     <td><?= $status ?></td>
                                     <td><?= $data[$i]['phone'] ?> </td>
