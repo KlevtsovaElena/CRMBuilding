@@ -116,10 +116,12 @@ class VendorsController extends BaseController
         $timeStr = base_convert($timeStr, 10, 16);
 
         // уникальный hash
-        $post['hash_string'] = crypt($timeStr . $post['email'], 'hashbot');
+        $hash_string =  crypt($timeStr . $post['email'], 'hashbot'); 
+        $post['hash_string'] = preg_replace("/[^a-zA-Z0-9]/", "", $hash_string);
 
         // пароль для входа в crm
-        $post['password'] = crypt($timeStr . $post['email'] . time() + 10, 'crmpass');
+        $password = crypt($timeStr . $post['email'] . time() + 10, 'crmpass');
+        $post['password'] = preg_replace("/[^a-zA-Z0-9]/", "", $password);
 
         // добавляем запись в базу
         $this->vendorRepository->add($post);
