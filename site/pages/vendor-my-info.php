@@ -21,7 +21,8 @@ if($role !== 2) {
 
     <p><b>Ссылка для бота:</b></p>
     <div class="vendor-info-text">
-        <span class="copy-text"><?php echo 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string;?></span>
+        <!-- <span class="copy-text"><?php //echo 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string;?></span> -->
+        <span class="copy-text"><?php echo 'https://t.me/Uzstroibot?start=provider_' . $vendor_hash_string;?></span>
         <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
     </div>
 
