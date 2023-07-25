@@ -672,7 +672,7 @@ function applyInVendors() {
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
             history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
-            window.location.href = 'http://localhost/pagesadmin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
+            window.location.href = 'http://localhost/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
         }
     //если активировано значение desc
     } else if (dataSort === "desc") {
@@ -690,12 +690,12 @@ function applyInVendors() {
             window.location.href = 'http://localhost/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':desc';
         //если в гет-параметрах уже есть страница, но не поиск
         } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'aadmin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
             window.location.href = 'http://localhost/pages/admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
             history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
-            window.location.href = 'http://localhost/pages/aadmin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
+            window.location.href = 'http://localhost/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
         }
     } else if (!dataSort) {
         apply('admin-vendors');

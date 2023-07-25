@@ -50,6 +50,7 @@ if($role !== 1) {
             //print_r($sortBy);
             //print_r($mark);
         } else {
+            $sortBy = '';
             $_GET['orderby'] = 'order_date:desc';
         }
 
@@ -137,8 +138,8 @@ if($role !== 1) {
                 <thead>
                     <tr role="row">
 
-                        <!-- <th class="ta-center cell-title" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th> -->
-                        <th class="ta-center">№</th>
+                        <th class="ta-center cell-title" data-id="order_id" data-sort="<?php if ($sortBy == 'order_id')  {echo $mark; } ?>">№</th>
+                        <!-- <th class="ta-center">№</th> -->
                         <th class="ta-center cell-title" data-id="order_date" data-sort="<?php if ($sortBy == 'order_date')  {echo $mark; } ?>">Дата</th>
                         <th class="ta-center cell-title" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                         <th class="ta-center cell-title" data-id="vendor_city" data-sort="<?php if ($sortBy == 'vendor_city')  {echo $mark; } ?>">Город</th>
@@ -163,7 +164,7 @@ if($role !== 1) {
                             $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=' . $offset);
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
-                            $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                            //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
                         //если мы на первой странице
                         } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
@@ -173,7 +174,7 @@ if($role !== 1) {
                                 $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0');
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
-                                $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
                         }
 
@@ -187,7 +188,7 @@ if($role !== 1) {
                             //если есть, записываем в переменную их количество
                             } else {
                                 $totalEntries = $data['count'];
-                                $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
                             //сокращаем массив до данных только по заказам для выведения в форме
                             $data = $data['orders'];
@@ -205,7 +206,7 @@ if($role !== 1) {
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
                             //print_r($data);
-                            $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                            //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
                         //если мы на первой странице
                         } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
@@ -215,7 +216,7 @@ if($role !== 1) {
                                 $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby']);
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
-                                $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
                         }
 
@@ -229,7 +230,7 @@ if($role !== 1) {
                             //если есть, записываем в переменную их количество
                             } else {
                                 $totalEntries = $data['count'];
-                                $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
                             //сокращаем массив до данных только по заказам для выведения в форме
                             $data = $data['orders'];
@@ -262,7 +263,7 @@ if($role !== 1) {
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $num++; ?></strong></a></td>
+                                <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                 <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
                                 <td><?= $data[$i]['vendor_name'] ?></td>
