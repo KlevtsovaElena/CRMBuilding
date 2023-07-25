@@ -19,13 +19,20 @@ if($role !== 2) {
 
     <p class="page-title">Мои данные</p>
 
-    <p><b>Ссылка для бота:</b></p>
+    <p><b>Ссылка для бота локального:</b></p>
     <div class="vendor-info-text">
-        <!-- <span class="copy-text"><?php //echo 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string;?></span> -->
         <span class="copy-text"><?php echo 'https://t.me/Uzstroibot?start=provider_' . $vendor_hash_string;?></span>
         <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
     </div>
+<br>
+<br>
+<br>
 
+    <p><b>Ссылка для бота сервер:</b></p>
+    <div class="vendor-info-text">
+        <span class="copy-text"><?php echo 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string;?></span>
+        <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
+    </div>
 <!-- ЗДЕСЬ БУДЕТ ОСНОВНОЙ КОД СТРАНИЦЫ -->
 
 <script>
