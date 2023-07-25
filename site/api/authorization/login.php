@@ -36,7 +36,7 @@
             $timeStr = (string)$timeToken;
             $timeStr = base_convert($timeStr, 10, 16);
             $token = crypt($timeStr . $vendor[0]->hash_string, 'token');
-
+            $token = preg_replace("/[^a-zA-Z0-9]/", "", $token);
             // подготовим данные
             $post=[];
             $post['id'] =  $id;
