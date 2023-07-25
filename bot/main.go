@@ -600,14 +600,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			break
 
 		// кейс для вывода категорий товаров на выбор
-		case usersDB[chatId].Step == 5 && text == "Заказать 🛍" || button == "backToGoods":
+		case (usersDB[chatId].Step == 5 && text == "Заказать 🛍") || (button == "backToGoods"):
 
 			user := usersDB[chatId]
 			user.Step = 5
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/categories/get-all-by-exist-products.php")
+			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php")
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -616,7 +616,16 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			var categories []Category
 			err = json.NewDecoder(resp.Body).Decode(&categories)
 			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
+
+				buttons := [][]map[string]interface{}{
+					{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
+				}
+
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
+
+				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -795,6 +804,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			finalPrice := 0
+			user.Step = 8
 			benefit := 0
 			marketPrice := 0
 			cartText := ""
@@ -822,22 +832,81 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			}
 
-			buttons := [][]map[string]interface{}{
-				{{"text": "Оформить заказ", "callback_data": "buy"}},
-				{{"text": "Назад", "callback_data": "backToGoods"}},
+			//если человек переходит в корзину из главного меню
+			if text == "Корзина 🗑" {
+
+				// если товаров нет
+				if finalPrice == 0 {
+
+					buttons := [][]map[string]interface{}{
+						{{"text": "Назад", "callback_data": "backToMenu"}},
+					}
+
+					// Создаем объект инлайн клавиатуры
+					inlineKeyboard := map[string]interface{}{
+						"inline_keyboard": buttons,
+					}
+
+					sendMessage(chatId, "Корзина пуста", inlineKeyboard)
+				} else {
+
+					buttons := [][]map[string]interface{}{
+						{{"text": "Оформить заказ", "callback_data": "buy"}},
+						{{"text": "Назад", "callback_data": "backToMenu"}},
+					}
+
+					// Создаем объект инлайн клавиатуры
+					inlineKeyboard := map[string]interface{}{
+						"inline_keyboard": buttons,
+					}
+
+					encodedCartText := url.QueryEscape(cartText)
+					encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					finalText := encodedCartText + encodedText
+
+					// Отправляем сообщение с клавиатурой и перезаписываем шаг
+					sendMessage(chatId, finalText, inlineKeyboard)
+
+				}
+
+				// если пользователь смотрит коризину после списка товаров
+			} else {
+
+				// если товаров нет
+				if finalPrice == 0 {
+
+					buttons := [][]map[string]interface{}{
+						{{"text": "Назад", "callback_data": "backToMenu"}},
+					}
+
+					// Создаем объект инлайн клавиатуры
+					inlineKeyboard := map[string]interface{}{
+						"inline_keyboard": buttons,
+					}
+
+					sendMessage(chatId, "Корзина пуста", inlineKeyboard)
+
+				} else {
+
+					buttons := [][]map[string]interface{}{
+						{{"text": "Оформить заказ", "callback_data": "buy"}},
+						{{"text": "Назад", "callback_data": "backToGoods"}},
+					}
+
+					// Создаем объект инлайн клавиатуры
+					inlineKeyboard := map[string]interface{}{
+						"inline_keyboard": buttons,
+					}
+
+					encodedCartText := url.QueryEscape(cartText)
+					encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					finalText := encodedCartText + encodedText
+
+					// Отправляем сообщение с клавиатурой и перезаписываем шаг
+					sendMessage(chatId, finalText, inlineKeyboard)
+				}
 			}
 
-			// Создаем объект инлайн клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			encodedCartText := url.QueryEscape(cartText)
-			encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
-			finalText := encodedCartText + encodedText
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, finalText, inlineKeyboard)
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -966,7 +1035,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			// обнуляем корзину
-			user = UserT{Cart: map[int]int{}}
+			user.Cart = map[int]int{}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжуться в течении часа", keyboard)
@@ -1319,21 +1388,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "Связаться", inlineKeyboard)
-		}
-
-		// кейс при нажатии на кнопку мои заказы
-		if text == "Корзина 🗑" {
-
-			buttons := [][]map[string]interface{}{
-				{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Корзина", inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку настройки
