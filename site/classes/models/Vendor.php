@@ -18,6 +18,7 @@
         public int $is_active;
         public string $password;
         public ?string $token;
+        public ?string $percent;
         public int $deleted; //Настя: добавила для нового поля
     }
 ?>
