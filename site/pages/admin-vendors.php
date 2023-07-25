@@ -47,10 +47,11 @@ if($role !== 1) {
             $orderBy = explode(":", $orderByArray[0]);
             $sortBy = $orderBy[0];
             $mark = $orderBy[1];
-            print_r($sortBy);
-            print_r($mark);
+            //print_r($sortBy);
+            //print_r($mark);
         } else {
-            $sortBy = "";
+            $sortBy = '';
+            $_GET['orderby'] = 'status:asc';
         }
     ?>
 
@@ -90,7 +91,7 @@ if($role !== 1) {
                 <!-- поле поиска -->
                 <input type="search" id="search" name="search" value="" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
-                <button onclick="apply('admin-vendors')" class="btn btn-ok d-iblock">Применить</button>
+                <button onclick="applyInVendors()" class="btn btn-ok d-iblock">Применить</button>
             </div>
 
         </section>
@@ -114,17 +115,18 @@ if($role !== 1) {
 
         <!-- таблица поставщиков -->
         <section class="orders">
-            <table id="list-orders">
+            <table id="list-orders" data-section="admin-vendors"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> >
 
                 <thead>
                     <tr role="row">
 
-                        <th data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th>
-                        <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
-                        <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
-                        <th data-id="total_price" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
-                        <th data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
-                        <th data-id="email">Email</th>
+                        <!-- <th class="cell-title" data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th> -->
+                        <th>№</th>
+                        <th class="cell-title" data-id="city_name" data-sort="<?php if ($sortBy == 'city_name')  {echo $mark; } ?>">Город</th>
+                        <th class="cell-title" data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
+                        <th class="cell-title" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
+                        <th class="cell-title" data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
+                        <th class="cell-title" data-id="email" data-sort="<?php if ($sortBy == 'email')  {echo $mark; } ?>">Email</th>
                         <th data-id="confirmed">Подтвердил</th>
                         <th data-id="owns">Должен</th>
                         <th data-id="incoming">Поступление</th>
@@ -136,11 +138,85 @@ if($role !== 1) {
                 <tbody class="list-orders__body">
                 <tr role="row" class="list-orders__row">
 
-                    <?php //если мы НЕ на первой странице
+                <!-- если еще НЕ задан гет-параметр сортировки полей таблицы по одному ключу -->
+                <?php if (!isset($_GET['orderby'])) { 
+                    
+                    //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
-                        //отрисовываем строки в цикле от начальной до конечной цифры оффсетного значения
-                        $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                        for ($i = $offset; $i < $limit + $offset; $i++) {
+                        //соберём данные для отображения в форме 
+                        $dataJson = file_get_contents('http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit . '&offset=' . $offset);
+                        $data = json_decode($dataJson, true);
+                        $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                    
+                    //если мы на первой странице
+                    } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
+                        //и поиск не активирован
+                        if (!isset($_GET['search'])) {
+                            //соберём данные для отображения в форме 
+                            $dataJson = file_get_contents('http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit . '&offset=0');
+                            $data = json_decode($dataJson, true);
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                        }
+                    }
+                    //если активирован поиск
+                    if(isset($_GET['search'])) {
+                        $dataJson = file_get_contents("http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&search=" . $_GET['search']);
+                        $data = json_decode($dataJson, true);
+                        //print_r($data);
+                        //отрисовываем список элементов, которые совпадают с поисковым запросом
+                        //если по данному поисковому запросу записей нет, записываем в переменную 0
+                        if (!$data) {
+                            $totalNumElements = 0;
+                        //если есть, записываем в переменную их количество
+                        } else {
+                            $totalEntries = count($data);
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                        }
+                    }
+                }
+
+                //если уже имеется гет-параметр сортировки полей таблицы по одному ключу
+                elseif (isset($_GET['orderby'])) {
+
+                    //если мы НЕ на первой странице
+                    if(isset($_GET['page']) && $_GET['page'] > 1) {
+                        //соберём данные для отображения в форме 
+                        $dataJson = file_get_contents('http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby']);
+                        $data = json_decode($dataJson, true); 
+                        //print_r($data);
+                        $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+
+                    //если мы на первой странице
+                    } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
+                        //и поиск не активирован
+                        if (!isset($_GET['search'])) {
+                            //соберём данные для отображения в форме 
+                            $dataJson = file_get_contents("http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby']);
+                            $data = json_decode($dataJson, true);
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                        }
+                    }
+
+                    //если активирован поиск
+                    if(isset($_GET['search'])) {
+                        $dataJson = file_get_contents('http://nginx/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search']);
+                        $data = json_decode($dataJson, true);
+                        //print_r($data);
+                        //если по данному поисковому запросу записей нет, записываем в переменную 0
+                        if (!$data) {
+                            $totalNumElements = 0;
+                        //если есть, записываем в переменную их количество
+                        } else {
+                            $totalNumElements = count($data);
+                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                        }
+                    }
+                }
+
+                if($data) {
+                    //отрисовываем строки в цикле от начальной до конечной цифры оффсетного значения
+                        //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                        for ($i = 0; $i < count($data); $i++) {
                             //проверка на то, чтобы выводилось не больше строк, чем есть в БД
                             if(isset($data[$i]['id'])) {
                                 //расфишровка статусов
@@ -154,7 +230,7 @@ if($role !== 1) {
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <td><a href="#"><strong><?= $num++; ?></strong></a></td>
+                                <td class="ta-center"><a href="#"><strong><?= $num++; ?></strong></a></td>
                                 <td><?= $data[$i]['city_name'] ?></td>
                                 <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
                                 <td><?= $status ?></td>
@@ -166,93 +242,9 @@ if($role !== 1) {
                                 <td></td>
                                 <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                             </tr>
-                            <?php }
-                        } 
-                    
-                    //если мы на первой странице
-                    } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
-                        //и поиск не активирован
-                        if (!isset($_GET['search'])) {
-                            //отрисовываем строки в цикле по заданному лимиту отображаемых элементов на 1 странице
-                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            for ($i = 0; $i < $limit; $i++) {
-                                //проверка на то, чтобы выводилось не больше строк, чем есть в БД
-                                if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
-                                    //расфишровка статусов
-                                    $status;
-                                    if($data[$i]['is_active'] == 1) {
-                                        $status = 'Активен';
-                                    }
-                                    if($data[$i]['is_active'] == 0) {
-                                        $status = 'Не активен';
-                                    }
-                                    ?>
-                                <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                                <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                    <td><a href="#"><strong><?= $num++; ?></strong></a></td>
-                                    <td><?= $data[$i]['city_name'] ?></td>
-                                    <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
-                                    <td><?= $status ?></td>
-                                    <td><?= $data[$i]['phone'] ?> </td>
-                                    <td><?= $data[$i]['email'] ?> </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
-                                </tr>
-                            <?php }
-                            } 
+                        <?php }
                         }
-                    } 
-
-                    //если активирован поиск
-                    if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents("http://nginx/api/vendors.php?search=" . $_GET['search']);
-                        $data = json_decode($dataJson, true);
-                        //print_r($data);
-                        //отрисовываем список элементов, которые совпадают с поисковым запросом
-                        $totalNumElements = 0; //для подсчета общего кол-ва записей
-                        if ($data) {
-                            $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            for ($i = 0; $i < count($data); $i++) { 
-                                //проверка на то, чтобы выводилось не больше строк, чем есть в БД, и что не удален
-                                if(isset($data[$i]['id']) && $data[$i]['deleted'] == 0) { 
-                                    $totalNumElements++; 
-                                    //расфишровка статусов
-                                    $status;
-                                    if($data[$i]['is_active'] == 1) {
-                                        $status = 'Активен';
-                                    }
-                                    if($data[$i]['is_active'] == 0) {
-                                        $status = 'Не активен';
-                                    }
-                                    ?>
-                                    <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                                    <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                        <td><a href="#"><strong><?= $num++; ?></strong></a></td>
-                                        <?php
-                                        //достаем название города через 2 бд и цикл 
-                                        for ($c = 0; $c < count($cities); $c++) {
-                                            if ($data[$i]['city_id'] == $cities[$c]['id']) {?>
-                                            <td><?= $cities[$c]['name'] ?></td>
-                                        <?php } 
-                                        }?>
-                                        <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
-                                        <td><?= $status ?></td>
-                                        <td><?= $data[$i]['phone'] ?> </td>
-                                        <td><?= $data[$i]['email'] ?> </td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
-                                    </tr>
-                            <?php }
-                            } 
-                        }
-                        
-                    } ?>
+                } ?>
 
                 </tr>
             </tbody>
@@ -267,12 +259,12 @@ if($role !== 1) {
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
             
             <span class="current-page"><?= $currentPage ?></span>
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
         </div>

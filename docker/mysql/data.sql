@@ -146,7 +146,9 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price`, `unit_id`, `deleted`) VALUES
 (1,	'Гипсокартон ФОРУС стеновой простой (12.5мм) (2 сорт)	',	'',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	0,	1,	1,	1,	555,	49000,	55000,	5,	0),
 (2,	'Гипсокартон КНАУФ потолочный влагостойкий (9.5мм)',	'',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	0,	1,	3,	1,	56,	50000,	65000,	1,	0),
-(3,	'Шпаклевка гипсовая Fugen Knauf',	'',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1656334021/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/Xz_s07vVf0mj2kodJguxPg/81975392.png',	0,	3,	3,	1,	15,	15000,	20000,	1,	0);
+(3,	'Шпаклевка гипсовая Fugen Knauf',	'',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1656334021/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/Xz_s07vVf0mj2kodJguxPg/81975392.png',	0,	3,	3,	1,	15,	15000,	20000,	1,	0),
+(4,	'test1',	'test',	'http://localhost/upload/f077387be6873b8692f9c23416cbd51a.jpg',	0,	1,	1,	1,	4,	11111,	22222,	1,	0),
+(5,	'test2',	'test2',	'http://localhost/upload/b991e017f3fbe7f999e1fb676a033964.jpg',	0,	1,	1,	1,	43,	11111,	22222,	1,	0);
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (
@@ -187,10 +189,10 @@ CREATE TABLE `vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `comment`, `date_reg`, `hash_string`, `is_active`, `password`, `token`, `deleted`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	NULL,	NULL,	NULL,	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	'toWczZ9m3z0Sc',	0),
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	892205925,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	1,	'crK8GaB5k/z6A',	'tokUFLikUe1MU',	0),
 (2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	1,	'crF3z6ZLaP79c',	'',	0),
 (3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	NULL,	NULL,	NULL,	2,	'Третий поставщик',	1689508041,	'hahUrbGggM/Kc',	1,	'cr9Oe/o1K7r0o',	'',	0),
 (4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	1,	'crtdJGYGWRn1k',	'',	0),
-(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	'',	0);
+(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	'Админ',	1688636888,	'hazetypXJkIIk',	1,	'vendor',	'tofgR.1acu0xw',	0);
 
--- 2023-07-21 10:11:54
+-- 2023-07-24 15:51:07

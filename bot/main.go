@@ -114,6 +114,14 @@ type UserT struct {
 	Cart        map[int]int `json:"cart"`
 	Category_id string      `json:"category_id"`
 	Hash        string      `json:"hash_string"`
+	Vendor_id   int         `json:"vendor_ids"`
+}
+
+// структура ответа от сервера
+type ServerResponce struct {
+	OK      bool   `json:"ok"`
+	PayLoad int    `json:"payLoad"`
+	Error   string `json:"error"`
 }
 
 // структура заказа
@@ -237,12 +245,11 @@ func getUsers() {
 }
 
 // функция для отправки POST запроса
-func sendPost(requestBody string, url string) {
+func sendPost(requestBody string, url string) ([]byte, error) {
 	// Создаем новый POST-запрос
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
 	if err != nil {
-		fmt.Println("Ошибка при создании запроса:", err)
-		return
+		return nil, fmt.Errorf("Ошибка при создании запроса: %v", err)
 	}
 
 	// Устанавливаем заголовок Content-Type для указания типа данных в теле запроса
@@ -252,10 +259,22 @@ func sendPost(requestBody string, url string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Ошибка при выполнении запроса:", err)
-		return
+		return nil, fmt.Errorf("Ошибка при выполнении запроса: %v", err)
 	}
 	defer resp.Body.Close()
+
+	// Проверяем код состояния HTTP-ответа
+	if resp.StatusCode == http.StatusOK {
+		// Успешный запрос, читаем тело ответа
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("Ошибка при чтении тела ответа: %v", err)
+		}
+		return body, nil
+	} else {
+		// Обработка ошибки при некорректном статусе HTTP-ответа
+		return nil, fmt.Errorf("Некорректный код состояния HTTP: %s", resp.Status)
+	}
 }
 
 // функция для отправки сообщения пользователю
@@ -335,10 +354,42 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		switch {
 
 		case usersDB[chatId].Step == 1:
-			sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
-			user := usersDB[chatId]
-			user.Step += 1
-			usersDB[chatId] = user
+
+			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
+
+			response, _ := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+
+			// Используйте переменную response для обработки ответа
+			fmt.Println("Ответ сервера:", string(response))
+
+			//посмотреть данные
+			fmt.Println(string(response))
+
+			//парсим данные из json
+			var serverResr ServerResponce
+			json.Unmarshal(response, &serverResr)
+
+			status := serverResr.OK
+			payLoad := serverResr.PayLoad
+			serverMessage := serverResr.Error
+
+			if status {
+
+				sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
+				user := usersDB[chatId]
+				user.Vendor_id = payLoad
+				user.Step += 1
+				usersDB[chatId] = user
+
+			} else if serverMessage == "Поставщик с таким telegram id уже зарегистрирован" {
+
+				sendMessage(chatId, serverMessage, nil)
+
+			} else {
+
+				sendMessage(chatId, serverMessage, nil)
+
+			}
 
 		case usersDB[chatId].Step == 2:
 
@@ -351,10 +402,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
-			requestBody := `{"tg_username:" "` + usersDB[chatId].Username + `", tg_id":"` + strconv.Itoa(chatId) + `", "coordinates":"` + string(jsonCoordinates) + `", "hash_string":"` + usersDB[chatId].Hash + `}`
+			requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
 			fmt.Println(requestBody)
 
-			sendPost(requestBody, "http://"+link+"/api/notification/telegram-send-location.php")
+			sendPost(requestBody, "http://"+link+"/api/vendors.php")
 
 			user := usersDB[chatId]
 			user.Step = 1
