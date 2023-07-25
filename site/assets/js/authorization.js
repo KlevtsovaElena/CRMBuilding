@@ -13,6 +13,7 @@ inputBox.forEach (item => {
 
 /* ---------- ВХОД В АККАУНТ ---------- */
 function logIn() {
+
     const login = document.getElementById('email');
     const pass = document.getElementById('password');
     const info_auth = document.querySelector('.info-auth');
@@ -64,7 +65,14 @@ function logIn() {
     }
 
     // и перейдём на страницу CRM
-    window.location.href = 'http://localhost/index.php';
+    let urlSearch = window.location.search;
+    let urlGetParams = new URLSearchParams(urlSearch);
+    if(urlGetParams.get('return_url')) {
+        window.location.href = urlSearch.replace('?return_url=', '');
+    } else {
+        window.location.href = 'http://localhost/index.php';
+    }
+
 }
 
 // /* ---------- ОТОБРАЗИТЬ В КРУЖКЕ ТОЛЬКО ПЕРВУЮ БУКВУ ИМЕНИ ---------- */

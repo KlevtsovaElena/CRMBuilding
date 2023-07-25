@@ -7,8 +7,9 @@
 if(isset($_COOKIE['profile'])) {
     if(trim($_COOKIE['profile']) == '' ) {
         // 1.
+        $return_url =  ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         setcookie('profile', '', -1, '/');
-        header('Location: http://localhost/pages/login.php');
+        header('Location: http://localhost/pages/login.php?return_url=' . $return_url);
         exit(0);
     } else {
         // 2.
@@ -25,10 +26,14 @@ if(isset($_COOKIE['profile'])) {
         $responseJson = file_get_contents('http://nginx/api/authorization/check.php', false, $context);
         $response = json_decode($responseJson, true);
 
+        // смотрим, что вернул сервер
+        // если данные проверку не прошли, то 
         if (!$response || ($response['success'] == false)) {
+            $return_url =  ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             setcookie('profile', '', -1, '/');
-            header('Location: http://localhost/pages/login.php');
+            header('Location: http://localhost/pages/login.php?return_url=' . $return_url);
             exit(0);
+        // если данные проверку прошли, то 
         } else if ($response['success'] == true) {
             $profile = $response['profile'];
             $vendor_id = $profile['id'];
@@ -40,8 +45,9 @@ if(isset($_COOKIE['profile'])) {
     }
 } else {
     // 3.
+    $return_url =  ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: http://localhost/pages/login.php?return_url=' . $return_url);
     exit(0);
 }
 ?>
