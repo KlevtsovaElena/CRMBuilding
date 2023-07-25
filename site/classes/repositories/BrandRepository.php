@@ -12,13 +12,13 @@ class BrandRepository extends BaseRepository
     const TABLE_NAME = 'brands';
     const CLASS_NAME = 'models\Brand';
 
-    const GET_BY_CATEGORY_ID = 'SELECT DISTINCT b.`id`, b.`brand_name`
+    const GET_BY_CATEGORY_ID = 'SELECT DISTINCT b.`id`, b.`brand_name`, b.`deleted`
                                 FROM brands b
                                     INNER JOIN `products` p ON
                                     p.`brand_id` = b.`id`
-                                WHERE b.`deleted` = 0 
-                                    AND p.`deleted` = 0
-                                    AND p.`category_id` = :category_id';
+                                WHERE p.`category_id` = :category_id
+                                    AND b.`deleted` = 0 
+                                    AND p.`deleted` = 0';
 
 
     public function getTableName(): string
