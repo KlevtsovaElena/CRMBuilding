@@ -648,11 +648,13 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			break
 
 		// кейс для вывода брендов товаров для пользователя
-		case usersDB[chatId].Step == 6:
+		case usersDB[chatId].Step == 6 || button == "backToBrands":
 
 			user := usersDB[chatId]
 			user.Step = 6
-			user.Category_id = button
+			if button != "backToBrands" {
+				user.Category_id = button
+			}
 			usersDB[chatId] = user
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
@@ -665,7 +667,16 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			var brands []Brand
 			err = json.NewDecoder(resp.Body).Decode(&brands)
 			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
+
+				buttons := [][]map[string]interface{}{
+					{{"text": "Назад 🔙", "callback_data": "backToGoods"}},
+				}
+
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
+
+				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -717,12 +728,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				buttons := [][]map[string]interface{}{
 					{
 						{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(product.ID)},
-						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(product.ID)},
+						{"text": "0", "callback_data": "quantity"},
 						{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(product.ID)},
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
-						{"text": "0", "callback_data": "quantity"},
+						{"text": "Назад", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
 					},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -983,12 +994,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
-							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
+							{"text": "Назад", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -1022,12 +1033,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				buttons := [][]map[string]interface{}{
 					{
 						{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+						{"text": "1", "callback_data": "quantity"},
 						{"text": "➕ 1", "callback_data": "addone:" + productStr},
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": "1", "callback_data": "quantity"},
+						{"text": "Назад", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -1065,12 +1076,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
-							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + strconv.Itoa(ID)},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
+							{"text": "Назад", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -1104,12 +1115,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				buttons := [][]map[string]interface{}{
 					{
 						{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-						{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+						{"text": "10", "callback_data": "quantity"},
 						{"text": "➕ 1", "callback_data": "addone:" + productStr},
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": "10", "callback_data": "quantity"},
+						{"text": "Назад", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
 					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -1148,12 +1159,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
 							{"text": "➕ 1", "callback_data": "addone:" + productStr},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
+							{"text": "Назад", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
@@ -1194,12 +1205,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-							{"text": "Добавить в корзину 🛒", "callback_data": "addone:" + productStr},
+							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
 							{"text": "➕ 1", "callback_data": "addone:" + productStr},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
+							{"text": "Назад", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
 						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
