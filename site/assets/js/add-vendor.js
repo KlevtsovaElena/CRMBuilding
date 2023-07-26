@@ -5,7 +5,6 @@ const formAddVendor = document.querySelector('.form-add-vendor');
 const vendorInfo = document.querySelector('.vendor-info');
 const copyBtn = document.querySelectorAll('.copy-result');
 let errorVendor = document.querySelector('.vendor-info-error');
-console.log(copyBtn);
 
 // запишем значения полей формы в переменные
 const nameVendor = formAddVendor.querySelector('#name');
@@ -13,6 +12,7 @@ const cityId = formAddVendor.querySelector('#city_id');
 const comment = formAddVendor.querySelector('#comment');
 const phone = formAddVendor.querySelector('#phone');
 const email = formAddVendor.querySelector('#email');
+const percent = formAddVendor.querySelector('#percent');
 const is_active = formAddVendor.querySelector('#is_active');
 
 function addVendor() {
@@ -39,6 +39,7 @@ function addVendor() {
         'phone': phone.value,
         'email': email.value.trim(),
         'is_active': is_active.value,
+        'percent': percent.value,
         'role': 2 // соответствует роли поставщика
     });
 
@@ -81,7 +82,7 @@ function addVendor() {
 function validationAddVendor() {
     hasError = false;
 
-    [nameVendor, cityId, email, is_active].forEach(item =>  {
+    [nameVendor, cityId, email, percent, is_active].forEach(item =>  {
     
         console.log(item.getAttribute('name') + "    " + item.value);
 
@@ -184,6 +185,7 @@ function editVendor(id) {
         'comment': comment.value.trim(),
         'phone': phone.value,
         'email': email.value.trim(),
+        'percent': percent.value,
         'is_active': is_active.value
     });
 
@@ -233,4 +235,13 @@ function deleteVendorFromEditForm(id) {
     // переход обратно на странницу списка поставщиков с прежними параметрами
     window.location.href = 'http://localhost/pages/admin-vendors.php?' + params;
     
+}
+
+// проверка поля с процентом
+function percentValid(obj) {
+    if (obj.value < 0) {
+        obj.value = 0; 
+    } else if (obj.value > 100) {
+        obj.value = 100;
+    } 
 }

@@ -9,7 +9,8 @@ if($role !== 2) {
 <?php 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
-        "<link rel='stylesheet' href='./../assets/css/base.css'>"
+        "<link rel='stylesheet' href='./../assets/css/base.css'>",
+        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>"
@@ -53,7 +54,7 @@ if($role !== 2) {
 <!-- ЗДЕСЬ БУДЕТ ОСНОВНОЙ КОД СТРАНИЦЫ -->
 
 <section class="form-elements-container">
-    <p class="data-vendor-elem"><b> <?= $vendor_name; ?> </b></p>
+    <p class="data-vendor-elem data-vendor-elem__name"><b> <?= $vendor_name; ?> </b></p>
     <hr class="ghost">
 
     <div class="data-vendor-elem">
@@ -83,22 +84,6 @@ if($role !== 2) {
 </section>
 
 <?php include('./../components/footer.php'); ?>
-
-<style>
-    .data-vendor-elem {
-        margin-bottom: 15px;
-    }
-
-    .data-vendor-elem__title,
-    .data-vendor-elem__data {
-        margin: 5px;
-    }
-
-    .data-vendor-elem__title {
-        font-size: 0.9rem;
-    }
-
-</style>
 
 <!-- скрипт удалить, когда не нужна будет ссылка с хэшем -->
 <script>
