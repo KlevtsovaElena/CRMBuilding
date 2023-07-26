@@ -34,7 +34,8 @@ class VendorRepository extends BaseRepository
                                     v.`password` as `password`,
                                     v.`token` as `token`,
                                     v.`deleted` as `deleted`,
-                                    c.`deleted` as `city_deleted`
+                                    c.`deleted` as `city_deleted`,
+                                    v.`percent` as `percent`
                                 FROM vendors v
                                     INNER JOIN cities c ON
                                     c.`id` = v.`city_id`
@@ -58,6 +59,7 @@ class VendorRepository extends BaseRepository
         'password' => 'v.password',
         'token' => 'v.token',
         'deleted' => 'v.deleted',
+        'percent' => 'v.percent',
         'city_deleted' => 'c.deleted'
     ];
 
