@@ -24,7 +24,7 @@ if($role !== 1) {
 <?php 
     $id = $_GET['id']; 
 
-    $vendorJson = file_get_contents("http://nginx/api/vendors.php?deleted=0&id=" . $id);
+    $vendorJson = file_get_contents("http://nginx/api/vendors/get-with-details.php?deleted=0&id=" . $id);
     $vendor = json_decode($vendorJson, true);
 
     $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0&is_active=1");
@@ -40,7 +40,7 @@ if($role !== 1) {
 
             <!-- название -->
             <div class="form-add-vendor__item">
-                <p>Название</p><input type="text" id="name" name="name" value="<?= $vendor['name']?>" required>
+                <p>Название</p><input type="text" id="name" name="name" value="<?= $vendor[0]['name']?>" required>
                 <div class="error-info d-none"></div>
             </div>
 
@@ -48,15 +48,11 @@ if($role !== 1) {
             <div class="form-add-vendor__item">
                 <p>Город</p>
                 <select id="city_id" name="city_id" value="" required>
-                    <option value="" selected hidden>Выберите город...</option>
+                    <option value="<?= $vendor[0]['city_id']; ?>" selected hidden><?= $vendor[0]['city_name']; ?></option>
                     <?php 
-                    foreach($cities as $city) { 
-                        if ($city['id'] === $vendor['city_id']) {?>
-                            <option value="<?= $city['id']; ?>" selected><?= $city['name']; ?></option>
-                        <?php } else { ?>
-                            <option value="<?= $city['id']; ?>" ><?= $city['name']; ?></option>
-                        <?php }                         
-                    }; ?>
+                    foreach($cities as $city) { ?>
+                            <option value="<?= $city['id']; ?>" ><?= $city['name']; ?></option>                       
+                    <?php   }; ?>
 
                 </select>
                 <div class="error-info d-none"></div> 
@@ -64,19 +60,25 @@ if($role !== 1) {
 
             <!-- комментарий -->
             <div class="form-add-vendor__item">
-                <p>Комментарий</p><textarea id="comment" name="comment"><?= $vendor['comment']; ?></textarea>
+                <p>Комментарий</p><textarea id="comment" name="comment"><?= $vendor[0]['comment']; ?></textarea>
                 <div class="error-info d-none"></div> 
             </div>
 
             <!-- телефон -->
             <div class="form-add-vendor__item">
-                <p>Телефон</p><input type="tel" id="phone" name="phone" value="<?= $vendor['phone']; ?>" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                <p>Телефон</p><input type="tel" id="phone" name="phone" value="<?= $vendor[0]['phone']; ?>" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
                 <div class="error-info d-none"></div>
             </div>
 
             <!-- email -->
             <div class="form-add-vendor__item">
-                <p>Email</p><input type="email" id="email" name="email" value="<?= $vendor['email']; ?>" placeholder="example@example.com" required>
+                <p>Email</p><input type="email" id="email" name="email" value="<?= $vendor[0]['email']; ?>" placeholder="example@example.com" required>
+                <div class="error-info d-none"></div>
+            </div>
+
+            <!-- процент -->
+            <div class="form-add-vendor__item">
+                <p>Установленная % ставка</p><input type="number" id="percent" name="percent"  min="0" max="100" value="<?= $vendor[0]['percent']; ?>" placeholder="0" onchange="percentValid(this)">
                 <div class="error-info d-none"></div>
             </div>
 
@@ -84,8 +86,8 @@ if($role !== 1) {
             <div class="form-add-vendor__item">
                 <p>Статус</p>
                 <select id="is_active" name="is_active" value="" required>
-                    <option value="1" <?php if($vendor['is_active'] == 1) {echo 'selected';} ?>>Активен</option>
-                    <option value="0" <?php if($vendor['is_active'] == 0) {echo 'selected';} ?>>Не активен</option>
+                    <option value="1" <?php if($vendor[0]['is_active'] == 1) {echo 'selected';} ?>>Активен</option>
+                    <option value="0" <?php if($vendor[0]['is_active'] == 0) {echo 'selected';} ?>>Не активен</option>
                 </select>
                 <div class="error-info d-none"></div>
             </div> 
@@ -94,8 +96,8 @@ if($role !== 1) {
             <div class="form-add-vendor__item">
                 <p>Координаты: 
                     <?php 
-                    if(isset($vendor['coordinates']['latitude']) && isset($vendor['coordinates']['longitude']))  {
-                        echo $vendor['coordinates']['latitude'] . ', ' . $vendor['coordinates']['longitude']; 
+                    if(isset($vendor[0]['coordinates']['latitude']) && isset($vendor[0]['coordinates']['longitude']))  {
+                        echo $vendor[0]['coordinates']['latitude'] . ', ' . $vendor[0]['coordinates']['longitude']; 
                     } else {
                         echo "не указаны";
                     }?></p>
@@ -103,7 +105,7 @@ if($role !== 1) {
 
             <!-- пароль -->
             <div class="form-add-vendor__item">
-                <p>Пароль: <?= $vendor['password']; ?></p>
+                <p>Пароль: <?= $vendor[0]['password']; ?></p>
             </div> 
 
         </form>
@@ -120,7 +122,7 @@ if($role !== 1) {
 
         <div class="vendor-info">
 
-            <p>Логин и пароль поставщика <b> <?= $vendor['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
+            <p>Логин и пароль поставщика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
             <br>
             <!-- <p><b>Ссылка для бота:</b></p>
             <div class="vendor-info-text">
@@ -130,8 +132,8 @@ if($role !== 1) {
             <p><b>Вход в CRM</b></p>
             <div class="vendor-info-text d-flex">
                 <div class="copy-text">
-                    <p><i>Логин: <?= $vendor['email']; ?> &nbsp&nbsp</i></p>
-                    <p><i>Пароль: <?= $vendor['password']; ?></i></p> 
+                    <p><i>Логин: <?= $vendor[0]['email']; ?> &nbsp&nbsp</i></p>
+                    <p><i>Пароль: <?= $vendor[0]['password']; ?></i></p> 
                 </div>
                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>                             
             </div>

@@ -1,7 +1,7 @@
 console.log("Подключили auth");
 
 /* ---------- ВХОД ПО ENTER ---------- */
-let inputBox = document.querySelectorAll('input');
+let inputBox = document.querySelectorAll('.input-login');
 inputBox.forEach (item => {
     item.addEventListener('keypress', (e) => {
         if(e.key == 'Enter') {

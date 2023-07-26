@@ -17,3 +17,20 @@
     font-size: 0.9rem;
     margin-top: 5px;
 }
+
+.data-vendor-elem {
+    margin-bottom: 15px;
+}
+
+.data-vendor-elem__title,
+.data-vendor-elem__data {
+    margin: 5px;
+}
+
+.data-vendor-elem__title {
+    font-size: 0.9rem;
+}
+
+.data-vendor-elem__name {
+    font-size: 1.5rem;
+}
