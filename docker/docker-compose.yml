@@ -6,11 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile-nginx
     volumes:
+      - ./ssl:/etc/ssl
       - ./../site/:/var/www
     depends_on:
       - php
     ports:
       - 80:80
+      - 443:443
 
   php:
     build:
@@ -26,6 +28,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DB: ${MYSQL_DB}
       MYSQL_CHARSET: ${MYSQL_CHARSET}
+      API_LINK: ${API_LINK}
     ports:
       - 9010:9000
 
