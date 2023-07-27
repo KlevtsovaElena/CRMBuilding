@@ -69,6 +69,12 @@ if($role !== 1) {
                 <div class="error-info d-none"></div>
             </div>
 
+            <!-- процент -->
+            <div class="form-add-vendor__item">
+                <p>Установленная % ставка</p><input type="number" id="percent" name="percent"  min="0" max="100" value="" placeholder="0" onchange="percentValid(this)">
+                <div class="error-info d-none"></div>
+            </div>
+
             <!-- статус -->
             <div class="form-add-vendor__item">
                 <p>Статус</p>

@@ -18,13 +18,13 @@
 
         <!-- login -->
         <div class="form-login__item">
-            <p>Логин</p><input type="text" id="email" name="email" value="" required>
+            <p>Логин</p><input type="text" class="input-login" id="email" name="email" value="" required>
             <div class="error-info d-none"></div>
         </div>
 
         <!-- password -->
         <div class="form-login__item">
-            <p>Пароль</p><input type="text" id="password" name="password" value="" required>
+            <p>Пароль</p><input type="text" class="input-login" id="password" name="password" value="" required>
             <div class="error-info d-none"></div>
         </div>
 

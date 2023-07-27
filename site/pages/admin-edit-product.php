@@ -49,7 +49,7 @@ if($role !== 1) {
         
             <!-- пропишем в форму данные товара по id -->
             <?php 
-                $productJson = file_get_contents("http://nginx/api/products.php?deleted=0&id=" . $id);
+                $productJson = file_get_contents("http://nginx/api/products/get-with-details.php?deleted=0&id=" . $id);
                 $product = json_decode($productJson, true);
             ?>
             <div class="form-add-product__elements form-elements-container">
@@ -57,18 +57,14 @@ if($role !== 1) {
 
                 <p>Поставщик: 
                     <b>
-                    <?php foreach($vendors as $vendor) { 
-                        if ($vendor['id'] === $product['vendor_id']) {
-                            echo $vendor['name'];
-                        }
-                    }?>
+                    <?= $product[0]['vendor_name']; ?>
                     </b>
                 </p>
                 <br>
 
                 <!-- наименование -->
                 <div class="form-add-product__elements-item">
-                    <p>Наименование</p><input type="text" id="name" name="name" value="<?= $product['name']; ?>" required>
+                    <p>Наименование</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
                     <div class="error-info d-none"></div>
                 </div>
 
@@ -79,8 +75,8 @@ if($role !== 1) {
                     <p>(Допустимые форматы: .jpg, .jpeg, .png)</p>
                     <div class="form-add-product__elements-item__img">
                         
-                        <div class="form-add-product__elements-item__img-prew"><img src="<?= $product['photo']; ?>" alt="изображение товара"></div>
-                        <input type="hidden"  id="photo" name="photo" value="<?= $product['photo']; ?>">
+                        <div class="form-add-product__elements-item__img-prew"><img src="<?= $product[0]['photo']; ?>" alt="изображение товара"></div>
+                        <input type="hidden"  id="photo" name="photo" value="<?= $product[0]['photo']; ?>">
                         <input type="file"  id="new_photo" name="new_photo" accept="image/png, image/jpg, image/jpeg" onchange="loadFile()">  
                         <div><progress id="progress" max="100" value="0" class="d-none"></progress></div>
                                 
@@ -91,17 +87,11 @@ if($role !== 1) {
                 <!-- категория -->
                 <div class="form-add-product__elements-item">
                     <p>Категория</p>
-                    <select id="category_id" name="category_id" value="<?= $product['category_id']; ?>" required>
-                        <option value="" selected hidden>Выберите категорию...</option>
-                        <?php foreach($categories as $category) { 
-                            if ($category['id'] === $product['category_id']) {
-                            ?>
-                                <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
-                            <?php } else { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                            <?php } 
-                        }; ?>
-
+                    <select id="category_id" name="category_id" value="" required>
+                        <option value="<?= $product[0]['category_id']; ?>" selected hidden><?= $product[0]['category_name']; ?></option>
+                        <?php foreach($categories as $category) { ?>
+                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
+                        <?php }; ?>
                     </select>
                     <div class="error-info d-none"></div> 
                 </div>
@@ -109,66 +99,54 @@ if($role !== 1) {
                 <!-- бренд -->
                 <div class="form-add-product__elements-item">
                     <p>Бренд</p>
-                    <select id="brand_id" name="brand_id" value="<?= $product['brand_id']; ?>" required>
-                        <option value="" selected hidden>Выберите бренд...</option>
-                        <?php foreach($brands as $brand) { 
-                            if ($brand['id'] === $product['brand_id']) {
-                            ?>
-                                <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
-                            <?php } else { ?>
-                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php } 
-                        }; ?>
-
+                    <select id="brand_id" name="brand_id" value="" required>
+                        <option value="<?= $product[0]['brand_id']; ?>" selected hidden><?= $product[0]['brand_name']; ?></option>
+                        <?php foreach($brands as $brand) { ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php }; ?>
                     </select>
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- описание -->
                 <div class="form-add-product__elements-item">
-                    <p>Описание</p><textarea id="description" name="description"><?= $product['description']; ?></textarea>
+                    <p>Описание</p><textarea id="description" name="description"><?= $product[0]['description']; ?></textarea>
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- артикул -->
                 <div class="form-add-product__elements-item d-none">
-                    <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="<?= $product['article']; ?>" placeholder="0">
+                    <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="<?= $product[0]['article']; ?>" placeholder="0">
                     <div class="error-info d-none"></div>
                 </div> 
 
                 <!-- количество остатков -->
                 <div class="form-add-product__elements-item">
-                    <p>Количество остатков</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="<?= $product['quantity_available']; ?>" required placeholder="0">
+                    <p>Количество остатков</p><input type="number" id="quantity_available" name="quantity_available" min="0" value="<?= $product[0]['quantity_available']; ?>" required placeholder="0">
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- единица измерения -->
                 <div class="form-add-product__elements-item">
                     <p>Единица измерения</p>
-                    <select id="unit_id" name="unit_id" value="<?= $product['unit_id']; ?>" required>
-
-                    <?php foreach($units as $unit) { 
-                        if ($unit['id'] === $product['unit_id']) {
-                        ?>
-                            <option value="<?= $unit['id']; ?>" selected><?= $unit['name']; ?></option>
-                        <?php } else { ?>
+                    <select id="unit_id" name="unit_id" value="" required>
+                        <option value="<?= $product[0]['unit_id']; ?>" selected hidden><?= $product[0]['unit_name']; ?></option>
+                        <?php foreach($units as $unit) { ?>
                             <option value="<?= $unit['id']; ?>"><?= $unit['name']; ?></option>
-                        <?php } 
-                    }; ?>
-
+                        <?php }; ?>
                     </select>
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- цена поставщика -->
                 <div class="form-add-product__elements-item">
-                    <p>Цена </p><input type="number" id="price" name="price" min="0" value="<?= $product['price']; ?>" required placeholder="0">
+                    <p>Цена </p><input type="number" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" required placeholder="0">
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- среднерыночная цена -->
                 <div class="form-add-product__elements-item">
-                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product['max_price']; ?>" required placeholder="0">
+                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0">
                     <div class="error-info d-none"></div> 
                 </div> 
 
