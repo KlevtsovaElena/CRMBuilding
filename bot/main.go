@@ -1333,7 +1333,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс при нажатии на кнопку актуальный курс
 		if text == "Актуальный курс 💹" {
 
-			channelURL := "https://t.me/stroybotchannel2"
+			channelURL := "t.me/stroy_bot_prices"
 
 			// Получаем текущую дату и время
 			currentTime := time.Now()

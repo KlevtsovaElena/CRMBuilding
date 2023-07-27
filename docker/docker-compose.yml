@@ -80,3 +80,15 @@ services:
       bot_token: ${CURRENCY_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"
+
+  price-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-price-service
+    env_file:
+      - .env
+    volumes:
+      - ./../price-service/:/app/
+    environment:
+      bot_token: ${PRICE_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_PRICE_CHANEL}
