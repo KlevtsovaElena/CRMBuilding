@@ -22,6 +22,21 @@ const info = document.querySelector('.info-table');
 //получаем все элементы заголовка для отслеживания сортировки
 const headTableOrders = document.getElementById('list-orders').querySelectorAll('[data-sort]');
 
+// определим разницу временной зоны с UTC в миллисекундах (изначально в минутах)
+let timeZoneDiff = new Date().getTimezoneOffset() * 60 * 1000;
+// данные календаря
+let dateFromEl = document.getElementById('date_from');
+let dateTillEl = document.getElementById('date_till');
+// если в гет параметре были данные, то нужно из формата юникс перевести в yyyy-mm-dd и отобразить в календаре
+if (dateFromEl.getAttribute('order-date') > 0) {
+    let dateFromCalendar = new Date(dateFromEl.getAttribute('order-date') * 1000).toLocaleDateString().split('.');
+    dateFromEl.value = dateFromCalendar[2] + '-' + dateFromCalendar[1] + '-' + dateFromCalendar[0];
+} 
+if (dateTillEl.getAttribute('order-date') > 0) {
+    let dateTillCalendar = new Date(dateTillEl.getAttribute('order-date') * 1000).toLocaleDateString().split('.');
+    dateTillEl.value = dateTillCalendar[2] + '-' + dateTillCalendar[1] + '-' + dateTillCalendar[0];
+} 
+
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
@@ -141,6 +156,31 @@ function getFilters() {
         params += "&search=order_id:" + searchEl.value;
     }
 
+    // проверим значения дат (начало и конец интервала)
+
+    // начало интервала
+    if(dateFromEl.value) {
+
+        // 1. переведём дату из календаря в юникс и получим дату со сдвигом,
+        // т.е. если перевести, получим не 01.01.23 00:00:00,  а локальную 01.01.23 03:00:00
+        // а нам нужно, чтобы локальная была 00:00:00 
+        // 2. для этого добавим разницу во времени timeZoneDiff в миллисекундах (высчитано в начале файла)
+        // и получим в результате что надо, эквивалентно 01.01.23 00:00:00 по локали
+        // 3. для передачи на сервер убираем миллисекунды и передаём в юникс формате в минутах, как у нас в базе (делим на 1000)
+
+        params += "&date_from=" + ((Date.parse(dateFromEl.value) + timeZoneDiff) / 1000);
+    } 
+
+    // конец интервала
+    if(dateTillEl.value) {
+
+        // 1 и 3 аналогично началу интервала
+        // 2 помимо timeZoneDif мы прибавляем 24 часа к дате и отнимаем 1 секунду (24*60*60*1000 - 1000)
+        // и получим в результате что надо, эквивалентно 01.01.23 23:59:59 по локали 
+
+        params += "&date_till=" + ((Date.parse(dateTillEl.value) + timeZoneDiff + 24*60*60*1000 - 1000) / 1000);
+
+    } 
 
 console.log(params);
     return params;
@@ -190,7 +230,7 @@ function getOrdersData(params) {
 
     // количество записей в базе по указанным параметрам
     totalOrdersCount = orders['count'];
-console.log('всего ' + totalOrdersCount + ' выборка ' + orders['orders'].length);
+
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (orders['orders'].length === 0 && totalOrdersCount > 0) {
         changeData();
@@ -231,28 +271,6 @@ function renderListOrders(orders) {
 
         let products = "";
 
-        let productName = "";
-        
-        // соберём данные заказанных товаров и общую стоимость заказа
-        // for (let j = 0; j < orders['orders'][i]['products'].length; j++){
-        //     // если вдруг товар в базе не найден,
-        //     // т.е. его названия нет в ответе, то установим name="Товар не найден в базе "
-        //     if (!orders['orders'][i]['products'][j]['name']) {
-        //         productName = "Товар в базе не найден";
-        //     } else {
-        //         productName = orders['orders'][i]['products'][j]['name'];
-        //     }
-        //     products += productName + " (" + 
-        //                     (orders['orders'][i]['products'][j]['quantity']) + '), ';
-        //                     // если вдруг товар в базе не найден,
-        //                     // т.е. его цены нет в ответе, то мы её не учитываем
-        //                     if (orders['orders'][i]['products'][j]['price']) {
-        //                         totalPrice += orders['orders'][i]['products'][j]['quantity'] * orders['orders'][i]['products'][j]['price'];
-        //                     }
-
-        // }
-
-
         for (let j = 0; j < orders['orders'][i]['products'].length; j++){
 
             productName = orders['orders'][i]['products'][j]['name'];
@@ -263,17 +281,17 @@ function renderListOrders(orders) {
                             
         }
 
-
         products = products.slice(0, -2);
 
         // отформатируем дату
    
         let dateTimeOrder = new Date(orders['orders'][i]['order_date'] * 1000);
         //.slice(0, -3) просто обрезает 3 последних символа. Таким образом, получаем время без секунд
-        let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
+        //let timeOrder = dateTimeOrder.toLocaleTimeString().slice(0, -3);
 
         //преобразуем дату с сервера в дату, которая у пользователя
         let dateOrder = dateTimeOrder.toLocaleDateString();
+
         let archiveStatus = "";
         let archiveText = "";
         if(orders['orders'][i]['archive'] == '1') {
@@ -517,7 +535,6 @@ function saveChangeOrder() {
 
     // если статус был 0, то пересчитаем кол-во новых заказов и отрисуем новую цифру
     if (rowOrder.classList.contains('row-status0')) {
-        console.log("newchange");
         changeCountNewOrders();
     } 
 

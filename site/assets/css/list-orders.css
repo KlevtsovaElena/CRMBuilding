@@ -146,7 +146,18 @@ th[data-id="status"] {
     cursor: pointer;
 }
 
-@media(max-width: 1024px) {
+.middle-input {
+    max-width: 102px;
+    font-size: 0.7rem;
+}
+
+.small-input {
+    max-width: 74px;
+    font-size: 0.7rem;
+}
+
+
+@media(max-width: 1250px) {
     .filters-container-flex {
         flex-wrap: wrap;
     }
