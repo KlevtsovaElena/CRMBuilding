@@ -35,16 +35,24 @@ if($role !== 2) {
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
-                <div class="form-elements-container filters-container-flex">
+            <div class="form-elements-container filters-container-flex">
+                    <!-- дата начало -->
+                    <div class="d-iblock">
+                        с <input type="date" id="date_from" name="date_from" order-date="0" class="middle-input">
+                    </div>
+                    <!-- дата конец -->
+                    <div class="d-iblock">
+                        по <input type="date" id="date_till" name="date_till"  order-date="0" class="middle-input">
+                    </div>
                     <!-- поле поиска -->
                     <div class="d-iblock">
                         <div>Поиск</div>
-                        <input type="search" id="search" name="search" value="" placeholder="По №заказа">
+                        <input type="search" id="search" name="search" class="small-input" value="" placeholder="№заказа">
                     </div>
                     <!-- выбор статуса -->
                     <div class="d-iblock">
                         <div>Статус</div>
-                        <select id="status" name="status" value="">
+                        <select id="status" name="status" value=""  class="middle-input">
 
                             <option value="">Все</option>
                             <option value="0">Новый</option>
@@ -137,6 +145,17 @@ if (count($_GET) !== 0) {
         $status = "";
     }
 
+    if(isset($_GET['date_from'])) {
+        $date_from = $_GET['date_from'];
+    } else {
+        $date_from = 0;
+    }
+
+    if(isset($_GET['date_till'])) {
+        $date_till = $_GET['date_till'];
+    } else {
+        $date_till = 0;
+    }
 
     if(isset($_GET['orderby'])) {
         $orderByArray = explode(";", $_GET['orderby']);
@@ -166,16 +185,26 @@ if (count($_GET) !== 0) {
             <section class="form-filters">
 
                 <div class="form-elements-container filters-container-flex">
+
+                    <!-- дата начало -->
+                    <div class="d-iblock">
+                        с <input type="date" id="date_from" name="date_from" order-date="<?= $date_from; ?>" class="middle-input">
+                    </div>
+                    <!-- дата конец -->
+                    <div class="d-iblock">
+                        по <input type="date" id="date_till" name="date_till" order-date="<?= $date_till; ?>"  class="middle-input">
+                    </div>
+
                     <!-- поле поиска -->
                     <div class="d-iblock">
                         <div>Поиск</div>
-                        <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="По №заказа">
+                        <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="№заказа" class="small-input">
                     </div>
                     
                     <!-- выбор статуса -->
                     <div class="d-iblock">
                         <div>Статус</div>
-                        <select id="status" name="status" value="">
+                        <select id="status" name="status" value="" class="middle-input">
 
                             <?php
                             if (!isset($_GET['status']) && !isset($_GET['archive'])) {
