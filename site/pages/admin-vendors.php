@@ -130,7 +130,7 @@ if($role !== 1) {
                         <th data-id="confirmed">Подтвердил</th>
                         <th data-id="owns">Должен</th>
                         <th data-id="incoming">Поступление</th>
-                        <th data-id="percent">Процент</th>                      
+                        <th class="cell-title" data-id="percent" data-sort="<?php if ($sortBy == 'percent')  {echo $mark; } ?>">Процент</th>                      
                         <th></th>
                     </tr>
                 </thead>
@@ -239,7 +239,7 @@ if($role !== 1) {
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
+                                <td class="ta-center"><?= $data[$i]['percent'] ?>%</td>
                                 <td><svg onclick="deleteOne('vendors', <?=$data[$i]['id'] ?>)" class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></td>
                             </tr>
                         <?php }
