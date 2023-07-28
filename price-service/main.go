@@ -51,7 +51,7 @@ func main() {
 		timeNow := time.Now()
 
 		//сравниваем текущее время (часы и минуты) и время рассылки
-		if strconv.Itoa(timeNow.Hour()) == planed_hour || strconv.Itoa(timeNow.Minute()) == planed_minute {
+		if strconv.Itoa(timeNow.Hour()+3) == planed_hour && strconv.Itoa(timeNow.Minute()) == planed_minute {
 
 			fmt.Println("START")
 			//запускаем функцию отправки сообщения
