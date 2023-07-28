@@ -874,6 +874,120 @@ function sortByDateTill() {
     return unixTime;
 }
 
+//функция для изменения номера телефона для связи в боте на Главной
+function changePhone() {
+
+    //достаем нередактируемую строку с телефоном внутри
+    let phoneEl = document.getElementById('phone-number');
+
+    //достаем текущий телефон
+    let phone = phoneEl.innerHTML;
+    console.log(phone);
+
+     //меняем простую строку на редактируемый инпут
+    changeTagName(phoneEl, 'input');
+
+    //вставляем в инпут телефон
+    document.getElementById('phone-number').value = phone;
+    console.log(document.getElementById('phone-number').value);
+
+    let newPhone;
+
+    //по нажатию на энтер
+    // document.addEventListener('keyup', event => {
+    //     if( event.code === 'Enter' ) {
+
+    //         //меняем телефон и отправляем изменения
+    //         changePhoneAndSend(phone);
+    //     }
+    // });
+      
+
+      //меняем кнопку "Изменить на "Сохранить"
+      let btn = document.getElementById('btn-phone');
+      btn.innerHTML = 'Сохранить';
+      btn.onclick = function() {
+          changePhoneAndSend(phone);
+      }
+
+}
+
+//функция изменения и отправки телефона для связи на Главной у админа
+function changePhoneAndSend(oldPhone) {
+
+    //достаем измененное значение
+    newPhone = document.getElementById('phone-number').value;
+
+    //если новое значение пустое
+    if (newPhone.trim() == '') {
+        alert('Телефон не может быть пустым');
+        return;
+    }
+
+    //если новый телефон совпадает со старым (изменения не внесены), делаем то же самое, но без пост-запроса
+    if (newPhone === oldPhone) {
+        //меняем редактируемый инпут на простую строку
+        changeTagName(document.getElementById('phone-number'), 'p');
+
+        //вставляем внутрь прежнее значение
+        document.getElementById('phone-number').innerHTML = oldPhone;
+
+        //меняем кнопку обратно на "Изменить"
+        let btn = document.getElementById('btn-phone');
+        btn.innerHTML = 'Изменить';
+        btn.onclick = function() {
+            changePhone();
+        }
+        return;
+    }
+
+    //запрос подтверждения
+    let yes = window.confirm('Вы действительно хотите изменить телефон?');
+
+    if(!yes) {
+        console.log("не изменять");
+        return;
+    }
+
+    //меняем редактируемый инпут на простую строку
+    changeTagName(document.getElementById('phone-number'), 'p');
+
+    //вставляем внутрь измененное значение
+    document.getElementById('phone-number').innerHTML = newPhone;
+
+    //ссылка
+    //let link = 
+
+    //соберем json для передачи на сервер
+    obj = JSON.stringify({
+        'new_phone': newPhone
+    });
+    console.log(obj);
+
+    //отправляем новый телефон на сервер
+    //sendRequestPOST(obj, );
+
+    //меняем кнопку обратно на "Изменить"
+    let btn = document.getElementById('btn-phone');
+    btn.innerHTML = 'Изменить';
+    btn.onclick = function() {
+        changePhone();
+    }
+
+}
+
+//функция изменения типа элемента
+function changeTagName(el, newTagName) {
+    let n = document.createElement(newTagName);
+    let attr = el.attributes;
+    for (let i = 0, len = attr.length; i < len; ++i) {
+      n.setAttribute(attr[i].name, attr[i].value);
+    }
+    n.innerHTML = el.innerHTML;
+    el.parentNode.replaceChild(n, el);
+  }
+ 
+
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 document.cookie = 'time_zone=' + timeZone;

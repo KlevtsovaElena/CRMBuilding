@@ -55,8 +55,8 @@
         <nav class="menu-left" >
 
             <ul class="menu-left__items">
-                <li class="menu-left__item" data-page-name = "/index.php">
-                    <a href="/index.php" class="menu-left__item-link">
+                <li class="menu-left__item" data-page-name = "/pages/admin-main.php">
+                    <a href="./../pages/admin-main.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
