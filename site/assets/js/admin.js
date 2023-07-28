@@ -512,13 +512,41 @@ function applyInOrders() {
 
     console.log(limit.value);
 
-    //лимит задан всегда, поэтому проверяем только наличие поискового запроса
+    //лимит задан всегда, поэтому проверяем наличие поискового запроса
     //получим введенное в поиск значение
     let searchQuery = document.getElementById('search').value;
     let dataSearch = searchQuery.trim();
 
+    //и даты "с"
+    let from = sortByDateFrom();
+    console.log(from);
 
+    //и даты "по"
+    let till = sortByDateTill();
+    console.log(till);
 
+    //собираем фильтры (дата + поиск)
+    let filters = '';
+
+    //если задана дата
+    if (from || till) {
+        //если  С
+        if (from) {
+            filters += '&order_date_from=' + from;
+        } 
+        if (till) {
+            //если ДО
+            filters += '&order_date_till=' + till;
+        } 
+    }
+
+    //если задан поиск
+    if (dataSearch) {
+        limit.value = 'all';
+        filters += '&search=order_id:' + dataSearch;
+    } 
+
+    //собираем сортировку
     // получим значение атрибута data-sort
     let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
     console.log(allTitlesElems);
@@ -539,81 +567,137 @@ function applyInOrders() {
             console.log(key);
         }
     }
-
-    // получим значение атрибута data-limit, содержащего уже заданный лимит кол-ва отображаемых на стр. записей
-    // let dataLimit = document.getElementById('list-orders').getAttribute('data-limit');
-    // console.log(dataLimit);
-
+    
     // получим значение атрибута data-page, содержащего номер текущей страницы
     let dataPage = document.getElementById('list-orders').getAttribute('data-page');
     console.log(dataPage);
 
+    let sorting = '';
+
     //если активировано значение asc
     if (dataSort && dataSort === "asc") {
-        
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc';
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc';
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc';
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
-        }
+        sorting += '&orderby=' + key + ':asc';
     //если активировано значение desc
     } else if (dataSort === "desc") {
-
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc';
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc';
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
-            window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
-        }
-    } else if (!dataSort) {
-        //проверим значение поиска
-        if(searchQuery.trim()) {
-            console.log(searchQuery);
-
-            //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + searchQuery.trim());
-
-            document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + searchQuery.trim();
-            
-        } else {
-
-        //вносим изменение в адресную строку страницы
-        history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value);
-
-        document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value;
-
-        }
-
+        sorting += '&orderby=' + key + ':desc';
     }
+
+    //вносим изменение в адресную строку страницы
+    history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + filters + sorting);
+
+    document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + filters + sorting;
+
+    // //если активировано значение asc
+    // if (dataSort && dataSort === "asc") {
+    //     //передаем его в адресную строку как гет-параметр
+    //     //вносим изменение в адресную строку страницы
+    //     //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
+    //     //если в гет-параметрах нет ни поиска, ни страницы
+    //     if (!dataSearch && !dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc';
+    //     //если в гет-параметрах уже есть поиск, но не страница
+    //     } else if (dataSearch && !dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc';
+    //     //если в гет-параметрах уже есть страница, но не поиск
+    //     } else if (!dataSearch && dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc';
+    //     //если в гет-параметрах уже есть и страница, и поиск
+    //     } else if (dataSearch && dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
+    //     }
+    // //если активировано значение desc
+    // } else if (dataSort === "desc") {
+
+    //     //передаем его в адресную строку как гет-параметр
+    //     //вносим изменение в адресную строку страницы
+    //     //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
+    //     //если в гет-параметрах нет ни поиска, ни страницы
+    //     if (!dataSearch && !dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc';
+    //     //если в гет-параметрах уже есть поиск, но не страница
+    //     } else if (dataSearch && !dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc';
+    //     //если в гет-параметрах уже есть страница, но не поиск
+    //     } else if (!dataSearch && dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
+    //     //если в гет-параметрах уже есть и страница, и поиск
+    //     } else if (dataSearch && dataPage) {
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
+    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
+    //     }
+    // } else if (!dataSort) {
+    //     //проверим значение дат и поиска
+    //     if((from || till) && searchQuery.trim()) {
+    //         //если есть только С и поиск
+    //         if(from && searchQuery.trim()) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&search=order_id:' + searchQuery.trim());
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + 'search=order_id:' + searchQuery.trim();
+    //         //если есть только ПО и поиск
+    //         } else if(till && searchQuery.trim()) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_till=' + till + '&search=order_id:' + searchQuery.trim());
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_till=' + till + 'search=order_id:' + searchQuery.trim();
+    //         //если есть С, ПО и поиск
+    //         } else if((from && till) && searchQuery.trim()) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till + '&search=order_id:' + searchQuery.trim());
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till + 'search=order_id:' + searchQuery.trim();
+
+    //         }
+    //     }
+    //     //если есть только одна или обе даты без поиска
+    //     else if((from || till) && !searchQuery.trim()) {
+    //         //если есть только С
+    //         if(from && !till) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from);
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from;
+    //         //если есть только ПО
+    //         } else if(till && !from) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_till=' + till);
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_till=' + till;
+    //         //если есть С и ПО
+    //         } else if(from && till) {
+    //             //вносим изменение в адресную строку страницы
+    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till);
+
+    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till;
+
+    //         }
+    //     }
+    //     //есть только поиск без дат
+    //     else if (searchQuery.trim() && !(from || till)) {
+    //         console.log(searchQuery);
+
+    //         //вносим изменение в адресную строку страницы
+    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + searchQuery.trim());
+
+    //         document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + searchQuery.trim();
+    //     //если нет ни поиска, ни дат  
+    //     } else {
+
+    //     //вносим изменение в адресную строку страницы
+    //     history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value);
+
+    //     document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value;
+
+    //     }
+
+    // }
 }
 
 //функция при нажатии на кнопку "Применить" для admin-vendors!!!
@@ -755,6 +839,39 @@ let getParam = window.location.search;
 // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
 window.location.href = "http://localhost/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
     
+}
+
+//функция сбора параметра сортировки по дате ДО
+function sortByDateFrom() {
+
+    //достаем выбранную дату из календаря
+    let fromString = document.getElementById('from').value;
+    console.log(fromString);
+
+    //добавляем к ней время начала суток
+    let dateString = fromString + " 00:00:00";
+    //конвертируем в юникс формат без миллисекунд
+    let unixTime = Date.parse(dateString) / 1000;
+
+    console.log(unixTime);
+    return unixTime;
+}
+
+//функция сбора параметра сортировки по дате ПОСЛЕ
+function sortByDateTill() {
+    //достаем выбранную дату из календаря
+    let tillString = document.getElementById('till').value;
+
+    console.log(tillString);
+    //console.log(till.value);
+
+    //добавляем к ней время начала суток
+    let dateString = tillString + " 23:59:59";
+    //конвертируем в юникс формат без миллисекунд
+    let unixTime = Date.parse(dateString) / 1000;
+
+    console.log(unixTime);
+    return unixTime;
 }
 
 //записываем в куки локальный часовой пояс

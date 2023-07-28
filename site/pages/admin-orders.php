@@ -54,7 +54,7 @@ if($role !== 1) {
             $_GET['orderby'] = 'order_date:desc';
         }
 
-        //функция конвертации юникс времени в локальное время на клиенте
+        //функция конвертации юникс времени в локальное время на клиенте в формате d.m.Y H:i
         function convertUnixToLocalTime($unixTime) {
             
             //задаем дефолтный часовой пояс или достаем из куки
@@ -66,11 +66,27 @@ if($role !== 1) {
             date_default_timezone_set("$timeZone");
         
             //конвертируем время в часовой пояс, указанный выше
-            $localTime = date('d.m.Y', $unixTime);
+            $localTime = date('d.m.Y H:i', $unixTime);
         
             return $localTime;
         }
 
+        //функция конвертации юникс времени в локальное время для календаря в формате Y-m-d
+        function convertUnixForCalendar($unixTime) {
+
+            //задаем дефолтный часовой пояс или достаем из куки
+            $timeZone = 'UTC';
+            if(isset($_COOKIE['time_zone'])) {
+                $timeZone = $_COOKIE['time_zone'];
+            }
+            
+            date_default_timezone_set("$timeZone");
+
+            //конвертируем время в часовой пояс, указанный выше
+            $date = date('Y-m-d', $unixTime);
+
+            return $date;
+        }
     ?>
 
         <!-- далее отрисовываем всю страницу -->
@@ -79,6 +95,28 @@ if($role !== 1) {
         <section class="form-filters">
             <div class="form-elements-container">
                 <!-- выбор кол-ва отображаемых записей на странице -->
+                <div class="id-block">
+                <?php
+                //если еще не переданы гет-параметры сортировки по дате
+                if (!isset($_GET['order_date_from']) && !isset($_GET['order_date_till'])) {
+                ?>
+                    c
+                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()">
+                    по
+                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()">
+                        
+                <?php }
+                //а если переданы, отображаем их
+                else {
+                ?>
+                
+                    c
+                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['order_date_from'])) { ?><?= convertUnixForCalendar($_GET['order_date_from']); ?><?php } ?>">
+                    по
+                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['order_date_till'])) { ?><?= convertUnixForCalendar($_GET['order_date_till']); ?><?php } ?>">
+                        
+                <?php } ?>
+                </div>
                 <div class="d-iblock">Показывать по
                     <select id="limit" name="limit" value="" required>
                     <?php
@@ -154,14 +192,27 @@ if($role !== 1) {
                 <tbody class="list-orders__body">
                 <tr role="row" class="list-orders__row">
 
-                    <?php 
+                    <?php
+
+                    //если заданы гет-параметры даты, собираем их в переменную
+                    $dateParams = '';
+                    
+                    if (isset($_GET['order_date_from']) || isset($_GET['order_date_till'])) {
+                        if (isset($_GET['order_date_from'])) {
+                            $dateParams = $dateParams . '&order_date_from=' . $_GET['order_date_from'];
+                        }
+                        if (isset($_GET['order_date_till'])) {
+                            $dateParams = $dateParams . '&order_date_till=' . $_GET['order_date_till'];
+                        }
+                        print_r($dateParams);
+                    }
                     //если еще НЕ задан гет-параметр сортировки полей таблицы по одному ключу
                     if (!isset($_GET['orderby'])) {
 
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=' . $offset);
+                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=' . $offset . $dateParams);
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
                             //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -171,7 +222,7 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0');
+                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0' . $dateParams);
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -180,7 +231,7 @@ if($role !== 1) {
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=" . $_GET['search']);
+                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=" . $_GET['search'] . $dateParams);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
@@ -202,7 +253,7 @@ if($role !== 1) {
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby']);
+                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
                             //print_r($data);
@@ -213,7 +264,7 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby']);
+                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -222,7 +273,7 @@ if($role !== 1) {
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search']);
+                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
