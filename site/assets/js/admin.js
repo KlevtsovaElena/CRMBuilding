@@ -788,7 +788,7 @@ function applyInVendors() {
 }
 
 //функция по чекбоксам со статусом города
-function checkboxChanged(id) {
+function checkboxChangedCity(id) {
 
     //выдаем поп-ап с подтверждением действия
     let isChecked = window.confirm('Вы действительно хотите изменить статус города?');
@@ -825,6 +825,50 @@ function checkboxChanged(id) {
     console.log(obj);
 
     let link = 'http://localhost/api/cities.php';
+
+    //передаем на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+}
+
+//функция по чекбоксам "поставщик подтвердил цены" у админа
+function checkboxChangedVendorPrice(id) {
+
+    //выдаем поп-ап с подтверждением действия
+    let isChecked = window.confirm('Вы действительно хотите изменить статус?');
+
+    if(!isChecked) {
+        console.log("не менять");
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'price_confirmed': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'price_confirmed': 0
+        });
+    }
+
+    console.log(obj);
+
+    let link = 'http://localhost/api/vendors.php';
 
     //передаем на сервер в пост-запросе
     sendRequestPOST(link, obj);
