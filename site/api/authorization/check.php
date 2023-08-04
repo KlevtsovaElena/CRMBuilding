@@ -44,7 +44,8 @@
                         'phone' => $vendor[0]->phone,
                         'email' => $vendor[0]->email,
                         'role' => $vendor[0]->role,
-                        'coordinates' => $vendor[0]->coordinates
+                        'coordinates' => $vendor[0]->coordinates,
+                        'price_confirmed' => $vendor[0]->price_confirmed,
                     ],
                 ];
                 echo json_encode($response,  JSON_UNESCAPED_UNICODE);
