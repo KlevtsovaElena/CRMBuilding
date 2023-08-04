@@ -583,9 +583,9 @@ function applyInOrders() {
     }
 
     //вносим изменение в адресную строку страницы
-    history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + filters + sorting);
+    history.replaceState(history.length, null, 'admin-main.php?limit=' + limit.value + filters + sorting);
 
-    document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + filters + sorting;
+    document.location.href = 'http://localhost/pages/admin-main.php?limit=' + limit.value + filters + sorting;
 
     // //если активировано значение asc
     // if (dataSort && dataSort === "asc") {
