@@ -15,7 +15,16 @@ const email = formAddVendor.querySelector('#email');
 const percent = formAddVendor.querySelector('#percent');
 const is_active = formAddVendor.querySelector('#is_active');
 
+// подтверждение цены инфа
+let priceConfirmedEl = document.querySelector('.price-confirm-container');
+let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
+let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+
 function addVendor() {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -40,6 +49,7 @@ function addVendor() {
         'email': email.value.trim(),
         'is_active': is_active.value,
         'percent': percent.value,
+        'price_confirmed': 1,
         'role': 2 // соответствует роли поставщика
     });
 
@@ -163,6 +173,10 @@ console.log("подключили edit-vendor.js");
 
 
 function editVendor(id) {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -186,6 +200,7 @@ function editVendor(id) {
         'phone': phone.value,
         'email': email.value.trim(),
         'percent': percent.value,
+        'price_confirmed':  priceConfirmedEl.getAttribute('confirm-price'),
         'is_active': is_active.value
     });
 
@@ -200,7 +215,10 @@ function editVendor(id) {
 // удаление поставщика админом
 
 function deleteVendorFromEditForm(id) {
-    
+        
+    // проверяем корректность токена
+    check();
+
     // запрашиваем подтверждение удаления
     let isDelete = false;
 
@@ -244,4 +262,19 @@ function percentValid(obj) {
     } else if (obj.value > 100) {
         obj.value = 100;
     } 
+}
+
+// меняем отображение подтверждения цен при нажатии на галочку или крестик
+function changePriceConfirm() {
+
+    let confirmPrice = priceConfirmedEl.getAttribute('confirm-price');
+
+    if (confirmPrice == 1) {
+        priceConfirmedEl.setAttribute('confirm-price', '0');
+        priceConfirmedEl.innerHTML = tmplPriceNotConfirm;
+    } else {
+        priceConfirmedEl.setAttribute('confirm-price', '1');
+        priceConfirmedEl.innerHTML = tmplPriceConfirm;
+    }
+
 }

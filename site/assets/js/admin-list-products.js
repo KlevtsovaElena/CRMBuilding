@@ -221,7 +221,8 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
-                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_name'])
+                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
+                                                        .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
                                                         .replace('${brand_id}', totalProducts['products'][i]['brand_name'])

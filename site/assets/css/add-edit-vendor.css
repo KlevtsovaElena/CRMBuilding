@@ -41,6 +41,7 @@
 
 .price-confirm-container svg {
     vertical-align: middle;
+    cursor: pointer;
 }
 
 .price-confirm {
@@ -49,4 +50,9 @@
 
 .price-not-confirm {
     color: #990000;
+}
+
+.link-text {
+    text-decoration: underline;
+    margin-bottom: 10px;
 }

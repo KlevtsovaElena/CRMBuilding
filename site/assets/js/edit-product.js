@@ -6,6 +6,10 @@ let productId = formAddProduct.getAttribute('product-id');
 let odj;
 
 function editProduct() {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -172,6 +176,10 @@ if (!new_photo.value) {
 }
 
 function deleteProductFromEditForm(id) {
+        
+    // проверяем корректность токена
+    check();
+    
     console.log(id);
 
     // запрашиваем подтверждение удаления

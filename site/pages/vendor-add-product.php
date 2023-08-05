@@ -141,7 +141,7 @@ if($role !== 2) {
         </div>
 
         <div>
-            <button class="btn btn-ok" onclick="addProduct()">Сохранить</button>
+            <button class="btn btn-ok" onclick="addProduct(2)">Сохранить</button>
             <a href="vendor-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
         </div>
     </form>
