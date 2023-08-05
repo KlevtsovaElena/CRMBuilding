@@ -171,7 +171,7 @@ if($role !== 1) {
                                     <td class="input d-none"><input></td>
                                     <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                         <label>
-                                            <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
+                                            <input type="checkbox" onclick="checkboxChangedCity(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
                                             Активен
                                         </label>
                                     </td> <?php } ?>
@@ -199,7 +199,7 @@ if($role !== 1) {
                                     <td class="input d-none"><input></td>
                                     <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                             <label>
-                                            <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
+                                            <input type="checkbox" onclick="checkboxChangedCity(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
                                                 Активен
                                             </label>
                                     </td> <?php } ?>
@@ -230,7 +230,7 @@ if($role !== 1) {
                                         <td class="input d-none"><input></td>
                                         <?php if ($_GET['section'] == 'cities') {?> <td class="checkbox-cell">
                                             <label>
-                                            <input type="checkbox" onclick="checkboxChanged(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
+                                            <input type="checkbox" onclick="checkboxChangedCity(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["is_active"] == 1) {?> checked <?php } ?>>
                                                 Активен
                                             </label>
                                         </td> <?php } ?>
