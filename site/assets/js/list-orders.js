@@ -182,7 +182,6 @@ function getFilters() {
 
     } 
 
-console.log(params);
     return params;
 }
 
@@ -397,6 +396,9 @@ function renderPagination(totalOrdersCount, limit) {
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
 
+    // проверяем корректность токена
+    check();
+
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
 
@@ -411,6 +413,9 @@ function switchPage(variance) {
 
 /* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 function sortChange() {
+
+    // проверяем корректность токена
+    check();
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
@@ -449,6 +454,9 @@ headTableOrders.forEach(item => {
 const sendChangeData = document.querySelector('.form-filters').querySelector('button');
 
 function applyFilters() {
+
+    // проверяем корректность токена
+    check();
 
     // сбрасываем нумерацию страниц и офсет
     currentPage = 1;
@@ -516,6 +524,10 @@ function resetChangeOrder() {
 
 // сохранить изменения
 function saveChangeOrder() {
+    
+    // проверяем корректность токена
+    check();
+
     // вся строка заказа
     let rowOrder = event.target.closest('.list-orders__row');
 
