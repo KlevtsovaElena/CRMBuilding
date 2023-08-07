@@ -95,7 +95,7 @@ if($role !== 2) {
             </div>
 
             <!-- описание -->
-            <div class="form-add-product__elements-item">
+            <div class="form-add-product__elements-item d-none">
                 <p>Описание</p><textarea id="description" name="description"></textarea>
                 <div class="error-info d-none"></div> 
             </div>
