@@ -22,9 +22,15 @@ let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
 let offsetEl = containerPagination.getAttribute('offset');
 
+let priceConfirmedEl = document.querySelector('.price-confirm-container');
+let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
+let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+
+
 let prevButton;
 let nextButton;
 let totalPages;
+
 
 let changePriceEl;
 let changePriceInputEl;
@@ -67,11 +73,11 @@ let garbage;
 //    units[item['id']] = item['name_short'];
 // })
 // заполним страницу данными
-startRenderPage();
+startRenderPage(priceConfirmedEl.getAttribute('confirm-price'));
 
 
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
-function startRenderPage() {
+function startRenderPage(priceConfirmed) {
 
     // 1. собрать параметры запроса
     params = getParams();
@@ -84,6 +90,13 @@ function startRenderPage() {
 
     // 4. отрисуем таблицу с данными
     renderListProducts(totalProducts);
+
+    // 5. покажем инфу подтверждены ли цены
+    if (priceConfirmed == 0) {
+        priceConfirmedEl.innerHTML = tmplPriceNotConfirm;
+    } else if (priceConfirmed == 1) {
+        priceConfirmedEl.innerHTML = tmplPriceConfirm;
+    }
 
 }
 
@@ -177,8 +190,6 @@ function getProductsData(params) {
 
     // количество записей в базе по указанным параметрам
     totalProductsCount = totalProducts['count'];
-
-    console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
 
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (totalProducts['products'].length === 0 && totalProductsCount > 0) {
@@ -314,6 +325,9 @@ function renderPagination(totalProductsCount, limit) {
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
 
+    // проверяем корректность токена
+    priceConfirmed = check()['price_confirmed'];
+
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
 
@@ -321,13 +335,16 @@ function switchPage(variance) {
     offset = (currentPage - 1) * limit;
    
     // отрисуем страничку
-    startRenderPage();
+    startRenderPage(priceConfirmed);
 
 }
 
 
 /* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 function sortChange() {
+
+    // проверяем корректность токена
+    priceConfirmed = check()['price_confirmed'];
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
@@ -353,7 +370,7 @@ function sortChange() {
     }
 
     // отрисуем страничку
-    startRenderPage();
+    startRenderPage(priceConfirmed);
 }
 
 // отслеживаем клик по заголовку
@@ -367,12 +384,15 @@ const sendChangeData = document.querySelector('.form-filters').querySelector('bu
 
 function applyFilters() {
 
+    // проверяем корректность токена
+    priceConfirmed = check()['price_confirmed'];
+
     // сбрасываем нумерацию страниц и офсет
     currentPage = 1;
     offset = 0;
 
     // заполним страницу данными
-    startRenderPage();
+    startRenderPage(priceConfirmed);
 
 }
 sendChangeData.addEventListener("click", applyFilters);
@@ -381,18 +401,17 @@ sendChangeData.addEventListener("click", applyFilters);
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
 function deleteProduct() {
 
+    // проверяем корректность токена
+    priceConfirmed = check()['price_confirmed'];
+
     // запрашиваем подтверждение удаления
     let isDelete = false;
 
     isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
 
     if(!isDelete) {
-        console.log(" ни в коем случае");
         return;
     }
-
-    // если подтвердили удаление
-    console.log("удаляем");
 
     // найдём id товара по атрибуту product-id
     const productId = event.target.closest('.list-products__row').getAttribute('product-id');
@@ -410,7 +429,7 @@ function deleteProduct() {
 
 
     // заполним страницу данными
-    startRenderPage();
+    startRenderPage(priceConfirmed);
 
 }
 
@@ -492,6 +511,10 @@ function resetChangePrice() {
 
 // сохранить изменения
 function saveChangePrice() {
+
+    // проверяем корректность токена
+    check();
+
     // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
 
@@ -534,15 +557,24 @@ function saveChangePrice() {
             };
         }        
 
-        // если всё ок, то собираем данные и отправляем в БД
+        // если всё ок, то собираем данные и отправляем в БД (изменение цены)
         obj['id'] = idProduct;
         let objJson = JSON.stringify(obj);
 
-        // отправка запроса на запись 
+        // отправка запроса на запись (изменение цены)
         sendRequestPOST('http://localhost/api/products.php', objJson);
 
+        // отправим запрос на изменение статуса подтверждения цен поставщика
+        // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
+        let objVendor = JSON.stringify({
+            'id': vendor_id,
+            'price_confirmed':  0
+        });
+        sendRequestPOST('http://localhost/api/vendors.php', objVendor);
+
+
         // перерисовка страницы
-        startRenderPage();
+        startRenderPage(0);
 
         return;
     }

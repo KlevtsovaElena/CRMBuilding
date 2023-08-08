@@ -401,8 +401,6 @@ input:focus, textarea:focus, select:focus {
 .menu-left__items {
     width: 100%;
     cursor: pointer;
-    margin-top: 20px;
-    margin-bottom: 20px;
     flex: 1;
 }
 

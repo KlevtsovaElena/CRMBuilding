@@ -114,6 +114,22 @@ td:nth-last-child(1) {
     cursor: pointer;
 }
 
+.price-confirm-container {
+    margin-top: 15px;
+}
+
+.price-confirm-container svg {
+    vertical-align: middle;
+}
+
+.price-confirm {
+    color: #006633;
+}
+
+.price-not-confirm {
+    color: #990000;
+}
+
 @media(max-width: 1024px) {
     .filters-container-flex {
         flex-wrap: wrap;

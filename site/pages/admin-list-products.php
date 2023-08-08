@@ -330,7 +330,7 @@ if (count($_GET) !== 0) {
         
         <tr role="row" class="list-products__row" product-id="${id}">
             
-            <td>${vendor_id}</td>
+            <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
             <td>${brand_id}</td>

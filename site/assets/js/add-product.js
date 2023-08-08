@@ -24,7 +24,11 @@ let photoFileData;
 let photoFileName;
 
 
-function addProduct() {
+function addProduct(role) {
+    
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -55,6 +59,16 @@ function addProduct() {
 
     // передаём данные на сервер
     sendRequestPOST('http://localhost/api/products.php', obj);
+
+    // если товар добавляет поставщик, а не админ, то поставщика переводим в 0 до подтверждения цен
+    if (role == 2) {
+        // отправим запрос на изменение статуса подтверждения цен поставщика
+        let objVendor = JSON.stringify({
+            'id': vendor_id.value,
+            'price_confirmed':  0
+        });
+        sendRequestPOST('http://localhost/api/vendors.php', objVendor);
+    }
 
     // получаем ответ с сервера
 
