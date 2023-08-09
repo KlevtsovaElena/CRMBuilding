@@ -36,7 +36,9 @@ class VendorRepository extends BaseRepository
                                     v.`deleted` as `deleted`,
                                     c.`deleted` as `city_deleted`,
                                     v.`percent` as `percent`,
-                                    v.`price_confirmed` as `price_confirmed`
+                                    v.`price_confirmed` as `price_confirmed`,
+                                    v.`currency_dollar` as `currency_dollar`,
+                                    v.`rate` as `rate`
                                 FROM vendors v
                                     INNER JOIN cities c ON
                                     c.`id` = v.`city_id`
@@ -62,7 +64,9 @@ class VendorRepository extends BaseRepository
         'deleted' => 'v.deleted',
         'percent' => 'v.percent',
         'city_deleted' => 'c.deleted',
-        'price_confirmed' => 'v.price_confirmed'
+        'price_confirmed' => 'v.price_confirmed',
+        'currency_dollar' => 'v.currency_dollar',
+        'rate' => 'v.rate'
     ];
 
     //Настя: добавила __construct для координат

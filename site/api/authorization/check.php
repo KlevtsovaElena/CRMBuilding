@@ -46,6 +46,7 @@
                         'role' => $vendor[0]->role,
                         'coordinates' => $vendor[0]->coordinates,
                         'price_confirmed' => $vendor[0]->price_confirmed,
+                        'currency_dollar' => $vendor[0]->currency_dollar,
                     ],
                 ];
                 echo json_encode($response,  JSON_UNESCAPED_UNICODE);

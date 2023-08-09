@@ -56,3 +56,14 @@
     text-decoration: underline;
     margin-bottom: 10px;
 }
+
+input[type=radio] {
+    width: unset;
+    min-width: unset;
+    appearance: auto;
+    vertical-align: middle;
+ }
+ 
+ .currency-title {
+     font-size: 0.8rem;
+ }
