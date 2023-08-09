@@ -1,0 +1,14 @@
+.rate-dollar {
+    min-width: unset;
+    max-width: unset;
+    width: 120px;
+    font-weight: bold;
+    background-color: transparent;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.rate-dollar:focus {
+    background-color: white;
+}
