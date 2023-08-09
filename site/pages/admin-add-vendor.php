@@ -75,6 +75,14 @@ if($role !== 1) {
                 <div class="error-info d-none"></div>
             </div>
 
+            <!-- валюта поставщика -->
+            <div class="form-add-vendor__item">
+                <p>Валюта цен</p>
+                <input type="radio" id="uzs" name="currency_dollar" value="0" checked><span class="currency-title"> Цена в сумах</span>
+                <input type="radio" id="usd" name="currency_dollar" value="1"><span class="currency-title"> Цена в долларах</span>
+                <div class="error-info d-none"></div>
+            </div>
+
             <!-- статус -->
             <div class="form-add-vendor__item">
                 <p>Статус</p>

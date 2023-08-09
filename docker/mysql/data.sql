@@ -137,18 +137,20 @@ CREATE TABLE `products` (
   `vendor_id` int unsigned NOT NULL,
   `quantity_available` int unsigned NOT NULL,
   `price` int unsigned NOT NULL,
+  `price_dollar` int unsigned DEFAULT '0',
   `max_price` int unsigned NOT NULL,
+  `max_price_dollar` int unsigned DEFAULT '0',
   `unit_id` tinyint unsigned NOT NULL,
   `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `max_price`, `unit_id`, `deleted`) VALUES
-(1,	'Гипсокартон ФОРУС стеновой простой (12.5мм) (2 сорт)	',	'',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	0,	1,	1,	1,	555,	49000,	55000,	5,	0),
-(2,	'Гипсокартон КНАУФ потолочный влагостойкий (9.5мм)',	'',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	0,	1,	3,	1,	56,	50000,	65000,	1,	0),
-(3,	'Шпаклевка гипсовая Fugen Knauf',	'',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1656334021/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/Xz_s07vVf0mj2kodJguxPg/81975392.png',	0,	3,	3,	1,	15,	15000,	20000,	1,	0),
-(4,	'test1',	'test',	'http://localhost/upload/f077387be6873b8692f9c23416cbd51a.jpg',	0,	1,	1,	1,	4,	11111,	22222,	1,	0),
-(5,	'test2',	'test2',	'http://localhost/upload/b991e017f3fbe7f999e1fb676a033964.jpg',	0,	1,	1,	1,	43,	11111,	22222,	1,	0);
+INSERT INTO `products` (`id`, `name`, `description`, `photo`, `article`, `category_id`, `brand_id`, `vendor_id`, `quantity_available`, `price`, `price_dollar`, `max_price`, `max_price_dollar`, `unit_id`, `deleted`) VALUES
+(1,	'Гипсокартон ФОРУС стеновой простой (12.5мм) (2 сорт)	',	'',	'https://files.glotr.uz/company/000/032/664/products/2023/01/04/2023-01-04-20-13-40-311478-133a1ba7ad6c046ac3a323b45830b541.webp?_=ozbol',	0,	1,	1,	1,	555,	49000,	0,	55000,	0,	5,	0),
+(2,	'Гипсокартон КНАУФ потолочный влагостойкий (9.5мм)',	'',	'https://himtorgkirov.ru/upload/iblock/871/87144fffbd1986e51362eb87abcb04a9.jpg',	0,	1,	3,	1,	56,	50000,	0,	65000,	0,	1,	0),
+(3,	'Шпаклевка гипсовая Fugen Knauf',	'',	'https://cdn.leroymerlin.ru/lmru/image/upload/v1656334021/b_white,c_pad,d_photoiscoming.png,f_auto,h_2000,q_auto,w_2000/lmcode/Xz_s07vVf0mj2kodJguxPg/81975392.png',	0,	3,	3,	1,	15,	15000,	0,	20000,	0,	1,	0),
+(4,	'test1',	'test',	'http://localhost/upload/f077387be6873b8692f9c23416cbd51a.jpg',	0,	1,	1,	1,	4,	11111,	0,	22222,	0,	1,	0),
+(5,	'test2',	'test2',	'http://localhost/upload/b991e017f3fbe7f999e1fb676a033964.jpg',	0,	1,	1,	1,	43,	11111,	0,	22222,	0,	1,	0);
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (
@@ -186,15 +188,17 @@ CREATE TABLE `vendors` (
   `token` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL,
   `deleted` tinyint unsigned DEFAULT '0',
-  `price_confirmed` tinyint unsigned DEFAULT '0',
+  `price_confirmed` tinyint unsigned DEFAULT '1',
+  `currency_dollar` tinyint unsigned DEFAULT '0',
+  `rate` int unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	892205925,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	0,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1),
-(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	0,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'',	1,	0,	1),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1),
-(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1),
-(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'',	1,	0,	1);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`) VALUES
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	892205925,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	0,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1,	0,	0),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	0,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'',	1,	0,	1,	0,	0),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	0),
+(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	0),
+(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'',	1,	0,	1,	0,	0);
 
--- 2023-08-04 11:56:41
+-- 2023-08-09 13:06:11

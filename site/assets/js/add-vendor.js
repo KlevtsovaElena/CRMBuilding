@@ -16,9 +16,15 @@ const percent = formAddVendor.querySelector('#percent');
 const is_active = formAddVendor.querySelector('#is_active');
 
 // подтверждение цены инфа
-let priceConfirmedEl = document.querySelector('.price-confirm-container');
-let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
-let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+let priceConfirmedEl;
+let tmplPriceConfirm;
+let tmplPriceNotConfirm;
+
+if (document.querySelector('.price-confirm-container')) {
+    priceConfirmedEl = document.querySelector('.price-confirm-container');
+    tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
+    tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+}
 
 function addVendor() {
         
@@ -40,6 +46,14 @@ function addVendor() {
         return;
     }
 
+    let currencyDollar;
+    const radio = document.getElementsByName('currency_dollar');
+    radio.forEach(item => {
+        if (item.checked) {
+            currencyDollar = item.value;
+        }
+    })
+
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
         'name': nameVendor.value.trim(),
@@ -48,7 +62,8 @@ function addVendor() {
         'phone': phone.value,
         'email': email.value.trim(),
         'is_active': is_active.value,
-        'percent': percent.value,
+        'percent': percent.value, 
+        'currency_dollar': currencyDollar,
         'price_confirmed': 1,
         'role': 2 // соответствует роли поставщика
     });
@@ -191,6 +206,14 @@ function editVendor(id) {
         return;
     }
 
+    let currencyDollar;
+    const radio = document.getElementsByName('currency_dollar');
+    radio.forEach(item => {
+        if (item.checked) {
+            currencyDollar = item.value;
+        }
+    })
+
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
         'id': id,
@@ -200,6 +223,7 @@ function editVendor(id) {
         'phone': phone.value,
         'email': email.value.trim(),
         'percent': percent.value,
+        'currency_dollar': currencyDollar,
         'price_confirmed':  priceConfirmedEl.getAttribute('confirm-price'),
         'is_active': is_active.value
     });
