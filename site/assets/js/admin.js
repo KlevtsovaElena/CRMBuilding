@@ -700,6 +700,88 @@ function applyInOrders() {
     // }
 }
 
+//функция при нажатии на кнопку "Применить" для admin-main!!!
+function applyInMain() {
+
+    console.log(limit.value);
+
+    //лимит задан всегда, поэтому проверяем наличие поискового запроса
+    //получим введенное в поиск значение
+    let searchQuery = document.getElementById('search').value;
+    let dataSearch = searchQuery.trim();
+
+    //и даты "с"
+    let from = sortByDateFrom();
+    console.log(from);
+
+    //и даты "по"
+    let till = sortByDateTill();
+    console.log(till);
+
+    //собираем фильтры (дата + поиск)
+    let filters = '';
+
+    //если задана дата
+    if (from || till) {
+        //если  С
+        if (from) {
+            filters += '&date_from=' + from;
+        } 
+        if (till) {
+            //если ДО
+            filters += '&date_till=' + till;
+        } 
+    }
+
+    //если задан поиск
+    if (dataSearch) {
+        limit.value = 'all';
+        filters += '&search=name' + dataSearch;
+    } 
+
+    //собираем сортировку
+    // получим значение атрибута data-sort
+    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
+    console.log(allTitlesElems);
+
+    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
+    let dataSort = '';
+    //переменная для ключа, соответствующего названию сортируемого поля в БД
+    let key = '';
+
+    //в цикле вынимаем эти два элемента
+    for (let i = 0; i < allTitlesElems.length; i++) {
+        if (allTitlesElems[i].getAttribute('data-sort')) {
+            //вынимаем заданное значение ключа
+            dataSort = allTitlesElems[i].getAttribute('data-sort');
+            console.log(dataSort);
+            //вынимаем ключ
+            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
+            console.log(key);
+        }
+    }
+    
+    // получим значение атрибута data-page, содержащего номер текущей страницы
+    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
+    console.log(dataPage);
+
+    let sorting = '';
+
+    //если активировано значение asc
+    if (dataSort && dataSort === "asc") {
+        sorting += '&orderby=' + key + ':asc';
+    //если активировано значение desc
+    } else if (dataSort === "desc") {
+        sorting += '&orderby=' + key + ':desc';
+    }
+
+    //вносим изменение в адресную строку страницы
+    history.replaceState(history.length, null, 'admin-main.php?limit=' + limit.value + filters + sorting);
+
+    document.location.href = 'http://localhost/pages/admin-main.php?limit=' + limit.value + filters + sorting;
+
+}
+
 //функция при нажатии на кнопку "Применить" для admin-vendors!!!
 function applyInVendors() {
 

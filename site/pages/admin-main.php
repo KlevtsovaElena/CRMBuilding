@@ -74,8 +74,8 @@ if($role !== 1) {
 
     <?php
         //достанем актуальный телефон для отображения
-        $dataJson = file_get_contents("http://nginx/api/settings.php?name=phone");
-        $phone = json_decode($dataJson, true); 
+        $dataJsonPhone = file_get_contents("http://nginx/api/settings.php?name=phone");
+        $phone = json_decode($dataJsonPhone, true); 
         $phone = $phone[0]['value'];
 
     ?>
@@ -99,32 +99,38 @@ if($role !== 1) {
     <!-- далее отрисовываем таблицу заказов за период -->
     
 
+    <br>
     <!-- сортировка по дате -->
     <div class="id-block ta-center">
         <p class="page-title ta-center">Заказано товаров за период</p>
-            <?php
-            //если еще не переданы гет-параметры сортировки по дате
-            if (!isset($_GET['order_date_from']) && !isset($_GET['order_date_till'])) {
-            ?>
-                c
-                <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()">
-                по
-                <input id="till" type="date" class="middle-input" onchange="sortByDateTill()">
-                    
-            <?php }
-            //а если переданы, отображаем их
-            else {
-            ?>
-                c
-                <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['order_date_from'])) { ?><?= convertUnixForCalendar($_GET['order_date_from']); ?><?php } ?>">
-                по
-                <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['order_date_till'])) { ?><?= convertUnixForCalendar($_GET['order_date_till']); ?><?php } ?>">
-                    
-            <?php } ?>
-            </div>
+            
+    </div>
 
     <section class="form-filters ta-center">
         <div class="form-elements-container">
+
+        <div class="d-iblock">
+            <?php
+                //если еще не переданы гет-параметры сортировки по дате
+                if (!isset($_GET['date_from']) && !isset($_GET['date_till'])) {
+                ?>
+                    c
+                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()">
+                    по
+                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()">
+                        
+                <?php }
+                //а если переданы, отображаем их
+                else {
+                ?>
+                    c
+                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['date_from'])) { ?><?= convertUnixForCalendar($_GET['date_from']); ?><?php } ?>">
+                    по
+                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['date_till'])) { ?><?= convertUnixForCalendar($_GET['date_till']); ?><?php } ?>">
+                        
+                <?php } ?>
+            </div>
+            <br>
             
             <div class="d-iblock">Показывать по
                 <select id="limit" name="limit" value="" required>
@@ -151,9 +157,9 @@ if($role !== 1) {
                 </select>
             </div>
             <!-- поле поиска -->
-            <input type="search" id="search" name="search" value="" placeholder="№ заказа">
+            <input type="search" id="search" name="search" value="" placeholder="Наименование">
             <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
-            <button onclick="applyInOrders()" class="btn btn-ok d-iblock">Применить</button>
+            <button onclick="applyInMain()" class="btn btn-ok d-iblock">Применить</button>
         </div>
 
     </section>
@@ -163,6 +169,14 @@ if($role !== 1) {
         //теперь сокращаем выдачу данных в массиве до products
         $data = $data['orders'];
         //print_r($data);
+
+        $totalSum = 0;
+        //считаем суммарную стоимость всех товаров за весь период
+        for ($l = 0; $l < count($data); $l++) {
+            $totalSum += $data[$l]['total_price'];
+        }
+        
+
         //проверяем, выбран ли лимит на кол-во отображаемых элементов
         if (isset($_GET['limit'])) {
             //если выбрано отображать все
@@ -186,14 +200,14 @@ if($role !== 1) {
                 <thead>
                     <tr role="row">
 
-                        <th class="ta-center cell-title" data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th>
+                        <!-- <th class="ta-center cell-title" data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th> -->
                         <!-- <th class="ta-center">№</th> -->
                         <th class="ta-center cell-title" data-id="vendor_city" data-sort="<?php if ($sortBy == 'vendor_city')  {echo $mark; } ?>">Город</th>
                         <th class="ta-center cell-title" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                         <th class="ta-center cell-title" data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
-                        <th class="ta-center cell-title" data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена
+                        <th class="ta-center cell-title" data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена за 1 ед.
                         <th class="ta-center cell-title" data-id="quantity" data-sort="<?php if ($sortBy == 'quantity')  {echo $mark; } ?>">Количество
-                        <!-- <th class="ta-center cell-title" data-id="total_price" data-sort="<?php if ($sortBy == 'total_price')  {echo $mark; } ?>">Цена за период</th> -->
+                        <th class="ta-center cell-title" data-id="total_price" data-sort="<?php if ($sortBy == 'total_price')  {echo $mark; } ?>">Цена за период</th>
                     </tr>
                 </thead>
 
@@ -205,12 +219,12 @@ if($role !== 1) {
                     //если заданы гет-параметры даты, собираем их в переменную
                     $dateParams = '';
                     
-                    if (isset($_GET['order_date_from']) || isset($_GET['order_date_till'])) {
-                        if (isset($_GET['order_date_from'])) {
-                            $dateParams = $dateParams . '&order_date_from=' . $_GET['order_date_from'];
+                    if (isset($_GET['date_from']) || isset($_GET['ate_till'])) {
+                        if (isset($_GET['date_from'])) {
+                            $dateParams = $dateParams . '&date_from=' . $_GET['date_from'];
                         }
-                        if (isset($_GET['order_date_till'])) {
-                            $dateParams = $dateParams . '&order_date_till=' . $_GET['order_date_till'];
+                        if (isset($_GET['date_till'])) {
+                            $dateParams = $dateParams . '&date_till=' . $_GET['date_till'];
                         }
                         print_r($dateParams);
                     }
@@ -306,15 +320,14 @@ if($role !== 1) {
                                 
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['id'] ?></strong></a></td>
+                                <!-- <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['id'] ?></strong></a></td> -->
                                 <td><?= $data[$i]['vendor_city'] ?></td>
                                 <td><?= $data[$i]['vendor_name'] ?></td>
                                 <td><?= $data[$i]['name'] ?></td>
                                 <td><?= number_format($data[$i]['price'], 0, ',', ' '); ?></td>
                                 <td><?= $data[$i]['quantity'] ?></td>
                                 <!-- выводим общую стоимость в нужном формате -->
-                                <?php $totalPrice += $data[$i]['price']; ?>
-                                <!-- <td class="ta-center"><?= number_format($data[$i]['total_price'], 0, ',', ' '); ?> </td> -->
+                                <td class="ta-center"><?= number_format($data[$i]['total_price'], 0, ',', ' '); ?> </td>
                             </tr>
                             <?php }
                             }
@@ -332,7 +345,7 @@ if($role !== 1) {
     </section>
 
     <!-- выводим общую стоимость в нужном формате -->
-        <div><p>Общая стоимость за период:</p><?= number_format($totalPrice, 0, ',', ' '); ?> </div>
+    <div><p>Итого за период:</p><?= number_format($totalSum, 0, ',', ' '); ?> </div>
 
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
