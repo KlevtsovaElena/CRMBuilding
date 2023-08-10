@@ -14,7 +14,9 @@ let  description = formAddProduct.querySelector('#description');
 let  article = formAddProduct.querySelector('#article');
 let  quantity_available = formAddProduct.querySelector('#quantity_available');
 let  price = formAddProduct.querySelector('#price');
+let  price_dollar = formAddProduct.querySelector('#price_dollar');
 let  max_price = formAddProduct.querySelector('#max_price');
+let  max_price_dollar = formAddProduct.querySelector('#max_price_dollar');
 let  unit_id = formAddProduct.querySelector('#unit_id');
 
 let priceValue;
@@ -31,6 +33,13 @@ function addProduct(role) {
 
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
+
+    // если поставщик не выбран, то не пропускаем дальше (это для страницы админа
+    // тк там блок изменения цен зависит от валюты поставщика, если он не выбран, то блока нет)
+    if (!vendor_id.value) {
+        alert('Выберите поставщика!');
+        return;
+    }
 
     hasError = validationAdd();
 
@@ -50,7 +59,9 @@ function addProduct(role) {
         'article': article.value,
         'quantity_available': quantity_available.value,
         'price': price.value,
+        'price_dollar': price_dollar.value,
         'max_price': max_price.value,
+        'max_price_dollar': max_price_dollar.value,
         'unit_id': unit_id.value,
         'deleted': 0,
         photoFileData,
@@ -70,12 +81,9 @@ function addProduct(role) {
         sendRequestPOST('http://localhost/api/vendors.php', objVendor);
     }
 
-    // получаем ответ с сервера
-
-    formAddProduct.reset();
-    imagePreview.innerHTML = "<img>";
     alert("Данные отправлены");
-
+    // перезагрузим страницу
+    window.location.href = window.location.href;
 }
 
 function validationAdd() {
@@ -89,8 +97,6 @@ function validationAdd() {
     // валидация полей (кроме vendorId)
     [nameProduct, new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price, vendor_id].forEach(item => {
-    
-            console.log(item.getAttribute('name') + "    " + item.value);
     
             const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
             
@@ -186,6 +192,18 @@ function validationAdd() {
     
         })
 
+        if (price.classList.contains('error')) {
+            price_dollar.classList.add('error');
+        } else {
+            price_dollar.classList.remove('error');
+        }
+
+        if (max_price.classList.contains('error')) {
+            max_price_dollar.classList.add('error');
+        } else {
+            max_price_dollar.classList.remove('error');
+        }
+
         return hasError;
 }
 /* ---------- КОДИРОВАНИЕ ФАЙЛА В base64 ---------- */
@@ -229,3 +247,62 @@ const handleFilePreview = (e) => {
 
 new_photo.addEventListener('change', handleFilePreview);
 
+/* ---------- ПЕРЕСЧЁТ ЦЕН В СУМЫ ---------- */
+
+function calcPriceUzs() {
+
+    // запишем курс в переменную
+    let rate = event.target.getAttribute('rate');
+
+    // куда записывать пересчитанную сумму в сумах
+    let priceUzsEl = event.target.closest('.form-add-product__elements-item').querySelector('.price-uzs');
+
+    let priceUzs = rate * event.target.value;
+    priceUzsEl.innerHTML = "<b>" + priceUzs + "</b>";
+
+    if (event.target.value === '') {
+        event.target.closest('.form-add-product__elements-item').querySelector('.price-value').value = '';
+    } else {
+        event.target.closest('.form-add-product__elements-item').querySelector('.price-value').value = priceUzs;
+    }
+    
+
+}
+
+/* ---------- ПЕРЕРИСОВКА БЛОКА С ИЗМЕНЕНИЕМ ЦЕН В ЗАВИСИМОСТИ ОТ ВАЛЮТЫ ПОСТАВЩИКА (У АДМИНА) ---------- */
+
+function renderPriceBlock() {
+
+    // контейнер для блока изменения цен
+    let blockPrice = document.getElementById('block-price');
+
+    // шаблоны изменения цен
+    let tmplPriceUzs = document.getElementById('tmpl-price-uzs');
+    let tmplPriceUsd = document.getElementById('tmpl-price-usd');
+
+    let currencyTmp;
+    let rateTemp;
+
+    // после выбора поставщика в списке, определим какая у него валюта цен
+    for (let i = 0; i < vendor_id.options.length; i++) {
+        if(vendor_id.options[i].selected){
+            rateTemp = vendor_id.options[i].getAttribute('rate');
+            currencyTmp = vendor_id.options[i].getAttribute('currency');
+            break;
+        };
+    }
+
+    // если валюта доллар, то отрисуем шаблон изменения цен в долларах
+    if (currencyTmp == "1") {
+        blockPrice.innerHTML = tmplPriceUsd.innerHTML   .replace('${rate}', rateTemp)
+                                                        .replace('${rate}', rateTemp);
+    } else {
+        blockPrice.innerHTML = tmplPriceUzs.innerHTML;
+    }
+
+    price = formAddProduct.querySelector('#price');
+    price_dollar = formAddProduct.querySelector('#price_dollar');
+    max_price = formAddProduct.querySelector('#max_price');
+    max_price_dollar = formAddProduct.querySelector('#max_price_dollar');
+
+}

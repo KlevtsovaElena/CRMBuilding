@@ -10,7 +10,7 @@ if($role !== 2) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
+        "<link rel='stylesheet' href='./../assets/css/vendor.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>"
