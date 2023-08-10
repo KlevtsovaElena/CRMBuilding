@@ -11,12 +11,13 @@ rateEl.addEventListener('change', () => {
     // если отмена, то перезагружаем страницу
     if (!rateChange) {
         window.location.href = window.location.href;
+        return;
     }
 
     // иначе
-    // 1. запрос на перезапись курса доллара
+    // запрос на перезапись курса доллара
     let vendorId = document.querySelector('.menu-top__profile').getAttribute('vendor-id');
-    console.log(vendorId);
+    
     let obj  = JSON.stringify({
         'id': vendorId,
         'rate': rateEl.value,
