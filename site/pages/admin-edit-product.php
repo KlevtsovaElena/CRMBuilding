@@ -109,7 +109,7 @@ if($role !== 1) {
                 </div>
 
                 <!-- описание -->
-                <div class="form-add-product__elements-item">
+                <div class="form-add-product__elements-item d-none">
                     <p>Описание</p><textarea id="description" name="description"><?= $product[0]['description']; ?></textarea>
                     <div class="error-info d-none"></div> 
                 </div>
@@ -154,7 +154,7 @@ if($role !== 1) {
 
             <div class="btn-group-3">
                 <div>
-                    <button class="btn btn-ok" onclick="editProduct()">Сохранить</button>
+                    <button class="btn btn-ok" onclick="editProduct(1)">Сохранить</button>
                     <a href="admin-edit-product.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
                 </div>
             

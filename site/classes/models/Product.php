@@ -16,5 +16,7 @@
         public int $max_price;
         public int $unit_id;
         public int $deleted;
+        public ?int $price_dollar;
+        public ?int $max_price_dollar;
     }
 ?>

@@ -98,7 +98,7 @@ if($role !== 1) {
                 <div class="id-block">
                 <?php
                 //если еще не переданы гет-параметры сортировки по дате
-                if (!isset($_GET['order_date_from']) && !isset($_GET['order_date_till'])) {
+                if (!isset($_GET['date_from']) && !isset($_GET['date_till'])) {
                 ?>
                     c
                     <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()">
@@ -111,9 +111,9 @@ if($role !== 1) {
                 ?>
                 
                     c
-                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['order_date_from'])) { ?><?= convertUnixForCalendar($_GET['order_date_from']); ?><?php } ?>">
+                    <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['date_from'])) { ?><?= convertUnixForCalendar($_GET['date_from']); ?><?php } ?>">
                     по
-                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['order_date_till'])) { ?><?= convertUnixForCalendar($_GET['order_date_till']); ?><?php } ?>">
+                    <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['date_till'])) { ?><?= convertUnixForCalendar($_GET['date_till']); ?><?php } ?>">
                         
                 <?php } ?>
                 </div>
@@ -197,14 +197,14 @@ if($role !== 1) {
                     //если заданы гет-параметры даты, собираем их в переменную
                     $dateParams = '';
                     
-                    if (isset($_GET['order_date_from']) || isset($_GET['order_date_till'])) {
-                        if (isset($_GET['order_date_from'])) {
-                            $dateParams = $dateParams . '&order_date_from=' . $_GET['order_date_from'];
+                    if (isset($_GET['date_from']) || isset($_GET['date_till'])) {
+                        if (isset($_GET['date_from'])) {
+                            $dateParams = $dateParams . '&date_from=' . $_GET['date_from'];
                         }
-                        if (isset($_GET['order_date_till'])) {
-                            $dateParams = $dateParams . '&order_date_till=' . $_GET['order_date_till'];
+                        if (isset($_GET['date_till'])) {
+                            $dateParams = $dateParams . '&date_till=' . $_GET['date_till'];
                         }
-                        print_r($dateParams);
+                        //print_r($dateParams);
                     }
                     //если еще НЕ задан гет-параметр сортировки полей таблицы по одному ключу
                     if (!isset($_GET['orderby'])) {

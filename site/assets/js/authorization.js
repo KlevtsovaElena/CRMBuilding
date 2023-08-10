@@ -1,4 +1,4 @@
-console.log("Подключили auth");
+console.log("Подключили authorization.js");
 
 /* ---------- ВХОД ПО ENTER ---------- */
 let inputBox = document.querySelectorAll('.input-login');
@@ -105,4 +105,37 @@ function logOut() {
     //рисуем форму авторизации
     window.location.href = 'http://localhost/pages/login.php';
 
+}
+
+/* ---------- ПРОВЕРКА ТОКЕНА, ЕСЛИ СТРАНИЦА НЕ ПЕРЕЗАГРУЖАЕТСЯ ---------- */
+// можно ли делать запросы к базе на странице, которая не перезагружается
+// такая ситуация возникает, когда нажимаем на кнопку НАЗАД , но при этом уже вышли из аккаунта
+// всё равно нам показывается предпоследняя страница аккаунта
+// поэтому надо проверять при отправке запросов в базу корректность токена в куки
+
+function check() {
+    //берём токен из куки
+    const cookie = document.cookie.match(/profile=(.+?)(;|$)/);
+
+    //если токена нет, то рисуем форму Авторизации и выходим из функции
+    if (cookie == null || cookie == undefined || cookie == ""){
+        window.location.href = 'http://localhost/pages/login.php';
+        return;
+    }
+
+    //если токен есть , то передаём его на сервер
+    let params = "cookie=" + cookie[1];
+
+    //отправляем запрос на сервер
+    let jsonResponse = sendRequestFormUrlPOST("http://localhost/api/authorization/check.php", params);
+    let response = JSON.parse(jsonResponse);
+
+    // если токен в куки некорректный, то переброс на страницу авторизации
+    if(!response['success']) {
+        window.location.href = 'http://localhost/pages/login.php';
+        return;
+    };
+
+    return response['profile'];
+    
 }

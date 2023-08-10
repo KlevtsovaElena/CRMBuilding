@@ -532,11 +532,11 @@ function applyInOrders() {
     if (from || till) {
         //если  С
         if (from) {
-            filters += '&order_date_from=' + from;
+            filters += '&date_from=' + from;
         } 
         if (till) {
             //если ДО
-            filters += '&order_date_till=' + till;
+            filters += '&date_till=' + till;
         } 
     }
 
@@ -788,7 +788,7 @@ function applyInVendors() {
 }
 
 //функция по чекбоксам со статусом города
-function checkboxChanged(id) {
+function checkboxChangedCity(id) {
 
     //выдаем поп-ап с подтверждением действия
     let isChecked = window.confirm('Вы действительно хотите изменить статус города?');
@@ -825,6 +825,50 @@ function checkboxChanged(id) {
     console.log(obj);
 
     let link = 'http://localhost/api/cities.php';
+
+    //передаем на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+}
+
+//функция по чекбоксам "поставщик подтвердил цены" у админа
+function checkboxChangedVendorPrice(id) {
+
+    //выдаем поп-ап с подтверждением действия
+    let isChecked = window.confirm('Вы действительно хотите изменить статус?');
+
+    if(!isChecked) {
+        console.log("не менять");
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'price_confirmed': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'price_confirmed': 0
+        });
+    }
+
+    console.log(obj);
+
+    let link = 'http://localhost/api/vendors.php';
 
     //передаем на сервер в пост-запросе
     sendRequestPOST(link, obj);
@@ -891,7 +935,7 @@ function changePhone() {
     document.getElementById('phone-number').value = phone;
     console.log(document.getElementById('phone-number').value);
 
-    let newPhone;
+    //let newPhone;
 
     //по нажатию на энтер
     // document.addEventListener('keyup', event => {
@@ -946,6 +990,19 @@ function changePhoneAndSend(oldPhone) {
 
     if(!yes) {
         console.log("не изменять");
+        //меняем редактируемый инпут на простую строку
+        changeTagName(document.getElementById('phone-number'), 'p');
+
+        //вставляем внутрь старое значение
+        document.getElementById('phone-number').innerHTML = oldPhone;
+
+        //меняем кнопку обратно на "Изменить"
+        let btn = document.getElementById('btn-phone');
+        btn.innerHTML = 'Изменить';
+        btn.onclick = function() {
+            changePhone();
+        }
+
         return;
     }
 
@@ -956,16 +1013,17 @@ function changePhoneAndSend(oldPhone) {
     document.getElementById('phone-number').innerHTML = newPhone;
 
     //ссылка
-    //let link = 
+    let link = 'http://localhost/api/settings.php';
 
     //соберем json для передачи на сервер
     obj = JSON.stringify({
-        'new_phone': newPhone
+        'name' : 'phone',
+        'value' : newPhone
     });
     console.log(obj);
 
     //отправляем новый телефон на сервер
-    //sendRequestPOST(obj, );
+    sendRequestPOST(link, obj);
 
     //меняем кнопку обратно на "Изменить"
     let btn = document.getElementById('btn-phone');

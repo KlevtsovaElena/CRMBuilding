@@ -53,7 +53,6 @@ let totalProductsCount;
 let totalProductsJson;
 
 let garbage;
-console.log(vendor_idEl);
 
 // // закэшируем значения брендов и категорий и поставщиков
 // brand_idEl.querySelectorAll('option').forEach(item => {
@@ -185,8 +184,6 @@ function getProductsData(params) {
     // количество записей в базе по указанным параметрам
     totalProductsCount = totalProducts['count'];
 
-    console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
-
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (totalProducts['products'].length === 0 && totalProductsCount > 0) {
         changeData();
@@ -224,7 +221,8 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
-                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_name'])
+                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
+                                                        .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
                                                         .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
@@ -322,6 +320,9 @@ function renderPagination(totalProductsCount, limit) {
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
 
+    // проверяем корректность токена
+    check();
+
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
 
@@ -336,6 +337,9 @@ function switchPage(variance) {
 
 /* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 function sortChange() {
+
+    // проверяем корректность токена
+    check();
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
@@ -375,6 +379,9 @@ const sendChangeData = document.querySelector('.form-filters').querySelector('bu
 
 function applyFilters() {
 
+    // проверяем корректность токена
+    check();
+
     // сбрасываем нумерацию страниц и офсет
     currentPage = 1;
     offset = 0;
@@ -388,6 +395,9 @@ sendChangeData.addEventListener("click", applyFilters);
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
 function deleteProduct() {
+    
+    // проверяем корректность токена
+    check();
 
     // запрашиваем подтверждение удаления
     let isDelete = false;
@@ -395,12 +405,8 @@ function deleteProduct() {
     isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
 
     if(!isDelete) {
-        console.log(" ни в коем случае");
         return;
     }
-
-    // если подтвердили удаление
-    console.log("удаляем");
 
     // найдём id товара по атрибуту product-id
     const productId = event.target.closest('.list-products__row').getAttribute('product-id');
@@ -500,6 +506,10 @@ function resetChangePrice() {
 
 // сохранить изменения
 function saveChangePrice() {
+    
+    // проверяем корректность токена
+    check();
+    
     // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
 

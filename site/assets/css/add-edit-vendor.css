@@ -34,3 +34,36 @@
 .data-vendor-elem__name {
     font-size: 1.5rem;
 }
+
+.price-confirm-container {
+    margin-bottom: 15px;
+}
+
+.price-confirm-container svg {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.price-confirm {
+    color: #006633;
+}
+
+.price-not-confirm {
+    color: #990000;
+}
+
+.link-text {
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+
+input[type=radio] {
+    width: unset;
+    min-width: unset;
+    appearance: auto;
+    vertical-align: middle;
+ }
+ 
+ .currency-title {
+     font-size: 0.8rem;
+ }

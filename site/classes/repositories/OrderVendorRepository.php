@@ -138,6 +138,18 @@ class OrderVendorRepository extends BaseRepository
         // Получаем часть строки запроса с лимитом и оффсетом
         $limitString = SqlHelper::getLimitString($inputParams);
 
+        if (isset($inputParams['date_from']))
+        {
+            $whereString .= ' AND (o.order_date >= :date_from)';
+            $whereParams['date_from'] = $inputParams['date_from'];
+        }
+
+        if (isset($inputParams['date_till']))
+        {
+            $whereString .= ' AND (o.order_date < :date_till)';
+            $whereParams['date_till'] = $inputParams['date_till'];
+        }
+
         $query = sprintf(static::GET_WITH_DETAILS, implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
 
         $whereParams = SqlHelper::convertToSqlParam($whereParams);
@@ -169,12 +181,23 @@ class OrderVendorRepository extends BaseRepository
         $whereParams = SqlHelper::convertToSqlParam($whereParams);
         $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
 
+        if (isset($inputParams['date_from']))
+        {
+            $whereString .= ' AND (o.order_date >= :date_from)';
+            $whereParams['date_from'] = $inputParams['date_from'];
+        }
+
+        if (isset($inputParams['date_till']))
+        {
+            $whereString .= ' AND (o.order_date < :date_till)';
+            $whereParams['date_till'] = $inputParams['date_till'];
+        }
+
         // Формируем результирующую строку запроса
         $query = sprintf(static::GET_COUNT_WITH_DETAILS, implode(' ', [$whereString, $searchString]));
 
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute(array_merge($whereParams, $formattedSearchParams));
-
 
         if (!$data = $statement->fetch())
             return 0;

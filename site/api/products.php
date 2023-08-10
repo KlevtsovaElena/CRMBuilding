@@ -64,7 +64,7 @@
 
             file_put_contents($fsPath . $fileName, $decodedContent);
 
-            return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['HTTP_HOST'] . $path . $fileName;
+            return $path . $fileName;
         }
     }
 

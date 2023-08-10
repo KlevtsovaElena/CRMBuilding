@@ -98,7 +98,7 @@ if($role !== 2) {
                 </div>
 
                 <!-- описание -->
-                <div class="form-add-product__elements-item">
+                <div class="form-add-product__elements-item d-none">
                     <p>Описание</p><textarea id="description" name="description"><?= $product[0]['description']; ?></textarea>
                     <div class="error-info d-none"></div> 
                 </div>
@@ -129,13 +129,13 @@ if($role !== 2) {
 
                 <!-- цена поставщика -->
                 <div class="form-add-product__elements-item">
-                    <p>Цена </p><input type="number" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" required placeholder="0">
+                    <p>Цена </p><input type="number" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" required placeholder="0" price-old="<?= $product[0]['price']; ?>">
                     <div class="error-info d-none"></div> 
                 </div>
 
                 <!-- среднерыночная цена -->
                 <div class="form-add-product__elements-item">
-                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0">
+                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0" max-price-old="<?= $product[0]['max_price']; ?>">
                     <div class="error-info d-none"></div> 
                 </div> 
 
@@ -143,7 +143,7 @@ if($role !== 2) {
 
             <div class="btn-group-3">
                 <div>
-                    <button class="btn btn-ok" onclick="editProduct()">Сохранить</button>
+                    <button class="btn btn-ok" onclick="editProduct(2)">Сохранить</button>
                     <a href="vendor-edit-product.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
                 </div>
             

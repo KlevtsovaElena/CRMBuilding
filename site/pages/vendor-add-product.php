@@ -95,7 +95,7 @@ if($role !== 2) {
             </div>
 
             <!-- описание -->
-            <div class="form-add-product__elements-item">
+            <div class="form-add-product__elements-item d-none">
                 <p>Описание</p><textarea id="description" name="description"></textarea>
                 <div class="error-info d-none"></div> 
             </div>
@@ -141,7 +141,7 @@ if($role !== 2) {
         </div>
 
         <div>
-            <button class="btn btn-ok" onclick="addProduct()">Сохранить</button>
+            <button class="btn btn-ok" onclick="addProduct(2)">Сохранить</button>
             <a href="vendor-add-product.php" class="btn btn-neutral">Сбросить изменения</a> 
         </div>
     </form>

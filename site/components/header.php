@@ -154,7 +154,7 @@
         <div class="menu-top">
             <div class="menu-top__container">
                 <div class="menu-top__logo">StroiCRM</div>
-                <div class="menu-top__profile">
+                <div class="menu-top__profile" vendor-id="<?= $vendor_id ?>">
                     <div class="menu-top__profile-name">        
                         <?= $vendor_name; ?>
                     </div>
@@ -198,22 +198,13 @@
                 </li> -->
                 <li class="menu-left__item" data-page-name = "/pages/vendor-finances.php">
                     <a href="./../pages/vendor-finances.php" class="menu-left__item-link">
-                        <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g id="SVGRepo_iconCarrier"> <title>list</title> <path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
-                        </svg>
+                    <svg class="fill" viewBox="2 7 28 18" stroke="#ced4da"><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;} .st1{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:3;} .st2{fill:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;} .st3{fill:none;} </style> <rect x="3" y="8" class="st0" width="22" height="12"></rect> <path class="st0" d="M3,16c2.2,0,4,1.8,4,4v4h22V12h-4c-2.2,0-4-1.8-4-4"></path> <circle class="st0" cx="14" cy="14" r="3"></circle> <path class="st0" d="M7,8c0,2.2-1.8,4-4,4"></path> <path class="st0" d="M25,16c-2.2,0-4,1.8-4,4"></path> </g></svg>
                         <span>Финансы</span>
                     </a>
                 </li>
                 <li class="menu-left__item" data-page-name = "/pages/vendor-my-info.php">
                     <a href="./../pages/vendor-my-info.php" class="menu-left__item-link">
-                        <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g id="SVGRepo_iconCarrier"> <title>house-solid</title> <path class="clr-i-solid clr-i-solid-path-1" d="M33,19a1,1,0,0,1-.71-.29L18,4.41,3.71,18.71a1,1,0,0,1-1.41-1.41l15-15a1,1,0,0,1,1.41,0l15,15A1,1,0,0,1,33,19Z"/>
-                            <path class="clr-i-solid clr-i-solid-path-2" d="M18,7.79,6,19.83V32a2,2,0,0,0,2,2h7V24h6V34h7a2,2,0,0,0,2-2V19.76Z"/> <rect x="0" y="0" width="36" height="36" fill-opacity="0"/> </g> 
-                        </svg>
+                        <svg class="fill" viewBox="5 5 38 38" xmlns="http://www.w3.org/2000/svg" fill="#ced4da"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 0h48v48H0z" fill="none"></path> <g id="Shopicon"> <path d="M4,20h4v24h32V20h4L24,4L4,20z M36,20v20H12V20v-1.277l12-9.6l12,9.6V20z"></path> <g> <path d="M29,23c0-2.761-2.239-5-5-5s-5,2.239-5,5s2.239,5,5,5S29,25.761,29,23z"></path> <path d="M24,28c-4.42,0-8,3.58-8,8h16C32,31.58,28.42,28,24,28z"></path> </g> </g> </g></svg>
                         <span id="header-main" data-vendor="">Мои данные</span>
                     </a>
                 </li>
