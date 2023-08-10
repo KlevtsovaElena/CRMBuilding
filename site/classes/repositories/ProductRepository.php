@@ -59,6 +59,16 @@ class ProductRepository extends BaseRepository
                                             u.`id` = p.`unit_id`
                                         %s';
 
+    const UPDATE_PRICE_BY_VENDOR = 'UPDATE products p
+                                        INNER JOIN vendors v ON
+                                        p.`vendor_id` = v.`id`
+                                        INNER JOIN products p1 ON
+                                        p1.`id` = p.`id`
+                                    SET p.price = p1.`price_dollar` * v.`rate`,
+                                        p.max_price = p1.`max_price_dollar` * v.`rate`
+                                    WHERE v.`id` = :vendor_id 
+                                        AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
+
     private static array $productDetailsAccosiations = [
         'id' => 'p.id',
         'name' => 'p.name',
@@ -212,6 +222,14 @@ class ProductRepository extends BaseRepository
             return 0;
 
         return $data['count'];
+    }
+
+    public function updatePriceByVendor(int $vendorId) 
+    {
+        $statement = \DbContext::getConnection()->prepare(static::UPDATE_PRICE_BY_VENDOR);
+        $statement->execute([
+            'vendor_id' => $vendorId
+        ]);
     }
 }
 ?>

@@ -201,4 +201,16 @@ INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`,
 (4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	0),
 (5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'',	1,	0,	1,	0,	0);
 
+DROP TABLE IF EXISTS `settings`;
+CREATE TABLE `settings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `settings` (`id`, `name`, `value`) VALUES
+(1,	'phone',	'89997776655');
+
+
 -- 2023-08-09 13:06:11
