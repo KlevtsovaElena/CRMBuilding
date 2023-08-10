@@ -24,10 +24,10 @@ if($role !== 1) {
     <?php
 
         //достанем актуальный телефон для отображения
-        //$dataJson = file_get_contents("http://nginx/api/...");
-        //$phone = json_decode($dataJson, true); 
-        //print_r($phone);
-        $phone = 89997776655;
+        $dataJson = file_get_contents("http://nginx/api/settings.php?name=phone");
+        $phone = json_decode($dataJson, true); 
+        $phone = $phone[0]['value'];
+
     ?>
 
     <p class="page-title">Главная</p>
