@@ -532,11 +532,11 @@ function applyInOrders() {
     if (from || till) {
         //если  С
         if (from) {
-            filters += '&order_date_from=' + from;
+            filters += '&date_from=' + from;
         } 
         if (till) {
             //если ДО
-            filters += '&order_date_till=' + till;
+            filters += '&date_till=' + till;
         } 
     }
 
