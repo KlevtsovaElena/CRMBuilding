@@ -1,6 +1,6 @@
 <?php if (!isset($profile)) {
     // если профиля нет, то проверку не прошли
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
 } ?>
 
     </section>    
@@ -13,7 +13,8 @@ for ($i = 0; $i < count($scriptsSrc); $i++) {
 }; 
 
 ?> 
-<script src='http://localhost/assets/js/authorization.js'></script>
+<script src='<?= $mainUrl; ?>/assets/js/authorization.js'></script>
+
 </body>
 </html>
 

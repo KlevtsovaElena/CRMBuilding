@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 2) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -25,13 +25,13 @@ if($role !== 2) {
 
     <!-- соберём данные для отображения в форме -->
     <?php
-        $brandsJson = file_get_contents("http://nginx/api/brands.php?deleted=0");
+        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
         $brands = json_decode($brandsJson, true);
 
-        $categoriesJson = file_get_contents("http://nginx/api/categories.php?deleted=0");
+        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents("http://nginx/api/units.php");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php");
         $units = json_decode($unitsJson, true);
     ?>
                         
@@ -126,18 +126,43 @@ if($role !== 2) {
                 <div class="error-info d-none"></div> 
             </div>
 
-            <!-- цена поставщика -->
-            <div class="form-add-product__elements-item">
-                <p>Цена </p><input type="number" id="price" name="price" min="0" value="" required placeholder="0">
-                <div class="error-info d-none"></div> 
-            </div>
+            <!-- в зависимости от валюты поставщика -->
+            <?php if ($profile['currency_dollar'] == "0") { ?>
+                
+                <!-- цена поставщика сум-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена, Сум </p><input type="number" id="price" name="price" min="0" value="" required placeholder="0"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="price_dollar" name="price_dollar" min="0" value="0">
+                    <div class="error-info d-none"></div> 
+                </div>
 
-            <!-- среднерыночная цена -->
-            <div class="form-add-product__elements-item">
-                <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0">
-                <div class="error-info d-none"></div> 
-            </div> 
+                <!-- среднерыночная цена сум-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена среднерыночная, Сум </p><input type="number" id="max_price" name="max_price" min="0" value="" required placeholder="0"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="max_price_dollar" name="max_price_dollar" min="0" value="0">
+                    <div class="error-info d-none"></div> 
+                </div> 
+            <?php } else { ?>
+ 
+                <!-- цена поставщика $-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена, $ </p>
+                    <input type="number" id="price_dollar" name="price_dollar" min="0" value="" required placeholder="0" class="price-dollar-add" rate="<?= $profile['rate']; ?>" onchange="calcPriceUzs()"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="price" name="price" min="0" value="" class="price-value">
+                    <span>$ = </span><span class="price-uzs"><b>0</b></span><span> Сум</span>
+                    <div class="error-info d-none"></div> 
+                </div>
 
+                <!-- среднерыночная цена $-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена среднерыночная, $ </p>
+                    <input type="hidden" id="max_price" name="max_price" min="0" value="" class="price-value">
+                    <input type="number" id="max_price_dollar" name="max_price_dollar" min="0" value="" required placeholder="0" class="max_price-dollar-add" rate="<?= $profile['rate']; ?>" onchange="calcPriceUzs()"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <span>$ = </span><span class="price-uzs"><b>0</b></span><span> Сум</span>
+                    <div class="error-info d-none"></div> 
+                </div> 
+                 
+            <?php }  ?>             
         </div>
 
         <div>

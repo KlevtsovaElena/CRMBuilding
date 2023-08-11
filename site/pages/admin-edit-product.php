@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 1) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -26,16 +26,16 @@ if($role !== 1) {
 
         <!-- соберём данные для отображения в форме -->
         <?php
-        $brandsJson = file_get_contents("http://nginx/api/brands.php?deleted=0");
+        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
         $brands = json_decode($brandsJson, true);
 
-        $categoriesJson = file_get_contents("http://nginx/api/categories.php?deleted=0");
+        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents("http://nginx/api/units.php");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php");
         $units = json_decode($unitsJson, true);
 
-        $vendorsJson = file_get_contents("http://nginx/api/vendors.php?role=2?deleted=0");
+        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2?deleted=0");
         $vendors = json_decode($vendorsJson, true);
     ?>
                         
@@ -49,7 +49,7 @@ if($role !== 1) {
         
             <!-- пропишем в форму данные товара по id -->
             <?php 
-                $productJson = file_get_contents("http://nginx/api/products/get-with-details.php?deleted=0&id=" . $id);
+                $productJson = file_get_contents($nginxUrl . "/api/products/get-with-details.php?deleted=0&id=" . $id);
                 $product = json_decode($productJson, true);
             ?>
             <div class="form-add-product__elements form-elements-container">
@@ -138,17 +138,43 @@ if($role !== 1) {
                     <div class="error-info d-none"></div> 
                 </div>
 
-                <!-- цена поставщика -->
+            <!-- в зависимости от валюты поставщика -->
+            <?php if ($product[0]['vendor_currency_dollar'] == "0") { ?>
+                
+                <!-- цена поставщика сум-->
                 <div class="form-add-product__elements-item">
-                    <p>Цена </p><input type="number" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" required placeholder="0">
+                    <p>Цена, Сум </p><input type="number" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" required placeholder="0"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="price_dollar" name="price_dollar" min="0" value="<?= $product[0]['price_dollar']; ?>">
                     <div class="error-info d-none"></div> 
                 </div>
 
-                <!-- среднерыночная цена -->
+                <!-- среднерыночная цена сум-->
                 <div class="form-add-product__elements-item">
-                    <p>Цена среднерыночная </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0">
+                    <p>Цена среднерыночная, Сум </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="max_price_dollar" name="max_price_dollar" min="0" value="<?= $product[0]['max_price_dollar']; ?>">
                     <div class="error-info d-none"></div> 
                 </div> 
+            <?php } else { ?>
+ 
+                <!-- цена поставщика $-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена, $ </p>
+                    <input type="number" id="price_dollar" name="price_dollar" min="0" value="<?php if($product[0]['price_dollar'] !== 0) {echo $product[0]['price_dollar'];} ?>" required placeholder="0" class="price-dollar-add" rate="<?= $product[0]['vendor_rate']; ?>" onchange="calcPriceUzs()"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <input type="hidden" id="price" name="price" min="0" value="<?= $product[0]['price']; ?>" class="price-value">
+                    <span>$ = </span><span class="price-uzs"><b><?= $product[0]['price']; ?></b></span><span> Сум</span>
+                    <div class="error-info d-none"></div> 
+                </div>
+
+                <!-- среднерыночная цена $-->
+                <div class="form-add-product__elements-item">
+                    <p>Цена среднерыночная, $ </p>
+                    <input type="hidden" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" class="price-value">
+                    <input type="number" id="max_price_dollar" name="max_price_dollar" min="0" value="<?php if($product[0]['max_price_dollar'] !== 0) {echo $product[0]['max_price_dollar'];} ?>" required placeholder="0" class="max_price-dollar-add" rate="<?= $product[0]['vendor_rate']; ?>" onchange="calcPriceUzs()"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <span>$ = </span><span class="price-uzs"><b><?= $product[0]['max_price']; ?></b></span><span> Сум</span>
+                    <div class="error-info d-none"></div> 
+                </div> 
+                 
+            <?php }  ?>               
 
             </div>
 

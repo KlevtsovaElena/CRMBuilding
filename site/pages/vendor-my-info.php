@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 2) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -10,7 +10,7 @@ if($role !== 2) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
+        "<link rel='stylesheet' href='./../assets/css/vendor.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>"
@@ -18,7 +18,7 @@ if($role !== 2) {
 ?>
 <?php include('./../components/header.php'); ?>
 <?php 
-    $vendorDataJson = file_get_contents("http://nginx/api/vendors/get-with-details.php?id=" . $vendor_id);
+    $vendorDataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?id=" . $vendor_id);
     $vendorData = json_decode($vendorDataJson, true);
     if(isset($vendorData[0]['coordinates']['latitude']) && isset($vendorData[0]['coordinates']['longitude'])) {
         $coordinates = $vendorData[0]['coordinates']['latitude'] . ', ' . $vendorData[0]['coordinates']['longitude'];

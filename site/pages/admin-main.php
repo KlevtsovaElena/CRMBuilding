@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 1) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
