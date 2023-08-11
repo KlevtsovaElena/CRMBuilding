@@ -1,4 +1,4 @@
-console.log('подключили list-products');
+console.log('подключили admin-list-products', mainUrl);
 // найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
 const containerListProducts = document.querySelector('.list-products__body');
@@ -13,7 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 
-let url = 'http://localhost/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
+let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -66,7 +66,7 @@ let garbage;
 // })
 
 // // закэшируем значения единиц измерения (временно, пока нет апишки)
-// let unitsJson = sendRequestGET('http://localhost/api/units.php');
+// let unitsJson = sendRequestGET(mainUrl + '/api/units.php');
 // let unitsData = JSON.parse(unitsJson);
 // unitsData.forEach(item => {
 //    units[item['id']] = item['name_short'];
@@ -418,10 +418,7 @@ function deleteProduct() {
     });
 
     // делаем запрос на удаление товара по id
-    sendRequestPOST('http://localhost/api/products.php', obj);
-
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
-
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // заполним страницу данными
     startRenderPage();
@@ -437,7 +434,7 @@ function editProduct(id) {
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
+    window.location.href = mainUrl + "/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
@@ -448,7 +445,7 @@ function addProduct() {
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-add-product.php?deleted=0" + params; 
+    window.location.href = mainUrl + "/pages/admin-add-product.php?deleted=0" + params; 
 }
 
 
@@ -557,7 +554,7 @@ function saveChangePrice() {
         let objJson = JSON.stringify(obj);
 
         // отправка запроса на запись 
-        sendRequestPOST('http://localhost/api/products.php', objJson);
+        sendRequestPOST(mainUrl + '/api/products.php', objJson);
 
         // перерисовка страницы
         startRenderPage();

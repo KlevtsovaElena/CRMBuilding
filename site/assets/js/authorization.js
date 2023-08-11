@@ -1,4 +1,4 @@
-console.log("Подключили authorization.js");
+console.log("Подключили authorization.js", mainUrl);
 
 /* ---------- ВХОД ПО ENTER ---------- */
 let inputBox = document.querySelectorAll('.input-login');
@@ -47,7 +47,7 @@ function logIn() {
     let params = "email=" + login.value.trim() + "&password=" + pass.value.trim() + "&deleted=0&is_active=1";
     
     //получаем ответ
-    let jsonResponse = sendRequestFormUrlPOST("http://localhost/api/authorization/login.php", params);
+    let jsonResponse = sendRequestFormUrlPOST(mainUrl + "/api/authorization/login.php", params);
     let response = JSON.parse(jsonResponse);
 
     //проверяем ответ
@@ -70,7 +70,7 @@ function logIn() {
     if(urlGetParams.get('return_url')) {
         window.location.href = urlSearch.replace('?return_url=', '');
     } else {
-        window.location.href = 'http://localhost/index.php';
+        window.location.href = mainUrl + '/index.php';
     }
 
 }
@@ -89,7 +89,7 @@ function logOut() {
 
     //если токена нет, то рисуем форму Авторизации и выходим из функции
     if (cookie == null || cookie == undefined || cookie == ""){
-        window.location.href = 'http://localhost/pages/login.php';
+        window.location.href = mainUrl + '/pages/login.php';
         return;
     }
 
@@ -97,13 +97,13 @@ function logOut() {
     let params = "token=" + cookie[1];
 
     //отправляем запрос на сервер
-    sendRequestFormUrlPOST("http://localhost/api/authorization/logout.php", params);
+    sendRequestFormUrlPOST(mainUrl + "/api/authorization/logout.php", params);
 
     //удаляем токен из куки
     document.cookie = "profile=''; path=/; max-age=-1";
 
     //рисуем форму авторизации
-    window.location.href = 'http://localhost/pages/login.php';
+    window.location.href = mainUrl + '/pages/login.php';
 
 }
 
@@ -119,7 +119,7 @@ function check() {
 
     //если токена нет, то рисуем форму Авторизации и выходим из функции
     if (cookie == null || cookie == undefined || cookie == ""){
-        window.location.href = 'http://localhost/pages/login.php';
+        window.location.href = mainUrl + '/pages/login.php';
         return;
     }
 
@@ -127,12 +127,12 @@ function check() {
     let params = "cookie=" + cookie[1];
 
     //отправляем запрос на сервер
-    let jsonResponse = sendRequestFormUrlPOST("http://localhost/api/authorization/check.php", params);
+    let jsonResponse = sendRequestFormUrlPOST(mainUrl + "/api/authorization/check.php", params);
     let response = JSON.parse(jsonResponse);
 
     // если токен в куки некорректный, то переброс на страницу авторизации
     if(!response['success']) {
-        window.location.href = 'http://localhost/pages/login.php';
+        window.location.href = mainUrl + '/pages/login.php';
         return;
     };
 

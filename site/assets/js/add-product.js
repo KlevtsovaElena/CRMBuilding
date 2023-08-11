@@ -1,4 +1,4 @@
-console.log("подключили add-product.js");
+console.log("подключили add-product.js", mainUrl);
 
 /* ---------- ВАЛИДАЦИЯ ФОРМЫ ДОБАВЛЕНИЯ ТОВАРОВ ---------- */
 
@@ -69,7 +69,7 @@ function addProduct(role) {
     });
 
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/products.php', obj);
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // если товар добавляет поставщик, а не админ, то поставщика переводим в 0 до подтверждения цен
     if (role == 2) {
@@ -78,7 +78,7 @@ function addProduct(role) {
             'id': vendor_id.value,
             'price_confirmed':  0
         });
-        sendRequestPOST('http://localhost/api/vendors.php', objVendor);
+        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
     }
 
     alert("Данные отправлены");

@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 1) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -40,7 +40,7 @@ if($role !== 1) {
                     <option value="" selected hidden></option>
 
                     <?php 
-                    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0&is_active=1");
+                    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
                     $cities = json_decode($citiesJson, true);
 
                     foreach($cities as $city) { ?>
