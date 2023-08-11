@@ -53,7 +53,7 @@ func SendMessage(text string) int {
 
 	var response SendMessageResponseT
 
-	resp, err := http.Get("https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + url.QueryEscape(channelName) + "&text=" + url.QueryEscape(text))
+	resp, err := http.Get("https://api.telegram.org/bot" + token + "/sendMessage?disable_notification=True&chat_id=" + url.QueryEscape(channelName) + "&text=" + url.QueryEscape(text))
 
 	if err != nil {
 		fmt.Println("Произошла сетевая ошибка при отправке сообщения.")
@@ -93,7 +93,7 @@ func PinMessage(messageId int) bool {
 
 	var response PinMessageResponseT
 
-	resp, err := http.Get("https://api.telegram.org/bot" + token + "/pinChatMessage?chat_id=" + channelName + "&message_id=" + strconv.Itoa(messageId))
+	resp, err := http.Get("https://api.telegram.org/bot" + token + "/pinChatMessage?disable_notification=True&chat_id=" + channelName + "&message_id=" + strconv.Itoa(messageId))
 
 	if err != nil {
 		fmt.Println("Произошла сетевая ошибка при закреплении сообщения.")
