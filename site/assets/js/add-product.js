@@ -1,7 +1,5 @@
 console.log("подключили add-product.js", mainUrl);
 
-/* ---------- ВАЛИДАЦИЯ ФОРМЫ ДОБАВЛЕНИЯ ТОВАРОВ ---------- */
-
 const formAddProduct = document.getElementById('form-add-product');
 
 // запишем значения полей формы в переменные
@@ -25,6 +23,8 @@ let file;
 let photoFileData;
 let photoFileName;
 
+
+/* ---------- ДОБАВЛЕНИЕ ТОВАРОВ ---------- */
 
 function addProduct(role) {
     
@@ -85,6 +85,8 @@ function addProduct(role) {
     // перезагрузим страницу
     window.location.href = window.location.href;
 }
+
+/* ---------- ВАЛИДАЦИЯ ФОРМЫ ДОБАВЛЕНИЯ ТОВАРОВ ---------- */
 
 function validationAdd() {
     

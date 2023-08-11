@@ -7,6 +7,8 @@ let productId = formAddProduct.getAttribute('product-id');
 let priceOld = price.getAttribute('price-old');
 let maxPriceOld = max_price.getAttribute('max-price-old');
 
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРОВ ---------- */
+
 function editProduct(role) {
         
     // проверяем корректность токена
@@ -36,7 +38,9 @@ function editProduct(role) {
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
+            'price_dollar': price_dollar.value,
             'max_price': max_price.value,
+            'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
             'photo': photo.value
         });
@@ -50,7 +54,9 @@ function editProduct(role) {
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
+            'price_dollar': price_dollar.value,
             'max_price': max_price.value,
+            'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
             photoFileData,
             photoFileName
@@ -77,7 +83,11 @@ function editProduct(role) {
     // получаем ответ с сервера
     alert("Данные изменены");
 
+    // перезагрузим страницу
+    window.location.href = window.location.href;
 }
+
+/* ---------- ВАЛИДАЦИЯ ФОРМЫ РЕДАКТИРОВАНИЯ ТОВАРОВ ---------- */
 
 function validationEdit() {
     hasError = false; 
@@ -187,9 +197,26 @@ if (!new_photo.value) {
     }
 }
 
+    // валидация полей цен в долларах 
+    if (price.classList.contains('error') || (!price_dollar.value)) {
+        price_dollar.classList.add('error');
+        hasError = true;
+    } else {
+        price_dollar.classList.remove('error');
+    }
+
+    if (max_price.classList.contains('error') || (!max_price_dollar.value)) {
+        max_price_dollar.classList.add('error');
+        hasError = true;
+    } else {
+        max_price_dollar.classList.remove('error');
+    }
+
     return hasError;
 
 }
+
+/* ---------- УДАЛЕНИЕ ТОВАРА СО СТРАНИЦЫ РЕДАКТИРОВАНИЯ ТОВАРА ---------- */
 
 function deleteProductFromEditForm(id) {
         
