@@ -11,5 +11,6 @@
         public int $archive;
         public int $total_price;
         public float $distance;
+        public int $notification_count;
     }
 ?>
