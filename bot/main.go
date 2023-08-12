@@ -237,7 +237,7 @@ var languages = map[string]map[string]string{
 var host string = "https://api.telegram.org/bot"
 var token string = os.Getenv("BOT_TOKEN")
 var link string = os.Getenv("API_LINK")
-var domen string = os.Getenv("SERVER_PHOTO_LINK")
+var domen string = os.Getenv("SERVER_URI")
 
 // данные всеx пользователей
 var usersDB map[int]UserT
@@ -1372,7 +1372,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс при нажатии на кнопку актуальные цены
 		if text == languages[usersDB[chatId].Language]["current_prices"]+"📈" {
 
-			channelURL := "https://t.me/stroyb0t"
+			channelURL := "t.me/stroybotchannel2"
 
 			// Получаем текущую дату и время
 			currentTime := time.Now()

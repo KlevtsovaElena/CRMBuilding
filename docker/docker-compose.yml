@@ -61,7 +61,7 @@ services:
       bot_token: ${BOT_TOKEN}
       SERVICE_NAME: ${SERVICE_NAME}
       API_LINK: ${API_LINK}
-      SERVER_PHOTO_LINK: ${SERVER_PHOTO_LINK}
+      SERVER_URI: ${SERVER_URI}
     volumes:
       - ./../bot/:/app/
     ports:
