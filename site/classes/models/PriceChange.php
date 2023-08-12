@@ -4,8 +4,9 @@
     class PriceChange
     {
         public int $id;
-        public int $productId;
-        public int $dateChange;
-        public int $newPrice;
+        public int $product_id;
+        public int $date_change;
+        public int $old_price;
+        public int $new_price;
     }
 ?>

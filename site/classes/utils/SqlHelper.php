@@ -233,5 +233,28 @@
 
             return $result;
         }
+
+        public static function sortArray(array $inputArray, array $orderByParams) {
+            usort($inputArray, function ($orderVendorA, $orderVendorB) use ($orderByParams) {
+
+                foreach ($orderByParams as $fieldName => $sortMethod) {
+                    if (!isset($orderVendorA[$fieldName]) && isset($orderVendorB[$fieldName]))
+                        return $sortMethod == 'asc' ? -1 : 1;
+    
+                    if (isset($orderVendorA[$fieldName]) && !isset($orderVendorB[$fieldName]))
+                        return $sortMethod == 'asc' ? 1 : -1;
+    
+                    if ($orderVendorA[$fieldName] < $orderVendorB[$fieldName])
+                        return $sortMethod == 'asc' ? -1 : 1;
+    
+                    if ($orderVendorA[$fieldName] > $orderVendorB[$fieldName])
+                        return $sortMethod == 'asc' ? 1 : -1;
+                }
+    
+                return 0;
+            });
+    
+            return $inputArray;
+        }
     }
 ?>

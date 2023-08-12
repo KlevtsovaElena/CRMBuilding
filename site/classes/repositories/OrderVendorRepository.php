@@ -51,6 +51,22 @@ class OrderVendorRepository extends BaseRepository
                                     ON c.id = o.customer_id 
                                     %s';
 
+    const GET_SALES_BY_PERIOD = 'SELECT v.`id` as `vendor_id`,
+                                    c.`name` as `vendor_city`,
+                                    v.`name` as `vendor_name`,
+                                    ov.`products` as `vendor_products`,
+                                    o.`order_date` as `order_date`
+                                FROM order_vendors ov
+                                INNER JOIN orders o ON
+                                o.`id` = ov.`order_id`
+                                INNER JOIN vendors v ON
+                                v.`id` = ov.`vendor_id`
+                                INNER JOIN cities c ON
+                                c.`id` = v.`city_id`
+                                WHERE ov.`status` = 4 
+                                AND v.`deleted` = 0 
+                                %s';
+
     private static array $orderVendorsDetailsAssociation = [
         'id' => 'ov.id',
         'order_id' => 'ov.order_id',
@@ -68,6 +84,14 @@ class OrderVendorRepository extends BaseRepository
         'products' => 'ov.products',
         'total_price' => 'ov.total_price',
         'distance' => 'ov.distance'
+    ];
+
+    private static array $orderVedorsByPeriodAssociation = [
+        'vendor_id' => 'v.id',
+        'vendor_city' => 'c.name',
+        'vendor_name' => 'v.name',
+        'vendor_products' => 'ov.products',
+        'order_date' => 'order_date'
     ];
 
     public function getTableName(): string
@@ -138,14 +162,12 @@ class OrderVendorRepository extends BaseRepository
         // Получаем часть строки запроса с лимитом и оффсетом
         $limitString = SqlHelper::getLimitString($inputParams);
 
-        if (isset($inputParams['date_from']))
-        {
+        if (isset($inputParams['date_from'])) {
             $whereString .= ' AND (o.order_date >= :date_from)';
             $whereParams['date_from'] = $inputParams['date_from'];
         }
 
-        if (isset($inputParams['date_till']))
-        {
+        if (isset($inputParams['date_till'])) {
             $whereString .= ' AND (o.order_date < :date_till)';
             $whereParams['date_till'] = $inputParams['date_till'];
         }
@@ -181,14 +203,12 @@ class OrderVendorRepository extends BaseRepository
         $whereParams = SqlHelper::convertToSqlParam($whereParams);
         $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
 
-        if (isset($inputParams['date_from']))
-        {
+        if (isset($inputParams['date_from'])) {
             $whereString .= ' AND (o.order_date >= :date_from)';
             $whereParams['date_from'] = $inputParams['date_from'];
         }
 
-        if (isset($inputParams['date_till']))
-        {
+        if (isset($inputParams['date_till'])) {
             $whereString .= ' AND (o.order_date < :date_till)';
             $whereParams['date_till'] = $inputParams['date_till'];
         }
@@ -203,6 +223,51 @@ class OrderVendorRepository extends BaseRepository
             return 0;
 
         return $data['count'];
+    }
+
+    public function getDeliveredWithDetails(array $inputParams) : array
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$orderVedorsByPeriodAssociation, $inputParams);
+
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$orderVedorsByPeriodAssociation, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' orderVedorsByPeriodAssociation значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = str_replace('WHERE', 'AND', SqlHelper::getWhereString($whereParams));
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // Получаем все параметры для сортировки
+        $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+        // Отбираем только подходящие для объекта
+        $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$orderVedorsByPeriodAssociation, $allOrderByParams);
+        // Получаем часть строки запроса с сортировкой
+        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+
+        if (isset($inputParams['date_from'])) {
+            $whereString .= ' AND (o.order_date >= :date_from)';
+            $whereParams['date_from'] = $inputParams['date_from'];
+        }
+
+        if (isset($inputParams['date_till'])) {
+            $whereString .= ' AND (o.order_date < :date_till)';
+            $whereParams['date_till'] = $inputParams['date_till'];
+        }
+
+        $query = sprintf(static::GET_SALES_BY_PERIOD, implode(' ', [$whereString, $searchString, $orderByString]));
+
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+        return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
     }
 }
 ?>
