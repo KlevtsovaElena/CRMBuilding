@@ -45,15 +45,12 @@ func main() {
 	//цикл для проверки времени
 	for range time.Tick(time.Second * 1) {
 
-		fmt.Println("scan")
-
 		//создаём переменную настоящего времени
 		timeNow := time.Now()
 
 		//сравниваем текущее время (часы и минуты) и время рассылки
 		if strconv.Itoa(timeNow.Hour()+3) == planed_hour && strconv.Itoa(timeNow.Minute()) == planed_minute {
 
-			fmt.Println("START")
 			//запускаем функцию отправки сообщения
 			makeGoodsList()
 

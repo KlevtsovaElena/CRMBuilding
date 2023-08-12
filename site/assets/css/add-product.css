@@ -38,3 +38,8 @@
 .form-add-product__elements-item {
     margin-bottom: 15px;
 }
+
+.price-dollar-add,
+.max_price-dollar-add {
+    width: unset;
+}

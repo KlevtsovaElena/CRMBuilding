@@ -36,6 +36,8 @@ class ProductRepository extends BaseRepository
                                         b.`brand_name` as `brand_name`,
                                         p.`vendor_id` as `vendor_id`,
                                         v.`name` as `vendor_name`,
+                                        v.`currency_dollar` as `vendor_currency_dollar`,
+                                        v.`rate` as `vendor_rate`,
                                         p.`quantity_available` as `quantity_available`,
                                         p.`price` as `price`,
                                         p.`price_dollar` as `price_dollar`,
@@ -67,6 +69,8 @@ class ProductRepository extends BaseRepository
                                     SET p.price = p1.`price_dollar` * v.`rate`,
                                         p.max_price = p1.`max_price_dollar` * v.`rate`
                                     WHERE v.`id` = :vendor_id 
+                                        AND p1.`price_dollar` <> 0
+                                        AND p1.`max_price_dollar` <> 0
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
     private static array $productDetailsAccosiations = [
@@ -90,7 +94,9 @@ class ProductRepository extends BaseRepository
         'deleted' => 'p.deleted',
         'category_deleted' => 'c.deleted',
         'brand_deleted' => 'b.deleted',
-        'vendor_deleted' => 'v.deleted'
+        'vendor_deleted' => 'v.deleted',
+        'vendor_currency_dollar' => 'v.currency_dollar',
+        'vendor_rate' => 'v.rate'
     ];
 
     public function getTableName(): string

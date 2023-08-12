@@ -1,6 +1,6 @@
 <?php if (!isset($profile)) {
     //  если профиля нет, то проверку не прошли
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
 } ?>
 
 <!DOCTYPE html>
@@ -77,7 +77,7 @@
                         </svg>
                         <?php 
                             //собираем данные по заказам поставщиков
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count.php?status=0");
+                            $dataJson = file_get_contents($nginxUrl . "/api/order-vendors/get-count.php?status=0");
                             $numNew = json_decode($dataJson, true);
                             $numNew = $numNew['count'];
                         ?>
@@ -220,7 +220,7 @@
                         <?php 
 
                             //собираем данные по заказам КОНКРЕТНОГО поставщика
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count.php?status=0&vendor_id=" . $vendor_id);
+                            $dataJson = file_get_contents($nginxUrl . "/api/order-vendors/get-count.php?status=0&vendor_id=" . $vendor_id);
                             $numNew = json_decode($dataJson, true);
                             $numNew = $numNew['count'];
                         ?>

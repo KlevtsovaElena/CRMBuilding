@@ -1,4 +1,4 @@
-console.log('подключили add-vendor.js');
+console.log('подключили add-vendor.js', mainUrl);
 
 // определим основные переменные
 const formAddVendor = document.querySelector('.form-add-vendor');
@@ -69,7 +69,7 @@ function addVendor() {
     });
 
     // передаём данные на сервер
-    let responseJson = sendRequestPOST('http://localhost/api/vendors.php', obj);
+    let responseJson = sendRequestPOST(mainUrl + '/api/vendors.php', obj);
     let response;
     // получаем ответ с сервера
     if (responseJson) {
@@ -182,11 +182,6 @@ function copyText() {
 
 }
 
-
-
-console.log("подключили edit-vendor.js");
-
-
 function editVendor(id) {
         
     // проверяем корректность токена
@@ -229,7 +224,7 @@ function editVendor(id) {
     });
 
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/vendors.php', obj);
+    sendRequestPOST(mainUrl + '/api/vendors.php', obj);
 
     // перезагрузим страницу
     window.location.href = window.location.href;
@@ -261,11 +256,11 @@ function deleteVendorFromEditForm(id) {
     });
 
     // делаем запрос на удаление поставщика по id
-    sendRequestPOST('http://localhost/api/vendors/delete-vendor-with-products.php', obj);
+    sendRequestPOST(mainUrl + '/api/vendors/delete-vendor-with-products.php', obj);
 
 
     // делаем запрос на удаление поставщика по id
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
 
     alert("Поставщик удалён");
 
@@ -275,7 +270,7 @@ function deleteVendorFromEditForm(id) {
     let params = paramsArr.join('&');
 
     // переход обратно на странницу списка поставщиков с прежними параметрами
-    window.location.href = 'http://localhost/pages/admin-vendors.php?' + params;
+    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;
     
 }
 

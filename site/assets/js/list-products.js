@@ -1,4 +1,4 @@
-console.log('подключили list-products');
+console.log('подключили list-products', mainUrl);
 // найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
 const containerListProducts = document.querySelector('.list-products__body');
@@ -14,7 +14,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
 
-let url = 'http://localhost/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&vendor_id=' + vendor_id;
+let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&vendor_id=' + vendor_id;
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -67,7 +67,7 @@ let garbage;
 //     categories[item.value] = item.innerText;
 // })
 // // закэшируем значения единиц измерения (временно, пока нет апишки)
-// let unitsJson = sendRequestGET('http://localhost/api/units.php');
+// let unitsJson = sendRequestGET(mainUrl + '/api/units.php');
 // let unitsData = JSON.parse(unitsJson);
 // unitsData.forEach(item => {
 //    units[item['id']] = item['name_short'];
@@ -423,9 +423,9 @@ function deleteProduct() {
     });
 
     // делаем запрос на удаление товара по id
-    sendRequestPOST('http://localhost/api/products.php', obj);
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
+    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + productId);
 
 
     // заполним страницу данными
@@ -442,7 +442,7 @@ function editProduct(id) {
     history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
+    window.location.href = mainUrl + "/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
@@ -453,7 +453,7 @@ function addProduct() {
     history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
+    window.location.href = mainUrl + "/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
 }
 
 
@@ -562,7 +562,7 @@ function saveChangePrice() {
         let objJson = JSON.stringify(obj);
 
         // отправка запроса на запись (изменение цены)
-        sendRequestPOST('http://localhost/api/products.php', objJson);
+        sendRequestPOST(mainUrl + '/api/products.php', objJson);
 
         // отправим запрос на изменение статуса подтверждения цен поставщика
         // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
@@ -570,7 +570,7 @@ function saveChangePrice() {
             'id': vendor_id,
             'price_confirmed':  0
         });
-        sendRequestPOST('http://localhost/api/vendors.php', objVendor);
+        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
 
 
         // перерисовка страницы

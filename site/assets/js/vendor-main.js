@@ -1,4 +1,4 @@
-console.log("подключили vendor-main.js")
+console.log("подключили vendor-main.js", mainUrl)
 
 // инпут с курсом доллара
 let rateEl = document.getElementById('rate');
@@ -25,7 +25,7 @@ rateEl.addEventListener('change', () => {
     })
 
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/price/change-price-rate.php', obj);
+    sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', obj);
     
     window.location.href = window.location.href;
 })
