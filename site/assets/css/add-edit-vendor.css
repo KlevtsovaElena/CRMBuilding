@@ -18,19 +18,35 @@
     margin-top: 5px;
 }
 
-.data-vendor-elem {
+.price-confirm-container {
     margin-bottom: 15px;
 }
 
-.data-vendor-elem__title,
-.data-vendor-elem__data {
-    margin: 5px;
+.price-confirm-container svg {
+    vertical-align: middle;
+    cursor: pointer;
 }
 
-.data-vendor-elem__title {
-    font-size: 0.9rem;
+.price-confirm {
+    color: #006633;
 }
 
-.data-vendor-elem__name {
-    font-size: 1.5rem;
+.price-not-confirm {
+    color: #990000;
 }
+
+.link-text {
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+
+input[type=radio] {
+    width: unset;
+    min-width: unset;
+    appearance: auto;
+    vertical-align: middle;
+ }
+ 
+ .currency-title {
+     font-size: 0.8rem;
+ }

@@ -35,3 +35,14 @@ input[type="checkbox"] {
 .table-header {
     min-width: unset !important;
 }
+
+.phone-block {
+    margin: 15px 0;
+}
+
+.phone {
+    margin: 15px 15px 15px 0;
+    font-weight: 600;
+    display: inline;
+    max-width: 200px;
+}

@@ -1,4 +1,4 @@
-console.log('подключили add-vendor.js');
+console.log('подключили add-vendor.js', mainUrl);
 
 // определим основные переменные
 const formAddVendor = document.querySelector('.form-add-vendor');
@@ -15,7 +15,22 @@ const email = formAddVendor.querySelector('#email');
 const percent = formAddVendor.querySelector('#percent');
 const is_active = formAddVendor.querySelector('#is_active');
 
+// подтверждение цены инфа
+let priceConfirmedEl;
+let tmplPriceConfirm;
+let tmplPriceNotConfirm;
+
+if (document.querySelector('.price-confirm-container')) {
+    priceConfirmedEl = document.querySelector('.price-confirm-container');
+    tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
+    tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+}
+
 function addVendor() {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -31,6 +46,14 @@ function addVendor() {
         return;
     }
 
+    let currencyDollar;
+    const radio = document.getElementsByName('currency_dollar');
+    radio.forEach(item => {
+        if (item.checked) {
+            currencyDollar = item.value;
+        }
+    })
+
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
         'name': nameVendor.value.trim(),
@@ -39,12 +62,14 @@ function addVendor() {
         'phone': phone.value,
         'email': email.value.trim(),
         'is_active': is_active.value,
-        'percent': percent.value,
+        'percent': percent.value, 
+        'currency_dollar': currencyDollar,
+        'price_confirmed': 1,
         'role': 2 // соответствует роли поставщика
     });
 
     // передаём данные на сервер
-    let responseJson = sendRequestPOST('http://localhost/api/vendors.php', obj);
+    let responseJson = sendRequestPOST(mainUrl + '/api/vendors.php', obj);
     let response;
     // получаем ответ с сервера
     if (responseJson) {
@@ -157,12 +182,11 @@ function copyText() {
 
 }
 
-
-
-console.log("подключили edit-vendor.js");
-
-
 function editVendor(id) {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -177,6 +201,14 @@ function editVendor(id) {
         return;
     }
 
+    let currencyDollar;
+    const radio = document.getElementsByName('currency_dollar');
+    radio.forEach(item => {
+        if (item.checked) {
+            currencyDollar = item.value;
+        }
+    })
+
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
         'id': id,
@@ -186,11 +218,13 @@ function editVendor(id) {
         'phone': phone.value,
         'email': email.value.trim(),
         'percent': percent.value,
+        'currency_dollar': currencyDollar,
+        'price_confirmed':  priceConfirmedEl.getAttribute('confirm-price'),
         'is_active': is_active.value
     });
 
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/vendors.php', obj);
+    sendRequestPOST(mainUrl + '/api/vendors.php', obj);
 
     // перезагрузим страницу
     window.location.href = window.location.href;
@@ -200,7 +234,10 @@ function editVendor(id) {
 // удаление поставщика админом
 
 function deleteVendorFromEditForm(id) {
-    
+        
+    // проверяем корректность токена
+    check();
+
     // запрашиваем подтверждение удаления
     let isDelete = false;
 
@@ -219,11 +256,11 @@ function deleteVendorFromEditForm(id) {
     });
 
     // делаем запрос на удаление поставщика по id
-    sendRequestPOST('http://localhost/api/vendors/delete-vendor-with-products.php', obj);
+    sendRequestPOST(mainUrl + '/api/vendors/delete-vendor-with-products.php', obj);
 
 
     // делаем запрос на удаление поставщика по id
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
 
     alert("Поставщик удалён");
 
@@ -233,7 +270,7 @@ function deleteVendorFromEditForm(id) {
     let params = paramsArr.join('&');
 
     // переход обратно на странницу списка поставщиков с прежними параметрами
-    window.location.href = 'http://localhost/pages/admin-vendors.php?' + params;
+    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;
     
 }
 
@@ -244,4 +281,19 @@ function percentValid(obj) {
     } else if (obj.value > 100) {
         obj.value = 100;
     } 
+}
+
+// меняем отображение подтверждения цен при нажатии на галочку или крестик
+function changePriceConfirm() {
+
+    let confirmPrice = priceConfirmedEl.getAttribute('confirm-price');
+
+    if (confirmPrice == 1) {
+        priceConfirmedEl.setAttribute('confirm-price', '0');
+        priceConfirmedEl.innerHTML = tmplPriceNotConfirm;
+    } else {
+        priceConfirmedEl.setAttribute('confirm-price', '1');
+        priceConfirmedEl.innerHTML = tmplPriceConfirm;
+    }
+
 }

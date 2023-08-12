@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 1) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -40,7 +40,7 @@ if($role !== 1) {
                     <option value="" selected hidden></option>
 
                     <?php 
-                    $citiesJson = file_get_contents("http://nginx/api/cities.php?deleted=0&is_active=1");
+                    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
                     $cities = json_decode($citiesJson, true);
 
                     foreach($cities as $city) { ?>
@@ -72,6 +72,14 @@ if($role !== 1) {
             <!-- процент -->
             <div class="form-add-vendor__item">
                 <p>Установленная % ставка</p><input type="number" id="percent" name="percent"  min="0" max="100" value="" placeholder="0" onchange="percentValid(this)">
+                <div class="error-info d-none"></div>
+            </div>
+
+            <!-- валюта поставщика -->
+            <div class="form-add-vendor__item">
+                <p>Валюта цен</p>
+                <input type="radio" id="uzs" name="currency_dollar" value="0" checked><span class="currency-title"> Цена в сумах</span>
+                <input type="radio" id="usd" name="currency_dollar" value="1"><span class="currency-title"> Цена в долларах</span>
                 <div class="error-info d-none"></div>
             </div>
 

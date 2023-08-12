@@ -1,7 +1,7 @@
 <?php require('../handler/check-profile.php'); 
 if($role !== 1) {
     setcookie('profile', '', -1, '/');
-    header('Location: http://localhost/pages/login.php');
+    header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
 };
 ?>
@@ -29,13 +29,13 @@ if($role !== 1) {
 <!-- соберём данные для отображения в форме -->
 
 <?php
-    $brandsJson = file_get_contents("http://nginx/api/brands.php?deleted=0");
+    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
     $brands = json_decode($brandsJson, true);
 
-    $categoriesJson = file_get_contents("http://nginx/api/categories.php?deleted=0");
+    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
     $categories = json_decode($categoriesJson, true);
 
-    $vendorsJson = file_get_contents("http://nginx/api/vendors.php?role=2&deleted=0");
+    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
     $vendors = json_decode($vendorsJson, true);
  
 ?>
@@ -330,7 +330,7 @@ if (count($_GET) !== 0) {
         
         <tr role="row" class="list-products__row" product-id="${id}">
             
-            <td>${vendor_id}</td>
+            <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
             <td>${brand_id}</td>

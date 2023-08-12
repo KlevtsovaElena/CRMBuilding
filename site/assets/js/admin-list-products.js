@@ -1,4 +1,4 @@
-console.log('подключили list-products');
+console.log('подключили admin-list-products', mainUrl);
 // найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table').innerHTML;
 const containerListProducts = document.querySelector('.list-products__body');
@@ -13,7 +13,7 @@ const headTableProducts = document.getElementById('list-products').querySelector
 // определим основные переменные
 let currentPage = 1;
 
-let url = 'http://localhost/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
+let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -53,7 +53,6 @@ let totalProductsCount;
 let totalProductsJson;
 
 let garbage;
-console.log(vendor_idEl);
 
 // // закэшируем значения брендов и категорий и поставщиков
 // brand_idEl.querySelectorAll('option').forEach(item => {
@@ -67,7 +66,7 @@ console.log(vendor_idEl);
 // })
 
 // // закэшируем значения единиц измерения (временно, пока нет апишки)
-// let unitsJson = sendRequestGET('http://localhost/api/units.php');
+// let unitsJson = sendRequestGET(mainUrl + '/api/units.php');
 // let unitsData = JSON.parse(unitsJson);
 // unitsData.forEach(item => {
 //    units[item['id']] = item['name_short'];
@@ -185,8 +184,6 @@ function getProductsData(params) {
     // количество записей в базе по указанным параметрам
     totalProductsCount = totalProducts['count'];
 
-    console.log('всего ' + totalProducts['count'] + ' выборка ' + totalProducts['products'].length);
-
     // если записей с таким offset нет, но в бд записи есть, то переделаем запрос с иным offset 
     if (totalProducts['products'].length === 0 && totalProductsCount > 0) {
         changeData();
@@ -224,7 +221,8 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
-                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_name'])
+                                                        .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
+                                                        .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
                                                         .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
@@ -322,6 +320,9 @@ function renderPagination(totalProductsCount, limit) {
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
 
+    // проверяем корректность токена
+    check();
+
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
 
@@ -336,6 +337,9 @@ function switchPage(variance) {
 
 /* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 function sortChange() {
+
+    // проверяем корректность токена
+    check();
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
@@ -375,6 +379,9 @@ const sendChangeData = document.querySelector('.form-filters').querySelector('bu
 
 function applyFilters() {
 
+    // проверяем корректность токена
+    check();
+
     // сбрасываем нумерацию страниц и офсет
     currentPage = 1;
     offset = 0;
@@ -388,6 +395,9 @@ sendChangeData.addEventListener("click", applyFilters);
 
 /* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
 function deleteProduct() {
+    
+    // проверяем корректность токена
+    check();
 
     // запрашиваем подтверждение удаления
     let isDelete = false;
@@ -395,12 +405,8 @@ function deleteProduct() {
     isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
 
     if(!isDelete) {
-        console.log(" ни в коем случае");
         return;
     }
-
-    // если подтвердили удаление
-    console.log("удаляем");
 
     // найдём id товара по атрибуту product-id
     const productId = event.target.closest('.list-products__row').getAttribute('product-id');
@@ -412,10 +418,7 @@ function deleteProduct() {
     });
 
     // делаем запрос на удаление товара по id
-    sendRequestPOST('http://localhost/api/products.php', obj);
-
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + productId);
-
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // заполним страницу данными
     startRenderPage();
@@ -431,7 +434,7 @@ function editProduct(id) {
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
+    window.location.href = mainUrl + "/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
@@ -442,7 +445,7 @@ function addProduct() {
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/admin-add-product.php?deleted=0" + params; 
+    window.location.href = mainUrl + "/pages/admin-add-product.php?deleted=0" + params; 
 }
 
 
@@ -500,6 +503,10 @@ function resetChangePrice() {
 
 // сохранить изменения
 function saveChangePrice() {
+    
+    // проверяем корректность токена
+    check();
+    
     // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
 
@@ -547,7 +554,7 @@ function saveChangePrice() {
         let objJson = JSON.stringify(obj);
 
         // отправка запроса на запись 
-        sendRequestPOST('http://localhost/api/products.php', objJson);
+        sendRequestPOST(mainUrl + '/api/products.php', objJson);
 
         // перерисовка страницы
         startRenderPage();

@@ -1,11 +1,19 @@
-console.log("подключили edit-product.js");
+console.log("подключили edit-product.js", mainUrl);
 
 let photo = document.getElementById("photo");
 let productId = formAddProduct.getAttribute('product-id');
 
-let odj;
+// первоначальные цены
+let priceOld = price.getAttribute('price-old');
+let maxPriceOld = max_price.getAttribute('max-price-old');
 
-function editProduct() {
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРОВ ---------- */
+
+function editProduct(role) {
+        
+    // проверяем корректность токена
+    check();
+
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
@@ -17,6 +25,7 @@ function editProduct() {
         return;
     }
     
+    let obj;
     
     // соберём json для передачи на сервер
     if (!new_photo.value) {
@@ -29,7 +38,9 @@ function editProduct() {
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
+            'price_dollar': price_dollar.value,
             'max_price': max_price.value,
+            'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
             'photo': photo.value
         });
@@ -43,7 +54,9 @@ function editProduct() {
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
+            'price_dollar': price_dollar.value,
             'max_price': max_price.value,
+            'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
             photoFileData,
             photoFileName
@@ -52,12 +65,29 @@ function editProduct() {
 
     console.log(obj);
     // передаём данные на сервер
-    sendRequestPOST('http://localhost/api/products.php', obj);
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
+
+    // если товар изменяет поставщик, а не админ, то проверяем менял ли он цену
+    // и если да, то поставщика переводим в 0 до подтверждения цен
+    if (role == 2) {
+        if (!(price.value == priceOld && max_price.value == maxPriceOld)) {        
+            // отправим запрос на изменение статуса подтверждения цен поставщика
+            let objVendor = JSON.stringify({
+                'id': vendor_id.value,
+                'price_confirmed':  0
+            });
+            sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+        }
+    }
 
     // получаем ответ с сервера
     alert("Данные изменены");
 
+    // перезагрузим страницу
+    window.location.href = window.location.href;
 }
+
+/* ---------- ВАЛИДАЦИЯ ФОРМЫ РЕДАКТИРОВАНИЯ ТОВАРОВ ---------- */
 
 function validationEdit() {
     hasError = false; 
@@ -167,11 +197,32 @@ if (!new_photo.value) {
     }
 }
 
+    // валидация полей цен в долларах 
+    if (price.classList.contains('error') || (!price_dollar.value)) {
+        price_dollar.classList.add('error');
+        hasError = true;
+    } else {
+        price_dollar.classList.remove('error');
+    }
+
+    if (max_price.classList.contains('error') || (!max_price_dollar.value)) {
+        max_price_dollar.classList.add('error');
+        hasError = true;
+    } else {
+        max_price_dollar.classList.remove('error');
+    }
+
     return hasError;
 
 }
 
+/* ---------- УДАЛЕНИЕ ТОВАРА СО СТРАНИЦЫ РЕДАКТИРОВАНИЯ ТОВАРА ---------- */
+
 function deleteProductFromEditForm(id) {
+        
+    // проверяем корректность токена
+    check();
+    
     console.log(id);
 
     // запрашиваем подтверждение удаления
@@ -194,11 +245,11 @@ function deleteProductFromEditForm(id) {
     });
 
     // делаем запрос на удаление товара по id
-    sendRequestPOST('http://localhost/api/products.php', obj);
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
 
     // делаем запрос на удаление товара по id
-    // sendRequestDELETE('http://localhost/api/products.php?id=' + id);
+    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
 
     alert("Товар удалён");
 
@@ -209,8 +260,8 @@ function deleteProductFromEditForm(id) {
 
     // переход обратно на странницу списка товаров с прежними параметрами
     if (window.location.href.includes('vendor-edit-product')) {
-        window.location.href = 'http://localhost/pages/vendor-list-products.php?' + params;
+        window.location.href = mainUrl + '/pages/vendor-list-products.php?' + params;
     } else if (window.location.href.includes('admin-edit-product')) {
-        window.location.href = 'http://localhost/pages/admin-list-products.php?' + params;
+        window.location.href = mainUrl + '/pages/admin-list-products.php?' + params;
     }
 }

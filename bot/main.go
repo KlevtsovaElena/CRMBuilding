@@ -163,6 +163,12 @@ type Brand struct {
 	BrandName string `json:"brand_name"`
 }
 
+type Settings struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 // структура товара
 type Product struct {
 	ID          int    `json:"id"`
@@ -198,9 +204,7 @@ var languages = map[string]map[string]string{
 		"public_offer":          "Ommaviy taklif",
 		"information":           "Ma'lumot",
 		"become_partner":        "Hamkor bo'lish",
-		"contact_us":            "Biz bilan aloqaga chiqish",
 		"back":                  "Ortga",
-		"share_phone_number":    "Telefon raqamini ulashish",
 		"main_menu":             "Asosiy menyu",
 		"order":                 "Buyurtma berish",
 		"my_orders":             "Mening buyurtmalarim",
@@ -217,9 +221,7 @@ var languages = map[string]map[string]string{
 		"public_offer":          "Оммавий таклиф",
 		"information":           "Маълумот",
 		"become_partner":        "Хамкор бўлиш)",
-		"contact_us":            "Биз билан алоқага чиқиш",
 		"back":                  "Ортга",
-		"share_phone_number":    "Телефон ракамини улашиш",
 		"main_menu":             "Асосий меню",
 		"order":                 "Буюртма бериш",
 		"my_orders":             "Mенинг буюртмаларим",
@@ -601,7 +603,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 
 			if button == "ru" || button == "uzbek" || button == "uzbekcha" {
-				fmt.Println("enter")
 				user.Language = button
 				usersDB[chatId] = user
 			}
@@ -1454,8 +1455,29 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["contact_us"], inlineKeyboard)
+			// Создаем GET-запрос
+			resp, err := http.Get("http://" + link + "/api/settings.php?name=phone")
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
+			}
+			defer resp.Body.Close()
+
+			var settings []Settings
+			err = json.NewDecoder(resp.Body).Decode(&settings)
+			if err != nil {
+				log.Fatal("Ошибка при декодировании JSON:", err)
+			}
+
+			// Используем полученные данные и подставляем их в кнопки
+			for _, setting := range settings {
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, setting.Value, inlineKeyboard)
+			}
+
+			user := usersDB[chatId]
+			user.Step = 4
+			usersDB[chatId] = user
 		}
 
 		// кейс при нажатии на кнопку настройки

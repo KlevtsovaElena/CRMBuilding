@@ -20,5 +20,8 @@
         public ?string $token;
         public ?string $percent;
         public int $deleted; //Настя: добавила для нового поля
+        public int $price_confirmed;
+        public ?int $currency_dollar;
+        public ?int $rate;
     }
 ?>

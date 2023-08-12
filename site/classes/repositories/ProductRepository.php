@@ -36,9 +36,13 @@ class ProductRepository extends BaseRepository
                                         b.`brand_name` as `brand_name`,
                                         p.`vendor_id` as `vendor_id`,
                                         v.`name` as `vendor_name`,
+                                        v.`currency_dollar` as `vendor_currency_dollar`,
+                                        v.`rate` as `vendor_rate`,
                                         p.`quantity_available` as `quantity_available`,
                                         p.`price` as `price`,
+                                        p.`price_dollar` as `price_dollar`,
                                         p.`max_price` as `max_price`,
+                                        p.`max_price_dollar` as `max_price_dollar`,
                                         p.`unit_id` as `unit_id`,
                                         u.`name` as `unit_name`,
                                         u.`name_short`as `unit_name_short`,
@@ -56,6 +60,18 @@ class ProductRepository extends BaseRepository
                                         INNER JOIN units u ON
                                             u.`id` = p.`unit_id`
                                         %s';
+
+    const UPDATE_PRICE_BY_VENDOR = 'UPDATE products p
+                                        INNER JOIN vendors v ON
+                                        p.`vendor_id` = v.`id`
+                                        INNER JOIN products p1 ON
+                                        p1.`id` = p.`id`
+                                    SET p.price = p1.`price_dollar` * v.`rate`,
+                                        p.max_price = p1.`max_price_dollar` * v.`rate`
+                                    WHERE v.`id` = :vendor_id 
+                                        AND p1.`price_dollar` <> 0
+                                        AND p1.`max_price_dollar` <> 0
+                                        AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
     private static array $productDetailsAccosiations = [
         'id' => 'p.id',
@@ -78,7 +94,9 @@ class ProductRepository extends BaseRepository
         'deleted' => 'p.deleted',
         'category_deleted' => 'c.deleted',
         'brand_deleted' => 'b.deleted',
-        'vendor_deleted' => 'v.deleted'
+        'vendor_deleted' => 'v.deleted',
+        'vendor_currency_dollar' => 'v.currency_dollar',
+        'vendor_rate' => 'v.rate'
     ];
 
     public function getTableName(): string
@@ -210,6 +228,14 @@ class ProductRepository extends BaseRepository
             return 0;
 
         return $data['count'];
+    }
+
+    public function updatePriceByVendor(int $vendorId) 
+    {
+        $statement = \DbContext::getConnection()->prepare(static::UPDATE_PRICE_BY_VENDOR);
+        $statement->execute([
+            'vendor_id' => $vendorId
+        ]);
     }
 }
 ?>

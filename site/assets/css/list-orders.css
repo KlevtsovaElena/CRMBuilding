@@ -149,6 +149,7 @@ th[data-id="status"] {
 .middle-input {
     max-width: 102px;
     font-size: 0.7rem;
+    cursor: text;
 }
 
 .small-input {

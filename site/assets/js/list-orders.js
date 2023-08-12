@@ -1,4 +1,4 @@
-console.log('подключили list-orders');
+console.log('подключили list-orders', mainUrl);
 
 // определим имеющиеся статусы
 let orderStatus = {
@@ -40,7 +40,7 @@ if (dateTillEl.getAttribute('order-date') > 0) {
 // определим основные переменные
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
-let url = 'http://localhost/api/order-vendors/get-count-with-details.php?vendor_id=' + vendor_id;
+let url = mainUrl + '/api/order-vendors/get-count-with-details.php?vendor_id=' + vendor_id;
 
 let searchEl = document.getElementById('search');
 let limitEl = document.getElementById('limit');
@@ -182,7 +182,6 @@ function getFilters() {
 
     } 
 
-console.log(params);
     return params;
 }
 
@@ -397,6 +396,9 @@ function renderPagination(totalOrdersCount, limit) {
 /* ---------- ПЕРЕКЛЮЧЕНИЕ СТРАНИЧЕК ---------- */
 function switchPage(variance) {
 
+    // проверяем корректность токена
+    check();
+
     // 1. поменяем номер странички
     currentPage = currentPage + variance;
 
@@ -411,6 +413,9 @@ function switchPage(variance) {
 
 /* ---------- НАЖАТИЕ НА ИМЯ ЗАГОЛОВКА ТАБЛИЦЫ (СОРТИРОВКА по одному ключу) ---------- */
 function sortChange() {
+
+    // проверяем корректность токена
+    check();
 
     // получим значение атрибута data-sort
     let dataSort = event.target.getAttribute('data-sort');
@@ -450,6 +455,9 @@ const sendChangeData = document.querySelector('.form-filters').querySelector('bu
 
 function applyFilters() {
 
+    // проверяем корректность токена
+    check();
+
     // сбрасываем нумерацию страниц и офсет
     currentPage = 1;
     offset = 0;
@@ -469,7 +477,7 @@ function showOrder(id) {
     history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = "http://localhost/pages/vendor-order.php?id=" + id + params ; 
+    window.location.href = mainUrl + "/pages/vendor-order.php?id=" + id + params ; 
 
 }
 
@@ -516,6 +524,10 @@ function resetChangeOrder() {
 
 // сохранить изменения
 function saveChangeOrder() {
+    
+    // проверяем корректность токена
+    check();
+
     // вся строка заказа
     let rowOrder = event.target.closest('.list-orders__row');
 
@@ -531,7 +543,7 @@ function saveChangeOrder() {
     let objJson = JSON.stringify(obj);
 
     // меняем статус в базе
-    sendRequestPOST('http://localhost/api/ordervendors.php', objJson);
+    sendRequestPOST(mainUrl + '/api/ordervendors.php', objJson);
 
     // если статус был 0, то пересчитаем кол-во новых заказов и отрисуем новую цифру
     if (rowOrder.classList.contains('row-status0')) {
@@ -546,7 +558,7 @@ function saveChangeOrder() {
 // получение кол-ва новых заказов и отрисовка
 function changeCountNewOrders() {
     // делаем запрос на получение количества новых заказов поставщика
-    let countNewOrders = sendRequestGET('http://localhost/api/order-vendors/get-count.php?status=0&vendor_id=' + vendor_id);
+    let countNewOrders = sendRequestGET(mainUrl + '/api/order-vendors/get-count.php?status=0&vendor_id=' + vendor_id);
     countNewOrders = JSON.parse(countNewOrders);
 
     let newOrdersContainer = document.getElementById('counter');
