@@ -528,7 +528,7 @@ function resetChangePrice(currency_dollar) {
 }
 
 // сохранить изменения
-function saveChangePrice(currency_dollar) {
+function saveChangePrice(currency_dollar, rate) {
 
     // проверяем корректность токена
     check();
@@ -545,8 +545,6 @@ function saveChangePrice(currency_dollar) {
     // все divs со старыми ценами продукта
     let changePrice = rowProduct.querySelectorAll('.change-price');
 
-if (currency_dollar == "0") {
-
     // собираем json для отправки на сервер
     let obj = {};
     changePriceInput.forEach(item => {
@@ -557,25 +555,60 @@ if (currency_dollar == "0") {
 
     })
 
+    // если в json что-то есть:
     if (Object.keys(obj).length > 0) {
+        // если цены в сумах
+        if (currency_dollar == "0") {
 
-        // если цена больше среднерыночной, то выходим
-        if (obj.price && obj.max_price) {
-            if (Number(obj.price) >= Number(obj.max_price)) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (obj.price && !obj.max_price) {
-            if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (!obj.price && obj.max_price) {
-            if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        }        
+            // если цена больше среднерыночной, то выходим
+            if (obj.price && obj.max_price) {
+                if (Number(obj.price) >= Number(obj.max_price)) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } else if (obj.price && !obj.max_price) {
+                if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } else if (!obj.price && obj.max_price) {
+                if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } 
+
+
+        // если цены в долларах    
+        } else {
+            // все divs с атрибутом старой цены в долларах
+            let oldPriceDollarEl = rowProduct.querySelectorAll('.price-uzs');
+
+            // если цена больше среднерыночной, то выходим
+            if (obj.price_dollar && obj.max_price_dollar) {
+                if (Number(obj.price_dollar) >= Number(obj.max_price_dollar)) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['price'] = obj.price_dollar * rate;
+                    obj['max_price'] = obj.max_price_dollar * rate;
+                }
+            } else if (obj.price_dollar && !obj.max_price_dollar) {
+                if (Number(obj.price_dollar) >= Number(oldPriceDollarEl[1].getAttribute('data-price-dollar'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['price'] = obj.price_dollar * rate;
+                }
+            } else if (!obj.price_dollar && obj.max_price_dollar) {
+                if (Number(obj.max_price_dollar) <= Number(oldPriceDollarEl[0].getAttribute('data-price-dollar'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['max_price'] = obj.max_price_dollar * rate;
+                }
+            }  
+        }
 
         // если всё ок, то собираем данные и отправляем в БД (изменение цены)
         obj['id'] = idProduct;
@@ -592,18 +625,12 @@ if (currency_dollar == "0") {
         });
         sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
 
-
         // перерисовка страницы
         startRenderPage(0);
 
-        
         return;
     }
 
-} else {
-
-    alert("доллары");
-}
     resetChangePrice(currency_dollar);
 
 }
