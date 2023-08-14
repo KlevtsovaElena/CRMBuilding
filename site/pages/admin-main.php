@@ -34,9 +34,9 @@ if($role !== 1) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0");
+        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?vendor_deleted=0');
         $data = json_decode($dataJson, true); 
-        print_r($data);
+        //print_r($data);
 
         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
         $totalEntries = $data['count'];
@@ -51,7 +51,7 @@ if($role !== 1) {
             //print_r($mark);
         } else {
             $sortBy = '';
-            $_GET['orderby'] = 'order_date:desc';
+            $_GET['orderby'] = 'name:asc';
         }
 
         //функция конвертации юникс времени в локальное время для календаря в формате Y-m-d
@@ -74,7 +74,7 @@ if($role !== 1) {
 
     <?php
         //достанем актуальный телефон для отображения
-        $dataJsonPhone = file_get_contents("http://nginx/api/settings.php?name=phone");
+        $dataJsonPhone = file_get_contents($nginxUrl . '/api/settings.php?name=phone');
         $phone = json_decode($dataJsonPhone, true); 
         $phone = $phone[0]['value'];
 
@@ -131,7 +131,7 @@ if($role !== 1) {
                 <?php } ?>
             </div>
             <br>
-            
+            <br>
             <div class="d-iblock">Показывать по
                 <select id="limit" name="limit" value="" required>
                 <?php
@@ -157,7 +157,7 @@ if($role !== 1) {
                 </select>
             </div>
             <!-- поле поиска -->
-            <input type="search" id="search" name="search" value="" placeholder="Наименование">
+            <!-- <input type="search" id="search" name="search" value="" placeholder="Наименование"> -->
             <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
             <button onclick="applyInMain()" class="btn btn-ok d-iblock">Применить</button>
         </div>
@@ -167,15 +167,8 @@ if($role !== 1) {
     
     <?php
         //теперь сокращаем выдачу данных в массиве до products
-        $data = $data['orders'];
+        $data = $data['products'];
         //print_r($data);
-
-        $totalSum = 0;
-        //считаем суммарную стоимость всех товаров за весь период
-        for ($l = 0; $l < count($data); $l++) {
-            $totalSum += $data[$l]['total_price'];
-        }
-        
 
         //проверяем, выбран ли лимит на кол-во отображаемых элементов
         if (isset($_GET['limit'])) {
@@ -206,7 +199,7 @@ if($role !== 1) {
                         <th class="ta-center cell-title" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                         <th class="ta-center cell-title" data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
                         <th class="ta-center cell-title" data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена за 1 ед.
-                        <th class="ta-center cell-title" data-id="quantity" data-sort="<?php if ($sortBy == 'quantity')  {echo $mark; } ?>">Количество
+                        <th class="ta-center cell-title" data-id="quantity" data-sort="<?php if ($sortBy == 'quantity')  {echo $mark; } ?>">Кол-во
                         <th class="ta-center cell-title" data-id="total_price" data-sort="<?php if ($sortBy == 'total_price')  {echo $mark; } ?>">Цена за период</th>
                     </tr>
                 </thead>
@@ -218,7 +211,7 @@ if($role !== 1) {
 
                     //если заданы гет-параметры даты, собираем их в переменную
                     $dateParams = '';
-                    
+                        
                     if (isset($_GET['date_from']) || isset($_GET['ate_till'])) {
                         if (isset($_GET['date_from'])) {
                             $dateParams = $dateParams . '&date_from=' . $_GET['date_from'];
@@ -226,106 +219,74 @@ if($role !== 1) {
                         if (isset($_GET['date_till'])) {
                             $dateParams = $dateParams . '&date_till=' . $_GET['date_till'];
                         }
-                        print_r($dateParams);
+                        //print_r($dateParams);
                     }
-                    //если еще НЕ задан гет-параметр сортировки полей таблицы по одному ключу
-                    if (!isset($_GET['orderby'])) {
 
-                        //если мы НЕ на первой странице
-                        if(isset($_GET['page']) && $_GET['page'] > 1) {
-                            //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&limit=" . $limit . '&offset=' . $offset . $dateParams);
-                            $data = json_decode($dataJson, true); 
-                            $data = $data['orders'];
-                            //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-
-                        //если мы на первой странице
-                        } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
-                            //и поиск не активирован
-                            if (!isset($_GET['search'])) {
-                                //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&limit=" . $limit . '&offset=0' . $dateParams);
-                                $data = json_decode($dataJson, true); 
-                                $data = $data['orders'];
-                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            }
-                        }
-
-                        //если активирован поиск
-                        if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&search=" . $_GET['search'] . $dateParams);
-                            $data = json_decode($dataJson, true);
-                            //если по данному поисковому запросу записей нет, записываем в переменную 0
-                            if (!$data) {
-                                $totalEntries = 0;
-                            //если есть, записываем в переменную их количество
-                            } else {
-                                $totalEntries = $data['count'];
-                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            }
-                            //сокращаем массив до данных только по заказам для выведения в форме
-                            $data = $data['orders'];
-                        }
-                             
+                    //считаем суммарную стоимость всех товаров за весь период, чтобы вывести ее отдельно
+                    $totalSum = 0;
+                    $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?' . $dateParams);
+                    $data = json_decode($dataJson, true); 
+                    $data = $data['products'];
+                    for ($l = 0; $l < count($data); $l++) {
+                        $totalSum += $data[$l]['total_price'];
                     }
-                        
-                    //если уже имеется гет-параметр сортировки полей таблицы по одному ключу
-                    elseif (isset($_GET['orderby'])) {
 
-                        //если мы НЕ на первой странице
-                        if(isset($_GET['page']) && $_GET['page'] > 1) {
+                    //если мы НЕ на первой странице
+                    if(isset($_GET['page']) && $_GET['page'] > 1) {
+                        //соберём данные для отображения в форме 
+                        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
+                        $data = json_decode($dataJson, true); 
+                        $data = $data['products'];
+                        //print_r($data);
+                        //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+
+                    //если мы на первой странице
+                    } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
+                        //и поиск не активирован
+                        if (!isset($_GET['search'])) {
+                            //print_r('not 1');
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
                             $data = json_decode($dataJson, true); 
-                            $data = $data['orders'];
+                            $data = $data['products'];
                             //print_r($data);
-                            //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-
-                        //если мы на первой странице
-                        } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
-                            //и поиск не активирован
-                            if (!isset($_GET['search'])) {
-                                //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
-                                $data = json_decode($dataJson, true); 
-                                $data = $data['orders'];
-                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            }
+                            //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                         }
+                    }
 
-                        //если активирован поиск
-                        if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?status=4&vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
-                            $data = json_decode($dataJson, true);
-                            //если по данному поисковому запросу записей нет, записываем в переменную 0
-                            if (!$data) {
-                                $totalEntries = 0;
-                            //если есть, записываем в переменную их количество
-                            } else {
-                                $totalEntries = $data['count'];
-                                //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            }
-                            //сокращаем массив до данных только по заказам для выведения в форме
-                            $data = $data['orders'];
-                        }
+                    //если активирован поиск
+                    // if(isset($_GET['search'])) {
+                    //     $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
+                    //     $data = json_decode($dataJson, true);
+                    //     //если по данному поисковому запросу записей нет, записываем в переменную 0
+                    //     if (!$data) {
+                    //         $totalEntries = 0;
+                    //     //если есть, записываем в переменную их количество
+                    //     } else {
+                    //         $totalEntries = $data['count'];
+                    //         //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                    //     }
+                    //     //сокращаем массив до данных только по заказам для выведения в форме
+                    //     $data = $data['products'];
+                    //     print_r($data);
+                    // }
 
-                    } 
                     
                     if ($data) {
-                        $totalPrice = 0;
+                        //print_r('yes');
                         //отрисовываем строки в цикле от начальной до конечной цифры оффсетного значения
                         for ($i = 0; $i < count($data); $i++) {
                             //проверка на то, чтобы выводилось не больше строк, чем есть в БД
-                            if(isset($data[$i]['id'])) { ?>
+                            if(isset($data[$i]['vendor_id'])) { ?>
                                 
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <!-- <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['id'] ?></strong></a></td> -->
-                                <td><?= $data[$i]['vendor_city'] ?></td>
-                                <td><?= $data[$i]['vendor_name'] ?></td>
+                                <td class="ta-center"><?= $data[$i]['vendor_city'] ?></td>
+                                <td class="ta-center"><?= $data[$i]['vendor_name'] ?></td>
                                 <td><?= $data[$i]['name'] ?></td>
-                                <td><?= number_format($data[$i]['price'], 0, ',', ' '); ?></td>
-                                <td><?= $data[$i]['quantity'] ?></td>
+                                <td class="ta-center"><?= number_format($data[$i]['price'], 0, ',', ' '); ?></td>
+                                <td class="ta-center"><?= $data[$i]['quantity'] ?></td>
                                 <!-- выводим общую стоимость в нужном формате -->
                                 <td class="ta-center"><?= number_format($data[$i]['total_price'], 0, ',', ' '); ?> </td>
                             </tr>
@@ -345,7 +306,7 @@ if($role !== 1) {
     </section>
 
     <!-- выводим общую стоимость в нужном формате -->
-    <div><p>Итого за период:</p><?= number_format($totalSum, 0, ',', ' '); ?> </div>
+    <div>Итого сумма за период: <b><?= number_format($totalSum, 0, ',', ' '); ?></b></div>
 
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>

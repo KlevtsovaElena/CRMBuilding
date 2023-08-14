@@ -7,7 +7,7 @@ let status = document.querySelector('.page-title').getAttribute('data-status');
 console.log(status);
 
 // собираем ссылку для запросов
-link = 'http://localhost/api/ordervendors.php';
+link = mainUrl + '/api/ordervendors.php';
 
 //достаем из атрибута роль
 let role = document.getElementById('new-order').getAttribute('data-role');
@@ -195,7 +195,7 @@ function backToAllOrders() {
 //функция отправки координат клиента в телеграм поставщика
 function sendLocation(latitude, longitude, id) {
 
-    let link = 'http://localhost/api/notification/telegram-send-location.php';
+    let link = mainUrl + '/api/notification/telegram-send-location.php';
 
     //формируем параметры для передачи в апишку
     let obj = JSON.stringify({

@@ -34,7 +34,7 @@ if($role !== 1) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0");
+        $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0');
         $data = json_decode($dataJson, true); 
         //print_r($data);
 
@@ -212,7 +212,7 @@ if($role !== 1) {
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=' . $offset . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=' . $offset . $dateParams);
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
                             //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -222,7 +222,7 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0' . $dateParams);
+                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0' . $dateParams);
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -231,7 +231,7 @@ if($role !== 1) {
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=" . $_GET['search'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=' . $_GET['search'] . $dateParams);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
@@ -253,7 +253,7 @@ if($role !== 1) {
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
                             $data = json_decode($dataJson, true); 
                             $data = $data['orders'];
                             //print_r($data);
@@ -264,7 +264,7 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents("http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
+                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
                                 $data = json_decode($dataJson, true); 
                                 $data = $data['orders'];
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -273,7 +273,7 @@ if($role !== 1) {
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents('http://nginx/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
