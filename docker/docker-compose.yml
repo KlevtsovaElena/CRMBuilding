@@ -61,6 +61,7 @@ services:
       bot_token: ${BOT_TOKEN}
       SERVICE_NAME: ${SERVICE_NAME}
       API_LINK: ${API_LINK}
+      SERVER_URI: ${SERVER_URI}
     volumes:
       - ./../bot/:/app/
     ports:
@@ -92,7 +93,7 @@ services:
     environment:
       bot_token: ${PRICE_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_PRICE_CHANEL}
-  
+
   notification-service:
     build:
       context: .

@@ -19,7 +19,9 @@
         public string $password;
         public ?string $token;
         public ?string $percent;
-        public int $deleted; //Настя: добавила для нового поля
+        public int $total_sum;
+        public int $owns;
+        public int $deleted;
         public int $price_confirmed;
         public ?int $currency_dollar;
         public ?int $rate;

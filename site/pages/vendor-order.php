@@ -24,7 +24,7 @@
 
     <!-- соберём данные для отображения в форме -->
     <?php
-        $dataJson = file_get_contents("http://nginx/api/order-vendors/get-with-details.php?id=".$_GET['id']);
+        $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-with-details.php?id='.$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
         //print_r($data);
@@ -102,7 +102,7 @@
                         <td class="total">Итого</td>
                         <td></td>
                         <td></td>
-                        <td><?= number_format($totalSum, 0, ',', ' '); ?> сум</td>
+                        <td id="total-sum" data-total-sum="<?= $totalSum ?>"><?= number_format($totalSum, 0, ',', ' '); ?> сум</td>
                     </tr>
             </tbody>
 

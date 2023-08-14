@@ -43,7 +43,7 @@ if($role !== 1) {
 
         //если совершен переход на Категории
         if($_GET['section'] == 'categories') { 
-            $dataJson = file_get_contents("http://nginx/api/categories.php?deleted=0");
+            $dataJson = file_get_contents($nginxUrl . '/api/categories.php?deleted=0');
             $keyName = 'category_name';
             $title = 'Категории';
     ?>     
@@ -51,7 +51,7 @@ if($role !== 1) {
     <?php } 
         //если совершен переход на Бренды
         if($_GET['section'] == 'brands') { 
-            $dataJson = file_get_contents("http://nginx/api/brands.php?deleted=0");
+            $dataJson = file_get_contents($nginxUrl . '/api/brands.php?deleted=0');
             $keyName = 'brand_name'; 
             $title = 'Бренды';      
     ?> 
@@ -59,7 +59,7 @@ if($role !== 1) {
     <?php } 
         //если совершен переход на Города
         if($_GET['section'] == 'cities') { 
-            $dataJson = file_get_contents("http://nginx/api/cities.php?deleted=0");
+            $dataJson = file_get_contents($nginxUrl . '/api/cities.php?deleted=0');
             $keyName = 'name'; 
             $title = 'Города';      
     ?> 
@@ -67,7 +67,7 @@ if($role !== 1) {
     <?php } 
         //если совершен переход на Поставщиков
         if($_GET['section'] == 'vendors') { 
-            $dataJson = file_get_contents("http://nginx/api/vendors.php?deleted=0");
+            $dataJson = file_get_contents($nginxUrl . '/api/vendors.php?deleted=0');
             $keyName = 'name'; 
             $title = 'Поставщики';      
     ?> 
@@ -214,7 +214,7 @@ if($role !== 1) {
 
                     //если активирован поиск
                     if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents("http://nginx/api/" . $_GET['section'] . ".php?search=" . $_GET['search']);
+                        $dataJson = file_get_contents($nginxUrl . '/api/' . $_GET['section'] . ".php?search=" . $_GET['search']);
                         $data = json_decode($dataJson, true);
                         //отрисовываем список категорий или брендов, которые совпадают с поисковым запросом
                         $totalNumElements = 0;
