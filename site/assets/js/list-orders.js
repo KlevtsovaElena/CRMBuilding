@@ -540,7 +540,10 @@ function saveChangeOrder() {
     let obj = {};
     obj['id'] = idOrder;
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
+    obj['with_own_recalc'] = true;
     let objJson = JSON.stringify(obj);
+
+    console.log(obj);
 
     // меняем статус в базе
     sendRequestPOST(mainUrl + '/api/ordervendors.php', objJson);

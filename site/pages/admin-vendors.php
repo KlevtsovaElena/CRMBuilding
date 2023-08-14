@@ -36,7 +36,7 @@ if($role !== 1) {
         //соберём данные для отображения в форме 
         $dataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&city_deleted=0");
         $data = json_decode($dataJson, true); 
-        print_r($data);
+        //print_r($data);
 
         $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0");
         $cities = json_decode($citiesJson, true);
