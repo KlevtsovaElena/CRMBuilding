@@ -19,7 +19,6 @@
         public string $password;
         public ?string $token;
         public ?string $percent;
-        public int $total_sum;
         public int $owns;
         public int $deleted;
         public int $price_confirmed;
