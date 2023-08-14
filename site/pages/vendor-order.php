@@ -102,7 +102,7 @@
                         <td class="total">Итого</td>
                         <td></td>
                         <td></td>
-                        <td><?= number_format($totalSum, 0, ',', ' '); ?> сум</td>
+                        <td id="total-sum" data-total-sum="<?= $totalSum ?>"><?= number_format($totalSum, 0, ',', ' '); ?> сум</td>
                     </tr>
             </tbody>
 

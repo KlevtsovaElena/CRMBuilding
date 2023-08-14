@@ -173,6 +173,14 @@ function edit(id, section_name) {
                         });
                     }
 
+                    //для admin-vendors
+                    if (section_name == 'vendors') {
+                        obj = JSON.stringify({
+                            'id': id,
+                            'owns': changedValue
+                        });
+                    }
+
                     console.log(obj);
 
                     //передаем на сервер в пост-запросе

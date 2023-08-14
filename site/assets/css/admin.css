@@ -16,6 +16,12 @@ input[type="checkbox"] {
     margin-right: 10px;
 }
 
+.digit {
+    color: black;
+    font-weight: normal;
+    cursor: default;
+}
+
 .edit {
     transform: rotate(90deg);
     width: 20px;
