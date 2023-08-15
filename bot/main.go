@@ -179,6 +179,7 @@ type Product struct {
 	MaxPrice    int    `json:"max_price"`
 }
 
+// словарь с переводом на разные языки
 var languages = map[string]map[string]string{
 	"ru": {
 		"change_number":         "Изменить номер",

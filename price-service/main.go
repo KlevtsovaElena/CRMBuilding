@@ -32,6 +32,9 @@ type Product struct {
 var channelName string = os.Getenv("TELEGRAM_PRICE_CHANEL")
 var token string = os.Getenv("PRICE_BOT_TOKEN")
 
+// переменная для формирование ссылки на картинку
+var domen string = os.Getenv("SERVER_URI")
+
 // переменные времени начала рассылки
 var planed_hour string = os.Getenv("price_task_start_hour")
 var planed_minute string = os.Getenv("price_task_start_minute")
@@ -103,7 +106,7 @@ func makeGoodsList() {
 
 		}
 
-		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + "&photo=" + product_photo + "&parse_mode=HTML"
+		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + "&photo=" + domen + product_photo + "&parse_mode=HTML"
 
 		fmt.Println(product_photo)
 
