@@ -100,6 +100,7 @@ CREATE TABLE `order_vendors` (
   `total_price` bigint unsigned NOT NULL,
   `distance` float unsigned NOT NULL,
   `notification_count` tinyint NOT NULL DEFAULT '0',
+  `owns_accrued` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

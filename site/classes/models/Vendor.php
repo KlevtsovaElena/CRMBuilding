@@ -18,7 +18,7 @@
         public int $is_active;
         public string $password;
         public ?string $token;
-        public ?string $percent;
+        public ?int $percent;
         public int $owns;
         public int $deleted;
         public int $price_confirmed;
