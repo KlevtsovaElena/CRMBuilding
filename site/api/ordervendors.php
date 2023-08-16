@@ -32,12 +32,12 @@ class OrderVendorsController extends BaseController
         if (isset($post['id'])) {
             $this->orderVendorRepository->updateById($post);
 
-            if (isset($post['with_own_recalc']) && $post['with_own_recalc'] == true && isset($post['status']) && $post['status'] == 4) {
+            if (isset($post['with_debt_recalc']) && $post['with_debt_recalc'] == true && isset($post['status']) && $post['status'] == 4) {
                 $currentOrderVendor = $this->orderVendorRepository->get([
                     'id' => $post['id']
                 ]);
 
-                if (isset($currentOrderVendor) && !$currentOrderVendor->owns_accrued) {
+                if (isset($currentOrderVendor) && !$currentOrderVendor->debt_accrued) {
                     try {
                         DbContext::getConnection()->beginTransaction();
 
@@ -47,12 +47,12 @@ class OrderVendorsController extends BaseController
 
                         $this->vendorRepository->updateById([
                             'id' => $currentVendor->id,
-                            'owns' => (($currentOrderVendor->total_price / 100) * $currentVendor->percent) + $currentVendor->owns
+                            'debt' => (($currentOrderVendor->total_price / 100) * $currentVendor->percent) + $currentVendor->debt
                         ]);
 
                         $this->orderVendorRepository->updateById([
                             'id' => $currentOrderVendor->id,
-                            'owns_accrued' => true
+                            'debt_accrued' => true
                         ]);
 
                         \DbContext::getConnection()->commit();

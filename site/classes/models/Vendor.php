@@ -19,7 +19,7 @@
         public string $password;
         public ?string $token;
         public ?int $percent;
-        public int $owns;
+        public int $debt;
         public int $deleted;
         public int $price_confirmed;
         public ?int $currency_dollar;

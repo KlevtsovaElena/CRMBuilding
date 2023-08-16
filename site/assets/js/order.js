@@ -138,7 +138,7 @@ function confirmDelivery() {
     let obj = JSON.stringify({
         'id': id,
         'status':  4,
-        'with_own_recalc': true
+        'with_debt_recalc': true
     });
 
     console.log(obj);

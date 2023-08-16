@@ -540,7 +540,7 @@ function saveChangeOrder() {
     let obj = {};
     obj['id'] = idOrder;
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
-    obj['with_own_recalc'] = true;
+    obj['with_debt_recalc'] = true;
     let objJson = JSON.stringify(obj);
 
     console.log(obj);
