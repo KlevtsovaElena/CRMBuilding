@@ -477,7 +477,7 @@ function showOrder(id) {
     history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = mainUrl + "/pages/vendor-order.php?id=" + id + params ; 
+    window.location.href = mainUrl + '/pages/vendor-order.php?vendor_id=' + vendor_id + '&id=' + id + params ; 
 
 }
 

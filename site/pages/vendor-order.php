@@ -1,10 +1,12 @@
-<?php require('../handler/check-profile.php'); 
-// if($role !== 2) {
-//     setcookie('profile', '', -1, '/');
-//    header('Location: ' . $mainUrl . '/pages/login.php');
-//     exit(0);
-// };
-// ?>
+<?php require('../handler/check-profile.php');
+if($role == 2) {
+    if($_GET['vendor_id'] != $vendor_id) {
+        setcookie('profile', '', -1, '/');
+       header('Location: ' . $mainUrl . '/pages/login.php');
+        exit(0);
+    };
+} 
+?>
 
 <?php 
 
