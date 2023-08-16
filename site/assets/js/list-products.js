@@ -34,8 +34,6 @@ let totalPages;
 
 let changePriceEl;
 let changePriceInputEl;
-let resetPriceEl;
-let savePriceEl;
 let changeInputsEl;
 
 let brands = {};
@@ -228,21 +226,35 @@ function renderListProducts(totalProducts) {
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
                                                         .replace('${name}', totalProducts['products'][i]['name'])
-                                                        .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                         .replace('${category_id}', totalProducts['products'][i]['category_name'])
+                                                        .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
-                                                        .replace('${price}', totalProducts['products'][i]['price'])
-                                                        .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
-                                                        .replace('${price}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                         .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
-                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
+                                                        .replace('${price_dollar_format}', totalProducts['products'][i]['price_dollar'].toLocaleString('ru'))
+                                                        .replace('${price_dollar_format}', totalProducts['products'][i]['price_dollar'].toLocaleString('ru'))
+                                                        .replace('${price}', totalProducts['products'][i]['price'])
+                                                        .replace('${price}', totalProducts['products'][i]['price'])
+                                                        .replace('${price}', totalProducts['products'][i]['price'])
+                                                        .replace('${price_dollar}', totalProducts['products'][i]['price_dollar'])
                                                         .replace('${max_price}', totalProducts['products'][i]['max_price'])
-                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
-                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
+                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'])
+                                                        .replace('${max_price}', totalProducts['products'][i]['max_price'])
+                                                        .replace('${max_price_dollar}', totalProducts['products'][i]['max_price_dollar'])
+                                                        .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
+                                                        .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
+                                                        .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
+                                                        .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
+                                                        .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
+                                                        .replace('${rate}', totalProducts['products'][i]['vendor_rate'])
+                                                        .replace('${rate}', totalProducts['products'][i]['vendor_rate']);
+                                                        
     }
 
 
@@ -260,20 +272,10 @@ function renderListProducts(totalProducts) {
 
     changePriceEl = document.querySelectorAll('.change-price');
     changePriceInputEl = document.querySelectorAll('.change-price-el');
-    resetPriceEl = document.querySelectorAll('.reset-price');
-    savePriceEl = document.querySelectorAll('.save-price');
     changeInputsEl = document.querySelectorAll('.change-price-input');
 
     changePriceEl.forEach(item => {
         item.addEventListener('click', showChangeInput);
-    })
-
-    resetPriceEl.forEach(item => {
-        item.addEventListener('click', resetChangePrice);
-    })
-
-    savePriceEl.forEach(item => {
-        item.addEventListener('click', saveChangePrice);
     })
 
 }
@@ -492,7 +494,7 @@ function showChangeInput() {
 }
 
 // сбросить изменения без сохранения
-function resetChangePrice() {
+function resetChangePrice(currency_dollar) {
     // сбросим все значения всех инпутов
     changeInputsEl.forEach(item => {
         item.value = "";
@@ -507,10 +509,26 @@ function resetChangePrice() {
     changePriceEl.forEach(item => {
         item.classList.remove('d-none');
     })
+
+    // если долларовый товар, то сбросим ещё и контейнер с пересчётом доллары в сумы на цену в атрибуте
+    if(currency_dollar == "1") {
+
+        // найдём divы с ценами в сум
+        let priceUzs = event.target.closest('.list-products__row').querySelectorAll('.price-uzs'); 
+
+        // перезапишем цену в соответсвии с данными из атрибута data-price-num
+        priceUzs.forEach(item => {
+
+            let priceTmp = Number(item.getAttribute('data-price-num'));
+            item.innerText = '(' + priceTmp.toLocaleString('ru') + ' Сум)';
+
+        })
+
+    }
 }
 
 // сохранить изменения
-function saveChangePrice() {
+function saveChangePrice(currency_dollar, rate) {
 
     // проверяем корректность токена
     check();
@@ -537,25 +555,60 @@ function saveChangePrice() {
 
     })
 
+    // если в json что-то есть:
     if (Object.keys(obj).length > 0) {
+        // если цены в сумах
+        if (currency_dollar == "0") {
 
-        // если цена больше среднерыночной, то выходим
-        if (obj.price && obj.max_price) {
-            if (Number(obj.price) >= Number(obj.max_price)) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (obj.price && !obj.max_price) {
-            if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        } else if (!obj.price && obj.max_price) {
-            if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
-                alert("Цена товара должна быть меньше среднерыночной цены!")
-                return;
-            };
-        }        
+            // если цена больше среднерыночной, то выходим
+            if (obj.price && obj.max_price) {
+                if (Number(obj.price) >= Number(obj.max_price)) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } else if (obj.price && !obj.max_price) {
+                if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } else if (!obj.price && obj.max_price) {
+                if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                }
+            } 
+
+
+        // если цены в долларах    
+        } else {
+            // все divs с атрибутом старой цены в долларах
+            let oldPriceDollarEl = rowProduct.querySelectorAll('.price-uzs');
+
+            // если цена больше среднерыночной, то выходим
+            if (obj.price_dollar && obj.max_price_dollar) {
+                if (Number(obj.price_dollar) >= Number(obj.max_price_dollar)) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['price'] = obj.price_dollar * rate;
+                    obj['max_price'] = obj.max_price_dollar * rate;
+                }
+            } else if (obj.price_dollar && !obj.max_price_dollar) {
+                if (Number(obj.price_dollar) >= Number(oldPriceDollarEl[1].getAttribute('data-price-dollar'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['price'] = obj.price_dollar * rate;
+                }
+            } else if (!obj.price_dollar && obj.max_price_dollar) {
+                if (Number(obj.max_price_dollar) <= Number(oldPriceDollarEl[0].getAttribute('data-price-dollar'))) {
+                    alert("Цена товара должна быть меньше среднерыночной цены!")
+                    return;
+                } else {
+                    obj['max_price'] = obj.max_price_dollar * rate;
+                }
+            }  
+        }
 
         // если всё ок, то собираем данные и отправляем в БД (изменение цены)
         obj['id'] = idProduct;
@@ -572,13 +625,32 @@ function saveChangePrice() {
         });
         sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
 
-
         // перерисовка страницы
         startRenderPage(0);
 
         return;
     }
 
-    resetChangePrice();
+    resetChangePrice(currency_dollar);
 
+}
+
+/* ---------- ПЕРЕСЧЁТ ЦЕН В СУМЫ ---------- */
+
+function calcPriceUzs(rate) {
+
+    // куда записывать пересчитанную сумму в сумах
+    let priceUzsEl = event.target.closest('td').querySelector('.price-uzs');
+
+    // пересчитаем цену в сумы
+    let priceUzs = rate * event.target.value;
+
+    // если value нет (пустой инпут), то запишем Сум из атрибута
+    // если не пустой, то запишем высчитанное значение
+    if (event.target.value) {
+        priceUzsEl.innerText = '(' + priceUzs.toLocaleString('ru') + " Сум)";
+    } else {
+        priceUzsEl.innerText = '(' + Number(priceUzsEl.getAttribute('data-price-num')).toLocaleString('ru') + " Сум)";
+    }
+    
 }

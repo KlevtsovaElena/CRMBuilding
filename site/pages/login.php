@@ -24,7 +24,7 @@
 
         <!-- password -->
         <div class="form-login__item">
-            <p>Пароль</p><input type="text" class="input-login" id="password" name="password" value="" required>
+            <p>Пароль</p><input type="password" class="input-login" id="password" name="password" value="" required>
             <div class="error-info d-none"></div>
         </div>
 

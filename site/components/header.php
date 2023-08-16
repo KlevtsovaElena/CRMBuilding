@@ -154,7 +154,7 @@
         <div class="menu-top">
             <div class="menu-top__container">
                 <div class="menu-top__logo">StroiCRM</div>
-                <div class="menu-top__profile" vendor-id="<?= $vendor_id ?>">
+                <div class="menu-top__profile" vendor-id="<?= $vendor_id ?>" currency_dollar="<?= $profile['currency_dollar'] ?>">
                     <div class="menu-top__profile-name">        
                         <?= $vendor_name; ?>
                     </div>
