@@ -228,7 +228,7 @@ CREATE TABLE `vendors` (
   `deleted` tinyint unsigned DEFAULT '0',
   `price_confirmed` tinyint unsigned DEFAULT '1',
   `currency_dollar` tinyint unsigned DEFAULT '0',
-  `rate` int unsigned DEFAULT '0',
+  `rate` int unsigned DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
