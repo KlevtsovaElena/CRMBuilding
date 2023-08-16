@@ -64,7 +64,7 @@
     <section class="orders" data-id=<?= $data['id'] ?> >
         <table>
             
-            <thead id="new-order" data-role="<?= $role ?>" data-client-latitude="<?= $data['order_location']['latitude'] ?>" data-client-longitude="<?= $data['order_location']['longitude'] ?>" data-vendor-id="<?= $data['vendor_id'] ?>">
+            <thead id="new-order" data-role="<?= $role ?>" data-client-latitude="<?= $data['order_location']['latitude'] ?>" data-client-longitude="<?= $data['order_location']['longitude'] ?>" data-tg-vendor-id="<?= $vendor_tg_id ?>">
                 <tr role="row">
                     <th class="table-header">
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>

@@ -80,7 +80,7 @@ function confirmOrder() {
     //достаем координаты клиента из дата-атрибута для отрисовки кнопки "Отправить себе координаты"
     let clientLatitude = document.getElementById('new-order').getAttribute('data-client-latitude');
     let clientLongitude = document.getElementById('new-order').getAttribute('data-client-longitude');
-    let vendor_id = document.getElementById('new-order').getAttribute('data-vendor-id');
+    let vendor_id = document.getElementById('new-order').getAttribute('data-tg-vendor-id');
 
     console.log(clientLatitude);
     console.log(clientLongitude);
