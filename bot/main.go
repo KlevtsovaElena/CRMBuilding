@@ -791,7 +791,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
+			resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
