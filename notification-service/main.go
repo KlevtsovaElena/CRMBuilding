@@ -109,7 +109,9 @@ func process() {
 			// Первое уведомление (при создании заказа)
 			if orderVendor.NotificationCount == 0 {
 				orderIdStr := strconv.Itoa(orderVendor.OrderID)
-				message := "Новый заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderIdStr
+				orderVendorStr := strconv.Itoa(orderVendor.ID)
+				vendorIdStr := strconv.Itoa(orderVendor.VendorID)
+				message := "Новый заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderVendorStr + "&vendor_id=" + vendorIdStr
 
 				vendor := getVendorById(orderVendor.VendorID)
 
@@ -130,7 +132,9 @@ func process() {
 
 				if difference >= 300 {
 					orderIdStr := strconv.Itoa(orderVendor.OrderID)
-					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderIdStr
+					orderVendorStr := strconv.Itoa(orderVendor.ID)
+					vendorIdStr := strconv.Itoa(orderVendor.VendorID)
+					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderVendorStr + "&vendor_id=" + vendorIdStr
 
 					vendor := getVendorById(orderVendor.VendorID)
 
@@ -152,7 +156,9 @@ func process() {
 
 				if difference >= 600 {
 					orderIdStr := strconv.Itoa(orderVendor.OrderID)
-					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderIdStr
+					orderVendorStr := strconv.Itoa(orderVendor.ID)
+					vendorIdStr := strconv.Itoa(orderVendor.VendorID)
+					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderVendorStr + "&vendor_id=" + vendorIdStr
 
 					vendor := getVendorById(orderVendor.VendorID)
 
@@ -175,7 +181,9 @@ func process() {
 
 				if difference >= 1200 {
 					orderIdStr := strconv.Itoa(orderVendor.OrderID)
-					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderIdStr
+					orderVendorStr := strconv.Itoa(orderVendor.ID)
+					vendorIdStr := strconv.Itoa(orderVendor.VendorID)
+					message := "У вас непросмотренный заказ №" + orderIdStr + "\n" + serverUri + "/pages/vendor-order.php?id=" + orderVendorStr + "&vendor_id=" + vendorIdStr
 					vendor := getVendorById(orderVendor.VendorID)
 					adminMessage := "Заказ №" + orderIdStr + " в течении 20 минут не просмотрен поставщиком '" + vendor.Name + "'."
 
