@@ -49,7 +49,10 @@ class ProductRepository extends BaseRepository
                                         p.`deleted` as `deleted`,
                                         c.`deleted` as `category_deleted`,
                                         b.`deleted` as `brand_deleted`,
-                                        v.`deleted` as `vendor_deleted`
+                                        v.`deleted` as `vendor_deleted`,
+                                        v.`is_active` as `vendor_active`,
+                                        v.`city_id` as `city_id`,
+                                        v.`price_confirmed` as `price_confirmed`
                                     FROM products p
                                         INNER JOIN categories c ON
                                             c.`id` = p.`category_id`
@@ -96,7 +99,10 @@ class ProductRepository extends BaseRepository
         'brand_deleted' => 'b.deleted',
         'vendor_deleted' => 'v.deleted',
         'vendor_currency_dollar' => 'v.currency_dollar',
-        'vendor_rate' => 'v.rate'
+        'vendor_rate' => 'v.rate',
+        'vendor_active' => 'v.is_active',
+        'city_id' => 'v.city_id',
+        'price_confirmed' => 'v.price_confirmed'
     ];
 
     public function getTableName(): string
