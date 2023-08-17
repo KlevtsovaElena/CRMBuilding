@@ -100,6 +100,7 @@ CREATE TABLE `order_vendors` (
   `total_price` bigint unsigned NOT NULL,
   `distance` float unsigned NOT NULL,
   `notification_count` tinyint NOT NULL DEFAULT '0',
+  `debt_accrued` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -217,7 +218,7 @@ CREATE TABLE `vendors` (
   `coordinates` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `role` tinyint NOT NULL,
   `percent` tinyint DEFAULT '0',
-  `owns` int unsigned DEFAULT '0',
+  `debt` int unsigned DEFAULT '0',
   `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `date_reg` bigint NOT NULL,
   `hash_string` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -231,12 +232,12 @@ CREATE TABLE `vendors` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `owns`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	892205925,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	0,	1,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'toStqvGkDkeHU',	1,	0,	1,	0,	0),
-(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'',	1,	0,	1,	0,	0),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	0),
-(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	0),
-(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'to9TonSdiTR22',	1,	0,	1,	0,	0);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `debt`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`) VALUES
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	892205925,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	0,	1,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'toStqvGkDkeHU',	1,	0,	1,	0,	1),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'',	1,	0,	1,	0,	1),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	1),
+(4,	'Поставщик4',	4,	'71117770099',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1),
+(5,	'Админ',	5,	'77777777777',	'admin@bk.ru',	NULL,	NULL,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'to9TonSdiTR22',	1,	0,	1,	0,	1);
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (

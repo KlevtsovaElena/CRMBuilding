@@ -477,7 +477,7 @@ function showOrder(id) {
     history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = mainUrl + "/pages/vendor-order.php?id=" + id + params ; 
+    window.location.href = mainUrl + '/pages/vendor-order.php?vendor_id=' + vendor_id + '&id=' + id + params ; 
 
 }
 
@@ -540,7 +540,10 @@ function saveChangeOrder() {
     let obj = {};
     obj['id'] = idOrder;
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
+    obj['with_debt_recalc'] = true;
     let objJson = JSON.stringify(obj);
+
+    console.log(obj);
 
     // меняем статус в базе
     sendRequestPOST(mainUrl + '/api/ordervendors.php', objJson);

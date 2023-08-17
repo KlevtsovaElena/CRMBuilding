@@ -1,3 +1,6 @@
+td:nth-last-child(1) {
+    min-width: 25px;
+}
 
 input[type="checkbox"] {
     appearance: auto;
@@ -28,7 +31,7 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-.cancel {
+.cancel, .save {
     width: 20px;
     cursor: pointer;
 }
@@ -44,6 +47,9 @@ input[type="checkbox"] {
 
 .phone-block {
     margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
 .phone {

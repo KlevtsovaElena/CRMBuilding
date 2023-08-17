@@ -1,9 +1,6 @@
 //достаем id записи открытого заказа из атрибута
 let id = document.querySelector('.orders').getAttribute('data-id');
 console.log(id);
-//достаем id поставщика из атрибута
-let vendor_id = document.getElementById('new-order').getAttribute('data-vendor-id');
-console.log(vendor_id);
 
 //достаем статус открытого заказа из атрибута
 let status = document.querySelector('.page-title').getAttribute('data-status');
@@ -11,7 +8,6 @@ console.log(status);
 
 // собираем ссылку для запросов
 link = mainUrl + '/api/ordervendors.php';
-link2 = mainUrl + '/api/vendors.php';
 
 //достаем из атрибута роль
 let role = document.getElementById('new-order').getAttribute('data-role');
@@ -52,7 +48,6 @@ if (status == 0 && role == 2) {
             counter.classList.toggle('d-none');
         }
         
-    
         //console.log('статус заказа  с id ' + id + ' изменен на ' + 1);
     
       });
@@ -85,6 +80,7 @@ function confirmOrder() {
     //достаем координаты клиента из дата-атрибута для отрисовки кнопки "Отправить себе координаты"
     let clientLatitude = document.getElementById('new-order').getAttribute('data-client-latitude');
     let clientLongitude = document.getElementById('new-order').getAttribute('data-client-longitude');
+    let vendor_id = document.getElementById('new-order').getAttribute('data-tg-vendor-id');
 
     console.log(clientLatitude);
     console.log(clientLongitude);
@@ -129,7 +125,6 @@ function confirmOrder() {
         };
     }
 
-    
     //возвращение на страницу всех заказов
     // backToAllOrders();
 
@@ -139,28 +134,31 @@ function confirmOrder() {
 function confirmDelivery() {
 
     // соберём json для передачи на сервер
-    //статус в таблице order_vendors меняется на 4 - доставлен (завершен)
+    //статус в таблице order_vendors меняется на 4 - доставлен (завершен) + вешаем флаг о том, что нужна проверка для расчета задолженности поставщика
     let obj = JSON.stringify({
         'id': id,
-        'status':  4
+        'status':  4,
+        'with_debt_recalc': true
     });
+
+    console.log(obj);
 
     //передаем параметры на сервер в пост-запросе
     sendRequestPOST(link, obj);
 
-    //достаем сумму данного заказа из атрибута
-    let new_sum = document.getElementById('total-sum').getAttribute('data-total-sum');
-    console.log(new_sum);
+    // //достаем сумму данного заказа из атрибута
+    // let new_sum = document.getElementById('total-sum').getAttribute('data-total-sum');
+    // console.log(new_sum);
 
-    // соберём json для передачи на сервер
-    //отправляем новую сумму за успешный заказ
-    let obj2 = JSON.stringify({
-        'id': vendor_id,
-        'total_sum':  new_sum
-    });
+    // // соберём json для передачи на сервер
+    // //отправляем новую сумму за успешный заказ
+    // let obj2 = JSON.stringify({
+    //     'id': vendor_id,
+    //     'total_sum':  new_sum
+    // });
 
     //передаем параметры на сервер в пост-запросе
-    sendRequestPOST(linkX, obj2);
+    // sendRequestPOST(linkX, obj2);
 
     //возвращение на страницу всех заказов
     backToAllOrders();

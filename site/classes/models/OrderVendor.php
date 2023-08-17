@@ -12,5 +12,6 @@
         public int $total_price;
         public float $distance;
         public int $notification_count;
+        public bool $debt_accrued;
     }
 ?>

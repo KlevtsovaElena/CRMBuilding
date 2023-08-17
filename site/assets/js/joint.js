@@ -28,11 +28,15 @@ function sortChange() {
     // получим значение атрибута data-page, содержащего номер текущей страницы
     let dataPage = document.getElementById('list-orders').getAttribute('data-page');
 
-    // получим значение даты С
-    let from = sortByDateFrom();   
-    
-    // получим значение даты ПО
-    let till = sortByDateTill();   
+    //проверка, есть ли на странице сортировка по дате
+    let from; let till;
+    if (document.getElementById('from') || document.getElementById('till')) {
+        // получим значение даты С
+        from = sortByDateFrom();   
+        
+        // получим значение даты ПО
+        till = sortByDateTill();  
+    } 
 
     //собираем фильтры (дата + поиск)
     let filters = '';

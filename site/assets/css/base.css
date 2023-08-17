@@ -552,3 +552,10 @@ th {
     align-items: end;
     font-size: 0.9rem;
 }
+
+.actions-with-cell {
+    min-width: 55px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}

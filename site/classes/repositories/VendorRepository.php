@@ -36,7 +36,7 @@ class VendorRepository extends BaseRepository
                                     v.`deleted` as `deleted`,
                                     c.`deleted` as `city_deleted`,
                                     v.`percent` as `percent`,
-                                    v.`owns` as `owns`,
+                                    v.`debt` as `debt`,
                                     v.`price_confirmed` as `price_confirmed`,
                                     v.`currency_dollar` as `currency_dollar`,
                                     v.`rate` as `rate`
@@ -64,7 +64,7 @@ class VendorRepository extends BaseRepository
         'token' => 'v.token',
         'deleted' => 'v.deleted',
         'percent' => 'v.percent',
-        'owns' => 'v.owns',
+        'debt' => 'v.debt',
         'city_deleted' => 'c.deleted',
         'price_confirmed' => 'v.price_confirmed',
         'currency_dollar' => 'v.currency_dollar',

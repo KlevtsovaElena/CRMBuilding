@@ -179,6 +179,7 @@ type Product struct {
 	MaxPrice    int    `json:"max_price"`
 }
 
+// словарь с переводом на разные языки
 var languages = map[string]map[string]string{
 	"ru": {
 		"change_number":         "Изменить номер",
@@ -790,7 +791,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
+			resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button)
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -828,7 +829,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				//создание запроса
 				caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + "Цена среднерыночная \n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\nЦена Стройбота \n<b>" + strconv.Itoa(product.Price) + " сум</b>")
-				apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + domen + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
+				apiURL := ""
+
+				if strings.Contains(product.Photo, "http") {
+					apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
+				} else {
+					apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + domen + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
+				}
+
 				fmt.Println(domen)
 				requestURL, err := url.Parse(apiURL)
 				if err != nil {
