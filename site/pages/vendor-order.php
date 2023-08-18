@@ -29,7 +29,7 @@ if($role == 2) {
         $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-with-details.php?id='.$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
-        print_r($data);
+        //print_r($data);
 
         function convertUnixToLocalTime($unixTime) {
 
