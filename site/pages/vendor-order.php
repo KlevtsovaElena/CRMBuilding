@@ -29,7 +29,7 @@ if($role == 2) {
         $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-with-details.php?id='.$_GET['id']);
         $data = json_decode($dataJson, true);
         $data = $data[0];
-        //print_r($data);
+        print_r($data);
 
         function convertUnixToLocalTime($unixTime) {
 
@@ -72,7 +72,7 @@ if($role == 2) {
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?php if(!$data['vendor_location']) { ?> <?='локация поставщика отсутствует' ?> <?php } else { ?> <?= $data['distance'] ?> км <?php } ?></div> 
+                            <div>До клиента: <?php if($data['order_location']['longitude'] && $data['order_location']['latitude']) { ?> <?= $data['distance'] ?> км <?php } else { ?> - <?php } ?></div> 
                         </div> 
                     </th>
                     <th></th>
@@ -141,8 +141,10 @@ if($role == 2) {
         <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->
         <?php if ($data['status'] == 2) {?>
             <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
-            <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $vendor_tg_id ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
-        <?php } ?>
+            <?php if($data['order_location']['latitude'] && $data['order_location']['longitude']) { ?>
+                <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $vendor_tg_id ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
+            <?php }    
+        } ?>
 
     </section>
     <?php } ?>

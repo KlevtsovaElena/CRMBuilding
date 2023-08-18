@@ -90,19 +90,24 @@ function confirmOrder() {
         //возвращаем кнопку "Отменить" для возможности отмены заказа
         btn.insertAdjacentHTML("afterend", `<button id="cancel-order" class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>`);
 
-        //и отрисовываем кнопку "Отправить себе координаты" для возможности отмены заказа
-        //для этого под уже имеющейся кнопкой отмены доставки
-        let btn2 = document.getElementById('cancel-order');
-        //console.log(btn2);
-        //рисуем кнопку "Отправить себе координаты"
-        btn2.insertAdjacentHTML("afterend", `<button id="send-location" class="btn btn-ok d-iblock">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>`);
+        //и отрисовываем кнопку "Отправить себе координаты" для возможности отмены заказа, ЕСЛИ КООРДИНАТЫ БЫЛИ ПЕРЕДАНЫ
+        if (clientLatitude != 0 && clientLongitude != 0) {
+            console.log(clientLatitude);
+            console.log(clientLongitude);
+            //для этого под уже имеющейся кнопкой отмены доставки
+            let btn2 = document.getElementById('cancel-order');
+            //console.log(btn2);
+            //рисуем кнопку "Отправить себе координаты"
+            btn2.insertAdjacentHTML("afterend", `<button id="send-location" class="btn btn-ok d-iblock">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>`);
 
-        //и вешаем на нее онклик с координатами клиента
-        let addedBtn = document.getElementById('send-location');
-        addedBtn.onclick = function(){
-            sendLocation(clientLatitude, clientLongitude, vendor_id);
-            console.log('sending location works');
-        };
+            //и вешаем на нее онклик с координатами клиента
+            let addedBtn = document.getElementById('send-location');
+            addedBtn.onclick = function(){
+                sendLocation(clientLatitude, clientLongitude, vendor_id);
+                console.log('sending location works');
+            };
+        }
+
     }
 
     //в случае, если статус до подтверждения был "новый" или "просмотрен"
@@ -145,20 +150,6 @@ function confirmDelivery() {
 
     //передаем параметры на сервер в пост-запросе
     sendRequestPOST(link, obj);
-
-    // //достаем сумму данного заказа из атрибута
-    // let new_sum = document.getElementById('total-sum').getAttribute('data-total-sum');
-    // console.log(new_sum);
-
-    // // соберём json для передачи на сервер
-    // //отправляем новую сумму за успешный заказ
-    // let obj2 = JSON.stringify({
-    //     'id': vendor_id,
-    //     'total_sum':  new_sum
-    // });
-
-    //передаем параметры на сервер в пост-запросе
-    // sendRequestPOST(linkX, obj2);
 
     //возвращение на страницу всех заказов
     backToAllOrders();
