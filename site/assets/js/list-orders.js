@@ -301,6 +301,17 @@ function renderListOrders(orders) {
             archiveText = "В архив";
         }
 
+        let distance; 
+        if (orders['orders'][i]['vendor_location']['latitude'] && orders['orders'][i]['vendor_location']['longitude']) {
+            if (orders['orders'][i]['order_location']['latitude'] == 0 && orders['orders'][i]['order_location']['longitude'] == 0) {
+                distance = '-';  
+            } else { 
+                distance  =  orders['orders'][i]['distance'];  
+            }
+        } else {
+            distance = '-';
+        }
+
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders['orders'][i]['order_id'])
                                                         .replace('${order_id}', orders['orders'][i]['order_id'])
@@ -317,7 +328,7 @@ function renderListOrders(orders) {
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])
                                                         .replace('${total_price}',  orders['orders'][i]['total_price'].toLocaleString('ru'))
-                                                        .replace('${distance}',  orders['orders'][i]['distance'])
+                                                        .replace('${distance}',  distance)
                                                         .replace('${archive}', orders['orders'][i]['archive'])
                                                         .replace('${archive_status}', archiveStatus)
                                                         .replace('${archive_text}', archiveText);
