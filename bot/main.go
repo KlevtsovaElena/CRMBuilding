@@ -1019,18 +1019,13 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							"request_location": true,
 						},
 					},
-					{
-						{
-							"text": "Нет",
-						},
-					},
 				},
 				"resize_keyboard":   true,
 				"one_time_keyboard": true,
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			sendMessage(chatId, "Поделится текущим местоположением?", keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1038,21 +1033,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 		// кейс при нажатии на указание другого адреса
 		case usersDB[chatId].Step == 10 && button == "anotherAdress":
-			// Создаем объект клавиатуры
-			keyboard := map[string]interface{}{
-				"keyboard": [][]map[string]interface{}{
-					{
-						{
-							"text": "Отказаться",
-						},
-					},
-				},
-				"resize_keyboard":   true,
-				"one_time_keyboard": true,
-			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			sendMessage(chatId, "Отправьте геолакацию удобного местоположением", nil)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
