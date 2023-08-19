@@ -135,7 +135,7 @@ if($role == 2) {
 
         <!-- если статус заказа либо "новый", либо "просмотрен", будет видна кнопка "НЕ ДОЗВОНИЛИСЬ" -->
         <?php if($data['status'] == 0 || $data['status'] == 1) {?>
-            <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach()">НЕ ДОЗВОНИЛИСЬ</button>
+            <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach(<?= $data['customer_tg_id'] ?>)">НЕ ДОЗВОНИЛИСЬ</button>
         <?php } ?>
 
         <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->

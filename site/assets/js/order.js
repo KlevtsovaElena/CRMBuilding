@@ -175,17 +175,13 @@ function cancelOrder() {
 }
 
 //функция для проставления поставщиком статуса заказа "не дозвонились"
-function customerOutOfReach() {
-
-    //статус в таблице order_vendors меняется на ???
+function customerOutOfReach(customer_tg_id) {
 
     //в тг покупателю отправляется сообщение о том, что не дозвонились
     //создание объекта, отправляющего запросы
 
-    tg_id = 224039891; //здесь должен быть tg_id покупателя из БД!!!
-
     //формирование ссылки
-    let link = 'https://api.telegram.org/bot6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o/sendMessage?chat_id=' + tg_id + '&text=' + "Мы не смогли до Вас дозвониться.  Введите, пожалуйста, Ваш номер телефона вручную";
+    let link = 'https://api.telegram.org/bot6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o/sendMessage?chat_id=' + customer_tg_id + '&text=' + "Мы не смогли до Вас дозвониться.  Введите, пожалуйста, Ваш номер телефона вручную";
 
     //отправляем гет-запрос
     sendRequestGET(link);
