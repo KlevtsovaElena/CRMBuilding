@@ -118,6 +118,18 @@ type UserT struct {
 	Language    string      `json:"language"`
 }
 
+// структура для деталей о юзере
+type UserDetails struct {
+	ID         int    `json:"id"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	Phone      string `json:"phone"`
+	CityID     int    `json:"city_id"`
+	CityName   string `json:"city_name"`
+	TgID       int    `json:"tg_id"`
+	TgUsername string `json:"tg_username"`
+}
+
 // структура ответа от сервера
 type ServerResponce struct {
 	OK      bool   `json:"ok"`
@@ -549,8 +561,27 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					"one_time_keyboard": true,
 				}
 
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"], keyboard)
+				// Создаем GET-запрос
+				resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+				if err != nil {
+					log.Fatal("Ошибка при выполнении запроса:", err)
+				}
+				defer resp.Body.Close()
+
+				var userdetails []UserDetails
+				err = json.NewDecoder(resp.Body).Decode(&userdetails)
+				if err != nil {
+					log.Fatal("Ошибка при декодировании JSON:", err)
+				}
+
+				// Используем полученные данные и подставляем их в кнопки
+				for _, userdetail := range userdetails {
+
+					// Отправляем сообщение с клавиатурой и перезаписываем шаг
+					sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+
+				}
+
 				user.Step += 1
 				usersDB[chatId] = user
 				break
@@ -684,8 +715,27 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"], keyboard)
+			// Создаем GET-запрос
+			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
+			}
+			defer resp.Body.Close()
+
+			var userdetails []UserDetails
+			err = json.NewDecoder(resp.Body).Decode(&userdetails)
+			if err != nil {
+				log.Fatal("Ошибка при декодировании JSON:", err)
+			}
+
+			// Используем полученные данные и подставляем их в кнопки
+			for _, userdetail := range userdetails {
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+
+			}
+
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -713,8 +763,27 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"], keyboard)
+			// Создаем GET-запрос
+			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
+			}
+			defer resp.Body.Close()
+
+			var userdetails []UserDetails
+			err = json.NewDecoder(resp.Body).Decode(&userdetails)
+			if err != nil {
+				log.Fatal("Ошибка при декодировании JSON:", err)
+			}
+
+			// Используем полученные данные и подставляем их в кнопки
+			for _, userdetail := range userdetails {
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+
+			}
+
 			user.Step += 1
 			usersDB[chatId] = user
 			break
