@@ -14,6 +14,30 @@ class CustomerRepository extends BaseRepository
     const TABLE_NAME = 'customers';
     const CLASS_NAME = 'models\Customer';
 
+    const GET_WITH_DETAILS = 'SELECT c.`id` as `id`,
+                            c.`first_name` as `first_name`,
+                            c.`last_name` as `last_name`,
+                            c.`phone` as `phone`,
+                            c.`city_id` as `city_id`,
+                            cit.`name` as `city_name`,
+                            c.`tg_id` as `tg_id`,
+                            c.`tg_username` as `tg_username`
+                        FROM customers c
+                        LEFT OUTER JOIN cities cit
+                        ON cit.id = c.city_id
+                        %s';
+
+    private static array $customersDetailsAssociation = [
+        'id' => 'c.id',
+        'first_name' => 'c.first_name',
+        'last_name' => 'c.last_name',
+        'phone' => 'c.phone',
+        'city_id' => 'c.city_id',
+        'city_name' => 'cit.name',
+        'tg_id' => 'c.tg_id',
+        'tg_username' => 'c.tg_username'
+    ];
+
     private CoordinateRepository $coordinateRepository;
 
     public function __construct()
@@ -69,6 +93,54 @@ class CustomerRepository extends BaseRepository
             return null;
 
         return $this->map($data);
+    }
+
+    public function getWithDetails(array $inputParams): array
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$customersDetailsAssociation, $inputParams);
+
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$customersDetailsAssociation, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // Получаем все параметры для сортировки
+        $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+        // Отбираем только подходящие для объекта
+        $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$customersDetailsAssociation, $allOrderByParams);
+        // Получаем часть строки запроса с сортировкой
+        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+        // Получаем часть строки запроса с лимитом и оффсетом
+        $limitString = SqlHelper::getLimitString($inputParams);
+
+        $query = sprintf(static::GET_WITH_DETAILS, implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
+
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+        return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
+
+    public function mapWithDetails(array $row): array
+    {
+        $item = [];
+        foreach ($row as $key => $value) {
+            $item[$key] = $value;
+        }
+
+        return $item;
     }
 }
 ?>
