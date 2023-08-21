@@ -482,28 +482,79 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс для начального сообщения для пользователя
 		case text == "/start" || usersDB[chatId].Step == 1:
 
-			user := usersDB[chatId]
-			user.Step = 1
-			usersDB[chatId] = user
-
-			//собираем объект клавиатуры для выбора языка
-			buttons := [][]map[string]interface{}{
-				{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
-				{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbek"}},
-				{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzbekcha"}},
+			// Создаем GET-запрос
+			resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
+			defer resp.Body.Close()
 
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
+			var personExist []UserT
+			err = json.NewDecoder(resp.Body).Decode(&personExist)
+			if err != nil {
+				user := usersDB[chatId]
+				user.Step = 1
+				usersDB[chatId] = user
+
+				//собираем объект клавиатуры для выбора языка
+				buttons := [][]map[string]interface{}{
+					{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
+					{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbek"}},
+					{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzbekcha"}},
+				}
+
+				inlineKeyboard := map[string]interface{}{
+					"inline_keyboard": buttons,
+				}
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык", inlineKeyboard)
+
+				//следующий шаг
+				user.Step += 1
+				usersDB[chatId] = user
+				break
+			} else {
+				user := usersDB[chatId]
+				user.Step = 4
+				usersDB[chatId] = user
+
+				if button == "ru" || button == "uzbek" || button == "uzbekcha" {
+					user.Language = button
+					usersDB[chatId] = user
+				}
+
+				// формируем json и отправляем данные пользователя на бэк
+				requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
+				fmt.Println(requestBody)
+
+				sendPost(requestBody, "http://"+link+"/api/customers.php")
+
+				// Создаем объект клавиатуры
+				keyboard := map[string]interface{}{
+					"keyboard": [][]map[string]interface{}{
+						{{"text": languages[usersDB[chatId].Language]["order"] + "🛍"}},
+
+						{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + "💹"},
+							{"text": languages[usersDB[chatId].Language]["settings"] + "⚙️"},
+						},
+						{{"text": languages[usersDB[chatId].Language]["my_orders"] + "📕"},
+							{"text": languages[usersDB[chatId].Language]["current_prices"] + "📈"},
+						},
+						{{"text": languages[usersDB[chatId].Language]["contact"] + "📞"},
+							{"text": languages[usersDB[chatId].Language]["cart"] + "🗑"},
+						},
+					},
+					"resize_keyboard":   true,
+					"one_time_keyboard": true,
+				}
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"], keyboard)
+				user.Step += 1
+				usersDB[chatId] = user
+				break
 			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык", inlineKeyboard)
-
-			//следующий шаг
-			user.Step += 1
-			usersDB[chatId] = user
-			break
 
 		// кейс для получения номера телефона
 		case usersDB[chatId].Step == 2 || button == "backToPhone":
@@ -1019,13 +1070,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							"request_location": true,
 						},
 					},
+					{
+						{
+							"text": "Нет",
+						},
+					},
 				},
 				"resize_keyboard":   true,
 				"one_time_keyboard": true,
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится текущим местоположением?", keyboard)
+			sendMessage(chatId, "Поделится местоположением?", keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1033,9 +1089,21 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 		// кейс при нажатии на указание другого адреса
 		case usersDB[chatId].Step == 10 && button == "anotherAdress":
+			// Создаем объект клавиатуры
+			keyboard := map[string]interface{}{
+				"keyboard": [][]map[string]interface{}{
+					{
+						{
+							"text": "Отказаться",
+						},
+					},
+				},
+				"resize_keyboard":   true,
+				"one_time_keyboard": true,
+			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Отправьте геолакацию удобного местоположением", nil)
+			sendMessage(chatId, "Поделится местоположением?", keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
