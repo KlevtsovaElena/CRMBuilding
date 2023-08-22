@@ -7,6 +7,14 @@ let rateEl = document.getElementById('rate');
 if(rateEl) {
     rateEl.addEventListener('change', () => {
 
+        // валидация поля
+        let rateValue = rateEl.value;
+        if (!(rateValue && rateValue>0)) {
+           alert('Значение должно быть больше 0');
+           window.location.href = window.location.href;
+           return;
+        } 
+
         let rateChange = window.confirm('Вы действительно хотите изменить курс доллара?');
     
         // если отмена, то перезагружаем страницу
@@ -21,7 +29,7 @@ if(rateEl) {
         
         let obj  = JSON.stringify({
             'id': vendorId,
-            'rate': rateEl.value,
+            'rate': rateValue,
             'price_confirmed': 0
         })
     
