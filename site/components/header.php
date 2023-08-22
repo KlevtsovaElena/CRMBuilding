@@ -175,7 +175,7 @@
         <nav class="menu-left" >
 
             <ul class="menu-left__items">
-                <li class="menu-left__item" data-page-name = "/index.php">
+                <!-- <li class="menu-left__item" data-page-name = "/index.php">
                     <a href="/index.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -185,7 +185,7 @@
                         </svg>
                         <span id="header-main" data-vendor="">Главная</span>
                     </a>
-                </li>
+                </li> -->
                 <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
                     <a href="./../pages/vendor-add-product.php" class="menu-left__item-link">
                         <svg stroke="#ced4da" viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
@@ -196,12 +196,12 @@
                         <span>Добавить товар</span>
                     </a>
                 </li> -->
-                <li class="menu-left__item" data-page-name = "/pages/vendor-finances.php">
+                <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-finances.php">
                     <a href="./../pages/vendor-finances.php" class="menu-left__item-link">
                     <svg class="fill" viewBox="2 7 28 18" stroke="#ced4da"><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;} .st1{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:3;} .st2{fill:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;} .st3{fill:none;} </style> <rect x="3" y="8" class="st0" width="22" height="12"></rect> <path class="st0" d="M3,16c2.2,0,4,1.8,4,4v4h22V12h-4c-2.2,0-4-1.8-4-4"></path> <circle class="st0" cx="14" cy="14" r="3"></circle> <path class="st0" d="M7,8c0,2.2-1.8,4-4,4"></path> <path class="st0" d="M25,16c-2.2,0-4,1.8-4,4"></path> </g></svg>
                         <span>Финансы</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-left__item" data-page-name = "/pages/vendor-my-info.php">
                     <a href="./../pages/vendor-my-info.php" class="menu-left__item-link">
                         <svg class="fill" viewBox="5 5 38 38" xmlns="http://www.w3.org/2000/svg" fill="#ced4da"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 0h48v48H0z" fill="none"></path> <g id="Shopicon"> <path d="M4,20h4v24h32V20h4L24,4L4,20z M36,20v20H12V20v-1.277l12-9.6l12,9.6V20z"></path> <g> <path d="M29,23c0-2.761-2.239-5-5-5s-5,2.239-5,5s2.239,5,5,5S29,25.761,29,23z"></path> <path d="M24,28c-4.42,0-8,3.58-8,8h16C32,31.58,28.42,28,24,28z"></path> </g> </g> </g></svg>

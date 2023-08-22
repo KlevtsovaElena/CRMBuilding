@@ -13,7 +13,8 @@ if($role !== 2) {
         "<link rel='stylesheet' href='./../assets/css/vendor.css'>"
     ];
     $scriptsSrc = [
-        "<script src='./../assets/js/main.js'></script>"
+        "<script src='./../assets/js/main.js'></script>",
+        "<script src='./../assets/js/vendor-main.js'></script>"
     ];
 ?>
 <?php include('./../components/header.php'); ?>
@@ -102,6 +103,31 @@ if($role !== 2) {
         <p class="data-vendor-elem__data"><span class="ghost data-vendor-elem__title">Координаты склада:</span> <?=  $coordinates; ?></p>
         <hr class="ghost">
     </div>
+
+    <!-- поле для установки курса доллара -->
+    <!-- если цены в долларах -->
+    <?php if ($profile['currency_dollar'] == "1") {?>
+        <div class="data-vendor-elem">
+            <div class="">
+                <p class="ghost data-vendor-elem__title">Установленный курс доллара:</p>
+                <span><b>1 $ = </b></span> 
+                <input type="number" class="rate-dollar" id="rate" name="rate" value="<?= $profile['rate']; ?>" title="Изменить"> 
+                <span><b>Cум</b></span>
+            </div>
+            <hr class="ghost">
+        </div>
+    <?php } ?>
+
+    <!-- если долг перед админом есть, то показываем -->
+    <?php if ((int)$vendorData[0]['debt'] > 0) {?>
+        <div class="data-vendor-elem">
+            <span class="ghost data-vendor-elem__title">Долг:</span>
+            <span><b><?= $vendorData[0]['debt']; ?></b></span><span class="ghost data-vendor-elem__data"> Сум</span>
+            <hr class="ghost">
+        </div>
+    <?php } ?>
+
+
 </section>
 
 <?php include('./../components/footer.php'); ?>
@@ -136,3 +162,5 @@ if($role !== 2) {
 
 }
     </script>
+
+
