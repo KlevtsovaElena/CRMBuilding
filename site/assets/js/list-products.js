@@ -27,6 +27,8 @@ let priceConfirmed;
 let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
 let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
 
+let activeCheckEl = document.querySelector('.active-check');
+let activeEl = activeCheckEl.querySelector('input');
 
 let prevButton;
 let nextButton;
@@ -141,6 +143,11 @@ function getFilters() {
             }
         }
     })
+
+    // проверим чекбокс неактивных товаров
+    if(activeEl.value) {
+        params += "&" + activeEl.value;
+    }
 
     // вернём параметры
     return params;
@@ -446,6 +453,21 @@ function deleteProduct() {
 
 }
 
+/* ---------- НАЖАТИЕ НА ГАЛОЧКУ НЕАКТИВНЫЕ В МЕНЮ ФИЛЬТРАЦИИ ---------- */
+
+// если выбрана галочка, то не нужен параметр is_active
+// если же галочки нет, то запрашиваем только is_active=1
+// для этого меняем значение атрибута value  у чекбокса
+activeCheckEl.onclick = function(){
+    if(activeEl.checked) {
+        activeEl.value = ""
+        
+    } else {
+        activeEl.value = "is_active=1";  
+    }
+
+    console.log(activeEl.value);
+}
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editProduct(id) {
@@ -711,3 +733,4 @@ function checkboxChangedProductActive(id) {
     startRenderPage(priceConfirmed);
 
 }
+

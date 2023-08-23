@@ -107,6 +107,15 @@ if($role !== 1) {
                     <div>Поиск</div>
                     <input type="search" id="search" name="search" value="" placeholder="Поиск">
                 </div>
+              
+                <!-- показывать неактивные -->
+                <div class="active-check">
+                    <div >
+                        <input type="checkbox" id="active-check" name="active-check" checked value="">
+                    </div>
+                    <lable>Неактивные</lable>
+                </div>
+
                 <button class="btn btn-ok d-iblock">Применить</button>
 
             </div>
@@ -287,6 +296,22 @@ if (count($_GET) !== 0) {
                 <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
             </div>
             
+            
+            <!-- показывать неактивные -->
+            <div class="active-check">
+                <div >
+                    <input type="checkbox" id="active-check" name="active-check" 
+                        <?php 
+                            if(isset($_GET['is_active']) && $_GET['is_active']=='1') {
+                                echo 'value="is_active=1"';
+                            } else {
+                                echo 'checked value=""';
+                            }?>
+                    >
+                </div>
+                <lable>Неактивные</lable>
+            </div>
+
             <button class="btn btn-ok d-iblock">Применить</button>
             
         </div>

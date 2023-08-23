@@ -24,6 +24,9 @@ let limitEl = document.getElementById('limit');
 let vendor_idEl = document.getElementById('vendor_id');
 let offsetEl = containerPagination.getAttribute('offset');
 
+let activeCheckEl = document.querySelector('.active-check');
+let activeEl = activeCheckEl.querySelector('input');
+
 let prevButton;
 let nextButton;
 let totalPages;
@@ -137,6 +140,11 @@ function getFilters() {
             }
         }
     })
+
+    // проверим чекбокс неактивных товаров
+    if(activeEl.value) {
+        params += "&" + activeEl.value;
+    }
 
     // вернём параметры
     return params;
@@ -464,6 +472,22 @@ function deleteProduct() {
     // заполним страницу данными
     startRenderPage();
 
+}
+
+/* ---------- НАЖАТИЕ НА ГАЛОЧКУ НЕАКТИВНЫЕ В МЕНЮ ФИЛЬТРАЦИИ ---------- */
+
+// если выбрана галочка, то не нужен параметр is_active
+// если же галочки нет, то запрашиваем только is_active=1
+// для этого меняем значение атрибута value  у чекбокса
+activeCheckEl.onclick = function(){
+    if(activeEl.checked) {
+        activeEl.value = ""
+        
+    } else {
+        activeEl.value = "is_active=1";  
+    }
+
+    console.log(activeEl.value);
 }
 
 

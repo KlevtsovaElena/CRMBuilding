@@ -141,6 +141,22 @@ td:nth-last-child(1) {
     opacity: 0.3;
 }
 
+.active-check {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.active-check input {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+}
+
+.active-check input:focus {
+    outline: none;
+}
+
 @media(max-width: 1024px) {
     .filters-container-flex {
         flex-wrap: wrap;
