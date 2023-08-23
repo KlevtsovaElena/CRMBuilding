@@ -126,7 +126,7 @@ if($role !== 1) {
                             <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
-                            <th data-id="max_price" data-sort="">Цена среднерыночная</th>
+                            <th data-id="max_price" data-sort="">Цена рынок</th>
                             
                         </tr>
                     </thead>
@@ -304,7 +304,7 @@ if (count($_GET) !== 0) {
                     <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
-                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена среднерыночная</th>
+                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок</th>
                     
                 </tr>
             </thead>

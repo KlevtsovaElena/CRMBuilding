@@ -115,7 +115,7 @@ if($role !== 2) {
                             <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
-                            <th data-id="max_price" data-sort="">Цена среднерыночная, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
+                            <th data-id="max_price" data-sort="">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             
                         </tr>
                     </thead>
@@ -270,7 +270,7 @@ if (count($_GET) !== 0) {
                     <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
-                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена среднерыночная, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
+                    <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     
                 </tr>
             </thead>

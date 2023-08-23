@@ -224,7 +224,7 @@ function renderListProducts(totalProducts) {
     for (i = 0; i < records; i++) {
 
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
-            console.log(i, 'сум');
+            
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
@@ -243,7 +243,6 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
         
         } else if (totalProducts['products'][i]['vendor_currency_dollar'] == "1"){
-            console.log(i, '$');
 
             containerListProducts.innerHTML += tmplRowProductDollar.replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
