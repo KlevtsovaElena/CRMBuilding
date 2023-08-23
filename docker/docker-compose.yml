@@ -66,6 +66,7 @@ services:
       - ./../bot/:/app/
     ports:
       - 5001:8080
+    restart: always
 
   currency-service:
     build:
@@ -81,6 +82,7 @@ services:
       bot_token: ${CURRENCY_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"
+    restart: always
 
   price-service:
     build:
@@ -93,6 +95,7 @@ services:
     environment:
       bot_token: ${PRICE_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_PRICE_CHANEL}
+    restart: always
 
   notification-service:
     build:

@@ -354,13 +354,31 @@ func sendPost(requestBody string, url string) ([]byte, error) {
 
 // функция для отправки сообщения пользователю
 func sendMessage(chatId int, text string, keyboard map[string]interface{}) {
-	url := host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=" + text
+	request_url := host + token + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=" + text
 	if keyboard != nil {
 		// Преобразуем клавиатуру в JSON
 		keyboardJSON, _ := json.Marshal(keyboard)
-		url += "&reply_markup=" + string(keyboardJSON)
+		request_url += "&reply_markup=" + string(keyboardJSON)
 	}
-	http.Get(url)
+	//http.Get(url)
+	requestURL, err := url.Parse(request_url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Создание HTTP GET-запроса с параметрами
+	request, err := http.NewRequest("GET", requestURL.String(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Отправка запроса
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(response)
 }
 
 func processMessage(message MessageT, messageInline MessageInlineT) {
@@ -577,8 +595,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				// Используем полученные данные и подставляем их в кнопки
 				for _, userdetail := range userdetails {
 
+					menuText := url.QueryEscape("\nВаш город: ")
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
-					sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+					sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
 				}
 
@@ -684,6 +703,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		case usersDB[chatId].Step == 4:
 
 			user := usersDB[chatId]
+			user.Step = 4
 
 			if button == "ru" || button == "uzbek" || button == "uzbekcha" {
 				user.Language = button
@@ -731,8 +751,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
+				menuText := url.QueryEscape("\nВаш город: ")
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
 			}
 
@@ -779,8 +800,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
+				menuText := url.QueryEscape("\nВаш город: ")
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+". Ваш город: "+userdetail.CityName, keyboard)
+				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
 			}
 
