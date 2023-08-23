@@ -16,6 +16,7 @@ let  price_dollar = formAddProduct.querySelector('#price_dollar');
 let  max_price = formAddProduct.querySelector('#max_price');
 let  max_price_dollar = formAddProduct.querySelector('#max_price_dollar');
 let  unit_id = formAddProduct.querySelector('#unit_id');
+let  is_active = formAddProduct.querySelector('#is_active');
 
 let priceValue;
 let hasError;
@@ -64,6 +65,7 @@ function addProduct(role) {
         'max_price_dollar': max_price_dollar.value,
         'unit_id': unit_id.value,
         'deleted': 0,
+        'is_active': is_active.value,
         photoFileData,
         photoFileName
     });
@@ -98,7 +100,7 @@ function validationAdd() {
 
     // валидация полей (кроме vendorId)
     [nameProduct, new_photo, brand_id, category_id, unit_id,
-        quantity_available, price, max_price, vendor_id].forEach(item => {
+        quantity_available, price, max_price, vendor_id, is_active].forEach(item => {
     
             const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
             

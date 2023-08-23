@@ -23,9 +23,12 @@ let limitEl = document.getElementById('limit');
 let offsetEl = containerPagination.getAttribute('offset');
 
 let priceConfirmedEl = document.querySelector('.price-confirm-container');
+let priceConfirmed;
 let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
 let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
 
+let activeCheckEl = document.querySelector('.active-check');
+let activeEl = activeCheckEl.querySelector('input');
 
 let prevButton;
 let nextButton;
@@ -141,6 +144,11 @@ function getFilters() {
         }
     })
 
+    // проверим чекбокс неактивных товаров
+    if(activeEl.value) {
+        params += "&" + activeEl.value;
+    }
+
     // вернём параметры
     return params;
 }
@@ -225,7 +233,15 @@ function renderListProducts(totalProducts) {
 
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
+
+        let checked;
+        if (totalProducts['products'][i]['is_active'] == '1') {
+            checked = 'checked';
+        } else {
+            checked = '';
+        }
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
@@ -234,6 +250,8 @@ function renderListProducts(totalProducts) {
                                                         .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                         .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
+                                                        .replace('${is_active}', totalProducts['products'][i]['is_active'])
+                                                        .replace('${checked}', checked)
                                                         .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                         .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                         .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
@@ -435,6 +453,21 @@ function deleteProduct() {
 
 }
 
+/* ---------- НАЖАТИЕ НА ГАЛОЧКУ НЕАКТИВНЫЕ В МЕНЮ ФИЛЬТРАЦИИ ---------- */
+
+// если выбрана галочка, то не нужен параметр is_active
+// если же галочки нет, то запрашиваем только is_active=1
+// для этого меняем значение атрибута value  у чекбокса
+activeCheckEl.onclick = function(){
+    if(activeEl.checked) {
+        activeEl.value = ""
+        
+    } else {
+        activeEl.value = "is_active=1";  
+    }
+
+    console.log(activeEl.value);
+}
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editProduct(id) {
@@ -654,3 +687,50 @@ function calcPriceUzs(rate) {
     }
     
 }
+
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРА ЧЕРЕЗ ЧЕКБОКС (АКТИВЕН/НЕАКТИВЕН) ---------- */
+
+function checkboxChangedProductActive(id) {
+    // проверяем корректность токена
+    priceConfirmed = check()['price_confirmed'];
+
+    let isChecked = window.confirm('Вы действительно хотите изменить статус активности товара?');
+
+    if(!isChecked) {
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 0
+        });
+    }
+
+    console.log(obj);
+
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
+
+    // перерисовка страницы
+    startRenderPage(priceConfirmed);
+
+}
+
