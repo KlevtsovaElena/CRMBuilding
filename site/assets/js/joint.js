@@ -54,7 +54,11 @@ function sortChange() {
 
     //если задан статус
     if (dataStatus) {
-        filters += '&status=' + dataStatus;
+        if (dataStatus == 5) {
+            filters += '&archive=1';
+        } else {
+            filters += '&status=' + dataStatus;
+        } 
     }
 
     //если задана дата
@@ -74,6 +78,12 @@ function sortChange() {
         dataLimit = 'all';
         filters += '&search=' + dataSearch;
     } 
+
+    //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
+    // let archiveCheck = document.getElementById('archive');
+    // if (!archiveCheck.checked) {
+    //     filters += '&archive=0';
+    // }
 
     //если задана страница
     if (dataPage) {

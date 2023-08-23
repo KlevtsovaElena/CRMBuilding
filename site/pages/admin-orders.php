@@ -174,10 +174,11 @@ if($role !== 1) {
                             2 => 'Подтверждён',
                             3 => 'Отменён',
                             4 => 'Доставлен',
+                            5 => 'В архиве'
                         );
 
                         //если статус не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['status'])) {
+                        if (!isset($_GET['status']) && !isset($_GET['archive'])) {
                         ?>
                             <option value="" <?= 'selected' ?> >все</option>
                             <?php for ($s = 0; $s < count($statuses); $s++) { ?>
@@ -185,24 +186,34 @@ if($role !== 1) {
                             <?php }
                         //если статус уже задан в гет-параметрах, выводим его
                         } else {
-                            $statusSel = $_GET['status']; 
-                            ?>
 
-                            <option value="">все</option>
-                            <?php 
-                            for ($s = 0; $s < count($statuses); $s++) { 
-                                if($statusSel == $s) {?>
-                                
-                                <option value="<?= $s ?>"  <?= 'selected' ?>><?= $statuses[$s] ?></option>
-                            <?php 
-                                } else { ?>
+                            $statusSel;
+
+                            //если задан статус "В архиве"
+                            if (isset($_GET['archive']) && $_GET['archive'] == 1) {
+                                $statusSel = 5; 
+                            //если задан статус 0-4
+                            } elseif (isset($_GET['status'])) {
+
+                                $statusSel = $_GET['status']; 
+                            }
+                                ?>
+
+                                <option value="">все</option>
+                                <?php 
+                                for ($s = 0; $s < count($statuses); $s++) { 
+                                    if($statusSel == $s) {?>
                                     
-                                <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
+                                    <option value="<?= $s ?>"  <?= 'selected' ?>><?= $statuses[$s] ?></option>
+                                <?php 
+                                    } else { ?>
+                                        
+                                    <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
+                                <?php 
+                                    }
+                                ?>
                             <?php 
                                 }
-                            ?>
-                        <?php 
-                            }
                         } ?> 
                     </select>
                 </div>
@@ -239,8 +250,16 @@ if($role !== 1) {
                         ?> 
                     </select>
                 </div>
+
+                <!-- чекбокс для архивных заказов -->
+                <!-- <div class="archive-check">
+                    <div>
+                        <input type="checkbox" id="archive" name="archive" <?php if (isset($_GET['archive']) && $_GET['archive'] == 1) { echo 'checked'; } ?> onclick="archivedChecked()">
+                    </div>
+                    <lable>Архивные</lable>
+                </div> -->
                 
-                <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
+                <!-- кнопка, активирующая фильтры на странице и поиск -->
                 <button onclick="applyInOrders()" class="btn btn-ok d-iblock">Применить</button>
             </div>
 
@@ -304,14 +323,21 @@ if($role !== 1) {
                         }
                     }
 
-                    //если заданы гет-параметры поставщика, собираем их в переменную
+                    //если заданы гет-параметры поставщика, собираем в переменную
                     if (isset($_GET['vendor_name'])) {
                         $params = $params . '&vendor_name=' . $_GET['vendor_name'];
                     }
 
-                    //если заданы параметры статуса, собираем их в переменную
+                    //если заданы параметры статуса, собираем в переменную
                     if (isset($_GET['status'])) {
                         $params = $params . '&status=' . $_GET['status'];
+                    }
+
+                    //если задан гет-параметр "В архиве", собираем в переменную
+                    if (isset($_GET['archive'])) {
+                        $params = $params . '&archive=' . $_GET['archive'];
+                    } else {
+                        $params = $params . '&archive=0';
                     }
 
                     //print_r($params);
@@ -440,7 +466,7 @@ if($role !== 1) {
                                 } 
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
+                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>" <?php if($data[$i]['archive'] == 1) { echo 'archive="1"'; } ?>>
                                 <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                 <td class="ta-center"><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>

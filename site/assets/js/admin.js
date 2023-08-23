@@ -424,13 +424,23 @@ function applyInOrders() {
 
     //если задан статус
     if (statusSel) {
-        filters += '&status=' + statusSel;
+        if (statusSel == 5) {
+            filters += '&archive=1';
+        } else {
+            filters += '&status=' + statusSel;
+        } 
     }
+
+    //если не отмечен чекбокс с архивными записями
+    // if (!archivedChecked()) {
+    //     filters += '&archive=0';
+    // }
+
+    //alert(filters);
 
     //собираем сортировку
     // получим значение атрибута data-sort
     let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
-    console.log(allTitlesElems);
 
     //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
     let dataSort = '';
@@ -873,6 +883,16 @@ function changeTagName(el, newTagName) {
     n.innerHTML = el.innerHTML;
     el.parentNode.replaceChild(n, el);
   }
+
+//функция чекбокса архивных записей
+function archivedChecked() {
+    //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
+    // let archiveCheck = document.getElementById('archive');
+    if (!event.target.checked) {
+        alert(3);
+        return 0;
+    }
+}
  
 
 //записываем в куки локальный часовой пояс

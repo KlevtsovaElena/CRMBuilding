@@ -72,7 +72,7 @@ if($role == 2) {
                         <div>Заказ <span>№ <?= $data['order_id'] ?></span> от <span><?= convertUnixToLocalTime($data['order_date']); ?></span></div>
                         <div class="contact-data">
                             <div><a href="tel:<?= $data['customer_phone'] ?>" class="phone"><?= $data['customer_phone'] ?></a></div>
-                            <div>До клиента: <?php if($data['order_location']['longitude'] && $data['order_location']['latitude']) { ?> <?= $data['distance'] ?> км <?php } else { ?> - <?php } ?></div> 
+                            <div>До клиента: <?php if($data['order_location']['longitude'] && $data['order_location']['latitude']) { ?> <?= $data['distance'] ?> км <?php } else { ?> координаты клиента отсутствуют <?php } ?></div> 
                         </div> 
                     </th>
                     <th></th>
