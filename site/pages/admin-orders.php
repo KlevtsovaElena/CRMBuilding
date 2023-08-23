@@ -178,7 +178,7 @@ if($role !== 1) {
                         );
 
                         //если статус не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['status'])) {
+                        if (!isset($_GET['status']) && !isset($_GET['archive'])) {
                         ?>
                             <option value="" <?= 'selected' ?> >все</option>
                             <?php for ($s = 0; $s < count($statuses); $s++) { ?>
@@ -254,9 +254,9 @@ if($role !== 1) {
                 <!-- чекбокс для архивных заказов -->
                 <!-- <div class="archive-check">
                     <div>
-                        <input type="checkbox" id="archive" name="archive" <?php if (isset($_GET['archive']) && $_GET['archive'] == 1) { echo 'checked'; } ?> onclick="archivedChecked()">
+                        <input type="checkbox" id="archive" name="archive" onclick="archivedChecked()">
                     </div>
-                    <lable>Архивные</lable>
+                    <lable>С архивными</lable>
                 </div> -->
                 
                 <!-- кнопка, активирующая фильтры на странице и поиск -->
@@ -287,7 +287,7 @@ if($role !== 1) {
 
         <!-- таблица заказов -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>" data-status-select="<?php if (isset($_GET['status'])) { echo $_GET['status']; } ?>">
+            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>" data-status-select="<?php if (isset($_GET['status'])) { echo $_GET['status']; } ?>" data-archive-select="<?php if(isset($_GET['archive'])) { ?><?= $_GET['archive'] ?><?php } ?>">
 
                 <thead>
                     <tr role="row">
@@ -333,7 +333,7 @@ if($role !== 1) {
                         $params = $params . '&status=' . $_GET['status'];
                     }
 
-                    //если задан гет-параметр "В архиве", собираем в переменную
+                    //если задан гет-параметр архива, собираем в переменную
                     if (isset($_GET['archive'])) {
                         $params = $params . '&archive=' . $_GET['archive'];
                     } else {
@@ -466,7 +466,7 @@ if($role !== 1) {
                                 } 
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>" <?php if($data[$i]['archive'] == 1) { echo 'archive="1"'; } ?>>
+                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>" <?php if($data[$i]['archive'] == 1) { echo 'archive="1"';} ?>>
                                 <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
                                 <td class="ta-center"><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>

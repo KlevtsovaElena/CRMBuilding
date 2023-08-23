@@ -431,10 +431,11 @@ function applyInOrders() {
         } 
     }
 
-    //если не отмечен чекбокс с архивными записями
-    // if (!archivedChecked()) {
-    //     filters += '&archive=0';
-    // }
+    //если отмечен чекбокс с архивными записями
+    if (archivedChecked()) {
+        filters += '&archive=""';
+        alert(4);
+    }
 
     //alert(filters);
 
@@ -883,17 +884,6 @@ function changeTagName(el, newTagName) {
     n.innerHTML = el.innerHTML;
     el.parentNode.replaceChild(n, el);
   }
-
-//функция чекбокса архивных записей
-function archivedChecked() {
-    //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
-    // let archiveCheck = document.getElementById('archive');
-    if (!event.target.checked) {
-        alert(3);
-        return 0;
-    }
-}
- 
 
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
