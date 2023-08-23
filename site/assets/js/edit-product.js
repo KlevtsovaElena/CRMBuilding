@@ -20,7 +20,6 @@ function editProduct(role) {
     hasError = validationEdit();
 
     // если были ошибки, то выходим
-    console.log(hasError);
     if (hasError) {
         return;
     }
@@ -42,6 +41,7 @@ function editProduct(role) {
             'max_price': max_price.value,
             'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
+            'is_active': is_active.value,
             'photo': photo.value
         });
     } else {
@@ -58,12 +58,12 @@ function editProduct(role) {
             'max_price': max_price.value,
             'max_price_dollar': max_price_dollar.value,
             'unit_id': unit_id.value,
+            'is_active': is_active.value,
             photoFileData,
             photoFileName
         });
     }
 
-    console.log(obj);
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
@@ -98,9 +98,9 @@ function validationEdit() {
 
    // валидация полей (кроме vendorId)
    [nameProduct, brand_id, category_id, unit_id, 
-    quantity_available, price, max_price].forEach(item => {
+    quantity_available, price, max_price, is_active].forEach(item => {
 
-        console.log(item.getAttribute('name') + "    " + item.value);
+        // console.log(item.getAttribute('name') + "    " + item.value);
 
         const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
         
@@ -222,8 +222,6 @@ function deleteProductFromEditForm(id) {
         
     // проверяем корректность токена
     check();
-    
-    console.log(id);
 
     // запрашиваем подтверждение удаления
     let isDelete = false;
@@ -231,12 +229,8 @@ function deleteProductFromEditForm(id) {
     isDelete = window.confirm('Вы действительно хотите удалить этот товар?');
 
     if(!isDelete) {
-        console.log(" ни в коем случае");
         return;
     }
-
-    // если подтвердили удаление
-    console.log("удаляем");
 
     // соберём json
     let obj = JSON.stringify({

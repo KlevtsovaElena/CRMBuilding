@@ -93,11 +93,11 @@
 td:nth-last-child(1) {
     padding-right: 30px;
     position: relative;
-    min-width: 140px;
+    /* min-width: 140px; */
 }
 
 .change-price {
-    width: 80px;
+    width: 85px;
     cursor: pointer;
     transition: all var(--speed-transition);
 }
@@ -128,6 +128,33 @@ td:nth-last-child(1) {
 
 .price-not-confirm {
     color: #990000;
+}
+
+.checkbox-product {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+    min-width: unset;
+}
+
+.list-products__row[is-active='0'] {
+    opacity: 0.3;
+}
+
+.active-check {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.active-check input {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+}
+
+.active-check input:focus {
+    outline: none;
 }
 
 @media(max-width: 1024px) {
