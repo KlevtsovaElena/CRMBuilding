@@ -178,7 +178,7 @@ if($role !== 1) {
                         );
 
                         //если статус не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['status']) && !isset($_GET['archive'])) {
+                        if (!isset($_GET['status'])) {
                         ?>
                             <option value="" <?= 'selected' ?> >все</option>
                             <?php for ($s = 0; $s < count($statuses); $s++) { ?>
@@ -355,7 +355,7 @@ if($role !== 1) {
                             $data = $data['orders'];
                             if ($params) {
                                 //считаем и записываем в переменную общее кол-во страниц
-                                $totalPages = ceil(count($data) / $limit);
+                                $totalPages = ceil($totalEntries / $limit);
                             }
                             //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
@@ -416,7 +416,7 @@ if($role !== 1) {
                                 $data = $data['orders'];
                                 if ($params) {
                                     //считаем и записываем в переменную общее кол-во страниц
-                                    $totalPages = ceil(count($data) / $limit);
+                                    $totalPages = ceil($totalEntries / $limit);
                                 }
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
