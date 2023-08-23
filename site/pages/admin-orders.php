@@ -10,7 +10,7 @@ if($role !== 1) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/list-products.css'>",
+        // "<link rel='stylesheet' href='./../assets/css/list-products.css'>",
         "<link rel='stylesheet' href='./../assets/css/list-orders.css'>",
         "<link rel='stylesheet' href='./../assets/css/admin.css'>"
     ];
@@ -37,9 +37,6 @@ if($role !== 1) {
         $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0');
         $data = json_decode($dataJson, true); 
         //print_r($data);
-
-        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-        $totalEntries = $data['count'];
 
         //если на странице уже заданы гет-параметры сортировки
         if(isset($_GET['orderby'])) {
@@ -93,31 +90,132 @@ if($role !== 1) {
         <p class="page-title">Заказы</p>
 
         <section class="form-filters">
-            <div class="form-elements-container">
+            <div class="form-elements-container filters-container-flex">
                 <!-- выбор кол-ва отображаемых записей на странице -->
-                <div class="id-block">
                 <?php
                 //если еще не переданы гет-параметры сортировки по дате
                 if (!isset($_GET['date_from']) && !isset($_GET['date_till'])) {
                 ?>
+                <div class="id-block">
                     c
                     <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()">
+                </div>
+
+                <div class="id-block">
                     по
                     <input id="till" type="date" class="middle-input" onchange="sortByDateTill()">
-                        
+                </div>
+
                 <?php }
                 //а если переданы, отображаем их
                 else {
                 ?>
-                
+                <div class="id-block">
                     c
                     <input id="from" type="date" class="middle-input" onchange="sortByDateFrom()" value="<?php if (isset($_GET['date_from'])) { ?><?= convertUnixForCalendar($_GET['date_from']); ?><?php } ?>">
+                </div>
+
+                <div class="id-block">
                     по
                     <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['date_till'])) { ?><?= convertUnixForCalendar($_GET['date_till']); ?><?php } ?>">
-                        
-                <?php } ?>
                 </div>
-                <div class="d-iblock">Показывать по
+                <?php } ?>
+
+                <!-- фильтрация по поставщику -->
+                <div class="d-iblock">
+                    <div>Поставщик</div> 
+                    <select id="vendor" name="vendor" value="" required>
+                    <?php
+                        //запрашиваем данные по поставщикам из БД
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0');
+                        $dataV = json_decode($dataJsonV, true);
+
+                        //если поставщик не был задан, устанавливаем в селекте выбранное значение "все"
+                        if (!isset($_GET['vendor_name'])) {
+                            
+                        ?>
+                            <option value="" <?= 'selected' ?> >все</option>
+                            <?php for ($v = 0; $v < count($dataV); $v++) { ?>
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php }
+                        //если поставщик уже задан в гет-параметрах, выводим его
+                        } else {
+                            $vendor = $_GET['vendor_name']; 
+                            ?>
+
+                            <option value="" <?php if($vendor == 'all') { echo 'selected'; } ?> >все</option>
+                            <?php 
+                            for ($v = 0; $v < count($dataV); $v++) { 
+                                if($vendor == $dataV[$v]['name']) {?>
+                                
+                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                } else { ?>
+                                    
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                }
+                            ?>
+                        <?php 
+                            }
+                        } ?> 
+                    </select>
+                </div>
+
+                <!-- фильтрация по статусу заказа -->
+                <div class="d-iblock">
+                    <div>Статус</div> 
+                    <select id="status" name="status" value="" required>
+                        <?php
+                        //список статусов
+                        $statuses = array(
+                            0 => 'Новый',
+                            1 => 'Просмотрен',
+                            2 => 'Подтверждён',
+                            3 => 'Отменён',
+                            4 => 'Доставлен',
+                        );
+
+                        //если статус не был задан, устанавливаем в селекте выбранное значение "все"
+                        if (!isset($_GET['status'])) {
+                        ?>
+                            <option value="" <?= 'selected' ?> >все</option>
+                            <?php for ($s = 0; $s < count($statuses); $s++) { ?>
+                                <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
+                            <?php }
+                        //если статус уже задан в гет-параметрах, выводим его
+                        } else {
+                            $statusSel = $_GET['status']; 
+                            ?>
+
+                            <option value="">все</option>
+                            <?php 
+                            for ($s = 0; $s < count($statuses); $s++) { 
+                                if($statusSel == $s) {?>
+                                
+                                <option value="<?= $s ?>"  <?= 'selected' ?>><?= $statuses[$s] ?></option>
+                            <?php 
+                                } else { ?>
+                                    
+                                <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
+                            <?php 
+                                }
+                            ?>
+                        <?php 
+                            }
+                        } ?> 
+                    </select>
+                </div>
+
+                <!-- поле поиска -->
+                <div class="d-iblock">
+                    <div>Поиск</div>
+                    <input type="search" id="search" name="search" value="" placeholder="№заказа" class="middle-input">
+                </div>
+
+                <!-- фильтрация по кол-ву отображаемых элементов на странице -->
+                <div class="d-iblock">
+                    <div>Показывать по </div>
                     <select id="limit" name="limit" value="" required>
                     <?php
                         //если лимит не был задан
@@ -141,8 +239,7 @@ if($role !== 1) {
                         ?> 
                     </select>
                 </div>
-                <!-- поле поиска -->
-                <input type="search" id="search" name="search" value="" placeholder="№ заказа">
+                
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
                 <button onclick="applyInOrders()" class="btn btn-ok d-iblock">Применить</button>
             </div>
@@ -164,14 +261,14 @@ if($role !== 1) {
             $limit = 10;
         }
 
-        //считаем и записываем в переменные общее кол-во страниц и оффсет
+        //считаем и записываем в переменную кол-во страниц и оффсет
         $totalPages = ceil(count($data) / $limit);
         $offset = ($currentPage - 1) * $limit;
 ?>
 
         <!-- таблица заказов -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> >
+            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>" data-status-select="<?php if (isset($_GET['status'])) { echo $_GET['status']; } ?>">
 
                 <thead>
                     <tr role="row">
@@ -194,27 +291,46 @@ if($role !== 1) {
 
                     <?php
 
-                    //если заданы гет-параметры даты, собираем их в переменную
-                    $dateParams = '';
+                    //собираем в отдельную переменную фильтры
+                    $params = '';
                     
+                    //если заданы гет-параметры даты, собираем их в переменную
                     if (isset($_GET['date_from']) || isset($_GET['date_till'])) {
                         if (isset($_GET['date_from'])) {
-                            $dateParams = $dateParams . '&date_from=' . $_GET['date_from'];
+                            $params = $params . '&date_from=' . $_GET['date_from'];
                         }
                         if (isset($_GET['date_till'])) {
-                            $dateParams = $dateParams . '&date_till=' . $_GET['date_till'];
+                            $params = $params . '&date_till=' . $_GET['date_till'];
                         }
-                        //print_r($dateParams);
                     }
+
+                    //если заданы гет-параметры поставщика, собираем их в переменную
+                    if (isset($_GET['vendor_name'])) {
+                        $params = $params . '&vendor_name=' . $_GET['vendor_name'];
+                    }
+
+                    //если заданы параметры статуса, собираем их в переменную
+                    if (isset($_GET['status'])) {
+                        $params = $params . '&status=' . $_GET['status'];
+                    }
+
+                    //print_r($params);
+
                     //если еще НЕ задан гет-параметр сортировки полей таблицы по одному ключу
                     if (!isset($_GET['orderby'])) {
 
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=' . $offset . $dateParams);
-                            $data = json_decode($dataJson, true); 
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=' . $offset . $params);
+                            $data = json_decode($dataJson, true);
+                            //записываем в переменную кол-во записей
+                            $totalEntries = $data['count']; 
                             $data = $data['orders'];
+                            if ($params) {
+                                //считаем и записываем в переменную общее кол-во страниц
+                                $totalPages = ceil(count($data) / $limit);
+                            }
                             //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
                         //если мы на первой странице
@@ -222,8 +338,9 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0' . $dateParams);
-                                $data = json_decode($dataJson, true); 
+                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0' . $params);
+                                $data = json_decode($dataJson, true);
+                                $totalEntries = $data['count']; 
                                 $data = $data['orders'];
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
@@ -231,7 +348,7 @@ if($role !== 1) {
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=' . $_GET['search'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&search=' . $_GET['search'] . $params);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
@@ -243,6 +360,8 @@ if($role !== 1) {
                             }
                             //сокращаем массив до данных только по заказам для выведения в форме
                             $data = $data['orders'];
+                            //считаем и записываем в переменную общее кол-во страниц
+                            $totalPages = ceil(count($data) / $limit);
                         }
                              
                     }
@@ -253,8 +372,9 @@ if($role !== 1) {
                         //если мы НЕ на первой странице
                         if(isset($_GET['page']) && $_GET['page'] > 1) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $dateParams);
-                            $data = json_decode($dataJson, true); 
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
+                            $data = json_decode($dataJson, true);
+                            $totalEntries = $data['count']; 
                             $data = $data['orders'];
                             //print_r($data);
                             //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -264,16 +384,21 @@ if($role !== 1) {
                             //и поиск не активирован
                             if (!isset($_GET['search'])) {
                                 //соберём данные для отображения в форме 
-                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $dateParams);
-                                $data = json_decode($dataJson, true); 
+                                $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                                $data = json_decode($dataJson, true);
+                                $totalEntries = $data['count']; 
                                 $data = $data['orders'];
+                                if ($params) {
+                                    //считаем и записываем в переменную общее кол-во страниц
+                                    $totalPages = ceil(count($data) / $limit);
+                                }
                                 //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                             }
                         }
 
                         //если активирован поиск
                         if(isset($_GET['search'])) {
-                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $dateParams);
+                            $dataJson = file_get_contents($nginxUrl . '/api/order-vendors/get-count-with-details.php?vendor_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $params);
                             $data = json_decode($dataJson, true);
                             //если по данному поисковому запросу записей нет, записываем в переменную 0
                             if (!$data) {
@@ -285,6 +410,8 @@ if($role !== 1) {
                             }
                             //сокращаем массив до данных только по заказам для выведения в форме
                             $data = $data['orders'];
+                            //считаем и записываем в переменную общее кол-во страниц
+                            $totalPages = ceil(count($data) / $limit);
                         }
 
                     } 
@@ -316,11 +443,11 @@ if($role !== 1) {
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
                                 <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['order_id'] ?></strong></a></td>
                                 <!-- конвертация юникс времени в стандартное в формате d.m.Y H:i -->
-                                <td><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
-                                <td><?= $data[$i]['vendor_name'] ?></td>
-                                <td><?= $data[$i]['vendor_city'] ?></td>
-                                <td><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                <td><?= $data[$i]['customer_phone'] ?></td>
+                                <td class="ta-center"><?= convertUnixToLocalTime($data[$i]['order_date']); ?></td>
+                                <td class="ta-center"><?= $data[$i]['vendor_name'] ?></td>
+                                <td class="ta-center"><?= $data[$i]['vendor_city'] ?></td>
+                                <td class="ta-center"><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
+                                <td class="ta-center"><?= $data[$i]['customer_phone'] ?></td>
                                 <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                 <td class="list-orders_products">
                                 <?php for ($p = 0; $p < count($data[$i]['products']); $p++) { ?> 
@@ -349,12 +476,12 @@ if($role !== 1) {
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $dateParams ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
             
             <span class="current-page"><?= $currentPage ?></span>
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $dateParams ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
         </div>

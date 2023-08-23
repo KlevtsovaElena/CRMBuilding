@@ -93,127 +93,6 @@ function edit(id, section_name) {
             //открываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.remove('d-none');
 
-            
-            // //при хотя бы одном клике по открывшемуся инпуту
-            // input.onclick = function() {
-
-            //     //1) вариант, когда только кликнули, но ничего не изменили в инпуте и ушли с него
-            //     //если после этого кликнули по любому другому месту, кроме инпута
-            //     input.onblur = function() {
-            //         //исключение - если кликнули по крестику отмены редактирования
-            //         document.onmousedown = function (e) {
-            //             if (e.target.className === "cancel" || e.target.className === "save") {
-            //                 console.log('отловлено нажатие');
-            //                 document.getElementsByClassName('edit')[i].onmousedown = cancel(id, uneditedValue);
-            //                 return;
-            //             } 
-            //         };
-
-            //         console.log('onblur срабатывает');
-            //         //скрываем инпут
-            //         inputBlock.classList.add('d-none');
-            //         //возвращаем нередактируемое поле
-            //         nameElements[i].classList.remove('d-none');
-            //         //возвращаем блок с карандашом
-            //         document.getElementsByClassName('edit')[i].classList.remove('d-none');
-            //         //скрываем блок с отменой
-            //         document.getElementsByClassName('cancel')[i].classList.add('d-none');
-            //         //скрываем блок с сохранением
-            //         document.getElementsByClassName('save')[i].classList.add('d-none');
-
-            //     }
-
-                //2) вариант, когда кликнули и внесли изменения в инпут
-                //при изменении в инпуте
-                // input.onchange = function() {
-
-                //     //console.log('onchange срабатывает');
-
-                //     //запрос подтверждения
-                //     let yes = window.confirm('Вы действительно хотите изменить этот элемент?');
-
-                //     if(!yes) {
-                //         console.log("не изменять");
-                //         return;
-                //     }
-
-                //     //копируем измененное значение
-                //     changedValue = inputBlock.querySelector('input').value;
-                //     if (changedValue.trim() === uneditedValue) {
-                //         console.log('значение не было обновлено');
-                //         return;
-                //     } 
-                //     if (changedValue.trim() === '') {
-                //         alert('Поле не может быть пустым');
-                //         return;
-                //     }
-                //     console.log(changedValue);
-
-                //     // собираем ссылку для запроса
-                //     link = mainUrl + '/api/'+ section_name + '.php';
-
-                //     // соберём json для передачи на сервер
-                //     //для категорий
-                //     if(section_name == 'categories') {
-                //         obj = JSON.stringify({
-                //             'id': id,
-                //             'category_name': changedValue
-                //         });
-                //     }
-
-                //     //для брендов
-                //     if (section_name == 'brands') {
-                //         obj = JSON.stringify({
-                //             'id': id,
-                //             'brand_name': changedValue
-                //         });
-                //     }
-
-                //     //для городов
-                //     if (section_name == 'cities') {
-                //         obj = JSON.stringify({
-                //             'id': id,
-                //             'name': changedValue
-                //         });
-                //     }
-
-                //     //для admin-vendors
-                //     if (section_name == 'vendors') {
-                //         obj = JSON.stringify({
-                //             'id': id,
-                //             'debt': changedValue
-                //         });
-                //     }
-
-                //     console.log(obj);
-
-                //     //передаем на сервер в пост-запросе
-                //     sendRequestPOST(link, obj);
-
-                //     //убираем инпут
-                //     inputBlock.classList.add('d-none');
-                //     //возвращаем нередактируемое поле
-                //     nameElements[i].classList.remove('d-none');
-                //     //и возвращаем измененное значение в исходный нередактируемый элемент
-                //     nameElements[i].innerHTML = changedValue;
-                //     //возвращаем блок с карандашом
-                //     document.getElementsByClassName('edit')[i].classList.remove('d-none');
-                //     //скрываем блок с отменой
-                //     document.getElementsByClassName('cancel')[i].classList.add('d-none');
-                //     //скрываем блок с сохранением
-                //     document.getElementsByClassName('save')[i].classList.add('d-none');
-
-                //     //если значение поменялось, заносим его в дата-атрибут, чтобы достать в функции cancel
-                //     if (changedValue.trim() != '' && changedValue.trim() !== uneditedValue) {
-                //         //console.log(nameElements[i]);
-                //         nameElements[i].setAttribute('data-new-name', changedValue);
-                //         //console.log(nameElements[i].getAttribute('data-new-name'));
-                //     }
-
-                // }
-                
-            
-            //}
         }
 
 
@@ -352,6 +231,9 @@ function save(id, uneditedValue, section_name) {
 
             //передаем на сервер в пост-запросе
             sendRequestPOST(link, obj);
+
+            //записываем только что измененное значение в дата-атрибут
+            nameElements[i].setAttribute('data-new-name', changedValue);
 
             //скрываем инпут и возвращаем нередактируемое поле с названием
             inputBlock.classList.add('d-none');
@@ -493,7 +375,15 @@ function applyInOrders() {
 
     console.log(limit.value);
 
-    //лимит задан всегда, поэтому проверяем наличие поискового запроса
+    //лимит задан всегда, поэтому проверяем наличие поискового запроса и другие селекты
+    //получим селект "поставщик"
+    let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
+    console.log(vendorSel);
+
+    //получим селект "статус"
+    let statusSel = document.getElementById('status').querySelectorAll('option:checked')[0].value;
+    console.log(statusSel);
+
     //получим введенное в поиск значение
     let searchQuery = document.getElementById('search').value;
     let dataSearch = searchQuery.trim();
@@ -506,7 +396,7 @@ function applyInOrders() {
     let till = sortByDateTill();
     console.log(till);
 
-    //собираем фильтры (дата + поиск)
+    //собираем фильтры (дата + поиск + селекты)
     let filters = '';
 
     //если задана дата
@@ -526,6 +416,16 @@ function applyInOrders() {
         limit.value = 'all';
         filters += '&search=order_id:' + dataSearch;
     } 
+
+    //если задан поставщик
+    if (vendorSel) {
+        filters += '&vendor_name=' + vendorSel;
+    }
+
+    //если задан статус
+    if (statusSel) {
+        filters += '&status=' + statusSel;
+    }
 
     //собираем сортировку
     // получим значение атрибута data-sort
@@ -568,117 +468,6 @@ function applyInOrders() {
 
     document.location.href = mainUrl + '/pages/admin-orders.php?limit=' + limit.value + filters + sorting;
 
-    // //если активировано значение asc
-    // if (dataSort && dataSort === "asc") {
-    //     //передаем его в адресную строку как гет-параметр
-    //     //вносим изменение в адресную строку страницы
-    //     //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-    //     //если в гет-параметрах нет ни поиска, ни страницы
-    //     if (!dataSearch && !dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':asc';
-    //     //если в гет-параметрах уже есть поиск, но не страница
-    //     } else if (dataSearch && !dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':asc';
-    //     //если в гет-параметрах уже есть страница, но не поиск
-    //     } else if (!dataSearch && dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc';
-    //     //если в гет-параметрах уже есть и страница, и поиск
-    //     } else if (dataSearch && dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
-    //     }
-    // //если активировано значение desc
-    // } else if (dataSort === "desc") {
-
-    //     //передаем его в адресную строку как гет-параметр
-    //     //вносим изменение в адресную строку страницы
-    //     //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-    //     //если в гет-параметрах нет ни поиска, ни страницы
-    //     if (!dataSearch && !dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&orderby=' + key + ':desc';
-    //     //если в гет-параметрах уже есть поиск, но не страница
-    //     } else if (dataSearch && !dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&orderby=' + key + ':desc';
-    //     //если в гет-параметрах уже есть страница, но не поиск
-    //     } else if (!dataSearch && dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
-    //     //если в гет-параметрах уже есть и страница, и поиск
-    //     } else if (dataSearch && dataPage) {
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
-    //         window.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
-    //     }
-    // } else if (!dataSort) {
-    //     //проверим значение дат и поиска
-    //     if((from || till) && searchQuery.trim()) {
-    //         //если есть только С и поиск
-    //         if(from && searchQuery.trim()) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&search=order_id:' + searchQuery.trim());
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + 'search=order_id:' + searchQuery.trim();
-    //         //если есть только ПО и поиск
-    //         } else if(till && searchQuery.trim()) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_till=' + till + '&search=order_id:' + searchQuery.trim());
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_till=' + till + 'search=order_id:' + searchQuery.trim();
-    //         //если есть С, ПО и поиск
-    //         } else if((from && till) && searchQuery.trim()) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till + '&search=order_id:' + searchQuery.trim());
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till + 'search=order_id:' + searchQuery.trim();
-
-    //         }
-    //     }
-    //     //если есть только одна или обе даты без поиска
-    //     else if((from || till) && !searchQuery.trim()) {
-    //         //если есть только С
-    //         if(from && !till) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from);
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from;
-    //         //если есть только ПО
-    //         } else if(till && !from) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_till=' + till);
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_till=' + till;
-    //         //если есть С и ПО
-    //         } else if(from && till) {
-    //             //вносим изменение в адресную строку страницы
-    //             history.replaceState(history.length, null, 'admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till);
-
-    //             document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&order_date_from=' + from + '&order_date_till=' + till;
-
-    //         }
-    //     }
-    //     //есть только поиск без дат
-    //     else if (searchQuery.trim() && !(from || till)) {
-    //         console.log(searchQuery);
-
-    //         //вносим изменение в адресную строку страницы
-    //         history.replaceState(history.length, null, 'admin-orders.php?limit=all&search=order_id:' + searchQuery.trim());
-
-    //         document.location.href = 'http://localhost/pages/admin-orders.php?limit=all&search=order_id:' + searchQuery.trim();
-    //     //если нет ни поиска, ни дат  
-    //     } else {
-
-    //     //вносим изменение в адресную строку страницы
-    //     history.replaceState(history.length, null, 'admin-orders.php?limit=' + limit.value);
-
-    //     document.location.href = 'http://localhost/pages/admin-orders.php?limit=' + limit.value;
-
-    //     }
-
-    // }
 }
 
 //функция при нажатии на кнопку "Применить" для admin-main!!!
@@ -965,25 +754,6 @@ function changePhone() {
     document.getElementById('phone-number').value = phone;
     console.log(document.getElementById('phone-number').value);
 
-    //let newPhone;
-
-    //по нажатию на энтер
-    // document.addEventListener('keyup', event => {
-    //     if( event.code === 'Enter' ) {
-
-    //         //меняем телефон и отправляем изменения
-    //         changePhoneAndSend(phone);
-    //     }
-    // });
-      
-
-      //меняем кнопку "Изменить на "Сохранить"
-    //   let btn = document.getElementById('btn-phone');
-    //   btn.innerHTML = 'Сохранить';
-    //   btn.onclick = function() {
-    //       changePhoneAndSend(phone);
-    //   }
-
     //скрываем карандаш
     document.querySelector('.edit').classList.add('d-none');
     //открываем иконку сохранения
@@ -1018,13 +788,6 @@ function changePhoneAndSend(oldPhone) {
         //вставляем внутрь прежнее значение
         document.getElementById('phone-number').innerHTML = oldPhone;
 
-        //меняем кнопку обратно на "Изменить"
-        // let btn = document.getElementById('btn-phone');
-        // btn.innerHTML = 'Изменить';
-        // btn.onclick = function() {
-        //     changePhone();
-        // }
-
         //возвращаем карандаш
         document.querySelector('.edit').classList.remove('d-none');
         //скрываем иконку сохранения
@@ -1044,13 +807,6 @@ function changePhoneAndSend(oldPhone) {
 
         //вставляем внутрь старое значение
         document.getElementById('phone-number').innerHTML = oldPhone;
-
-        //меняем кнопку обратно на "Изменить"
-        // let btn = document.getElementById('btn-phone');
-        // btn.innerHTML = 'Изменить';
-        // btn.onclick = function() {
-        //     changePhone();
-        // }
 
         //возвращаем карандаш
         document.querySelector('.edit').classList.remove('d-none');
@@ -1080,13 +836,6 @@ function changePhoneAndSend(oldPhone) {
 
     //отправляем новый телефон на сервер
     sendRequestPOST(link, obj);
-
-    //меняем кнопку обратно на "Изменить"
-    // let btn = document.getElementById('btn-phone');
-    // btn.innerHTML = 'Изменить';
-    // btn.onclick = function() {
-    //     changePhone();
-    // }
 
     //возвращаем карандаш
     document.querySelector('.edit').classList.remove('d-none');

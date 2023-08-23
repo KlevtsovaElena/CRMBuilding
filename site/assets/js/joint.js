@@ -28,6 +28,12 @@ function sortChange() {
     // получим значение атрибута data-page, содержащего номер текущей страницы
     let dataPage = document.getElementById('list-orders').getAttribute('data-page');
 
+    // получим значение атрибута data-vendor-select, содержащего название выбранного поставщика
+    let dataVendor = document.getElementById('list-orders').getAttribute('data-vendor-select');
+
+    // получим значение атрибута data-status-select, содержащего выбранный статус
+    let dataStatus = document.getElementById('list-orders').getAttribute('data-status-select');
+
     //проверка, есть ли на странице сортировка по дате
     let from; let till;
     if (document.getElementById('from') || document.getElementById('till')) {
@@ -40,6 +46,16 @@ function sortChange() {
 
     //собираем фильтры (дата + поиск)
     let filters = '';
+
+    //если задан поставщик
+    if (dataVendor) {
+        filters += '&vendor_name=' + dataVendor;
+    }
+
+    //если задан статус
+    if (dataStatus) {
+        filters += '&status=' + dataStatus;
+    }
 
     //если задана дата
     if (from || till) {
