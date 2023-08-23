@@ -127,6 +127,15 @@ if($role !== 2) {
                     <div class="error-info d-none"></div> 
                 </div>
 
+                <!-- статус -->
+                <div class="form-add-product__elements-item">
+                    <p>Статус</p>
+                    <select id="is_active" name="is_active" value="" required>
+                        <option value="1" <?php if($product[0]['is_active'] == 1) {echo 'selected';} ?>>Активен</option>
+                        <option value="0" <?php if($product[0]['is_active'] == 0) {echo 'selected';} ?>>Не активен</option>
+                    </select>
+                    <div class="error-info d-none"></div>
+                </div> 
 
 
             <!-- в зависимости от валюты поставщика -->
@@ -141,7 +150,7 @@ if($role !== 2) {
 
                 <!-- среднерыночная цена сум-->
                 <div class="form-add-product__elements-item">
-                    <p>Цена среднерыночная, Сум </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0"  max-price-old="<?= $product[0]['max_price']; ?>" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                    <p>Цена рынок, Сум </p><input type="number" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" required placeholder="0"  max-price-old="<?= $product[0]['max_price']; ?>" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
                     <input type="hidden" id="max_price_dollar" name="max_price_dollar" min="0" value="<?= $product[0]['max_price_dollar']; ?>">
                     <div class="error-info d-none"></div> 
                 </div> 
@@ -158,7 +167,7 @@ if($role !== 2) {
 
                 <!-- среднерыночная цена $-->
                 <div class="form-add-product__elements-item">
-                    <p>Цена среднерыночная, $ </p>
+                    <p>Цена рынок, $ </p>
                     <input type="hidden" id="max_price" name="max_price" min="0" value="<?= $product[0]['max_price']; ?>" class="price-value">
                     <input type="number" id="max_price_dollar" name="max_price_dollar" min="0" value="<?php if($product[0]['max_price_dollar'] !== 0) {echo $product[0]['max_price_dollar'];} ?>" required placeholder="0" class="max_price-dollar-add" rate="<?= $product[0]['vendor_rate']; ?>" onchange="calcPriceUzs()"  onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
                     <span>$ = </span><span class="price-uzs"><b><?= $product[0]['max_price']; ?></b></span><span> Сум</span>

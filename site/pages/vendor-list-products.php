@@ -116,7 +116,7 @@ if($role !== 2) {
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             <th data-id="max_price" data-sort="">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
-                            
+                            <th data-id="is_active" data-sort="">Активен</th>
                         </tr>
                     </thead>
 
@@ -271,7 +271,8 @@ if (count($_GET) !== 0) {
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
-                    
+                    <th data-id="is_active" data-sort="<?php if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th>
+
                 </tr>
             </thead>
 
@@ -294,7 +295,7 @@ if (count($_GET) !== 0) {
     <!-- шаблон таблицы -->
     <template id="template-body-table">
         
-        <tr role="row" class="list-products__row" product-id="${id}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
             
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
@@ -328,9 +329,12 @@ if (count($_GET) !== 0) {
 
                 <?php } ?>
                 
-
+            </td>
+            <td>
+                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>                
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
+
         </tr>
 
     </template>

@@ -222,10 +222,17 @@ function renderListProducts(totalProducts) {
 
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
+        let checked;
+        if (totalProducts['products'][i]['is_active'] == '1') {
+            checked = 'checked';
+        } else {
+            checked = '';
+        }
 
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
             
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
                                                                 .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
@@ -235,6 +242,8 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
+                                                                .replace('${is_active}', totalProducts['products'][i]['is_active'])
+                                                                .replace('${checked}', checked)
                                                                 .replace('${price}', totalProducts['products'][i]['price'])
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
@@ -246,6 +255,7 @@ function renderListProducts(totalProducts) {
 
             containerListProducts.innerHTML += tmplRowProductDollar.replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
                                                                 .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                                 .replace('${photo}',  totalProducts['products'][i]['photo'])
@@ -254,6 +264,8 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
+                                                                .replace('${is_active}', totalProducts['products'][i]['is_active'])
+                                                                .replace('${checked}', checked)
                                                                 .replace('${price}', totalProducts['products'][i]['price'])
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
@@ -664,4 +676,50 @@ function calcPriceUzs(rate) {
         priceUzsEl.innerText = '(' + Number(priceUzsEl.getAttribute('data-price-num')).toLocaleString('ru') + " Сум)";
     }
     
+}
+
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРА ЧЕРЕЗ ЧЕКБОКС (АКТИВЕН/НЕАКТИВЕН) ---------- */
+
+function checkboxChangedProductActive(id) {
+    // проверяем корректность токена
+    check()
+
+    let isChecked = window.confirm('Вы действительно хотите изменить статус активности товара?');
+
+    if(!isChecked) {
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_active': 0
+        });
+    }
+
+    console.log(obj);
+
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
+
+    // перерисовка страницы
+    startRenderPage();
+
 }
