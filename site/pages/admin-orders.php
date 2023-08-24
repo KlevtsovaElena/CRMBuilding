@@ -177,44 +177,39 @@ if($role !== 1) {
                             5 => 'В архиве'
                         );
 
+                        $statusSel = '';
+
                         //если статус не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['status']) && !isset($_GET['archive'])) {
+                        if (!isset($_GET['status']) && (!isset($_GET['archive']) || $_GET['archive'] == 0)) {
                         ?>
-                            <option value="" <?= 'selected' ?> >все</option>
-                            <?php for ($s = 0; $s < count($statuses); $s++) { ?>
-                                <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
-                            <?php }
-                        //если статус уже задан в гет-параметрах, выводим его
-                        } else {
-
-                            $statusSel;
-
-                            //если задан статус "В архиве"
-                            if (isset($_GET['archive']) && $_GET['archive'] == 1) {
-                                $statusSel = 5; 
-                            //если задан статус 0-4
-                            } elseif (isset($_GET['status'])) {
-
-                                $statusSel = $_GET['status']; 
-                            }
-                                ?>
-
-                                <option value="">все</option>
-                                <?php 
-                                for ($s = 0; $s < count($statuses); $s++) { 
-                                    if($statusSel == $s) {?>
+                            <option value="all" <?= 'selected' ?> >все</option>
+                            
+                        <?php 
+                        //если статус в гет-параметрах задан статус 5 "В архиве", выводим его
+                        } elseif (isset($_GET['archive']) && $_GET['archive'] == 1) {
+                            $statusSel = 5; ?>
+                            <option value="all">все</option>
+                        <?php
+                        //если задан статус 0-4 
+                        } elseif (isset($_GET['status'])) {
+                            $statusSel = $_GET['status']; ?>
+                            <option value="all">все</option>
+                        <?php 
+                        } ?>
+                            <?php 
+                            for ($s = 0; $s < count($statuses); $s++) { 
+                                if($statusSel == $s) {?>
+                                
+                                <option value="<?= $s ?>"  <?= 'selected' ?>><?= $statuses[$s] ?></option>
+                            <?php 
+                                } else { ?>
                                     
-                                    <option value="<?= $s ?>"  <?= 'selected' ?>><?= $statuses[$s] ?></option>
-                                <?php 
-                                    } else { ?>
-                                        
-                                    <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
-                                <?php 
-                                    }
-                                ?>
+                                <option value="<?= $s ?>"><?= $statuses[$s] ?></option>
                             <?php 
                                 }
-                        } ?> 
+                            ?>
+                        <?php 
+                            } ?> 
                     </select>
                 </div>
 
@@ -252,12 +247,12 @@ if($role !== 1) {
                 </div>
 
                 <!-- чекбокс для архивных заказов -->
-                <!-- <div class="archive-check">
+                <div class="archive-check">
                     <div>
-                        <input type="checkbox" id="archive" name="archive" onclick="archivedChecked()">
+                        <input type="checkbox" id="archive" name="archive" onclick="archiveChecked()" value="" <?php if (isset($_GET['archived']) || isset($_GET['archive']) && $_GET['archive'] == 1) { echo 'checked'; } ?>>
                     </div>
                     <lable>С архивными</lable>
-                </div> -->
+                </div>
                 
                 <!-- кнопка, активирующая фильтры на странице и поиск -->
                 <button onclick="applyInOrders()" class="btn btn-ok d-iblock">Применить</button>
@@ -336,6 +331,8 @@ if($role !== 1) {
                     //если задан гет-параметр архива, собираем в переменную
                     if (isset($_GET['archive'])) {
                         $params = $params . '&archive=' . $_GET['archive'];
+                    } else if (isset($_GET['archived'])) {
+                        true;
                     } else {
                         $params = $params . '&archive=0';
                     }
@@ -502,12 +499,12 @@ if($role !== 1) {
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>" class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
             
             <span class="current-page"><?= $currentPage ?></span>
-            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
+            <a href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>" class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
         </div>

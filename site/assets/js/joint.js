@@ -37,6 +37,9 @@ function sortChange() {
     // получим значение атрибута data-archive, содержащего статус архива
     let dataArchive = document.getElementById('list-orders').getAttribute('data-archive-select');
 
+    // получим значение чекбокса по архивных заказам
+    //let dataArchiveCheck = document.getElementById('archive').value;
+
     //проверка, есть ли на странице сортировка по дате
     let from; let till;
     if (document.getElementById('from') || document.getElementById('till')) {
@@ -88,8 +91,12 @@ function sortChange() {
     }
 
     //если отмечен чекбокс с архивными записями, выводим заказы с архивными
-    if (archivedChecked()) {
-        filters += '&archive=""';
+    if (archiveChecked()) {
+        filters.replace('&archive=.', '');
+        filters += '&archived';
+    //если НЕ отмечен чекбокс с архивными записями, выводим заказы без архивных
+    } else {
+        filters += '&archive=0';
     }
 
     //если задана страница
@@ -184,13 +191,18 @@ function sortByDateTill() {
     return unixTime;
 }
 
+let archiveCheck = document.getElementById('archive');
+
 //функция чекбокса архивных записей
-function archivedChecked() {
+function archiveChecked() {
     //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
-    // let archiveCheck = document.getElementById('archive');
-    if (event.target.checked) {
-        alert(3);
+    if (archiveCheck.checked) {
+        archiveCheck.value = '';
         return 1;
+    //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
+    } else {
+        archiveCheck.value = 'archive=0';
+        return 0;
     }
 }
 

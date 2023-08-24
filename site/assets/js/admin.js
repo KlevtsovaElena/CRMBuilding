@@ -424,18 +424,36 @@ function applyInOrders() {
 
     //если задан статус
     if (statusSel) {
-        if (statusSel == 5) {
+        //если выбраны только заказы "В архиве"
+        if(statusSel == 5) {
             filters += '&archive=1';
+            //сразу на фронте активируем чекбокс
+            archiveCheck.checked;
+        //если выбраны все заказы
+        } else if(statusSel == 'all') {
+            //если отмечен чекбокс с архивными записями, выводим заказы с архивными
+            if (archiveChecked()) {
+                filters.replace('&archive=.', '');
+                filters += '&archived';
+            //если НЕ отмечен чекбокс с архивными записями, выводим заказы без архивных
+            } else {
+                filters += '&archive=0';
+            }
+        //если выбраны заказы 0-4
         } else {
+            //если отмечен чекбокс с архивными записями, выводим заказы с архивными
+            if (archiveChecked()) {
+                filters.replace('&archive=.', '');
+                filters += '&archived';
+            //если НЕ отмечен чекбокс с архивными записями, выводим заказы без архивных
+            } else {
+                filters += '&archive=0';
+            }
+
             filters += '&status=' + statusSel;
         } 
     }
-
-    //если отмечен чекбокс с архивными записями
-    if (archivedChecked()) {
-        filters += '&archive=""';
-        alert(4);
-    }
+    
 
     //alert(filters);
 
