@@ -76,8 +76,6 @@ class ProductRepository extends BaseRepository
                                     SET p.price = p1.`price_dollar` * v.`rate`,
                                         p.max_price = p1.`max_price_dollar` * v.`rate`
                                     WHERE v.`id` = :vendor_id 
-                                        AND p1.`price_dollar` <> 0
-                                        AND p1.`max_price_dollar` <> 0
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
     private static array $productDetailsAccosiations = [
