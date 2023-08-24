@@ -189,6 +189,7 @@ type Product struct {
 	Photo       string `json:"photo"`
 	Price       int    `json:"price"`
 	MaxPrice    int    `json:"max_price"`
+	CityName    string `json:"city_name"`
 }
 
 // словарь с переводом на разные языки
@@ -1229,7 +1230,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			sendMessage(chatId, "Отправьте нужную геопозицию через телеграмм", keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1237,6 +1238,76 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 		// кейс для вывода сообщения о заказе и его отправка на бекенд
 		case usersDB[chatId].Step == 11:
+
+			user := usersDB[chatId]
+
+			// Создаем GET-запрос
+			res, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
+			}
+			defer res.Body.Close()
+
+			var userdetails []UserDetails
+			err = json.NewDecoder(res.Body).Decode(&userdetails)
+			if err != nil {
+				log.Fatal("Ошибка при декодировании JSON:", err)
+			}
+
+			// Используем полученные данные и подставляем их в кнопки
+			for _, userdetail := range userdetails {
+
+				for ID := range user.Cart {
+
+					// Создаем GET-запрос
+					res, err := http.Get("http://" + link + "/api/products/get-with-details.php?id=" + strconv.Itoa(ID))
+					if err != nil {
+						log.Fatal("Ошибка при выполнении запроса:", err)
+					}
+					defer res.Body.Close()
+
+					var product []Product
+					err = json.NewDecoder(res.Body).Decode(&product)
+					if err != nil {
+						log.Fatal("Ошибка при декодировании JSON:", err)
+					}
+
+					// Используем полученные данные и подставляем их в кнопки
+					for _, product := range product {
+						if product.CityName != userdetail.CityName {
+
+							// Создаем объект клавиатуры
+							keyboard := map[string]interface{}{
+								"keyboard": [][]map[string]interface{}{
+									{{"text": languages[usersDB[chatId].Language]["order"] + "🛍"}},
+
+									{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + "💹"},
+										{"text": languages[usersDB[chatId].Language]["settings"] + "⚙️"},
+									},
+									{{"text": languages[usersDB[chatId].Language]["my_orders"] + "📕"},
+										{"text": languages[usersDB[chatId].Language]["current_prices"] + "📈"},
+									},
+									{{"text": languages[usersDB[chatId].Language]["contact"] + "📞"},
+										{"text": languages[usersDB[chatId].Language]["cart"] + "🗑"},
+									},
+								},
+								"resize_keyboard":   true,
+								"one_time_keyboard": true,
+							}
+
+							// обнуляем корзину
+							user.Cart = map[int]int{}
+							errorText := url.QueryEscape("\nВаш город: " + userdetail.CityName + "\n Город, в котором находится товар: " + product.CityName + "\n Вы не сможете заказать эти товары, выберите другие")
+							// Отправляем сообщение с клавиатурой и перезаписываем шаг
+							sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+errorText, keyboard)
+
+							user.Step = 5
+							usersDB[chatId] = user
+							break
+						}
+					}
+				}
+			}
 
 			time := time.Now().Unix()
 			coordinates := Coordinates{
@@ -1287,7 +1358,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"one_time_keyboard": true,
 			}
 
-			user := usersDB[chatId]
 			// обнуляем корзину
 			user.Cart = map[int]int{}
 
@@ -1299,7 +1369,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		}
 
 		// кейс при нажатии на + в карточке товара
-		if strings.SplitN(button, ":", 2)[0] == "addone" && usersDB[chatId].Step == 7 {
+		if strings.SplitN(button, ":", 2)[0] == "addone" {
 			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -1381,7 +1451,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		}
 
 		// кейс при нажатии на + в карточке товара
-		if strings.SplitN(button, ":", 2)[0] == "add" && usersDB[chatId].Step == 7 {
+		if strings.SplitN(button, ":", 2)[0] == "add" {
 			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -1463,7 +1533,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		}
 
 		// кейс для - в карточке товаров
-		if strings.SplitN(button, ":", 2)[0] == "minus" && usersDB[chatId].Step == 7 {
+		if strings.SplitN(button, ":", 2)[0] == "minus" {
 			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -1509,7 +1579,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		}
 
 		// кейс для - в карточке товаров
-		if strings.SplitN(button, ":", 2)[0] == "minusone" && usersDB[chatId].Step == 7 {
+		if strings.SplitN(button, ":", 2)[0] == "minusone" {
 			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
@@ -1557,7 +1627,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс при нажатии на кнопку актуальные цены
 		if text == languages[usersDB[chatId].Language]["current_prices"]+"📈" {
 
-			channelURL := "t.me/stroybotchannel2"
+			channelURL := "t.me/stroy_bot_prices"
 
 			// Получаем текущую дату и время
 			currentTime := time.Now()
@@ -1587,7 +1657,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс при нажатии на кнопку актуальный курс
 		if text == languages[usersDB[chatId].Language]["current_exchange_rate"]+"💹" {
 
-			channelURL := "t.me/stroy_bot_prices"
+			channelURL := "t.me/stroybotchannel2"
 
 			// Получаем текущую дату и время
 			currentTime := time.Now()
