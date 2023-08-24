@@ -128,10 +128,10 @@ class VendorsController extends BaseController
 
         // формируем ссылку на бота с hash 
         // для сервера
-        // $linkBot = 'https://t.me/str0y_bot?start=provider_' . $post['hash_string'];
+        $linkBot = 'https://t.me/str0y_bot?start=provider_' . $post['hash_string'];
 
         // для локали
-        $linkBot = 'https://t.me/Uzstroibot?start=provider_' . $post['hash_string'];       
+        // $linkBot = 'https://t.me/Uzstroibot?start=provider_' . $post['hash_string'];       
 
         // возвращаем на фронт данные 
         $response = [

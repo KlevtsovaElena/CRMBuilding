@@ -50,13 +50,45 @@ function sendRequestDELETE(url) {
 
 }
 
-/* ---------- TOGGLE MENU LEFT ---------- */
-const menuLeft = document.querySelector('.menu-left');
-const mainContent = document.querySelector('.main-content');
 
+/* ---------- СОХРАНЕНИЕ РЕЖИМА МЕНЮ ПРИ КЛИКЕ НА ПМ (СВЕРНУТО/НЕ СВЕРНУТО) ---------- */
+document.addEventListener('DOMContentLoaded', restoreMenuState);
+
+// при загрузки страницы проверяем статус меню (свернуто или нет )
+// и добавляем соответсвующий класс меню
+function restoreMenuState() {
+    const menuLeft = document.querySelector('.menu-left');
+    const mainContent = document.querySelector('.main-content');
+
+    if (sessionStorage.getItem('menuState')) {
+        if (sessionStorage.getItem('menuState') == 'collapsed') {
+            menuLeft.classList.add('collapsed');
+            mainContent.classList.add('collapsed');
+        } else {
+            menuLeft.classList.remove('collapsed');
+            mainContent.classList.remove('collapsed');
+        }
+    }
+}
+
+
+/* ---------- TOGGLE MENU LEFT ---------- */
+// по кнопке Свернуть меню
 function toggleMenu() {
+    const menuLeft = document.querySelector('.menu-left');
+    const mainContent = document.querySelector('.main-content');
+
     menuLeft.classList.toggle('collapsed');
     mainContent.classList.toggle('collapsed');
+
+    // запишем статус в sessionStorage
+    let isCollapsed = menuLeft.classList.contains('collapsed');
+    if (isCollapsed) {
+        sessionStorage.setItem('menuState', 'collapsed');
+    } else {
+        sessionStorage.setItem('menuState', 'notCollapsed');
+
+    }
 }
 
 /* ---------- СКЛОНЕНИЕ СЛОВА ---------- */
