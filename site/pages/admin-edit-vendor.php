@@ -153,11 +153,11 @@ if($role !== 1) {
 
             <p>Логин и пароль поставщика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
             <br>
-            <!-- <p><b>Ссылка для бота:</b></p>
+            <p><b>Ссылка для бота:</b></p>
             <div class="vendor-info-text">
-                <span class="copy-text">${response['linkBot']}</span>
+                <span class="copy-text">https://t.me/str0y_bot?start=provider_<?= $vendor[0]['hash_string']; ?></span>
                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
-            </div> -->
+            </div>
             <p><b>Вход в CRM</b></p>
             <div class="vendor-info-text d-flex">
                 <div class="copy-text">
