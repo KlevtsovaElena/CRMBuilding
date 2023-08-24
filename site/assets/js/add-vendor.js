@@ -41,7 +41,6 @@ function addVendor() {
     hasError = validationAddVendor();
 
     // если были ошибки, то выходим
-    console.log(hasError);
     if (hasError) {
         return;
     }
@@ -109,8 +108,6 @@ function validationAddVendor() {
 
     [nameVendor, cityId, email, percent, is_active].forEach(item =>  {
     
-        console.log(item.getAttribute('name') + "    " + item.value);
-
         const errorInfoContainer = item.closest('.form-add-vendor__item').querySelector('.error-info');
         
         if (!(item.value.trim())) {
@@ -196,16 +193,17 @@ function editVendor(id) {
     hasError = validationAddVendor();
 
     // если были ошибки, то выходим
-    console.log(hasError);
     if (hasError) {
         return;
     }
 
     let currencyDollar;
+    let currencyDB;
     const radio = document.getElementsByName('currency_dollar');
     radio.forEach(item => {
         if (item.checked) {
             currencyDollar = item.value;
+            currencyDB = item.closest('.form-add-vendor__item').getAttribute('currency');    
         }
     })
 
@@ -226,10 +224,31 @@ function editVendor(id) {
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/vendors.php', obj);
 
-    // перезагрузим страницу
-    window.location.href = window.location.href;
+    // если меняем Сум на $, то цены П уводим на рассмотрение и обнуляем их в базе
+    if (currencyDollar == '1' && currencyDB == '0') {
+        let objPrice  = JSON.stringify({
+            'id': id,
+            'rate': 0,
+            'price_confirmed': 0
+        })
+    
+        // передаём данные на сервер
+        sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', objPrice);
+    }
+     
+    // // перезагрузим страницу
+    // window.location.href = window.location.href;
 }
 
+// вывести предупреждение при смене Сум на $
+function checkCurrency() {
+    const parentEl = event.target.closest('.form-add-vendor__item');
+    if (parentEl.getAttribute('currency') !== '1') {
+        const infoCurrency = parentEl.querySelector('.error-info');
+        infoCurrency.classList.remove('d-none');
+        infoCurrency.innerText = "! При изменении Сум на $ цены обнулятся";
+    }
+}
 
 // удаление поставщика админом
 

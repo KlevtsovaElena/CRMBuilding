@@ -102,10 +102,10 @@ if($role !== 1) {
             </div>
 
             <!-- валюта поставщика -->
-            <div class="form-add-vendor__item">
+            <div class="form-add-vendor__item" currency="<?= $vendor[0]['currency_dollar']; ?>">
                 <p>Валюта цен</p>
                 <input type="radio" id="uzs" name="currency_dollar" value="0" <?php if ($vendor[0]['currency_dollar'] == 0) {echo 'checked'; } ?>><span class="currency-title"> Цена в сумах</span>
-                <input type="radio" id="usd" name="currency_dollar" value="1" <?php if ($vendor[0]['currency_dollar'] == 1) {echo 'checked'; } ?>><span class="currency-title"> Цена в долларах</span>
+                <input type="radio" id="usd" name="currency_dollar" value="1" <?php if ($vendor[0]['currency_dollar'] == 1) {echo 'checked'; } ?>  onclick="checkCurrency()"><span class="currency-title"> Цена в долларах</span>
                 <?php if ($vendor[0]['currency_dollar'] == 1) {echo "<span>&nbsp  &nbsp (1 $ = " . $vendor[0]['rate'] . " Сум)</span>" ;} ?>
                 <div class="error-info d-none"></div>
             </div>
@@ -153,11 +153,11 @@ if($role !== 1) {
 
             <p>Логин и пароль поставщика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
             <br>
-            <!-- <p><b>Ссылка для бота:</b></p>
+            <p><b>Ссылка для бота:</b></p>
             <div class="vendor-info-text">
-                <span class="copy-text">${response['linkBot']}</span>
+                <span class="copy-text">https://t.me/str0y_bot?start=provider_<?= $vendor[0]['hash_string']; ?></span>
                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
-            </div> -->
+            </div>
             <p><b>Вход в CRM</b></p>
             <div class="vendor-info-text d-flex">
                 <div class="copy-text">

@@ -32,19 +32,10 @@ if($role !== 2) {
 
 
 <!-- убрать попозже -->
-    <p><b>Ссылка для бота локального:</b></p>
+    <p><b>Ссылка на бота:</b></p>
     <div class="vendor-info-text">
-        <?php $link_bot = 'https://t.me/Uzstroibot?start=provider_' . $vendor_hash_string; ?>
+        <?php $link_bot = 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string; ?>
         <a href="<?= $link_bot; ?>" class="copy-text" target="_blank"><?= $link_bot; ?></a>
-        <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
-    </div>
-    <br>
-    <br>
-
-    <p><b>Ссылка для бота сервер:</b></p>
-    <div class="vendor-info-text">
-        <?php $link_bot2 = 'https://t.me/str0y_bot?start=provider_' . $vendor_hash_string; ?>
-        <a href="<?= $link_bot2; ?>" class="copy-text" target="_blank"><?= $link_bot2; ?></a>
         <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
     </div>
     <br>
@@ -122,7 +113,7 @@ if($role !== 2) {
     <?php if ((int)$vendorData[0]['debt'] > 0) {?>
         <div class="data-vendor-elem">
             <span class="ghost data-vendor-elem__title">Долг:</span>
-            <span><b><?= $vendorData[0]['debt']; ?></b></span><span class="ghost data-vendor-elem__data"> Сум</span>
+            <span><b><?= number_format($vendorData[0]['debt'], 0, ',', ' '); ?></b></span><span class="ghost data-vendor-elem__data"> Сум</span>
             <hr class="ghost">
         </div>
     <?php } ?>
