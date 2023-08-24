@@ -52,6 +52,7 @@ class ProductRepository extends BaseRepository
                                         v.`deleted` as `vendor_deleted`,
                                         v.`is_active` as `vendor_active`,
                                         v.`city_id` as `city_id`,
+                                        cit.`name` as `city_name`,
                                         v.`price_confirmed` as `price_confirmed`,
                                         p.`is_active` as `is_active`
                                     FROM products p
@@ -61,6 +62,8 @@ class ProductRepository extends BaseRepository
                                             b.`id` = p.`brand_id`
                                         INNER JOIN vendors v ON
                                             v.`id` = p.`vendor_id`
+                                        INNER JOIN cities cit ON
+                                            cit.`id` = v.`city_id`
                                         INNER JOIN units u ON
                                             u.`id` = p.`unit_id`
                                         %s';
@@ -103,6 +106,7 @@ class ProductRepository extends BaseRepository
         'vendor_rate' => 'v.rate',
         'vendor_active' => 'v.is_active',
         'city_id' => 'v.city_id',
+        'city_name' => 'cit.name', 
         'price_confirmed' => 'v.price_confirmed',
         'is_active' => 'p.is_active'
     ];
