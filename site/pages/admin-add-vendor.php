@@ -59,7 +59,7 @@ if($role !== 1) {
 
             <!-- телефон -->
             <div class="form-add-vendor__item">
-                <p>Телефон</p><input type="tel" id="phone" name="phone" value="" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                <p>Телефон</p><input type="tel" id="phone" name="phone" value="" placeholder="+998-88-888-88-88" />
                 <div class="error-info d-none"></div>
             </div>
 
