@@ -90,13 +90,15 @@ function sortChange() {
         filters += '&archive=' + dataArchive;
     }
 
-    //если отмечен чекбокс с архивными записями, выводим заказы с архивными
-    if (archiveChecked()) {
-        filters.replace('&archive=.', '');
-        filters += '&archived';
-    //если НЕ отмечен чекбокс с архивными записями, выводим заказы без архивных
-    } else {
-        filters += '&archive=0';
+    //если отмечен чекбокс с архивными записями, выводим заказы с архивными (для страницы заказов)
+    if (archiveCheck) {
+        if (archiveChecked()) {
+            filters.replace('&archive=.', '');
+            filters += '&archived';
+        //если НЕ отмечен чекбокс с архивными записями, выводим заказы без архивных
+        } else {
+            filters += '&archive=0';
+        }
     }
 
     //если задана страница
@@ -193,7 +195,7 @@ function sortByDateTill() {
 
 let archiveCheck = document.getElementById('archive');
 
-//функция чекбокса архивных записей
+//функция чекбокса архивных записей (для страницы заказов)
 function archiveChecked() {
     //если не отмечен чекбокс с архивными записями, выводим заказы БЕЗ архивных
     if (archiveCheck.checked) {
