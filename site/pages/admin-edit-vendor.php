@@ -14,6 +14,7 @@ if($role !== 1) {
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
+        "<script src='./../assets/js/imask.min.js'></script>",
         "<script src='./../assets/js/add-vendor.js'></script>"
     ];
 ?>
@@ -85,7 +86,21 @@ if($role !== 1) {
 
             <!-- телефон -->
             <div class="form-add-vendor__item">
-                <p>Телефон</p><input type="tel" id="phone" name="phone" data-phone="<?= $vendor[0]['phone']; ?>" value="<?= $vendor[0]['phone']; ?>" placeholder="+998-88-888-88-88" />
+                <p>Телефон</p>
+                <?php 
+                // если телефон в базе стандартного формата (12 цифр, первые 3 - 998), то форматируем 
+                // если нет - запишем, как в базе
+                    $tel = $vendor[0]['phone'];
+                    $telFormat = $tel;
+                    substr($tel, 0,3);
+                    if ($tel && (strlen($tel) === 12) && substr($tel, 0,3) == '998') {
+                        $telFormat = '+' . substr($tel, 0,3) . '-' . substr($tel, 3,2) . '-' . substr($tel, 5,3) . '-' . substr($tel, 8,2) . '-' . substr($tel, 10);
+                    } 
+                ?>
+                <input type="tel" id="phoneOld" onclick="test()" value="<?= $telFormat; ?>" readOnly style="color: rgba(0,0,0,0.5);"/>
+
+                
+                <input type="hidden" id="phone" name="phone" class="phone-edit" data-phone="<?= $vendor[0]['phone']; ?>" value="<?= $vendor[0]['phone']; ?>" placeholder="+998-88-888-88-88" />
                 <div class="error-info d-none"></div>
             </div>
 
@@ -153,11 +168,6 @@ if($role !== 1) {
 
             <p>Логин и пароль поставщика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
             <br>
-            <p><b>Ссылка для бота:</b></p>
-            <div class="vendor-info-text">
-                <span class="copy-text">https://t.me/str0y_bot?start=provider_<?= $vendor[0]['hash_string']; ?></span>
-                <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
-            </div>
             <p><b>Вход в CRM</b></p>
             <div class="vendor-info-text d-flex">
                 <div class="copy-text">
@@ -165,6 +175,12 @@ if($role !== 1) {
                     <p><i>Пароль: <?= $vendor[0]['password']; ?></i></p> 
                 </div>
                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>                             
+            </div>
+            <br>
+            <p><b>Ссылка для бота:</b></p>
+            <div class="vendor-info-text">
+                <span class="copy-text">https://t.me/str0y_bot?start=provider_<?= $vendor[0]['hash_string']; ?></span>
+                <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>
             </div>
         </div>
     </section>   
