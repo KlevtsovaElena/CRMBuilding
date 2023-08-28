@@ -74,9 +74,19 @@ if($role !== 2) {
     </div>
 
     <!-- телефон поставщика -->
+    <?php 
+    // если телефон в базе стандартного формата (12 цифр, первые 3 - 998), то форматируем 
+    // если нет - запишем, как в базе
+        $tel = $profile['phone'];
+        $telFormat = $tel;
+        substr($tel, 0,3);
+        if ($tel && (strlen($tel) === 12) && substr($tel, 0,3) == '998') {
+            $telFormat = '+' . substr($tel, 0,3) . '-' . substr($tel, 3,2) . '-' . substr($tel, 5,3) . '-' . substr($tel, 8,2) . '-' . substr($tel, 10);
+        } 
+    ?>
     <div class="data-vendor-elem">
         <p class="ghost data-vendor-elem__title">Телефон:</p>
-        <p class="data-vendor-elem__data"><?= $profile['phone']; ?></p>
+        <p class="data-vendor-elem__data"><?= $telFormat; ?></p>
         <hr class="ghost">
     </div>
 

@@ -201,7 +201,8 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ---COUNTER в хэдере---- */
-.orders-with-counter {
+.orders-with-counter,
+.svg-counter {
     position: relative;
 }
 
