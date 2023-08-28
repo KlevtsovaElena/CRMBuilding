@@ -327,10 +327,10 @@ if (count($_GET) !== 0) {
 
                     <tr role="row" class="list-orders__row row-status${status}" order-id="${id}" archive="${archive}">
 
-                        <td><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
-                        <td>${order_date}</td>
+                        <td class="ta-center"><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
+                        <td class="ta-center">${order_date}</td>
                         <td>
-                            <div class="list-orders_status d-block status${status}" title="Изменить статус">${status}</div>
+                            <div class="ta-center list-orders_status d-block status${status}" title="Изменить статус">${status}</div>
                             <div class="change-status d-none">
                                 <select  class="change-order-select" name="change-order" value="">
                             
@@ -346,7 +346,7 @@ if (count($_GET) !== 0) {
                             </div>
                         </td>
                         <!-- <td  class="ta-center">${customer_id}</td> -->
-                        <td>${customer_phone}</td>
+                        <td class="ta-center"><a href="tel:${customer_phone}">${customer_phone}</a></td>
                         <td class="list-orders_products">${products}</td>
                         <td class="ta-center">${total_price}</td>
                         <td class="ta-center">${distance}</td>

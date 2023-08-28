@@ -94,6 +94,9 @@ function startRenderPage() {
     // 4. отрисуем таблицу с данными
     renderListOrders(orders);
 
+    // 5. добавим параметры в адресную строку
+    history.replaceState(history.length, null, 'vendor-list-orders.php?vendor_id=' + vendor_id + params);
+
 }
 
 
@@ -325,6 +328,7 @@ function renderListOrders(orders) {
                                                         .replace('${order_date}', dateOrder)
                                                         // .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
+                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])
                                                         .replace('${total_price}',  orders['orders'][i]['total_price'].toLocaleString('ru'))

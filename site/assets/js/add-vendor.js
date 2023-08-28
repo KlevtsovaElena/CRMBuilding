@@ -49,12 +49,14 @@ function addVendor() {
 
     // значение валюты
     let currencyDollar;
+    let priceConf = 1;
     const radio = document.getElementsByName('currency_dollar');
     radio.forEach(item => {
         if (item.checked) {
             currencyDollar = item.value;
         }
     })
+    if (currencyDollar == '1') priceConf = 0;
 
     // если есть значение телефона (не пустое)
     // проверим кол-во символов числового значения (998888888888) телефона должно равняться 12
@@ -91,7 +93,7 @@ function addVendor() {
         'is_active': is_active.value,
         'percent': percent.value, 
         'currency_dollar': currencyDollar,
-        'price_confirmed': 1,
+        'price_confirmed': priceConf,
         'role': 2 // соответствует роли поставщика
     });
 
@@ -127,7 +129,7 @@ function addVendor() {
                                 </div>
                                 <button class="copy-result btn btn-ok" onclick="copyText()">Copy</button>                             
                             </div>`
-
+                            
     formAddVendor.reset();
 }
 

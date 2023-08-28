@@ -96,6 +96,11 @@ function startRenderPage() {
     // 4. отрисуем таблицу с данными
     renderListProducts(totalProducts);
 
+    // 5. добавим параметры в адресную строку
+    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
+
+ 
+
 }
 
 
