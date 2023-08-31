@@ -8,17 +8,24 @@ $mainUrl = ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['
 $nginxUrl = "http://nginx";
 // *********************************************************************************************************************//
 
+// найдём имя файла и нужны ли параметры return_url (с индексной страницы не нужны)
+$fileName = pathinfo($_SERVER['REQUEST_URI'])['filename'];
+if ( $fileName == 'index' ||  $fileName == '') {
+    $return_url = "";
+} else {
+    $return_url =  "?return_url=" . $mainUrl . $_SERVER['REQUEST_URI'];
+}
 
 // проверка куки
 // 1. если есть, но пустой - удаляем куки и переадресация на форму
 // 2. если куки есть и не пустой - отправляем на сервер для сравнения
 // 3. если вообще нет - переадресация на форму входа
+
 if(isset($_COOKIE['profile'])) {
     if(trim($_COOKIE['profile']) == '' ) {
-        // 1.
-        $return_url =  $mainUrl . $_SERVER['REQUEST_URI'];
+        // 1.        
         setcookie('profile', '', -1, '/');
-        header('Location: ' . $mainUrl . '/pages/login.php?return_url=' . $return_url);
+        header('Location: ' . $mainUrl . '/pages/login.php' . $return_url);
         exit(0);
     } else {
         // 2.
@@ -38,9 +45,8 @@ if(isset($_COOKIE['profile'])) {
         // смотрим, что вернул сервер
         // если данные проверку не прошли, то 
         if (!$response || ($response['success'] == false)) {
-            $return_url =  $mainUrl . $_SERVER['REQUEST_URI'];
             setcookie('profile', '', -1, '/');
-            header('Location: ' . $mainUrl . '/pages/login.php?return_url=' . $return_url);
+            header('Location: ' . $mainUrl . '/pages/login.php' . $return_url);
             exit(0);
         // если данные проверку прошли, то 
         } else if ($response['success'] == true) {
@@ -54,9 +60,8 @@ if(isset($_COOKIE['profile'])) {
     }
 } else {
     // 3.
-    $return_url =  $mainUrl . $_SERVER['REQUEST_URI'];
     setcookie('profile', '', -1, '/');
-    header('Location: ' . $mainUrl . '/pages/login.php?return_url=' . $return_url);
+    header('Location: ' . $mainUrl . '/pages/login.php' . $return_url);
     exit(0);
 }
 ?>
