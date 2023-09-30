@@ -966,7 +966,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			for _, userdetail := range userdetails {
 
 				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_active=1&price_confirmed=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
+				resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -1297,10 +1297,68 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 							// обнуляем корзину
 							user.Cart = map[int]int{}
-							errorText := url.QueryEscape("\nВаш город: " + userdetail.CityName + "\n Город, в котором находится товар: " + product.CityName + "\n Вы не сможете заказать эти товары, выберите другие")
+							errorText := url.QueryEscape("\nВаш город: " + userdetail.CityName + "\nГород, в котором находится товар: " + product.CityName + "\nВы не сможете заказать эти товары, выберите другие")
 							// Отправляем сообщение с клавиатурой и перезаписываем шаг
 							sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+errorText, keyboard)
 
+							user.Step = 5
+							usersDB[chatId] = user
+							break
+						} else {
+							time := time.Now().Unix()
+							coordinates := Coordinates{
+								Latitude:  latitude,
+								Longitude: longitude,
+							}
+							jsonProducts, _ := json.Marshal(usersDB[chatId].Cart)
+							jsonCoordinates, _ := json.Marshal(coordinates)
+
+							// Создаем GET-запрос
+							resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
+							if err != nil {
+								log.Fatal("Ошибка при выполнении запроса:", err)
+							}
+							defer resp.Body.Close()
+
+							var userInfo []UserT
+							err = json.NewDecoder(resp.Body).Decode(&userInfo)
+							if err != nil {
+								log.Fatal("Ошибка при декодировании JSON:", err)
+							}
+
+							// Используем полученные данные
+							for _, user := range userInfo {
+								// Создаем тело запроса в виде строки JSON
+								requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
+
+								fmt.Println(requestBody)
+								sendPost(requestBody, "http://"+link+"/api/orders/create-with-vendor-calc.php")
+							}
+
+							// Создаем объект клавиатуры
+							keyboard := map[string]interface{}{
+								"keyboard": [][]map[string]interface{}{
+									{{"text": languages[usersDB[chatId].Language]["order"] + "🛍"}},
+
+									{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + "💹"},
+										{"text": languages[usersDB[chatId].Language]["settings"] + "⚙️"},
+									},
+									{{"text": languages[usersDB[chatId].Language]["my_orders"] + "📕"},
+										{"text": languages[usersDB[chatId].Language]["current_prices"] + "📈"},
+									},
+									{{"text": languages[usersDB[chatId].Language]["contact"] + "📞"},
+										{"text": languages[usersDB[chatId].Language]["cart"] + "🗑"},
+									},
+								},
+								"resize_keyboard":   true,
+								"one_time_keyboard": true,
+							}
+
+							// обнуляем корзину
+							user.Cart = map[int]int{}
+
+							// Отправляем сообщение с клавиатурой и перезаписываем шаг
+							sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжутся в течении часа", keyboard)
 							user.Step = 5
 							usersDB[chatId] = user
 							break
@@ -1309,63 +1367,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				}
 			}
 
-			time := time.Now().Unix()
-			coordinates := Coordinates{
-				Latitude:  latitude,
-				Longitude: longitude,
-			}
-			jsonProducts, _ := json.Marshal(usersDB[chatId].Cart)
-			jsonCoordinates, _ := json.Marshal(coordinates)
-
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var userInfo []UserT
-			err = json.NewDecoder(resp.Body).Decode(&userInfo)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные
-			for _, user := range userInfo {
-				// Создаем тело запроса в виде строки JSON
-				requestBody := `{"customer_id":` + strconv.Itoa(user.ID) + `, "order_date":` + strconv.Itoa(int(time)) + `, "products":` + string(jsonProducts) + `, "location": ` + string(jsonCoordinates) + `}`
-
-				fmt.Println(requestBody)
-				sendPost(requestBody, "http://"+link+"/api/orders/create-with-vendor-calc.php")
-			}
-
-			// Создаем объект клавиатуры
-			keyboard := map[string]interface{}{
-				"keyboard": [][]map[string]interface{}{
-					{{"text": languages[usersDB[chatId].Language]["order"] + "🛍"}},
-
-					{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + "💹"},
-						{"text": languages[usersDB[chatId].Language]["settings"] + "⚙️"},
-					},
-					{{"text": languages[usersDB[chatId].Language]["my_orders"] + "📕"},
-						{"text": languages[usersDB[chatId].Language]["current_prices"] + "📈"},
-					},
-					{{"text": languages[usersDB[chatId].Language]["contact"] + "📞"},
-						{"text": languages[usersDB[chatId].Language]["cart"] + "🗑"},
-					},
-				},
-				"resize_keyboard":   true,
-				"one_time_keyboard": true,
-			}
-
-			// обнуляем корзину
-			user.Cart = map[int]int{}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжутся в течении часа", keyboard)
-			user.Step = 5
-			usersDB[chatId] = user
-			break
 		}
 
 		// кейс при нажатии на + в карточке товара
