@@ -234,7 +234,13 @@ if($role !== 1) {
                                 <td><?= $data[$i]['city_name'] ?></td>
                                 <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
                                 <td><?= $status ?></td>
-                                <td><?= $data[$i]['phone'] ?> </td>
+                                <td>
+                                    <a href="tel:+<?= $data[$i]['phone'] ?>" >
+                                        <?php
+                                            if( $data[$i]['phone']) {echo '+' . $data[$i]['phone'];}
+                                        ?>
+                                    </a> 
+                                </td>
                                 <td><?= $data[$i]['email'] ?> </td>
                                 <td class="checkbox-cell ta-center">
                                     <input type="checkbox" onclick="checkboxChangedVendorPrice(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["price_confirmed"] == 1) {?> checked <?php } ?>>
