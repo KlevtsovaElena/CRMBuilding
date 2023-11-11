@@ -68,6 +68,8 @@ func main() {
 // функция отправки сообщения в канал
 func makeGoodsList() {
 
+	var link string = ""
+
 	fmt.Println("makeGoodsList")
 	// Создаем GET-запрос
 	resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php")
@@ -86,6 +88,7 @@ func makeGoodsList() {
 
 		var caption string = "<b>" + category.CategoryName + "</b>"
 		var product_photo string
+		var link string = "<b>#" + category.CategoryName + "</b>"
 
 		// Создаем GET-запрос
 		resp, err := http.Get("http://" + link + "/api/products.php?category_id=" + strconv.Itoa(category.ID))
@@ -106,7 +109,7 @@ func makeGoodsList() {
 
 		}
 
-		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + "&photo=" + domen + product_photo + "&parse_mode=HTML"
+		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + link + "&photo=" + domen + product_photo + "&parse_mode=HTML"
 
 		fmt.Println(product_photo)
 

@@ -1704,6 +1704,23 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if text == languages[usersDB[chatId].Language]["contact"]+"📞" {
 
 			buttons := [][]map[string]interface{}{
+				{{"text": "С помощью звонка 📲", "callback_data": "withPhone"}},
+				{{"text": "Написать в чате 💬", "callback_data": "withСhat"}},
+				{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
+			}
+
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Выберите удобный способ связи", inlineKeyboard)
+
+		}
+
+		if button == "withPhone" {
+
+			buttons := [][]map[string]interface{}{
 				{{"text": languages[usersDB[chatId].Language]["back"] + "🔙", "callback_data": "backToMenu"}},
 			}
 
@@ -1734,6 +1751,27 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 			user.Step = 4
 			usersDB[chatId] = user
+
+		}
+
+		if button == "withСhat" {
+
+			buttons := [][]map[string]interface{}{
+				{{"text": "Перейти", "url": "https://arzongo.uz"}},
+				{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
+			}
+
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Перейти в чат 💬", inlineKeyboard)
+
+			user := usersDB[chatId]
+			user.Step = 4
+			usersDB[chatId] = user
+
 		}
 
 		// кейс при нажатии на кнопку настройки
