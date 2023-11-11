@@ -35,6 +35,9 @@ if($role !== 1) {
     $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
     $categories = json_decode($categoriesJson, true);
 
+    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
+    $cities = json_decode($citiesJson, true);
+
     $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
     $vendors = json_decode($vendorsJson, true);
  
@@ -51,6 +54,18 @@ if($role !== 1) {
 
             <div class="form-elements-container filters-container-flex">
 
+                <!-- выбор города -->
+                <div class="d-iblock">
+                    <div>Город</div>
+                    <select id="city_id" name="city_id" value="">
+                        
+                        <option value="">Все</option>
+                        <?php foreach($cities as $city) { ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
+                        <?php }; ?>
+
+                    </select>
+                </div>
                 <!-- выбор поставщика -->
                 <div class="d-iblock">
                     <div>Поставщик</div>
@@ -129,6 +144,7 @@ if($role !== 1) {
                     <thead>
                         <tr role="row">
 
+                            <th data-id="city_id" data-sort="">Город</th>
                             <th data-id="vendor_id" data-sort="">Поставщик</th>
                             <th data-id="name" data-sort="">Наименование</th>
                             <th data-id="category_id" data-sort="">Категория</th>
@@ -188,6 +204,34 @@ if (count($_GET) !== 0) {
     <section class="form-filters">
 
         <div class="form-elements-container filters-container-flex">
+
+            <!-- выбор города -->
+            <div class="d-iblock">
+                <div>Город</div>
+                <select id="city_id" name="city_id" value="">
+                    
+                    <option value="">Все</option>
+ 
+                    <?php foreach($cities as $city) {
+                        if (!isset($_GET['city_id'])) {
+                        ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
+                        <?php
+                        } else if ($_GET['city_id'] == $city['id']) {
+                        ?>
+                            <option value="<?= $city['id']; ?>" selected><?= $city['name']; ?></option>
+
+                        <?php
+                        } else {
+                        ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>;
+                        <?php 
+                        }
+                    }; ?>  
+
+                </select>
+            </div>
+
             <!-- выбор поставщика -->
             <div class="d-iblock">
                 <div>Поставщик</div>
@@ -324,6 +368,7 @@ if (count($_GET) !== 0) {
             <thead>
                 <tr role="row">
 
+                    <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
                     <th data-id="vendor_id" data-sort="<?php if ($sortBy == 'vendor_id')  {echo $mark; } ?>">Поставщик</th>
                     <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
@@ -357,6 +402,7 @@ if (count($_GET) !== 0) {
         
         <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
             
+            <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
@@ -390,6 +436,7 @@ if (count($_GET) !== 0) {
         
         <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
             
+            <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>

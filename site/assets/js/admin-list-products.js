@@ -17,6 +17,7 @@ let currentPage = 1;
 
 let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
 
+let city_idEl = document.getElementById('city_id');
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
@@ -37,10 +38,10 @@ let resetPriceEl;
 let savePriceEl;
 let changeInputsEl;
 
-let brands = {};
-let categories = {};
-let vendors = {};
-let units = {};
+// let brands = {};
+// let categories = {};
+// let vendors = {};
+// let units = {};
 
 let orderby = "";
 let filters = "";
@@ -99,8 +100,6 @@ function startRenderPage() {
     // 5. добавим параметры в адресную строку
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
- 
-
 }
 
 
@@ -136,7 +135,7 @@ function getFilters() {
     // проверим значение бренда, категории и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
     // и добавляем в параметр строки запроса 
-    [brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
+    [city_idEl, brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
                 params += "&search=name:" + item.value + ";description:" + item.value;
@@ -243,7 +242,7 @@ function renderListProducts(totalProducts) {
         }
 
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
-            
+            //  для сумовых поставщиков
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
@@ -253,6 +252,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${name}', totalProducts['products'][i]['name'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
+                                                                .replace('${city_name}', totalProducts['products'][i]['city_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
                                                                 .replace('${is_active}', totalProducts['products'][i]['is_active'])
@@ -265,7 +265,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
         
         } else if (totalProducts['products'][i]['vendor_currency_dollar'] == "1"){
-
+            // для долларовых поставщиков
             containerListProducts.innerHTML += tmplRowProductDollar.replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
@@ -275,6 +275,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${name}', totalProducts['products'][i]['name'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
+                                                                .replace('${city_name}', totalProducts['products'][i]['city_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
                                                                 .replace('${is_active}', totalProducts['products'][i]['is_active'])
