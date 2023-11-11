@@ -59,7 +59,7 @@ let totalProductsJson;
 
 let garbage;
 
-// // закэшируем значения брендов и категорий и поставщиков
+// закэшируем значения брендов и категорий и поставщиков
 // brand_idEl.querySelectorAll('option').forEach(item => {
 //     brands[item.value] = item.innerText;
 // })

@@ -470,7 +470,13 @@ if($role !== 1) {
                                 <td class="ta-center"><?= $data[$i]['vendor_name'] ?></td>
                                 <td class="ta-center"><?= $data[$i]['vendor_city'] ?></td>
                                 <td class="ta-center"><a class="list-orders_status d-block status<?= $data[$i]['status'] ?>"><?= $status ?></a></td>
-                                <td class="ta-center"><?= $data[$i]['customer_phone'] ?></td>
+                                <td class="ta-center">
+                                    <a href="tel:+<?= $data[$i]['customer_phone'] ?>" >
+                                        <?php
+                                            if( $data[$i]['customer_phone']) {echo '+' . $data[$i]['customer_phone'];}
+                                        ?>
+                                    </a>
+                                </td>
                                 <!-- в отдельном цикле отрисовываем весь список продуктов в данном заказе -->
                                 <td class="list-orders_products">
                                 <?php for ($p = 0; $p < count($data[$i]['products']); $p++) { ?> 

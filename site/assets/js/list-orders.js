@@ -304,6 +304,7 @@ function renderListOrders(orders) {
             archiveText = "В архив";
         }
 
+        // если дистанция не указана, то отображаем  '-'
         let distance; 
         if (orders['orders'][i]['vendor_location']['latitude'] && orders['orders'][i]['vendor_location']['longitude']) {
             if (orders['orders'][i]['order_location']['latitude'] == 0 && orders['orders'][i]['order_location']['longitude'] == 0) {
@@ -314,6 +315,13 @@ function renderListOrders(orders) {
         } else {
             distance = '-';
         }
+
+        // если номер клиента указан, то отображаем его с плюсиком
+        let phone = orders['orders'][i]['customer_phone'];
+        if(orders['orders'][i]['customer_phone']) {
+            phone = '+' + orders['orders'][i]['customer_phone'];
+        } 
+
 
         // заполним шаблон
         containerListOrders.innerHTML += tmplRowOrder.replace('${order_id}', orders['orders'][i]['order_id'])
@@ -328,8 +336,8 @@ function renderListOrders(orders) {
                                                         .replace('${order_date}', dateOrder)
                                                         // .replace('${order_date}', dateOrder + ' ' + timeOrder)
                                                         .replace('${products}', products)
-                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
-                                                        .replace('${customer_phone}', orders['orders'][i]['customer_phone'])
+                                                        .replace('${customer_phone}', phone)
+                                                        .replace('${customer_phone}', phone)
                                                         .replace('${customer_id}', orders['orders'][i]['customer_id'])
                                                         .replace('${total_price}',  orders['orders'][i]['total_price'].toLocaleString('ru'))
                                                         .replace('${distance}',  distance)
