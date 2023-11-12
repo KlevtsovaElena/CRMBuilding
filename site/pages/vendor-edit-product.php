@@ -51,11 +51,44 @@ if($role !== 2) {
             ?>
             <div class="form-add-product__elements form-elements-container">
 
-                <!-- наименование -->
+                <!-- наименование-->
                 <div class="form-add-product__elements-item">
-                    <p>Наименование</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
-                    <div class="error-info d-none"></div>
+                    <p>Наименование</p>
+                    <div class="name-container">        
+                        <!-- наименование Русский-->
+                        <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
+                        <div class="error-info d-none"></div>
+
+                        <?php 
+                            if($product[0]['name2'] == NULL || $product[0]['name2'] == '') {$name2='';} else {$name2=$product[0]['name2'];}
+                            if($product[0]['name3'] == NULL || $product[0]['name3'] == '') {$name3='';} else {$name3=$product[0]['name3'];}
+                        ?>
+                        <!-- наименование Оʻzbek-->
+                        <p>Оʻzbek</p><input type="text" id="name2" name="name2" value="<?= $name2; ?>">
+                        <!-- наименование, Ўзбек -->
+                        <p>Ўзбек</p><input type="text" id="name3" name="name3" value="<?= $name3; ?>">
+                    </div>
+                </div>            
+
+                <!-- описание-->
+                <div class="form-add-product__elements-item">
+                    <p>Описание</p>
+                    <div class="description-container">    
+                        <!-- описание Русский -->
+                        <p>Русский (обязательно)</p><textarea id="description" name="description" required><?= $product[0]['description']; ?></textarea>
+                        <div class="error-info d-none"></div> 
+
+                        <?php 
+                            if($product[0]['description2'] == NULL || $product[0]['description2'] == '') {$description2='';} else {$description2=$product[0]['description2'];}
+                            if($product[0]['description3'] == NULL || $product[0]['description3'] == '') {$description3='';} else {$description3=$product[0]['description3'];}
+                        ?>
+                        <!-- описание Оʻzbek-->
+                        <p>Оʻzbek</p><textarea id="description2" name="description2"><?= $description2; ?></textarea>
+                        <!-- описание Ўзбек-->
+                        <p>Ўзбек</p><textarea id="description3" name="description3"><?= $description3; ?></textarea> 
+                    </div> 
                 </div>
+
 
                 <!-- фото -->
                 <div class="form-add-product__elements-item">
@@ -98,10 +131,10 @@ if($role !== 2) {
                 </div>
 
                 <!-- описание -->
-                <div class="form-add-product__elements-item d-none">
+                <!-- <div class="form-add-product__elements-item d-none">
                     <p>Описание</p><textarea id="description" name="description"><?= $product[0]['description']; ?></textarea>
                     <div class="error-info d-none"></div> 
-                </div>
+                </div> -->
 
                 <!-- артикул -->
                 <div class="form-add-product__elements-item d-none">

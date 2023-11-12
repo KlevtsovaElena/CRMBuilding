@@ -43,3 +43,17 @@
 .max_price-dollar-add {
     width: unset;
 }
+
+.name-container, .description-container {
+    margin-left: 20px;
+}
+
+.name-container p,
+.description-container p{
+    font-style: italic;
+}
+
+.name-container input, .description-container input,
+.description-container textarea, .description-container textarea {
+    max-width: 680px;
+}

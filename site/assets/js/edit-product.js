@@ -31,9 +31,13 @@ function editProduct(role) {
         obj = JSON.stringify({
             'id': productId,
             'name':  nameProduct.value,
+            'name2':  nameProduct2.value,
+            'name3':  nameProduct3.value,
             'brand_id': brand_id.value,
             'category_id': category_id.value,
             'description': description.value,
+            'description2': description2.value,
+            'description3': description3.value,
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
@@ -48,9 +52,13 @@ function editProduct(role) {
         obj = JSON.stringify({
             'id': productId,
             'name':  nameProduct.value,
+            'name2':  nameProduct2.value,
+            'name3':  nameProduct3.value,
             'brand_id': brand_id.value,
             'category_id': category_id.value,
             'description': description.value,
+            'description2': description2.value,
+            'description3': description3.value,
             'article': article.value,
             'quantity_available': quantity_available.value,
             'price': price.value,
@@ -97,7 +105,7 @@ function validationEdit() {
     } else {priceValue = 0;}
 
    // валидация полей (кроме vendorId)
-   [nameProduct, brand_id, category_id, unit_id, 
+   [nameProduct, description, brand_id, category_id, unit_id, 
     quantity_available, price, max_price, is_active].forEach(item => {
 
         // console.log(item.getAttribute('name') + "    " + item.value);
