@@ -380,6 +380,10 @@ function applyInOrders() {
     let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
     console.log(vendorSel);
 
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
     //получим селект "статус"
     let statusSel = document.getElementById('status').querySelectorAll('option:checked')[0].value;
     console.log(statusSel);
@@ -420,6 +424,11 @@ function applyInOrders() {
     //если задан поставщик
     if (vendorSel) {
         filters += '&vendor_name=' + vendorSel;
+    }
+
+    //если задан город
+    if (citySel) {
+        filters += '&vendor_city=' + citySel;
     }
 
     //если задан статус

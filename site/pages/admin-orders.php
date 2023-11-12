@@ -162,6 +162,47 @@ if($role !== 1) {
                     </select>
                 </div>
 
+                <!-- фильтрация по городу -->
+                <div class="d-iblock">
+                    <div>Город</div> 
+                    <select id="city" name="city" value="" required>
+                    <?php
+                        //запрашиваем данные по городам из БД
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
+                        $dataV = json_decode($dataJsonV, true);
+
+                        //если город не был задан, устанавливаем в селекте выбранное значение "все"
+                        if (!isset($_GET['vendor_city'])) {
+                            
+                        ?>
+                            <option value="" <?= 'selected' ?> >все</option>
+                            <?php for ($v = 0; $v < count($dataV); $v++) { ?>
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php }
+                        //если город уже задан в гет-параметрах, выводим его
+                        } else {
+                            $city = $_GET['vendor_city']; 
+                            ?>
+
+                            <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
+                            <?php 
+                            for ($v = 0; $v < count($dataV); $v++) { 
+                                if($city == $dataV[$v]['name']) {?>
+                                
+                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                } else { ?>
+                                    
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                }
+                            ?>
+                        <?php 
+                            }
+                        } ?> 
+                    </select>
+                </div>
+
                 <!-- фильтрация по статусу заказа -->
                 <div class="d-iblock">
                     <div>Статус</div> 
@@ -321,6 +362,11 @@ if($role !== 1) {
                     //если заданы гет-параметры поставщика, собираем в переменную
                     if (isset($_GET['vendor_name'])) {
                         $params = $params . '&vendor_name=' . $_GET['vendor_name'];
+                    }
+
+                    //если заданы гет-параметры города, собираем в переменную
+                    if (isset($_GET['vendor_city'])) {
+                        $params = $params . '&vendor_city=' . $_GET['vendor_city'];
                     }
 
                     //если заданы параметры статуса, собираем в переменную
