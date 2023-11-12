@@ -63,6 +63,48 @@ if($role !== 1) {
 
          <section class="form-filters">
             <div class="form-elements-container">
+                
+                <!-- фильтрация по городу -->
+                <div class="d-iblock">
+                    <div>Город</div> 
+                    <select id="city" name="city" value="" required>
+                    <?php
+                        //запрашиваем данные по городам из БД
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
+                        $dataV = json_decode($dataJsonV, true);
+
+                        //если город не был задан, устанавливаем в селекте выбранное значение "все"
+                        if (!isset($_GET['city_name'])) {
+                            
+                        ?>
+                            <option value="" <?= 'selected' ?> >все</option>
+                            <?php for ($v = 0; $v < count($dataV); $v++) { ?>
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php }
+                        //если город уже задан в гет-параметрах, выводим его
+                        } else {
+                            $city = $_GET['city_name']; 
+                            ?>
+
+                            <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
+                            <?php 
+                            for ($v = 0; $v < count($dataV); $v++) { 
+                                if($city == $dataV[$v]['name']) {?>
+                                
+                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                } else { ?>
+                                    
+                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                }
+                            ?>
+                        <?php 
+                            }
+                        } ?> 
+                    </select>
+                </div>
+
                 <!-- выбор кол-ва отображаемых записей на странице -->
                 <div class="d-iblock">Показывать по
                     <select id="limit" name="limit" value="" required>
@@ -111,7 +153,17 @@ if($role !== 1) {
         //считаем и записываем в переменные общее кол-во страниц и оффсет
         $totalPages = ceil(count($data) / $limit);
         $offset = ($currentPage - 1) * $limit;
-        $totalNumElements = count($data); ?>
+        $totalNumElements = count($data); 
+
+        //собираем в отдельную переменную фильтры
+        $params = '';
+
+        //если заданы гет-параметры города, собираем в переменную
+        if (isset($_GET['city_name'])) {
+            $params = $params . '&city_name=' . $_GET['city_name'];
+        } ?>
+
+
 
         <!-- таблица поставщиков -->
         <section class="orders">
@@ -144,7 +196,7 @@ if($role !== 1) {
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //соберём данные для отображения в форме 
-                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit . '&offset=' . $offset);
+                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit . '&offset=' . $offset . $params);
                         $data = json_decode($dataJson, true);
                         $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                     
@@ -153,14 +205,14 @@ if($role !== 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit . '&offset=0');
+                            $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=' . $limit .  $params . '&offset=0');
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                         }
                     }
                     //если активирован поиск
                     if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&city_deleted=0&search=" . $_GET['search']);
+                        $dataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&city_deleted=0&search=" . $_GET['search'] . $params);
                         $data = json_decode($dataJson, true);
                         //print_r($data);
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
@@ -181,7 +233,7 @@ if($role !== 1) {
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //соберём данные для отображения в форме 
-                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby']);
+                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                         $data = json_decode($dataJson, true); 
                         //print_r($data);
                         $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -191,7 +243,7 @@ if($role !== 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby']);
+                            $dataJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                         }
@@ -199,7 +251,7 @@ if($role !== 1) {
 
                     //если активирован поиск
                     if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search']);
+                        $dataJson = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&limit=all&offset=0&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $params);
                         $data = json_decode($dataJson, true);
                         //print_r($data);
                         //если по данному поисковому запросу записей нет, записываем в переменную 0
@@ -272,12 +324,12 @@ if($role !== 1) {
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
-            <a <?php if($currentPage > 1) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?>"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
+            <a <?php if($currentPage > 1) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
             
             <span class="current-page"><?= $currentPage ?></span>
-            <a <?php if($currentPage != $totalPages) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?>"<?php } ?> class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
+            <a <?php if($currentPage != $totalPages) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?>?><?= $params ?>"<?php } ?> class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
         </div>

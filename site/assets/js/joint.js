@@ -31,6 +31,10 @@ function sortChange() {
     // получим значение атрибута data-vendor-select, содержащего название выбранного поставщика
     let dataVendor = document.getElementById('list-orders').getAttribute('data-vendor-select');
 
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
     // получим значение атрибута data-status-select, содержащего выбранный статус
     let dataStatus = document.getElementById('list-orders').getAttribute('data-status-select');
 
@@ -56,6 +60,16 @@ function sortChange() {
     //если задан поставщик
     if (dataVendor) {
         filters += '&vendor_name=' + dataVendor;
+    }
+
+    //если задан город
+    if (citySel) {
+        if (section_name == 'admin-orders') {
+            filters += '&vendor_city=' + citySel;
+        }
+        if (section_name == 'admin-vendors') {
+            filters += '&city_name=' + citySel;
+        }
     }
 
     //если задан статус
