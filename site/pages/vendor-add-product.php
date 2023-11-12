@@ -46,10 +46,40 @@ if($role !== 2) {
             </div>
 
              <!-- наименование -->
-            <div class="form-add-product__elements-item">
+            <!-- <div class="form-add-product__elements-item">
                 <p>Наименование</p><input type="text" id="name" name="name" value="" required>
                 <div class="error-info d-none"></div>
-            </div>
+            </div> -->
+
+             <!-- наименование-->
+             <div class="form-add-product__elements-item">
+                <p>Наименование</p>
+                <div class="name-container">        
+                    <!-- наименование Русский-->
+                    <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="" required>
+                    <div class="error-info d-none"></div>
+
+                    <!-- наименование Оʻzbek-->
+                    <p>Оʻzbek</p><input type="text" id="name2" name="name2" value="">
+                    <!-- наименование, Ўзбек -->
+                    <p>Ўзбек</p><input type="text" id="name3" name="name3" value="">
+                </div>
+            </div>            
+
+            <!-- описание-->
+            <div class="form-add-product__elements-item">
+                <p>Описание</p>
+                <div class="description-container">    
+                    <!-- описание Русский -->
+                    <p>Русский (обязательно)</p><textarea id="description" name="description" required></textarea>
+                    <div class="error-info d-none"></div> 
+
+                    <!-- описание Оʻzbek-->
+                    <p>Оʻzbek</p><textarea id="description2" name="description2"></textarea>
+                    <!-- описание Ўзбек-->
+                    <p>Ўзбек</p><textarea id="description3" name="description3"></textarea> 
+                </div> 
+            </div>             
 
             <!-- фото -->
             <div class="form-add-product__elements-item">
@@ -95,10 +125,10 @@ if($role !== 2) {
             </div>
 
             <!-- описание -->
-            <div class="form-add-product__elements-item d-none">
+            <!-- <div class="form-add-product__elements-item d-none">
                 <p>Описание</p><textarea id="description" name="description"></textarea>
                 <div class="error-info d-none"></div> 
-            </div>
+            </div> -->
 
             <!-- артикул -->
             <div class="form-add-product__elements-item d-none">

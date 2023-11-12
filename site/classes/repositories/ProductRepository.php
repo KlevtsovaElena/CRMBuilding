@@ -27,7 +27,11 @@ class ProductRepository extends BaseRepository
 
     const GET_WITH_DETAILS = 'SELECT p.`id` as `id`,
                                         p.`name` as `name`,
+                                        p.`name2` as `name2`,
+                                        p.`name3` as `name3`,
                                         p.`description` as `description`,
+                                        p.`description2` as `description2`,
+                                        p.`description3` as `description3`,
                                         p.`photo` as `photo`,
                                         p.`article` as `article`,
                                         p.`category_id` as `category_id`,
@@ -81,7 +85,11 @@ class ProductRepository extends BaseRepository
     private static array $productDetailsAccosiations = [
         'id' => 'p.id',
         'name' => 'p.name',
+        'name2' => 'p.name2',
+        'name3' => 'p.name3',
         'description' => 'p.description',
+        'description2' => 'p.description2',
+        'description3' => 'p.description3',
         'photo' => 'p.photo',
         'article' => 'p.article',
         'category_id' => 'p.category_id',

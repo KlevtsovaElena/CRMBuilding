@@ -4,11 +4,15 @@ const formAddProduct = document.getElementById('form-add-product');
 
 // запишем значения полей формы в переменные
 let  vendor_id = formAddProduct.querySelector('#vendor_id');
-let  nameProduct = formAddProduct.querySelector('#name');
+let  nameProduct = formAddProduct.querySelector('#name');  //название продукта русский
+let  nameProduct2 = formAddProduct.querySelector('#name2'); //название продукта Оʻzbek
+let  nameProduct3 = formAddProduct.querySelector('#name3'); //название продукта Ўзбек
 let  new_photo = formAddProduct.querySelector('#new_photo');
 let  brand_id = formAddProduct.querySelector('#brand_id');
 let  category_id = formAddProduct.querySelector('#category_id');
-let  description = formAddProduct.querySelector('#description');
+let  description = formAddProduct.querySelector('#description'); //описание русский
+let  description2 = formAddProduct.querySelector('#description2'); //описание Оʻzbek
+let  description3 = formAddProduct.querySelector('#description3'); //описание Ўзбек
 let  article = formAddProduct.querySelector('#article');
 let  quantity_available = formAddProduct.querySelector('#quantity_available');
 let  price = formAddProduct.querySelector('#price');
@@ -42,6 +46,7 @@ function addProduct(role) {
         return;
     }
 
+    // валидация полей
     hasError = validationAdd();
 
     // если были ошибки, то выходим
@@ -54,9 +59,13 @@ function addProduct(role) {
     let obj = JSON.stringify({
         'vendor_id': vendor_id.value,
         'name':  nameProduct.value,
+        'name2':  nameProduct2.value,
+        'name3':  nameProduct3.value,
         'brand_id': brand_id.value,
         'category_id': category_id.value,
         'description': description.value,
+        'description2': description2.value,
+        'description3': description3.value,
         'article': article.value,
         'quantity_available': quantity_available.value,
         'price': price.value,
@@ -69,6 +78,7 @@ function addProduct(role) {
         photoFileData,
         photoFileName
     });
+
 
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/products.php', obj);
@@ -99,7 +109,7 @@ function validationAdd() {
     } else {priceValue = 0;}
 
     // валидация полей (кроме vendorId)
-    [nameProduct, new_photo, brand_id, category_id, unit_id,
+    [nameProduct, description, new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price, vendor_id, is_active].forEach(item => {
     
             const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
