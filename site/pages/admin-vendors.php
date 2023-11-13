@@ -62,7 +62,7 @@ if($role !== 1) {
         <a href="admin-add-vendor.php" class="btn btn-ok d-iblock">+ Добавить поставщика</a>
 
          <section class="form-filters">
-            <div class="form-elements-container">
+            <div class="form-elements-container filters-container-flex">
                 
                 <!-- фильтрация по городу -->
                 <div class="d-iblock">
