@@ -6,6 +6,7 @@
         public int $id;
         public string $name_short;
         public ?string $name;
+        public ?int $deleted;
     
     }
 ?>
