@@ -8,7 +8,7 @@ const containerPagination = document.querySelector('.pagination-wrapper');
 // контейнер информации внизу страницы
 const info = document.querySelector('.info-table');
 //получаем все элементы заголовка для отслеживания сортировки
-const headTableUnits = document.getElementById('list-units').querySelectorAll('th');
+const headTableUnits = document.getElementById('list-units').querySelectorAll('[data-sort]');
 
 // определим основные переменные
 let currentPage = 1;
@@ -200,22 +200,24 @@ function renderListUnits(totalUnits) {
         records = limit; 
     } 
 
-
-
-
-
-
+    // посчитаем с какой цифры начать нумерацию в таблице в зависимости от лимита и номера страницы
+    let numbering;
+    if(currentPage == 1) {
+        numbering = 1;
+    } else {
+        numbering = (currentPage-1)*limit + 1;
+    }
 
     // заполним данными и отрисуем шаблон
     for (i = 0; i < records; i++) {
 
         containerListUnits.innerHTML += tmplRowUnits.replace('${id}', totalUnits['units'][i]['id'])
-                                                        .replace('${count_unit}', i+1)
+                                                        .replace('${count_unit}', numbering)
                                                         .replace('${name}', totalUnits['units'][i]['name'])
                                                         .replace('${name}',  totalUnits['units'][i]['name'])
                                                         .replace('${name_short}', totalUnits['units'][i]['name_short'])
-                                                        .replace('${name_short}', totalUnits['units'][i]['name_short']);
-                                                        
+                                                        .replace('${name_short}', totalUnits['units'][i]['name_short']);    
+        numbering += 1;                                              
     }
 
 

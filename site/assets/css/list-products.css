@@ -208,6 +208,10 @@ td:nth-last-child(1) {
     vertical-align: middle;
 }
 
+.list-units__row {
+    font-size: 1rem;
+}
+
 @media(max-width: 1024px) {
     .filters-container-flex {
         flex-wrap: wrap;

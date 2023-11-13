@@ -31,11 +31,7 @@ if($role !== 1) {
         <button class="btn btn-ok d-iblock" onclick="">+ Добавить</button>
     </div>
 
-    <!-- получим данные из таблицы единиц измерения товаров -->
-    <?php 
-        // $unitsJson = file_get_contents($nginxUrl . '/api/units.php?deleted=0');
-        // $units = json_decode($unitsJson, true);
-    ?>
+    <!-- в зависимости от наличия гет параметров отрисовываем страницу  -->
 
     <!-- фильтрация -->
     <section class="form-filters">
@@ -44,20 +40,73 @@ if($role !== 1) {
                 <!-- выбор кол-во записей на листе -->
                 <div class="d-iblock">
                     <span>Показывать по</span>
-                    <select id="limit" name="limit" value="" required>
+
+                    <?php 
+                        if (count($_GET) == 0)  {
+                            $sortBy = "";
+                            $offset = 0;
+                    ?>
+                        <select id="limit" name="limit" value="" required>
+                            
+                            <option value="3">3</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+
+                        </select>
+
+                        <!-- поле поиска -->
+                        <div class="d-iblock">
+                            <input type="search" id="search" name="search" value="" placeholder="Поиск">
+                        </div>
+                    <?php 
+                        } else {
+                            // Разберём строку get для отрисовки фильтрации
+                            if(isset($_GET['search'])) {
+                                $searchText = $_GET['search'];
+                                $search = explode(";", $searchText);
+                                $search = explode(":", $search[1]);
+                                $searchText = $search[1];
+                            } else {
+                                $searchText = "";
+                            }
+
+                            if(isset($_GET['orderby'])) {
+                                $orderByArray = explode(";", $_GET['orderby']);
+                                $orderBy = explode(":", $orderByArray[0]);
+                                $sortBy = $orderBy[0];
+                                $mark = $orderBy[1];
+                            } else {
+                                $sortBy = "";
+                            }
                         
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="">все</option>
+                            if(isset($_GET['offset']) && $_GET['offset'] !== '') {
+                                $offset = $_GET['offset'];
+                            } else {
+                                $offset = 0;
+                            }   
+                            
+                    ?> 
+                        <select id="limit" name="limit" value="" required>
+                            
+                            <option value="3"  <?php if ($_GET['limit'] == 3) {echo 'selected';} ?> >3</option>
+                            <option value="10" <?php if ($_GET['limit'] == 10) {echo 'selected';} ?> >10</option>
+                            <option value="20" <?php if ($_GET['limit'] == 20) {echo 'selected';} ?> >20</option>
+                            <option value="50" <?php if ($_GET['limit'] == 50) {echo 'selected';} ?> >50</option>
+                            <option value="100" <?php if ($_GET['limit'] == 100) {echo 'selected';} ?> >100</option>
 
-                    </select>
+                        </select>   
+                        <!-- поле поиска -->
+                        <div class="d-iblock">
+                            <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
+                        </div>     
+                    
+                    <?php }      
+                    ?>  
                 </div>
 
-                <!-- поле поиска -->
-                <div class="d-iblock">
-                    <input type="search" id="search" name="search" value="" placeholder="Поиск">
-                </div>
+
 
                 <button class="btn btn-ok d-iblock">Применить</button>
 
@@ -72,8 +121,8 @@ if($role !== 1) {
                 <tr role="row">
 
                     <th class="ta-center">№</th>
-                    <th class="ta-center" data-id="name" data-sort="">Название</th>
-                    <th class="ta-center" data-id="name_short" data-sort="">Сокращённое название</th>
+                    <th class="ta-center" data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Название</th>
+                    <th class="ta-center" data-id="name_short" data-sort="<?php if ($sortBy == 'name_short')  {echo $mark; } ?>">Сокращённое название</th>
                     <th></th>
                     <th></th>
                     
@@ -88,7 +137,7 @@ if($role !== 1) {
         <div class="info-table"></div>
     </section>
 
-    <section class="pagination-wrapper" offset="0"><!-- пагинация --></section>
+    <section class="pagination-wrapper" offset="<?= $offset; ?>"><!-- пагинация --></section>
 
 
     <!-- ШАБЛОНЫ -->
