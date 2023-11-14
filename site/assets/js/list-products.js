@@ -567,7 +567,7 @@ function resetChangePrice(currency_dollar) {
 function saveChangePrice(currency_dollar, rate) {
 
     // проверяем корректность токена
-    check();
+    priceConfirmed = check()['price_confirmed'];
 
     // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
@@ -648,6 +648,7 @@ function saveChangePrice(currency_dollar, rate) {
 
         // если всё ок, то собираем данные и отправляем в БД (изменение цены)
         obj['id'] = idProduct;
+        obj['is_confirm'] = 0;
         let objJson = JSON.stringify(obj);
 
         // отправка запроса на запись (изменение цены)
@@ -655,14 +656,14 @@ function saveChangePrice(currency_dollar, rate) {
 
         // отправим запрос на изменение статуса подтверждения цен поставщика
         // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
-        let objVendor = JSON.stringify({
-            'id': vendor_id,
-            'price_confirmed':  0
-        });
-        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+        // let objVendor = JSON.stringify({
+        //     'id': vendor_id,
+        //     'price_confirmed':  0
+        // });
+        // sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
 
         // перерисовка страницы
-        startRenderPage(0);
+        startRenderPage(priceConfirmed);
 
         return;
     }

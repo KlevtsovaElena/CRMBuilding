@@ -56,6 +56,14 @@ function addProduct(role) {
     }
     
     // соберём json для передачи на сервер
+
+    // утверждён ли продукт?
+    // если товар добавляет поставщик, а не админ, то этот товар переводим в 0 до утверждения админом (поле is_confirm)
+    let confirmProduct;
+    if (role !== 1) {
+        confirmProduct = 0;
+    }
+
     let obj = JSON.stringify({
         'vendor_id': vendor_id.value,
         'name':  nameProduct.value,
@@ -75,6 +83,7 @@ function addProduct(role) {
         'unit_id': unit_id.value,
         'deleted': 0,
         'is_active': is_active.value,
+        'is_confirm': confirmProduct,
         photoFileData,
         photoFileName
     });
@@ -84,14 +93,14 @@ function addProduct(role) {
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // если товар добавляет поставщик, а не админ, то поставщика переводим в 0 до подтверждения цен
-    if (role == 2) {
-        // отправим запрос на изменение статуса подтверждения цен поставщика
-        let objVendor = JSON.stringify({
-            'id': vendor_id.value,
-            'price_confirmed':  0
-        });
-        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-    }
+    // if (role == 2) {
+    //     // отправим запрос на изменение статуса подтверждения цен поставщика
+    //     let objVendor = JSON.stringify({
+    //         'id': vendor_id.value,
+    //         'price_confirmed':  0
+    //     });
+    //     sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+    // }
 
     alert("Данные отправлены");
     // перезагрузим страницу

@@ -58,7 +58,8 @@ class ProductRepository extends BaseRepository
                                         v.`city_id` as `city_id`,
                                         cit.`name` as `city_name`,
                                         v.`price_confirmed` as `price_confirmed`,
-                                        p.`is_active` as `is_active`
+                                        p.`is_active` as `is_active`,
+                                        p.`is_confirm` as `is_confirm`
                                     FROM products p
                                         INNER JOIN categories c ON
                                             c.`id` = p.`category_id`
@@ -114,7 +115,8 @@ class ProductRepository extends BaseRepository
         'city_id' => 'v.city_id',
         'city_name' => 'cit.name', 
         'price_confirmed' => 'v.price_confirmed',
-        'is_active' => 'p.is_active'
+        'is_active' => 'p.is_active',
+        'is_confirm' => 'p.is_confirm'
     ];
 
     public function getTableName(): string
