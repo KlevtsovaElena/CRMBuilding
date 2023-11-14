@@ -157,8 +157,65 @@ td:nth-last-child(1) {
     outline: none;
 }
 
+
+.units {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+
+#list-units th[data-sort]:after {
+    right: 0;
+    top: calc(50% - 0.9rem/2);
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort]:before {
+    right: 6px;
+    top: calc(50% - 0.9rem/2);
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-units th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.save-unit, .reset-unit {
+    display: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.edit-unit {
+    display: inline-block;
+    transform: rotate(90deg);
+    cursor: pointer;
+    vertical-align: middle;
+}
+.edit-unit.active
+
+.list-units__row {
+    font-size: 1rem;
+}
+
 @media(max-width: 1024px) {
     .filters-container-flex {
         flex-wrap: wrap;
     }
 }
+

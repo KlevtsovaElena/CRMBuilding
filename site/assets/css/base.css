@@ -560,3 +560,7 @@ th {
     align-items: center;
     gap: 2px;
 }
+
+.middle-el {
+    max-width: 102px;
+}

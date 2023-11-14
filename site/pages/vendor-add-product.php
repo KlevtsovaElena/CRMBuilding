@@ -31,7 +31,7 @@ if($role !== 2) {
         $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents($nginxUrl . "/api/units.php");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0");
         $units = json_decode($unitsJson, true);
     ?>
                         

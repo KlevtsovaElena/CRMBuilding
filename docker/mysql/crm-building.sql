@@ -99,7 +99,7 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `t
 (21,	'Timon',	'Decathlon',	'79672772550',	1,	223054377,	'timondecathlon'),
 (22,	'S',	'R',	'998903480305',	1,	601131024,	'skidkabor'),
 (23,	'GsmServer™',	'',	'998981282810',	1,	197583494,	'unlockservers'),
-(25,	'Леночка',	'',	'998778886699',	3,	1752911328,	'KlevtsovaEV'),
+(25,	'Леночка',	'',	'998778886699',	1,	1752911328,	'KlevtsovaEV'),
 (27,	'Игорь',	'',	'79152032125',	1,	5677540667,	'LogunovIgor'),
 (28,	'Лол',	'',	'998777777777',	2,	892205925,	'rodionaka'),
 (29,	'Catherine',	'',	'79854377397',	3,	443133309,	'cazerine_hg'),
@@ -324,7 +324,8 @@ INSERT INTO `products` (`id`, `name`, `name2`, `name3`, `description`, `descript
 (136,	'тест3 рус',	'тест3 Оʻzbek',	'тест3 Ўзбек',	'описание рус',	'описание Оʻzbek ',	'описание Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	1,	1,	3,	20,	3000,	0,	4000,	0,	3,	0,	1),
 (137,	'тест4 рус',	'',	'тест4 Ўзбек',	'описание рус',	'',	'описание Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	1,	1,	3,	20,	1500,	0,	1999,	0,	2,	0,	1),
 (138,	'товар рус поставщик ред Админ',	'',	'товар Ўзбек поставщик ред Админ ',	'описание рус',	'',	'описание Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	1,	1,	3,	30,	1500,	0,	2000,	0,	4,	0,	1),
-(139,	'товар тест рус',	'',	'товар тест Ўзбек',	'описание товар тест рус',	'',	'описание товар тест Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	9,	4,	3,	20,	1300,	0,	1500,	0,	1,	0,	1);
+(139,	'товар тест рус',	'',	'товар тест Ўзбек',	'описание товар тест рус',	'',	'описание товар тест Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	9,	4,	3,	20,	1300,	0,	1500,	0,	1,	0,	1),
+(140,	'товар поставщик1 рус+Ўзбек',	'',	'товар поставщик1 рус+Ўзбек',	'описание рус+Ўзбек',	'',	'описание рус+Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	1,	1,	1,	8,	1000,	0,	2000,	0,	2,	0,	1);
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
@@ -342,17 +343,18 @@ CREATE TABLE `units` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name_short` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `deleted` tinyint unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `units` (`id`, `name_short`, `name`) VALUES
-(1,	'шт',	'штука'),
-(2,	'упак',	'упаковка'),
-(3,	'компл',	'комплект'),
-(4,	'кг',	'килограмм'),
-(5,	'гр',	'грамм'),
-(6,	'м2',	'квадратный метр'),
-(7,	'л',	'литр');
+INSERT INTO `units` (`id`, `name_short`, `name`, `deleted`) VALUES
+(1,	'шт',	'штука',	0),
+(2,	'упак',	'упаковка',	0),
+(3,	'компл',	'комплект',	0),
+(4,	'кг',	'килограмм',	0),
+(5,	'гр',	'грамм',	0),
+(6,	'м2',	'квадратный метр',	0),
+(7,	'л',	'литр',	0);
 
 DROP TABLE IF EXISTS `vendors`;
 CREATE TABLE `vendors` (
@@ -385,9 +387,9 @@ INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`,
 (2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1),
 (3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	1),
 (4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1),
-(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'tovdjQSZGJh8U',	1,	0,	1,	0,	1),
+(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'tok7dvBP15nrI',	1,	0,	1,	0,	1),
 (6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050),
 (9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	0,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	NULL,	1,	0,	1,	0,	1),
 (10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1);
 
--- 2023-11-12 14:05:31
+-- 2023-11-13 20:15:48
