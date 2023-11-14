@@ -48,7 +48,6 @@ if($role !== 1) {
                     ?>
                         <select id="limit" name="limit" value="" required>
                             
-                            <option value="3">3</option>
                             <option value="10">10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
@@ -90,7 +89,6 @@ if($role !== 1) {
                     ?> 
                         <select id="limit" name="limit" value="" required>
                             
-                            <option value="3"  <?php if ($_GET['limit'] == 3) {echo 'selected';} ?> >3</option>
                             <option value="10" <?php if ($_GET['limit'] == 10) {echo 'selected';} ?> >10</option>
                             <option value="20" <?php if ($_GET['limit'] == 20) {echo 'selected';} ?> >20</option>
                             <option value="50" <?php if ($_GET['limit'] == 50) {echo 'selected';} ?> >50</option>
