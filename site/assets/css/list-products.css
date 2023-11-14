@@ -196,6 +196,7 @@ td:nth-last-child(1) {
 }
 
 .save-unit, .reset-unit {
+    display: none;
     vertical-align: middle;
     cursor: pointer;
 }
@@ -204,9 +205,9 @@ td:nth-last-child(1) {
     display: inline-block;
     transform: rotate(90deg);
     cursor: pointer;
-    font-size: 20px;
     vertical-align: middle;
 }
+.edit-unit.active
 
 .list-units__row {
     font-size: 1rem;

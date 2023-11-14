@@ -16,7 +16,7 @@
         protected function onGet()
         {
             $units = $this->unitRepository->get($_GET);
-            $count = $this->unitRepository->getCountWithDetails($_GET);
+            $count = $this->unitRepository->getCountWithoutLimit($_GET);
             
             if (isset($_GET['id']) && $units)
                 $units = [$units];

@@ -40,17 +40,6 @@ let totaUnitsJson;
 
 let garbage;
 
-// let priceConfirmedEl = document.querySelector('.price-confirm-container');
-// let priceConfirmed;
-// let tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
-// let tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
-
-
-// let changePriceEl;
-// let changePriceInputEl;
-// let changeInputsEl;
-
-
 // заполним страницу данными
 startRenderPage();
 
@@ -71,7 +60,7 @@ function startRenderPage() {
     renderListUnits(totalUnits);
 
     // 5. добавим параметры в адресную строку
-    history.replaceState(history.length, null, 'admin-unit-product.php?&deleted=0' + params);
+    history.replaceState(history.length, null, 'admin-unit-product.php?deleted=0' + params);
 
 }
 
@@ -233,14 +222,6 @@ function renderListUnits(totalUnits) {
         item.addEventListener("click", deleteUnit);
     })
 
-    // changePriceEl = document.querySelectorAll('.change-price');
-    // changePriceInputEl = document.querySelectorAll('.change-price-el');
-    // changeInputsEl = document.querySelectorAll('.change-price-input');
-
-    // changePriceEl.forEach(item => {
-    //     item.addEventListener('click', showChangeInput);
-    // })
-
 }
 
 
@@ -363,7 +344,7 @@ function applyFilters() {
 sendChangeData.addEventListener("click", applyFilters);
 
 
-/* ---------- УДАЛЕНИЕ ТОВАРА ---------- */
+/* ---------- УДАЛЕНИЕ ЕДИНИЦЫ ТОВАРА ---------- */
 function deleteUnit() {
 
     // проверяем корректность токена
@@ -407,191 +388,127 @@ function deleteUnit() {
 //     window.location.href = mainUrl + "/pages/vendor-edit-product.php?id=" + id + "&vendor_id=" + vendor_id + "&deleted=0" + params ; 
 // }
 
-/* ---------- добавлениe единицы товара---------- */
+
+/* ---------- ДОБАВЛЕНИЕ ЕДИНИЦЫ ТОВАРОВ ---------- */
 function addUnit() {
+    // проверяем корректность токена
+    let role = check()['role'];
 
-    // заменяем в истории браузера стр на стр с get параметрами
-    // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
+    if (role !== 1) {return;}
 
-    // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = mainUrl + "/pages/vendor-add-product.php?vendor_id="  + vendor_id + "&deleted=0" + params ; 
-}
-
-
-/* ---------- ИЗМЕНЕНИЕ ЦЕНЫ---------- */
-
-// показать инпуты
-function showChangeInput() {
-    // строка продукта
-    let rowProduct = event.target.closest('.list-products__row');
+    //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
+    event.preventDefault(); 
     
-    // скрываем все инпуты, которые были открыты 
-    changePriceInputEl.forEach(item => {
-        item.classList.add('d-none');
-    })
+    // определим переменные для названия и сокращённого названия единицы товара
+    let nameUnit = document.getElementById('name');
+    let nameShortUnit = document.getElementById('name_short');
 
-    // инпуты этого продукта
-    let changePriceInput = rowProduct.querySelectorAll('.change-price-el');
-    // показываем их
-    changePriceInput.forEach(item => {
-        item.classList.remove('d-none');
-    })
+    // если оба поля пустые, то выходим из функции
+    // если какое-то одно пустое, то его приравниваем к заполненному
+    if (!(nameUnit.value.trim()) && !(nameShortUnit.value.trim())) {
+        alert('Оба поля пустые!');
+        return;
+    } else if (!(nameUnit.value.trim())) {
+        nameUnit.value = nameShortUnit.value;
+    } else if (!(nameShortUnit.value.trim())) {
+        nameShortUnit.value = nameUnit.value;
+    }
 
-
-    // показываем все div со старыми ценами
-    changePriceEl.forEach(item => {
-        item.classList.remove('d-none');
-    })
-
-    // divы со старыми ценами этого продукта
-    let changePrice = rowProduct.querySelectorAll('.change-price');
-    // скрываем их
-    changePrice.forEach(item => {
-        item.classList.add('d-none');
-    })
-
-}
-
-// сбросить изменения без сохранения
-function resetChangePrice(currency_dollar) {
-    // сбросим все значения всех инпутов
-    changeInputsEl.forEach(item => {
-        item.value = "";
+    // соберём json для передачи на сервер
+    let obj = JSON.stringify({
+        'name':  nameUnit.value,
+        'name_short':  nameShortUnit.value,
     });
 
-    // скрываем все инпуты, которые были открыты 
-    changePriceInputEl.forEach(item => {
-        item.classList.add('d-none');
-    })
+    // передаём данные на сервер
+    sendRequestPOST(mainUrl + '/api/units.php', obj);
 
-    // показываем все div со старыми ценами
-    changePriceEl.forEach(item => {
-        item.classList.remove('d-none');
-    })
+    // перезагрузим страницу
+    window.location.href = window.location.href;
 
-    // если долларовый товар, то сбросим ещё и контейнер с пересчётом доллары в сумы на цену в атрибуте
-    if(currency_dollar == "1") {
+}
 
-        // найдём divы с ценами в сум
-        let priceUzs = event.target.closest('.list-products__row').querySelectorAll('.price-uzs'); 
 
-        // перезапишем цену в соответсвии с данными из атрибута data-price-num
-        priceUzs.forEach(item => {
+/* ---------- ИЗМЕНЕНИЕ ЕДИНИЦЫ ТОВАРОВ---------- */
 
-            let priceTmp = Number(item.getAttribute('data-price-num'));
-            item.innerText = '(' + priceTmp.toLocaleString('ru') + ' Сум)';
+// показать инпуты для редактирвоания
+function showEditInput() {
+    // найдём строку записи, которую будут редактировать, родительский элемнт
+    let rowUnit = event.target.closest('.list-units__row');
 
-        })
+    // скроем ненужные поля и покажем поля для редактирования, кнопки сброса и сохранения
+    // скроем значок редактирования
+    rowUnit.querySelector('.edit-unit').style.display = 'none';
+    // скроем название и сокращ название
+    rowUnit.querySelector('.unit_name').classList.add('d-none');
+    rowUnit.querySelector('.unit_name_short').classList.add('d-none');
 
-    }
+    // покажем иконки сохранения и сброса
+    rowUnit.querySelector('.save-unit').style.display = 'inline-block';
+    rowUnit.querySelector('.reset-unit').style.display = 'inline-block';
+    // покажем инпуты для редактирования
+    rowUnit.querySelector('.unit_name-change').classList.remove('d-none');
+    rowUnit.querySelector('.unit_name_short-change').classList.remove('d-none');
+
+}
+
+// сбросить инпуты для редактирвоания
+function reset() {
+    // найдём строку записи, которую будут редактировать, родительский элемнт
+    let rowUnit = event.target.closest('.list-units__row');
+
+    // покажем значок редактирования
+    rowUnit.querySelector('.edit-unit').style.display = 'inline-block';
+    // покажем название и сокращ название
+    rowUnit.querySelector('.unit_name').classList.remove('d-none');
+    rowUnit.querySelector('.unit_name_short').classList.remove('d-none');
+
+    // скроем иконки сохранения и сброса
+    rowUnit.querySelector('.save-unit').style.display = 'none';
+    rowUnit.querySelector('.reset-unit').style.display = 'none';
+    // очистим и скроем инпуты для редактирования
+    rowUnit.querySelector('.unit_name-change').value = "";
+    rowUnit.querySelector('.unit_name-change').classList.add('d-none');
+    rowUnit.querySelector('.unit_name_short-change').value = "";
+    rowUnit.querySelector('.unit_name_short-change').classList.add('d-none');
 }
 
 // сохранить изменения
-function saveChangePrice(currency_dollar, rate) {
-
+function saveUnit() {
     // проверяем корректность токена
-    check();
+    let role = check()['role'];
+    if (role !== 1) {return;}
 
-    // строка продукта
-    let rowProduct = event.target.closest('.list-products__row');
-
-    // id продукта
-    let idProduct = rowProduct.getAttribute('product-id');
-
-    // все инпуты этого продукта
-    let changePriceInput = rowProduct.querySelectorAll('.change-price-input');
-
-    // все divs со старыми ценами продукта
-    let changePrice = rowProduct.querySelectorAll('.change-price');
-
-    // собираем json для отправки на сервер
+    // найдём строку записи, которую будут редактировать, родительский элемнт
+    let rowUnit = event.target.closest('.list-units__row');
     let obj = {};
-    changePriceInput.forEach(item => {
-        
-        if (item.value) {
-            obj[item.name] = item.value;
-        }
+    // найдём inputs
+    let newName = rowUnit.querySelector('.unit_name-change');
+    let newNameShort = rowUnit.querySelector('.unit_name_short-change');
 
-    })
+    // id unit
+    let idUnit = rowUnit.getAttribute('unit-id');
 
-    // если в json что-то есть:
-    if (Object.keys(obj).length > 0) {
-        // если цены в сумах
-        if (currency_dollar == "0") {
-
-            // если цена больше среднерыночной, то выходим
-            if (obj.price && obj.max_price) {
-                if (Number(obj.price) >= Number(obj.max_price)) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                }
-            } else if (obj.price && !obj.max_price) {
-                if (Number(obj.price) >= Number(changePrice[1].getAttribute('data-price-num'))) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                }
-            } else if (!obj.price && obj.max_price) {
-                if (Number(obj.max_price) <= Number(changePrice[0].getAttribute('data-price-num'))) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                }
-            } 
-
-
-        // если цены в долларах    
-        } else {
-            // все divs с атрибутом старой цены в долларах
-            let oldPriceDollarEl = rowProduct.querySelectorAll('.price-uzs');
-
-            // если цена больше среднерыночной, то выходим
-            if (obj.price_dollar && obj.max_price_dollar) {
-                if (Number(obj.price_dollar) >= Number(obj.max_price_dollar)) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                } else {
-                    obj['price'] = obj.price_dollar * rate;
-                    obj['max_price'] = obj.max_price_dollar * rate;
-                }
-            } else if (obj.price_dollar && !obj.max_price_dollar) {
-                if (Number(obj.price_dollar) >= Number(oldPriceDollarEl[1].getAttribute('data-price-dollar'))) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                } else {
-                    obj['price'] = obj.price_dollar * rate;
-                }
-            } else if (!obj.price_dollar && obj.max_price_dollar) {
-                if (Number(obj.max_price_dollar) <= Number(oldPriceDollarEl[0].getAttribute('data-price-dollar'))) {
-                    alert("Цена товара должна быть меньше среднерыночной цены!")
-                    return;
-                } else {
-                    obj['max_price'] = obj.max_price_dollar * rate;
-                }
-            }  
-        }
-
-        // если всё ок, то собираем данные и отправляем в БД (изменение цены)
-        obj['id'] = idProduct;
-        let objJson = JSON.stringify(obj);
-
-        // отправка запроса на запись (изменение цены)
-        sendRequestPOST(mainUrl + '/api/products.php', objJson);
-
-        // отправим запрос на изменение статуса подтверждения цен поставщика
-        // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
-        let objVendor = JSON.stringify({
-            'id': vendor_id,
-            'price_confirmed':  0
-        });
-        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-
-        // перерисовка страницы
-        startRenderPage(0);
-
+    // если оба значения не внесены, то ничего на сервер не отправляем
+    if (!(newName.value.trim()) && !(newNameShort.value.trim())) {
         return;
+    // если оба значения внесены, то собираем данные
+    } else if (newName.value.trim() && newNameShort.value.trim()) {
+        obj['name'] = newName.value;
+        obj['name_short'] = newNameShort.value;
+    } else if (newName.value.trim() && !(newNameShort.value.trim())) {
+        obj['name'] = newName.value;
+    } else if (!(newName.value.trim()) && newNameShort.value.trim()) {
+        obj['name_short'] = newNameShort.value;
     }
 
-    resetChangePrice(currency_dollar);
+    obj['id'] = idUnit;
+    let objJson = JSON.stringify(obj);
+
+    // отправка запроса на запись (изменение едницы товара)
+    sendRequestPOST(mainUrl + '/api/units.php', objJson);
+
+    // перерисовка страницы
+    startRenderPage();
 
 }
-
