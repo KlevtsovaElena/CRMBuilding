@@ -63,10 +63,10 @@ if($role !== 2) {
                             if($product[0]['name2'] == NULL || $product[0]['name2'] == '') {$name2='';} else {$name2=$product[0]['name2'];}
                             if($product[0]['name3'] == NULL || $product[0]['name3'] == '') {$name3='';} else {$name3=$product[0]['name3'];}
                         ?>
-                        <!-- наименование Оʻzbek-->
-                        <p>Оʻzbek</p><input type="text" id="name2" name="name2" value="<?= $name2; ?>">
-                        <!-- наименование, Ўзбек -->
-                        <p>Ўзбек</p><input type="text" id="name3" name="name3" value="<?= $name3; ?>">
+                        <!-- наименование Оʻzbekcha-->
+                        <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="<?= $name2; ?>">
+                        <!-- наименование, Ўзбекча -->
+                        <p>Ўзбекча</p><input type="text" id="name3" name="name3" value="<?= $name3; ?>">
                     </div>
                 </div>            
 
@@ -82,10 +82,10 @@ if($role !== 2) {
                             if($product[0]['description2'] == NULL || $product[0]['description2'] == '') {$description2='';} else {$description2=$product[0]['description2'];}
                             if($product[0]['description3'] == NULL || $product[0]['description3'] == '') {$description3='';} else {$description3=$product[0]['description3'];}
                         ?>
-                        <!-- описание Оʻzbek-->
-                        <p>Оʻzbek</p><textarea id="description2" name="description2"><?= $description2; ?></textarea>
-                        <!-- описание Ўзбек-->
-                        <p>Ўзбек</p><textarea id="description3" name="description3"><?= $description3; ?></textarea> 
+                        <!-- описание Оʻzbekcha-->
+                        <p>Оʻzbekcha</p><textarea id="description2" name="description2"><?= $description2; ?></textarea>
+                        <!-- описание Ўзбекча-->
+                        <p>Ўзбекча</p><textarea id="description3" name="description3"><?= $description3; ?></textarea> 
                     </div> 
                 </div>
 

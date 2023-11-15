@@ -65,10 +65,10 @@ if($role !== 1) {
                     <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="" required>
                     <div class="error-info d-none"></div>
 
-                    <!-- наименование Оʻzbek-->
-                    <p>Оʻzbek</p><input type="text" id="name2" name="name2" value="">
-                    <!-- наименование, Ўзбек -->
-                    <p>Ўзбек</p><input type="text" id="name3" name="name3" value="">
+                    <!-- наименование Оʻzbekcha-->
+                    <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="">
+                    <!-- наименование, Ўзбекча -->
+                    <p>Ўзбекча</p><input type="text" id="name3" name="name3" value="">
                 </div>
             </div>            
 
@@ -80,10 +80,10 @@ if($role !== 1) {
                     <p>Русский (обязательно)</p><textarea id="description" name="description" required></textarea>
                     <div class="error-info d-none"></div> 
 
-                    <!-- описание Оʻzbek-->
-                    <p>Оʻzbek</p><textarea id="description2" name="description2"></textarea>
-                    <!-- описание Ўзбек-->
-                    <p>Ўзбек</p><textarea id="description3" name="description3"></textarea> 
+                    <!-- описание Оʻzbekcha-->
+                    <p>Оʻzbekcha</p><textarea id="description2" name="description2"></textarea>
+                    <!-- описание Ўзбекча-->
+                    <p>Ўзбекча</p><textarea id="description3" name="description3"></textarea> 
                 </div> 
             </div>  
 
@@ -95,12 +95,12 @@ if($role !== 1) {
             </div>
            
             <div class="form-add-product__elements-item">
-                <p>Наименование, Оʻzbek</p><input type="text" id="name2" name="name2" value="">
+                <p>Наименование, Оʻzbekcha</p><input type="text" id="name2" name="name2" value="">
                 <div class="error-info d-none"></div>
             </div>
            
             <div class="form-add-product__elements-item">
-                <p>Наименование, Ўзбек</p><input type="text" id="name3" name="name3" value="">
+                <p>Наименование, Ўзбекча</p><input type="text" id="name3" name="name3" value="">
                 <div class="error-info d-none"></div>
             </div>
 -->
@@ -111,12 +111,12 @@ if($role !== 1) {
             </div>
             
             <div class="form-add-product__elements-item">
-                <p>Описание, Оʻzbek</p><textarea id="description2" name="description2"></textarea>
+                <p>Описание, Оʻzbekcha</p><textarea id="description2" name="description2"></textarea>
                 <div class="error-info d-none"></div> 
             </div>
             
             <div class="form-add-product__elements-item">
-                <p>Описание, Ўзбек</p><textarea id="description3" name="description3"></textarea>
+                <p>Описание, Ўзбекча</p><textarea id="description3" name="description3"></textarea>
                 <div class="error-info d-none"></div> 
             </div>                        
 -->
