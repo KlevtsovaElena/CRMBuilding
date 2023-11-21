@@ -1,0 +1,165 @@
+@import url('pagination.css');
+
+.orders {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.list-orders_products {
+    white-space: nowrap;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-orders_products:hover {
+    white-space: unset;
+}
+
+.list-orders_status {
+    padding: 3px 5px;
+    color: var(--light-color);
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+/* статус создан */
+.status0 {
+    background-color: var(--secondary-color);
+}
+
+/* статус просмотрен */
+.status1 {
+    background-color: #ff6600;
+}
+
+/* статус подтверждён */
+.status2 {
+    background-color: var(--primary-color-hover);
+}
+
+/* статус отменён */
+.status3 {
+    background-color: #666666;
+}
+
+/* статус завершён */
+.status4 {
+    background-color: #009900;
+}
+
+/* статус не дозвонились */
+.status5 {
+    background-color: #ff0000;
+}
+
+.list-orders__row[archive='1'] {
+    opacity: 0.3;
+}
+
+.row-status0 {
+    /* background: rgba(255, 0, 0, 0.1)!important;     */
+    background: rgba(255, 255, 0, 0.2)!important;
+    border: 1px solid white;
+}
+
+#list-orders th[data-sort]:after {
+    right: 0;
+    top: calc(50% - 0.9rem/2);
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+#list-orders th[data-sort]:before {
+    right: 6px;
+    top: calc(50% - 0.9rem/2);
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-orders th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-orders th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.info-table {
+    font-size: 0.9rem;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.filters-container-flex input,
+.filters-container-flex select {
+    min-width: unset;
+    min-width: unset;
+    width: unset;
+
+}
+
+.archive-check {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.archive-check input {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+}
+.archive-check input:focus {
+    outline: none;
+}
+/* .archive-check svg {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+}     */
+
+.change-order-select {
+    width: 65%;
+    min-width: unset;
+    max-width: unset;
+}
+
+th[data-id="status"] {
+    min-width: 140px;
+}
+.save-order, .reset-order {
+    width: 80px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.middle-input {
+    max-width: 102px;
+    font-size: 0.7rem;
+    cursor: auto;
+}
+
+.small-input {
+    max-width: 74px;
+    font-size: 0.7rem;
+}
+
+
+@media(max-width: 1250px) {
+    .filters-container-flex {
+        flex-wrap: wrap;
+    }
+}

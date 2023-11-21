@@ -1,0 +1,52 @@
+
+.vendor-info {
+    margin-top: 20px;
+}
+
+.form-add-vendor__item {
+    margin-bottom: 10px;
+}
+
+.form-add-vendor__item p { 
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+}
+
+.vendor-info-error {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.price-confirm-container {
+    margin-bottom: 15px;
+}
+
+.price-confirm-container svg {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.price-confirm {
+    color: #006633;
+}
+
+.price-not-confirm {
+    color: #990000;
+}
+
+.link-text {
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+
+input[type=radio] {
+    width: unset;
+    min-width: unset;
+    appearance: auto;
+    vertical-align: middle;
+ }
+ 
+ .currency-title {
+     font-size: 0.8rem;
+ }

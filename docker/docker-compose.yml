@@ -2,20 +2,33 @@ version: '3.3'
 
 services:
   nginx:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-nginx
     volumes:
+      - ./ssl:/etc/ssl
       - ./../site/:/var/www
-    ports: 
+    depends_on:
+      - php
+    ports:
       - 80:80
+      - 443:443
 
   php:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-php
     volumes:
       - ./../site/:/var/www
+    env_file:
+      - .env
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_CHARSET: ${MYSQL_CHARSET}
+      API_LINK: ${API_LINK}
     ports:
       - 9010:9000
 
@@ -26,8 +39,8 @@ services:
     volumes:
       - ./mysql/:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: "admin"
-      MYSQL_DATABASE: "crm-building"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
     ports:
       - 3309:3306
 
@@ -42,7 +55,57 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-bot
+    env_file:
+      - .env
+    environment:
+      bot_token: ${BOT_TOKEN}
+      SERVICE_NAME: ${SERVICE_NAME}
+      API_LINK: ${API_LINK}
+      SERVER_URI: ${SERVER_URI}
     volumes:
       - ./../bot/:/app/
     ports:
       - 5001:8080
+    restart: always
+
+  currency-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-currency-service
+    env_file:
+      - .env
+    volumes:
+      - ./../currency-service/:/app/
+    environment:
+      task_start_hour: "7"
+      task_start_minute: "30"
+      bot_token: ${CURRENCY_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_CHANEL}
+      TZ: "Europe/Moscow"
+    restart: always
+
+  price-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-price-service
+    env_file:
+      - .env
+    volumes:
+      - ./../price-service/:/app/
+    environment:
+      bot_token: ${PRICE_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_PRICE_CHANEL}
+    restart: always
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-notification-service
+    env_file:
+      - .env
+    volumes:
+      - ./../notification-service/:/app/
+    environment:
+      bot_token: ${BOT_TOKEN}
+      server_uri: ${SERVER_URI}
+      api_link: ${API_LINK}

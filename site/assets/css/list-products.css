@@ -1,0 +1,221 @@
+@import url('pagination.css');
+
+.products {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.list-products_name {
+    color: var(--primary-color)
+}
+
+.list-products_name a:hover {
+    color: var(--primary-color-hover);
+}
+
+.list-products_name img {
+    width: 45px;
+    height: 30px;
+    margin-right: 3px;
+    vertical-align: middle;
+    object-fit: contain;
+}
+
+.form-filters {
+    margin-top: 20px;
+}
+
+.form-filters label {
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+.form-filters input, 
+.form-filters select {
+    max-width: unset;
+    min-width: unset;
+    width: 100px;
+}
+
+.form-filters input[type="search"] {
+    width: 180px;
+}
+
+#list-products th:after {
+    right: 0;
+    top: calc(50% - 0.9rem/2);
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+#list-products th:before {
+    right: 6px;
+    top: calc(50% - 0.9rem/2);
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-products th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-products th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.info-table {
+    font-size: 0.9rem;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.garbage{
+    cursor: pointer;
+    transition: all var(--speed-transition);
+    position: absolute;
+    top: calc(50% - 12px);
+    right: 0.5rem;
+}
+
+.garbage:hover .garbage-svg {
+    cursor: pointer;
+    stroke: var(--secondary-color-hover);
+}
+
+td:nth-last-child(1) {
+    padding-right: 30px;
+    position: relative;
+    /* min-width: 140px; */
+}
+
+.change-price {
+    width: 85px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+}
+
+.change-price-input {
+    width: 80px;
+    min-width: unset;
+    max-width: unset;
+}
+
+.save-price, .reset-price {
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.price-confirm-container {
+    margin-top: 15px;
+}
+
+.price-confirm-container svg {
+    vertical-align: middle;
+}
+
+.price-confirm {
+    color: #006633;
+}
+
+.price-not-confirm {
+    color: #990000;
+}
+
+.checkbox-product {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+    min-width: unset;
+}
+
+.list-products__row[is-active='0'] {
+    opacity: 0.3;
+}
+
+.active-check {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.active-check input {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+}
+
+.active-check input:focus {
+    outline: none;
+}
+
+
+.units {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+
+#list-units th[data-sort]:after {
+    right: 0;
+    top: calc(50% - 0.9rem/2);
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort]:before {
+    right: 6px;
+    top: calc(50% - 0.9rem/2);
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-units th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.save-unit, .reset-unit {
+    display: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.edit-unit {
+    display: inline-block;
+    transform: rotate(90deg);
+    cursor: pointer;
+    vertical-align: middle;
+}
+.edit-unit.active
+
+.list-units__row {
+    font-size: 1rem;
+}
+
+@media(max-width: 1024px) {
+    .filters-container-flex {
+        flex-wrap: wrap;
+    }
+}
+

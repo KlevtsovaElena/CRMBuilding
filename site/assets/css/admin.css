@@ -1,0 +1,60 @@
+td:nth-last-child(1) {
+    min-width: 25px;
+}
+
+input[type="checkbox"] {
+    appearance: auto;
+    height: 15px;
+    width: 15px;
+    min-width: unset;
+}
+
+.add-block {
+    margin-bottom: 20px;
+}
+
+.input-add {
+    width: 220px !important;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+
+.digit {
+    color: black;
+    font-weight: normal;
+    cursor: default;
+}
+
+.edit {
+    transform: rotate(90deg);
+    width: 20px;
+    cursor: pointer;
+}
+
+.cancel, .save {
+    width: 20px;
+    cursor: pointer;
+}
+
+.delete-cell {
+    width: 30px !important;
+    min-width: unset !important;
+}
+
+.table-header {
+    min-width: unset !important;
+}
+
+.phone-block {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.phone {
+    margin: 15px 15px 15px 0;
+    font-weight: 600;
+    display: inline;
+    max-width: 200px;
+}

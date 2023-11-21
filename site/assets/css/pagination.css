@@ -1,0 +1,56 @@
+/* ПАГИНАЦИЯ */
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+}
+
+.page-switch {
+    display: flex;
+    justify-content: center;
+}
+
+.page-status {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.page-switch svg {
+    width: 15px;
+    cursor: pointer;
+    transition: all var(--speed-transition);
+}
+
+.page-switch__prev[disabled] svg,
+.page-switch__prev[disabled],
+.page-switch__next[disabled] svg,
+.page-switch__next[disabled] {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.page-switch__prev svg {
+    transform: rotate(90deg);
+    fill: var(--dark-color);
+}
+
+.page-switch__prev:hover svg,
+.page-switch__next:hover svg  {
+    fill: var(--primary-color);
+}
+
+.page-switch__prev[disabled]:hover svg,
+.page-switch__next[disabled]:hover svg {
+    fill: var(--dark-color);
+}
+
+.page-switch__next svg {
+    transform: rotate(270deg);
+    fill: var(--dark-color);
+}
+
+.page-switch .current-page {
+    margin: 0 10px;
+    font-weight: 700;
+}
