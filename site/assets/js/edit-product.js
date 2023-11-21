@@ -22,6 +22,7 @@ function editProduct(role) {
 
     // если были ошибки, то выходим
     if (hasError) {
+        console.log('oшибки');
         return;
     }
     
@@ -84,7 +85,10 @@ function editProduct(role) {
         if (!(price.value == priceOld && max_price.value == maxPriceOld)) {  
             obj['is_confirm'] = 0;
         }
+    } else {
+        obj['is_confirm'] = formAddProduct.querySelector('#is_confirm').value;;
     }
+    
     obj = JSON.stringify(obj);
 
     console.log(obj);

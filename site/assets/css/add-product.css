@@ -57,3 +57,19 @@
 .description-container textarea, .description-container textarea {
     max-width: 680px;
 }
+
+.confirm-container {
+    margin-bottom: 15px;
+}
+
+.confirm-container svg {
+    vertical-align: middle;
+}
+
+.price-confirm {
+    color: #006633;
+}
+
+.price-not-confirm {
+    color: #990000;
+}

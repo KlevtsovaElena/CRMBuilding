@@ -199,6 +199,16 @@ if($role !== 1) {
                 <div class="error-info d-none"></div>
             </div> 
 
+            <!-- статус -->
+            <div class="form-add-product__elements-item">
+                
+                <select id="is_confirm" name="is_confirm" value="" required>
+                    <option value="1">Утверждён</option>
+                    <option value="0">Не утверждён</option>
+                </select>
+                <div class="error-info d-none"></div>
+            </div> 
+
             <!-- здесь будут инпуты для цен из шаблона, по умолчанию в сум -->
             <div id="block-price">
 

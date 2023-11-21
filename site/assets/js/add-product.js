@@ -27,6 +27,7 @@ let hasError;
 let file; 
 let photoFileData;
 let photoFileName;
+let confirmProduct;
 
 
 /* ---------- ДОБАВЛЕНИЕ ТОВАРОВ ---------- */
@@ -59,9 +60,11 @@ function addProduct(role) {
 
     // утверждён ли продукт?
     // если товар добавляет поставщик, а не админ, то этот товар переводим в 0 до утверждения админом (поле is_confirm)
-    let confirmProduct;
+    // а если Админ - берем данные из селекта
     if (role !== 1) {
         confirmProduct = 0;
+    } else {
+        confirmProduct = formAddProduct.querySelector('#is_confirm').value;
     }
 
     let obj = JSON.stringify({
