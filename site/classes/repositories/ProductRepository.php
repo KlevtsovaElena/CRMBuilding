@@ -79,7 +79,8 @@ class ProductRepository extends BaseRepository
                                         INNER JOIN products p1 ON
                                         p1.`id` = p.`id`
                                     SET p.price = p1.`price_dollar` * v.`rate`,
-                                        p.max_price = p1.`max_price_dollar` * v.`rate`
+                                        p.max_price = p1.`max_price_dollar` * v.`rate`,
+                                        p.is_confirm = 0 
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 

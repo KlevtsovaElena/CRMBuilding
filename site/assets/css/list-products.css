@@ -114,10 +114,6 @@ td:nth-last-child(1) {
     cursor: pointer;
 }
 
-.price-confirm-container {
-    margin-top: 15px;
-}
-
 .price-confirm-container svg {
     vertical-align: middle;
 }
@@ -138,11 +134,11 @@ td:nth-last-child(1) {
 }
 
 .list-products__row[is-active='0'] {
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .list-products__row[is-confirm='0'] {
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .active-check{
@@ -223,6 +219,46 @@ td:nth-last-child(1) {
 
 .list-units__row {
     font-size: 1rem;
+}
+
+.confirm-price-daily {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.confirm-price-daily__info {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--border-form-elem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: help;
+    position: relative;
+}
+
+.confirm-price-daily__info-text {
+    opacity: 0;
+    position: absolute;
+    top: -15px;
+    left: 120%;
+    width: 150px;
+    height: 50px;
+    background-color: #fff9e6;
+    color: #5b0000;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 7px;
+    cursor: unset;
+    transition: all 0.5s;
+}
+
+.confirm-price-daily__info:hover .confirm-price-daily__info-text {
+    opacity: 1;
 }
 
 @media(max-width: 1420px) {

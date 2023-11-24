@@ -748,3 +748,13 @@ function checkboxChangedProductActive(id) {
 
 }
 
+/* ---------- ПОКАЗАТЬ ИНФОРМАЦИЮ О ЕЖЕДНЕВНОМ ПОДТВЕРЖДЕНИИ ЦЕН ---------- */
+function showConfirmPriceDailyInfo() {
+    let infoConfirmPriceDailyText = document.querySelector('.confirm-price-daily__info-text');
+    infoConfirmPriceDailyText.style.opacity = '1';
+    setTimeout(() => {
+
+        infoConfirmPriceDailyText.style.opacity = '0';
+
+    }, 3000);
+}

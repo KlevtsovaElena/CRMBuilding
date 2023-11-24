@@ -6,8 +6,10 @@
     --shadow-primary-active: 0 0 0 2px rgba(0, 136, 204, 0.5);
     --secondary-color: #d2323d;
     --secondary-color-hover: #e36159;
-    --color-info: #33CC66;
     --shadow-secondary-active: 0 0 0 2px rgba(210, 50, 45, 0.5);
+    --color-info: #33CC66;
+    --color-info-hover: #5bd684;
+    --shadow-color-info: 0 0 0 2px #84e0a3;
     --dark-color: #444444;
     --light-color: #ffffff;
     --neutral-color-hover: #F3F3F3;
@@ -261,6 +263,20 @@ input:focus, textarea:focus, select:focus {
 
 .btn-neutral:active {
     box-shadow: var(--shadow-neutral-color-active);
+    border:none;
+}
+
+.btn-green {
+    background: var(--color-info);
+    color: var(--light-color);
+}
+
+.btn-green:hover {
+    background: var(--color-info-hover);
+}
+
+.btn-green:active {
+    box-shadow: var(--shadow-color-info);
     border:none;
 }
 

@@ -284,7 +284,7 @@ function editVendor(id) {
     sendRequestPOST(mainUrl + '/api/vendors.php', obj);
 
     // если меняем Сум на $, то цены П уводим на рассмотрение и обнуляем их в базе
-    // и на каждый товар вешаем is_confirm = 0 СДЕЛАТЬ!!!!!!
+    // и на каждый товар вешаем is_confirm = 0 
     if (currencyDollar == '1' && currencyDB == '0') {
         let objPrice  = JSON.stringify({
             'id': id,

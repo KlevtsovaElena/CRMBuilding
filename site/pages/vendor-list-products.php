@@ -37,8 +37,16 @@ if($role !== 2) {
 ?>
 
     <!-- инфа о подтверждении цен -->
-    <div  class="price-confirm-container" confirm-price="<?= $profile['price_confirmed']; ?>">
+    <div class="confirm-price-daily">
+        <div  class="price-confirm-container" confirm-price="<?= $profile['price_confirmed']; ?>">
+        </div>
+        <a href="javascript: confirmPriceDaily()" class="btn btn-green d-iblock">Подтвердить цены</a>
+        <div class="confirm-price-daily__info" onclick="showConfirmPriceDailyInfo()">
+            ?
+            <div class="confirm-price-daily__info-text">Необходимо <b>ежедневно</b> подтверждать цены <b>с 9:00 до 10:00</b></div>
+        </div>
     </div>
+    
         
 <!-- если параметры get пустые -->
 <!-- отрисовываем страницу по дефолту -->
