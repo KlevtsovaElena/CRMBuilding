@@ -99,6 +99,50 @@ function edit(id, section_name) {
     }
 }
 
+function editOnClick(id, section_name) {
+
+    //достаем массив всех элементов, содержащих редактируемое название
+    let nameElements = document.querySelectorAll('.list-orders_status');
+    //console.log(nameElements);
+
+    //переменная для обновленного значения
+    //let changedValue = '';
+
+    //переменная для исходного значения
+    let uneditedValue = '';
+
+    //меняем поле с названием на редактируемый инпут
+    for (let i = 0; i < nameElements.length; i++) {
+        //ищем среди них то, у котого атрибут совпадает с нужным id
+        if (nameElements[i].getAttribute('data-id') == id) {
+
+            //копируем из нередактируемого поля текстовое значение, которое будет редактироваться в инпуте
+            uneditedValue = nameElements[i].innerHTML;
+            console.log(uneditedValue);
+            //скрываем нередактируемое поле
+            nameElements[i].classList.add('d-none');
+            //достаем инпут, который надо сделать видимым
+            let inputBlock = document.querySelectorAll('.input')[i];
+            //console.log(inputBlock);
+            //открываем инпут
+            inputBlock.classList.remove('d-none');
+            //кладем внутрь инпута значение, которое будем редактировать
+            inputBlock.querySelector('input').value = uneditedValue;
+            input = inputBlock.querySelector('input');
+
+            // //скрываем блок с карандашом
+            // document.getElementsByClassName('edit')[i].classList.add('d-none');
+            //открываем блок с отменой
+            document.getElementsByClassName('cancel')[i].classList.remove('d-none');
+            //открываем блок с сохранением
+            document.getElementsByClassName('save')[i].classList.remove('d-none');
+
+        }
+
+
+    }
+}
+
 //функция отмены редактирования (по нажатию на крестик)
 function cancel(id, name) {
     
@@ -127,8 +171,11 @@ function cancel(id, name) {
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.add('d-none');
-            //открываем блок с карандашом
-            document.getElementsByClassName('edit')[i].classList.remove('d-none');
+
+            if (document.getElementsByClassName('edit')[i]) {
+                //открываем блок с карандашом
+                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+            }
             
         }
     }
@@ -167,8 +214,12 @@ function save(id, uneditedValue, section_name) {
                 inputBlock.classList.add('d-none');
                 //возвращаем нередактируемое поле
                 nameElements[i].classList.remove('d-none');
-                //возвращаем блок с карандашом
-                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+
+                if (section_name !== 'vendors') {
+                    //возвращаем блок с карандашом
+                    document.getElementsByClassName('edit')[i].classList.remove('d-none');
+                }
+
                 //скрываем блок с отменой
                 document.getElementsByClassName('cancel')[i].classList.add('d-none');
                 //скрываем блок с сохранением
@@ -244,9 +295,11 @@ function save(id, uneditedValue, section_name) {
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.add('d-none');
-            //открываем блок с карандашом
-            document.getElementsByClassName('edit')[i].classList.remove('d-none');
-            
+
+            if (section_name !== 'vendors') {
+                //открываем блок с карандашом
+                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+            }
         }
     }
 }
