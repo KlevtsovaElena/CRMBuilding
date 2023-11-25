@@ -123,13 +123,71 @@ if($role !== 1) {
                     <input type="search" id="search" name="search" value="" placeholder="Поиск">
                 </div>
               
-                <!-- показывать неактивные -->
+
+                <!-- утверждённые/неутверждённые -->
+                <div class="d-iblock">
+                    <div>Утверждены</div>
+                    <select id="is_confirm" name="is_confirm" value="">
+                        
+                        <option value="">Все</option>
+                        <option value="is_confirm=1">Утверждены</option>
+                        <option value="is_confirm=0">Не утверждены</option>
+                        
+                    </select>
+                </div>
+
+
+                <!-- активные/неактивные -->
+                <div class="d-iblock">
+                    <div>Активные</div>
+                    <select id="is_active" name="is_active" value="">
+
+                        <option value="is_active=1">Активные</option>
+                        <option value="is_active=0">Неактивные</option>
+                        <option value="">Все</option>
+ 
+                    </select>
+                </div>
+                <!-- показывать неактивные
                 <div class="active-check">
                     <div >
-                        <input type="checkbox" id="active-check" name="active-check" checked value="">
+                        <input type="checkbox" id="active-check" name="active-check" value="is_active=1">
                     </div>
                     <lable>Неактивные</lable>
-                </div>
+                </div> -->
+
+
+                <!-- выбрать какие товары показывать из активных, неактивных, утверждённых, неутверждённых или все сразу, множ выбор -->
+                <!-- <div class="container-status-filter">
+
+                    <ul class="status-list-items">
+                        <li class="item"> 
+                            <input type="checkbox" class="t" id="confirm-product-check" name="confirm-product-check" checked value="is_confirm=1">
+                            <lable>Утверждены</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" id="notconfirm-product-check" name="notconfirm-product-check" checked value="is_confirm=0">
+                            <lable>Не утверждены</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" id="active-product-check" name="active-product-check" checked value="is_active=1">
+                            <lable>Активные</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" class="t" id="notactive-product-check" name="notactive-product-check" value="is_active=0">
+                            <lable>Неактивные</lable>
+                        </li>
+                    </ul>
+                </div> -->
+
+
+
+
+
+
+
+
+
 
                 <button class="btn btn-ok d-iblock">Применить</button>
 
@@ -152,7 +210,8 @@ if($role !== 1) {
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
                             <th data-id="max_price" data-sort="">Цена рынок</th>
-                            <th data-id="is_active" data-sort="">Активен</th>
+                            <!-- <th data-id="is_active" data-sort="">Активен</th> -->
+                            <th data-id="is_confirm" data-sort="">Утверждён</th>
                             
                         </tr>
                     </thead>
@@ -340,21 +399,30 @@ if (count($_GET) !== 0) {
                 <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
             </div>
             
-            
-            <!-- показывать неактивные -->
-            <div class="active-check">
-                <div >
-                    <input type="checkbox" id="active-check" name="active-check" 
-                        <?php 
-                            if(isset($_GET['is_active']) && $_GET['is_active']=='1') {
-                                echo 'value="is_active=1"';
-                            } else {
-                                echo 'checked value=""';
-                            }?>
-                    >
-                </div>
-                <lable>Неактивные</lable>
+            <!-- утверждённые/неутверждённые -->
+            <div class="d-iblock">
+                <div>Утверждены</div>
+                <select id="is_confirm" name="is_confirm" value="">
+                    
+                    <option value="">Все</option>
+                    <option value="is_confirm=1" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '1') {echo 'selected';} ?>>Утверждены</option>
+                    <option value="is_confirm=0" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '0') {echo 'selected';} ?>>Не утверждены</option>
+                    
+                </select>
             </div>
+            
+            <!-- активные/неактивные -->
+            <div class="d-iblock">
+                <div>Активные</div>
+                <select id="is_active" name="is_active" value="">
+
+                    <option value="is_active=1" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '1') {echo 'selected';} ?>>Активные</option>
+                    <option value="is_active=0" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '0') {echo 'selected';} ?>>Неактивные</option>
+                    <option value="">Все</option>
+
+                </select>
+            </div>
+
 
             <button class="btn btn-ok d-iblock">Применить</button>
             
@@ -376,7 +444,8 @@ if (count($_GET) !== 0) {
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок</th>
-                    <th data-id="is_active" data-sort="<?php if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th>
+                    <!-- <th data-id="is_active" data-sort="<?php //if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th> -->
+                    <th data-id="is_confirm" data-sort="<?php if ($sortBy == 'is_confirm')  {echo $mark; } ?>">Утверждён</th>
                     
                 </tr>
             </thead>
@@ -400,7 +469,7 @@ if (count($_GET) !== 0) {
     <!-- шаблон строки таблицы Сум -->
     <template id="template-body-table-uzs">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
             
             <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
@@ -424,7 +493,8 @@ if (count($_GET) !== 0) {
             </td>
 
             <td>
-                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>             
+                <!-- <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>              -->
+                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductConfirm(${id})" ${checked-confirm}></div>             
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
         </tr>
@@ -434,7 +504,7 @@ if (count($_GET) !== 0) {
      <!-- шаблон строки таблицы Доллар -->
     <template id="template-body-table-dollar">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
             
             <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
@@ -463,7 +533,9 @@ if (count($_GET) !== 0) {
             </td>
 
             <td>
-                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>            
+                
+                <!-- <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>     -->
+                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductConfirm(${id})" ${checked-confirm}></div>                 
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
         </tr>

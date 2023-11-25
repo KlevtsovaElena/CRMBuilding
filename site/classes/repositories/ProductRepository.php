@@ -58,7 +58,8 @@ class ProductRepository extends BaseRepository
                                         v.`city_id` as `city_id`,
                                         cit.`name` as `city_name`,
                                         v.`price_confirmed` as `price_confirmed`,
-                                        p.`is_active` as `is_active`
+                                        p.`is_active` as `is_active`,
+                                        p.`is_confirm` as `is_confirm`
                                     FROM products p
                                         INNER JOIN categories c ON
                                             c.`id` = p.`category_id`
@@ -78,7 +79,8 @@ class ProductRepository extends BaseRepository
                                         INNER JOIN products p1 ON
                                         p1.`id` = p.`id`
                                     SET p.price = p1.`price_dollar` * v.`rate`,
-                                        p.max_price = p1.`max_price_dollar` * v.`rate`
+                                        p.max_price = p1.`max_price_dollar` * v.`rate`,
+                                        p.is_confirm = 0 
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
@@ -114,7 +116,8 @@ class ProductRepository extends BaseRepository
         'city_id' => 'v.city_id',
         'city_name' => 'cit.name', 
         'price_confirmed' => 'v.price_confirmed',
-        'is_active' => 'p.is_active'
+        'is_active' => 'p.is_active',
+        'is_confirm' => 'p.is_confirm'
     ];
 
     public function getTableName(): string

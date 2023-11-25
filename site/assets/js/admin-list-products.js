@@ -25,8 +25,15 @@ let limitEl = document.getElementById('limit');
 let vendor_idEl = document.getElementById('vendor_id');
 let offsetEl = containerPagination.getAttribute('offset');
 
-let activeCheckEl = document.querySelector('.active-check');
-let activeEl = activeCheckEl.querySelector('input');
+// let activeCheckEl = document.querySelector('.active-check');
+// let activeEl = activeCheckEl.querySelector('input');
+
+let confirmCheckEl = document.getElementById('is_confirm');
+let activeCheckEl = document.getElementById('is_active');
+
+// чекбоксы активен/неактивен, утверждён/неутверждён
+// let statusProductEl = document.querySelector('.status-list-items').querySelectorAll('input');
+// let statusProductIdArray = []; 
 
 let prevButton;
 let nextButton;
@@ -146,9 +153,35 @@ function getFilters() {
     })
 
     // проверим чекбокс неактивных товаров
-    if(activeEl.value) {
-        params += "&" + activeEl.value;
+    // if(activeEl.value) {
+    //     params += "&" + activeEl.value;
+    // }
+
+    // проверим утверждённость товаров
+    if(confirmCheckEl.value) {
+        params += "&" + confirmCheckEl.value;
     }
+
+    // проверим активность товаров
+    if(activeCheckEl.value) {
+        params += "&" + activeCheckEl.value;
+    }
+
+    // проверим выбранные чекбоксы активный/неактивный, утверждённый/неутверждённый
+    // запишем id всех выделенных чекбоксов
+    // statusProductEl.forEach(statusId => {
+    //     if(statusId.hasAttribute('checked')) {
+    //         statusProductIdArray.push(statusId.id);
+    //     }  
+    // })
+    // // если выделены и активные и неактивные
+    // if(statusProductIdArray.indexOf('') && statusProductIdArray.indexOf('')) {
+    //     alert('выделены акт-неакт')
+    // } else if(!statusProductIdArray.indexOf('') && !statusProductIdArray.indexOf('')) {
+    //     alert('не выделены акт-неакт')
+    // }
+    // console.log(statusProductIdArray);
+
 
     // вернём параметры
     return params;
@@ -241,9 +274,17 @@ function renderListProducts(totalProducts) {
             checked = '';
         }
 
+        let checkedConfirm;
+        if (totalProducts['products'][i]['is_confirm'] == '1') {
+            checkedConfirm = 'checked';
+        } else {
+            checkedConfirm = '';
+        }
+
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
             //  для сумовых поставщиков
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
@@ -262,11 +303,15 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                                 .replace('${max_price}', totalProducts['products'][i]['max_price'])
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
-                                                                .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
+                                                                .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
+                                                                .replace('${checked-confirm}', checkedConfirm)
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+                                                                
         
         } else if (totalProducts['products'][i]['vendor_currency_dollar'] == "1"){
             // для долларовых поставщиков
             containerListProducts.innerHTML += tmplRowProductDollar.replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
@@ -296,12 +341,10 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${price_dollar_format}', totalProducts['products'][i]['price_dollar'].toLocaleString('ru'))
                                                                 .replace('${max_price_dollar}', totalProducts['products'][i]['max_price_dollar'])
                                                                 .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
-                                                                .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'));
-                                                                
-                                                                
-                                                                
-                                                                
-
+                                                                .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
+                                                                .replace('${checked-confirm}', checkedConfirm)
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+ 
         }
     }
 
@@ -485,16 +528,16 @@ function deleteProduct() {
 // если выбрана галочка, то не нужен параметр is_active
 // если же галочки нет, то запрашиваем только is_active=1
 // для этого меняем значение атрибута value  у чекбокса
-activeCheckEl.onclick = function(){
-    if(activeEl.checked) {
-        activeEl.value = ""
+// activeCheckEl.onclick = function(){
+//     if(activeEl.checked) {
+//         activeEl.value = ""
         
-    } else {
-        activeEl.value = "is_active=1";  
-    }
+//     } else {
+//         activeEl.value = "is_active=1";  
+//     }
 
-    console.log(activeEl.value);
-}
+//     console.log(activeEl.value);
+// }
 
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
@@ -741,6 +784,52 @@ function checkboxChangedProductActive(id) {
         obj = JSON.stringify({
             'id': id,
             'is_active': 0
+        });
+    }
+
+    console.log(obj);
+
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
+
+    // перерисовка страницы
+    startRenderPage();
+
+}
+
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРА ЧЕРЕЗ ЧЕКБОКС (утверждён/неутверждён) ---------- */
+
+function checkboxChangedProductConfirm(id) {
+    // проверяем корректность токена
+    check()
+
+    let isChecked = window.confirm('Вы действительно хотите изменить статус товара?');
+
+    if(!isChecked) {
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_confirm': 1
+        });
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_confirm': 0
         });
     }
 

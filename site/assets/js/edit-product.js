@@ -7,6 +7,7 @@ let productId = formAddProduct.getAttribute('product-id');
 let priceOld = price.getAttribute('price-old');
 let maxPriceOld = max_price.getAttribute('max-price-old');
 
+
 /* ---------- РЕДАКТИРОВАНИЕ ТОВАРОВ ---------- */
 
 function editProduct(role) {
@@ -21,14 +22,20 @@ function editProduct(role) {
 
     // если были ошибки, то выходим
     if (hasError) {
+        console.log('oшибки');
         return;
     }
     
     let obj;
     
     // соберём json для передачи на сервер
+    console.log('priceOld', priceOld);
+    console.log('maxPriceOld', maxPriceOld);
+    console.log('price', price.value);
+    console.log('max_price', max_price.value);
+
     if (!new_photo.value) {
-        obj = JSON.stringify({
+        obj = {
             'id': productId,
             'name':  nameProduct.value,
             'name2':  nameProduct2.value,
@@ -47,9 +54,9 @@ function editProduct(role) {
             'unit_id': unit_id.value,
             'is_active': is_active.value,
             'photo': photo.value
-        });
+        };
     } else {
-        obj = JSON.stringify({
+        obj = {
             'id': productId,
             'name':  nameProduct.value,
             'name2':  nameProduct2.value,
@@ -69,24 +76,37 @@ function editProduct(role) {
             'is_active': is_active.value,
             photoFileData,
             photoFileName
-        });
+        };
     }
 
+    // утверждён ли продукт?
+    // если товар изменяет поставщик (именно цену), а не админ, то этот товар переводим в 0 до утверждения админом (поле is_confirm)
+    if (role !== 1) {
+        if (!(price.value == priceOld && max_price.value == maxPriceOld)) {  
+            obj['is_confirm'] = 0;
+        }
+    } else {
+        obj['is_confirm'] = formAddProduct.querySelector('#is_confirm').value;;
+    }
+    
+    obj = JSON.stringify(obj);
+
+    console.log(obj);
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // если товар изменяет поставщик, а не админ, то проверяем менял ли он цену
     // и если да, то поставщика переводим в 0 до подтверждения цен
-    if (role == 2) {
-        if (!(price.value == priceOld && max_price.value == maxPriceOld)) {        
-            // отправим запрос на изменение статуса подтверждения цен поставщика
-            let objVendor = JSON.stringify({
-                'id': vendor_id.value,
-                'price_confirmed':  0
-            });
-            sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-        }
-    }
+    // if (role == 2) {
+    //     if (!(price.value == priceOld && max_price.value == maxPriceOld)) {        
+    //         // отправим запрос на изменение статуса подтверждения цен поставщика
+    //         let objVendor = JSON.stringify({
+    //             'id': vendor_id.value,
+    //             'price_confirmed':  0
+    //         });
+    //         sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+    //     }
+    // }
 
     // получаем ответ с сервера
     alert("Данные изменены");

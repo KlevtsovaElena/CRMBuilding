@@ -175,6 +175,16 @@ if($role !== 1) {
                 </div> 
 
 
+                <!-- статус -->
+                <div class="form-add-product__elements-item">
+                    
+                    <select id="is_confirm" name="is_confirm" value="" required>
+                        <option value="1" <?php if($product[0]['is_confirm'] == 1) {echo 'selected';} ?>>Утверждён</option>
+                        <option value="0" <?php if($product[0]['is_confirm'] == 0) {echo 'selected';} ?>>Не утверждён</option>
+                    </select>
+                    <div class="error-info d-none"></div>
+                </div> 
+
             <!-- в зависимости от валюты поставщика -->
             <?php if ($product[0]['vendor_currency_dollar'] == "0") { ?>
                 
