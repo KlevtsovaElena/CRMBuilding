@@ -112,7 +112,7 @@ function editProduct(role) {
     alert("Данные изменены");
 
     // перезагрузим страницу
-    // window.location.href = window.location.href;
+    window.location.href = window.location.href;
 }
 
 /* ---------- ВАЛИДАЦИЯ ФОРМЫ РЕДАКТИРОВАНИЯ ТОВАРОВ ---------- */

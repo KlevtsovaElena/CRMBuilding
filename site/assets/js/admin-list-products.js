@@ -25,10 +25,11 @@ let limitEl = document.getElementById('limit');
 let vendor_idEl = document.getElementById('vendor_id');
 let offsetEl = containerPagination.getAttribute('offset');
 
-let activeCheckEl = document.querySelector('.active-check');
-let activeEl = activeCheckEl.querySelector('input');
+// let activeCheckEl = document.querySelector('.active-check');
+// let activeEl = activeCheckEl.querySelector('input');
 
 let confirmCheckEl = document.getElementById('is_confirm');
+let activeCheckEl = document.getElementById('is_active');
 
 // чекбоксы активен/неактивен, утверждён/неутверждён
 // let statusProductEl = document.querySelector('.status-list-items').querySelectorAll('input');
@@ -152,14 +153,20 @@ function getFilters() {
     })
 
     // проверим чекбокс неактивных товаров
-    if(activeEl.value) {
-        params += "&" + activeEl.value;
-    }
+    // if(activeEl.value) {
+    //     params += "&" + activeEl.value;
+    // }
 
     // проверим утверждённость товаров
     if(confirmCheckEl.value) {
         params += "&" + confirmCheckEl.value;
     }
+
+    // проверим активность товаров
+    if(activeCheckEl.value) {
+        params += "&" + activeCheckEl.value;
+    }
+
     // проверим выбранные чекбоксы активный/неактивный, утверждённый/неутверждённый
     // запишем id всех выделенных чекбоксов
     // statusProductEl.forEach(statusId => {
@@ -521,16 +528,16 @@ function deleteProduct() {
 // если выбрана галочка, то не нужен параметр is_active
 // если же галочки нет, то запрашиваем только is_active=1
 // для этого меняем значение атрибута value  у чекбокса
-activeCheckEl.onclick = function(){
-    if(activeEl.checked) {
-        activeEl.value = ""
+// activeCheckEl.onclick = function(){
+//     if(activeEl.checked) {
+//         activeEl.value = ""
         
-    } else {
-        activeEl.value = "is_active=1";  
-    }
+//     } else {
+//         activeEl.value = "is_active=1";  
+//     }
 
-    console.log(activeEl.value);
-}
+//     console.log(activeEl.value);
+// }
 
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */

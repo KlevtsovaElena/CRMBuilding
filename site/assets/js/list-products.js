@@ -758,3 +758,26 @@ function showConfirmPriceDailyInfo() {
 
     }, 3000);
 }
+
+
+
+// ВРЕМЕННО при нажатии на кнопку Подтвердить Цены  в поле price_confirmed таблицы vendors записываем 1
+// потом заменить на передачу id поставщика в новую таблицу
+
+function confirmPriceDaily() {
+    // проверка корректности токена
+    check(); 
+
+    //собираем параметры для передачи в бд
+    obj = JSON.stringify({
+        'id': vendor_id,
+        'price_confirmed': 1
+    });
+
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/vendors.php', obj);
+
+    // перезагрузим страницу
+    window.location.href = window.location.href;
+
+}

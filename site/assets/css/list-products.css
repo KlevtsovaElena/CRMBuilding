@@ -108,6 +108,10 @@ td:nth-last-child(1) {
     max-width: unset;
 }
 
+.change-price-el {
+    text-wrap: nowrap;
+}
+
 .save-price, .reset-price {
     display: inline-block;
     vertical-align: middle;
@@ -247,12 +251,12 @@ td:nth-last-child(1) {
     top: -15px;
     left: 120%;
     width: 150px;
-    height: 50px;
+    height: 54px;
     background-color: #fff9e6;
     color: #5b0000;
     font-size: 10px;
     font-weight: 500;
-    padding: 7px;
+    padding: 5px;
     cursor: unset;
     transition: all 0.5s;
 }

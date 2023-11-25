@@ -137,13 +137,24 @@ if($role !== 1) {
                 </div>
 
 
-                <!-- показывать неактивные -->
+                <!-- активные/неактивные -->
+                <div class="d-iblock">
+                    <div>Активные</div>
+                    <select id="is_active" name="is_active" value="">
+
+                        <option value="is_active=1">Активные</option>
+                        <option value="is_active=0">Неактивные</option>
+                        <option value="">Все</option>
+ 
+                    </select>
+                </div>
+                <!-- показывать неактивные
                 <div class="active-check">
                     <div >
                         <input type="checkbox" id="active-check" name="active-check" value="is_active=1">
                     </div>
                     <lable>Неактивные</lable>
-                </div>
+                </div> -->
 
 
                 <!-- выбрать какие товары показывать из активных, неактивных, утверждённых, неутверждённых или все сразу, множ выбор -->
@@ -400,20 +411,18 @@ if (count($_GET) !== 0) {
                 </select>
             </div>
             
-            <!-- показывать неактивные -->
-            <div class="active-check">
-                <div >
-                    <input type="checkbox" id="active-check" name="active-check" 
-                        <?php 
-                            if(isset($_GET['is_active']) && $_GET['is_active']=='1') {
-                               echo 'value="is_active=1"';
-                            } else {
-                               echo 'checked value=""';
-                            }?>
-                    >
-                </div>
-                <lable>Неактивные</lable>
+            <!-- активные/неактивные -->
+            <div class="d-iblock">
+                <div>Активные</div>
+                <select id="is_active" name="is_active" value="">
+
+                    <option value="is_active=1" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '1') {echo 'selected';} ?>>Активные</option>
+                    <option value="is_active=0" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '0') {echo 'selected';} ?>>Неактивные</option>
+                    <option value="">Все</option>
+
+                </select>
             </div>
+
 
             <button class="btn btn-ok d-iblock">Применить</button>
             
