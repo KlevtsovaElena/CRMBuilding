@@ -20,3 +20,12 @@ if ($role == "2") { ?>
         window.location.href = mainUrl + '/pages/vendor-list-orders.php';
    </script>
 <?php } ?>
+
+<?php
+
+// домашняя страница для оптовика
+if ($role == "3") { ?>
+   <script type="text/javascript">
+        window.location.href = mainUrl + '/pages/wholesaler-main.php';
+   </script>
+<?php } ?>
