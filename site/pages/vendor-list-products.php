@@ -37,8 +37,16 @@ if($role !== 2) {
 ?>
 
     <!-- инфа о подтверждении цен -->
-    <div  class="price-confirm-container" confirm-price="<?= $profile['price_confirmed']; ?>">
+    <div class="confirm-price-daily">
+        <div  class="price-confirm-container" confirm-price="<?= $profile['price_confirmed']; ?>">
+        </div>
+        <a href="javascript: confirmPriceDaily()" class="btn btn-green d-iblock">Подтвердить цены</a>
+        <div class="confirm-price-daily__info" onclick="showConfirmPriceDailyInfo()">
+            ?
+            <div class="confirm-price-daily__info-text">Необходимо подтверждать цены <b>ежедневно с 9:00 до 10:00</b></div>
+        </div>
     </div>
+    
         
 <!-- если параметры get пустые -->
 <!-- отрисовываем страницу по дефолту -->
@@ -126,6 +134,7 @@ if($role !== 2) {
                             <th data-id="price" data-sort="">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             <th data-id="max_price" data-sort="">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             <th data-id="is_active" data-sort="">Активен</th>
+                            <th data-id="is_confirm" data-sort="">Утверждён</th>
                         </tr>
                     </thead>
 
@@ -296,6 +305,7 @@ if (count($_GET) !== 0) {
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     <th data-id="is_active" data-sort="<?php if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th>
+                    <th data-id="is_confirm" data-sort="<?php if ($sortBy == 'is_confirm')  {echo $mark; } ?>">Утверждён</th>
 
                 </tr>
             </thead>
@@ -319,7 +329,7 @@ if (count($_GET) !== 0) {
     <!-- шаблон таблицы -->
     <template id="template-body-table">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm_product}">
             
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
@@ -356,6 +366,9 @@ if (count($_GET) !== 0) {
             </td>
             <td>
                 <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>                
+            </td>
+            <td>
+                <div class="ta-center" class="confirm-product">${is_confirm}</div>                
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
 
@@ -380,13 +393,13 @@ if (count($_GET) !== 0) {
     <!-- шаблон цены подтверждены -->
     <template id="tmpl-price-confirm">
         <svg fill="#009933" width="20px" height="20px" viewBox="0 0 32.00 32.00" enable-background="new 0 0 32 32" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#009933" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#66FF99" stroke-width="0.256"></g><g id="SVGRepo_iconCarrier"> <g id="Approved"></g> <g id="Approved_1_"> <g> <path d="M30,1H2C1.448,1,1,1.448,1,2v28c0,0.552,0.448,1,1,1h28c0.552,0,1-0.448,1-1V2C31,1.448,30.552,1,30,1z M29,29H3V3h26V29z "></path> <path d="M12.629,21.73c0.192,0.18,0.438,0.27,0.683,0.27s0.491-0.09,0.683-0.27l10.688-10c0.403-0.377,0.424-1.01,0.047-1.413 c-0.377-0.404-1.01-0.425-1.413-0.047l-10.004,9.36l-4.629-4.332c-0.402-0.377-1.035-0.356-1.413,0.047 c-0.377,0.403-0.356,1.036,0.047,1.413L12.629,21.73z"></path> </g> </g> <g id="File_Approve"></g> <g id="Folder_Approved"></g> <g id="Security_Approved"></g> <g id="Certificate_Approved"></g> <g id="User_Approved"></g> <g id="ID_Card_Approved"></g> <g id="Android_Approved"></g> <g id="Privacy_Approved"></g> <g id="Approved_2_"></g> <g id="Message_Approved"></g> <g id="Upload_Approved"></g> <g id="Download_Approved"></g> <g id="Email_Approved"></g> <g id="Data_Approved"></g> </g></svg>
-        <span class="price-confirm">Все цены подтверждены</span>
+        <span class="price-confirm">Вы подтвердили цены</span>
     </template>
 
     <!-- шаблон цены не подтверждены -->
     <template id="tmpl-price-not-confirm">
         <svg fill="#d2323d" width="20px" height="20px" viewBox="0 0 128 128" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon points="82.4,40 64,58.3 45.6,40 40,45.6 58.3,64 40,82.4 45.6,88 64,69.7 82.4,88 88,82.4 69.7,64 88,45.6 "></polygon> <path d="M1,127h126V1H1V127z M9,9h110v110H9V9z"></path> </g> </g></svg>
-        <span class="price-not-confirm">Цены на рассмотрении</span>
+        <span class="price-not-confirm">Подтвердите цены</span>
     </template>
       
 <!-- подключим футер -->
