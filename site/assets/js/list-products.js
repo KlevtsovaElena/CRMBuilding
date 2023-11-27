@@ -413,8 +413,8 @@ headTableProducts.forEach(item => {
 
 
 /* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ (Выборка по фильтрам) ---------- */
-const sendChangeData = document.querySelector('.form-filters').querySelector('button');
-
+const sendChangeData = document.querySelector('.form-filters').querySelector('#btn-apply-filters');
+console.log('send', sendChangeData);
 function applyFilters() {
 
     // проверяем корректность токена
@@ -780,4 +780,47 @@ function confirmPriceDaily() {
     // перезагрузим страницу
     window.location.href = window.location.href;
 
+}
+
+/* ---------- МАССОВОЕ ИЗМЕНЕНИЕ ЦЕН ---------- */
+
+// найдём кнопку, при нажатии на которую, будем открывать модальное окно-форму для изменения цен
+const massChangePriceBtn = document.querySelector('.form-filters').querySelector('#btn-masschange-price');
+
+// найдём модальное окно и форму для изменения сумм в этом окне
+const modalMassChangePrice = document.querySelector(".modalbox");
+const massChangePriceForm = modalMassChangePrice.querySelector('form');
+
+// клик по 'Массовое изменение цен' открывает модальное окно
+function showMassChangePriceForm() {
+
+    // проверяем корректность токена
+    check();
+
+    // покажем модальное окно
+    modalMassChangePrice.classList.remove('d-none');
+
+}
+massChangePriceBtn.addEventListener("click", showMassChangePriceForm);
+
+// закрытие модального окна по скликиванию (клик по области модального окна, свободной от формы)
+function closeMassChangePriceForm() {
+    if (this === event.target) {
+        modalMassChangePrice.classList.add('d-none');
+    }
+}
+modalMassChangePrice.addEventListener("click", closeMassChangePriceForm);
+
+// закрытие модального окна по нажатию Х на форме
+function closeMassChangePriceFormIcon() {
+    modalMassChangePrice.classList.add('d-none');
+}
+
+// нажатие на кнопку Выполнить
+function massChangePriceClick() {
+    
+    //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
+    event.preventDefault(); 
+
+    console.log('выполнить');
 }

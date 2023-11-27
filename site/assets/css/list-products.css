@@ -265,6 +265,122 @@ td:nth-last-child(1) {
     opacity: 1;
 }
 
+#btn-masschange-price {
+    width: 120px;
+    font-size: 12px;
+    padding: 9px;
+}
+
+/* modalbox */
+.modalbox {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    z-index: 11;
+}
+
+.modal-form {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    padding: 22px;
+    width: 500px;
+    min-height: 300px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    color: var(--dark-color);;
+}
+
+.modal-form select {
+    max-width: unset;
+    min-width: unset;
+    width: 220px;
+}
+
+.masschange-price-case__text {
+    margin-right: 10px;
+}
+
+.masschange-price__title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.close-icon-flex {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close-icon {
+    width: 15px;
+    height: 25px;
+    font-weight: 700;
+    text-align: right;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.result-masschange-price {
+    font-size: 12px;
+    padding-top: 10px;
+    color: rgb(255, 0, 0);
+}
+
+/* .masschange-price-kind {
+    position: relative;
+    display: flex;
+    align-items: center;
+} */
+.masschange-price-case,
+.masschange-price-kind,
+.masschange-price-choose-products,
+.masschange-price-value {
+    margin-bottom: 8px;
+}
+
+.masschange-price-kind__input {
+    margin-bottom: 5px;
+    margin-left: 15px;
+}
+
+.masschange-price-kind input {
+    appearance: auto;
+    min-width: unset;
+    height: 15px;
+    width: 15px;
+    vertical-align: middle;
+}
+
+.masschange-price-kind lable {
+    margin-left: 10px;
+}
+
+.masschange-price-kind input:focus {
+    outline: none;
+}
+
+.masschange-price-choose-products__title {
+    margin-bottom: 8px;
+}
+.masschange-price-choose-products__check{
+    margin-left: 15px;
+}
+
+.masschange-price-value input {
+    width: 100px;
+    min-width: unset;
+}
+/* /modalbox */
+
 @media(max-width: 1420px) {
     .filters-container-flex {
         flex-wrap: wrap;

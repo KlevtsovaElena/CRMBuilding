@@ -115,9 +115,12 @@ if($role !== 2) {
                         <lable>Неактивные</lable>
                     </div>
 
-                    <button class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-apply-filters" class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-masschange-price" class="btn btn-ok d-iblock">Массовое изменение цен</button>
                     
                 </div>
+
+                
             </section>
 
             <!-- таблица товаров -->
@@ -286,7 +289,8 @@ if (count($_GET) !== 0) {
                 <lable>Неактивные</lable>
             </div>
                         
-            <button class="btn btn-ok d-iblock">Применить</button>
+            <button id="btn-apply-filters" class="btn btn-ok d-iblock">Применить</button>
+            <button id="btn-masschange-price" class="btn btn-ok d-iblock">Массовое изменение цен</button>
             
         </div>
     </section>
@@ -402,7 +406,148 @@ if (count($_GET) !== 0) {
         <span class="price-not-confirm">Подтвердите цены</span>
     </template>
       
+    <!-- masschange-form -->   
+
+    <div class="modalbox d-none" >
+        <form action="#" class="modal-form masschange-price" method="post">
+            <div class="close-icon-flex"><div class="close-icon" onclick="closeMassChangePriceFormIcon()">x</div></div>
+
+            <p class="masschange-price__title">Массовое изменение цен</p>
+
+            <!-- выбор случая -->
+            <div class="masschange-price-case">
+                <span class="masschange-price-case__text">Что сделать: </span>
+                <select id="case" name="case" value="">
+
+                    <option value="priceUpPercent">Поднять в %</option>
+                    <option value="priceDownPercent">Снизить в %</option>
+                    <option value="priceUpSoums">Поднять в Сумах</option>
+                    <option value="priceDownSoums">Снизить в Сумах</option>
+
+                </select>
+            </div>
+
+            <!-- выбор какие цены менять через чекбокс, по умолчанию все галки сняты -->
+            <div class="masschange-price-kind">
+                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price" name="kind-price" value=""><lable>цены</lable></div>
+                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price-max" name="kind-price-max" value=""><lable>среднерыночные цены</lable></div>
+            </div>
+
+            <!-- выбор категорий и брендов, по умолчанию выделены все -->
+            <div class="masschange-price-choose-products">
+                <p class="masschange-price-choose-products__title">для товаров:</p>
+                <!-- категории -->
+                <div class="masschange-price-choose-products__check">
+                    <select id="brand_id" name="brand_id" value="">
+
+                        <option value="">Всех категорий</option>
+                        <?php foreach($brands as $brand) { ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php }; ?>
+
+                    </select>
+                </div>
+                <!-- бренды -->
+                <div class="masschange-price-choose-products__check">
+                    <select id="brand_id" name="brand_id" value="">
+
+                        <option value="">Всех брендов</option>
+                        <?php foreach($brands as $brand) { ?>
+                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php }; ?>
+
+                    </select>
+                </div>
+            </div>
+
+            <!-- выбор на сколько изменить цены -->
+            <div class="masschange-price-value">
+                <span>на </span>
+                <input type="text" id="change-price-value" name="change-price-value" value="">
+                <span class="masschange-price-value__unit"> %</span>
+            </div>
+
+            <div class="ta-center"><button class="btn btn-ok" onclick="massChangePriceClick()">Выполнить</button></div>
+            <div id="result-masschange-price" class="result-masschange-price"></div>
+        </form>
+    </div>
+    <!-- <div class="loading" ></div> -->
+
+    <!-- <div id="success" class="modalbox d-none">
+        <form class="modal-form yes">
+            <div class="close-icon-flex"><div class="close-icon" onclick="closeMassChangePriceFormIcon()">x</div></div>
+            <p class="feedback-subtitle success"></p>
+        </form>
+    </div> -->
+
+    <!-- /masschange-form -->
+
+
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
+
+
+
+
+
+<style>
+    
+
+
+
+/* .yes {
+    min-height: unset;
+} */
+
+
+
+/* .loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url('../img/icons/loading.gif');
+    background-size: 50px 50px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 12;
+    transition: all 0.5s;
+}
+.loading.sending {
+    opacity: 1;
+    visibility: visible;
+} */
+
+
+
+/* .success {
+    text-align: center;
+} */
+
+</style>
+
+
+
+
+<script>
+
+
+/* ******** СКРЫТЬ поп-ап об успешно отправленной заявке по крестику или скликиванием ******** */
+// const modalFeedbackFormSuccess = document.getElementById("success");
+
+// function closeFeedbackIconSuccess() {
+//     modalFeedbackFormSuccess.classList.add('d-none');
+// }
+
+// function closeFeedbackSuccess() {
+//     if (this === event.target) {
+//         modalFeedbackFormSuccess.classList.add('d-none');
+//     }
+// }
+</script>
  
  
