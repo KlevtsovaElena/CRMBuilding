@@ -408,7 +408,7 @@ if (count($_GET) !== 0) {
       
     <!-- masschange-form -->   
 
-    <div class="modalbox d-none" >
+    <div class="modalbox " >
         <form action="#" class="modal-form masschange-price" method="post">
             <div class="close-icon-flex"><div class="close-icon" onclick="closeMassChangePriceFormIcon()">x</div></div>
 
@@ -429,8 +429,8 @@ if (count($_GET) !== 0) {
 
             <!-- выбор какие цены менять через чекбокс, по умолчанию все галки сняты -->
             <div class="masschange-price-kind">
-                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price" name="kind-price" value=""><lable>цены</lable></div>
-                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price-max" name="kind-price-max" value=""><lable>среднерыночные цены</lable></div>
+                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price" name="kind-price" value=""><lable for="kind-price">цены</lable></div>
+                <div class="masschange-price-kind__input"><input type="checkbox" id="kind-price-max" name="kind-price-max" value=""><lable for="kind-price-max">среднерыночные цены</lable></div>
             </div>
 
             <!-- выбор категорий и брендов, по умолчанию выделены все -->
@@ -438,18 +438,18 @@ if (count($_GET) !== 0) {
                 <p class="masschange-price-choose-products__title">для товаров:</p>
                 <!-- категории -->
                 <div class="masschange-price-choose-products__check">
-                    <select id="brand_id" name="brand_id" value="">
+                    <select id="category_id_masschange" name="category_id_masschange" value="">
 
                         <option value="">Всех категорий</option>
-                        <?php foreach($brands as $brand) { ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
+                        <?php foreach($categories as $category) { ?>
+                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
                         <?php }; ?>
 
                     </select>
                 </div>
                 <!-- бренды -->
                 <div class="masschange-price-choose-products__check">
-                    <select id="brand_id" name="brand_id" value="">
+                    <select id="brand_id_masschange" name="brand_id_masschange" value="">
 
                         <option value="">Всех брендов</option>
                         <?php foreach($brands as $brand) { ?>

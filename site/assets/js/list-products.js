@@ -790,6 +790,10 @@ const massChangePriceBtn = document.querySelector('.form-filters').querySelector
 // найдём модальное окно и форму для изменения сумм в этом окне
 const modalMassChangePrice = document.querySelector(".modalbox");
 const massChangePriceForm = modalMassChangePrice.querySelector('form');
+// элемент, куда будем отрисовывать ед изм
+const masschangePriceUnitEl = document.querySelector('.masschange-price-value__unit');
+// select выбора случая изменения цен (увел/уменьш)
+const masschangePriceCase = document.querySelector('#case');
 
 // клик по 'Массовое изменение цен' открывает модальное окно
 function showMassChangePriceForm() {
@@ -822,5 +826,91 @@ function massChangePriceClick() {
     //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
     event.preventDefault(); 
 
-    console.log('выполнить');
+    // соберём данные с формы и на основании их текст запроса и текст подтверждения изменения цен
+    // переменные для пост-запроса
+    let obj = {};
+
+    // переменные для текста предупреждения
+    let dataCase = '';
+    let dataPriceKind = '';
+    let dataProductsKind = '';
+    let unit = '';
+    let magnitude = '';
+
+    // выбранные цены
+    let formElValuePriceKind = document.getElementById('kind-price');
+    let formElValuePriceMaxKind = document.getElementById('kind-price-max');
+
+    if (!formElValuePriceKind.checked && !formElValuePriceMaxKind.checked) {
+        alert('Выберите галочкой какие цены изменить!');
+        return;
+    } else if (formElValuePriceKind.checked && formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Цены и среднерыночные цены ';
+        obj['price_change_kind'] = 'price;price_max';
+    } else if (formElValuePriceKind.checked && !formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Цены ';
+        obj['price_change_kind'] = 'price';
+    } else if (!formElValuePriceKind.checked && formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Cреднерыночные цены ';
+        obj['price_change_kind'] = 'price_max';
+    }
+
+    // выбранный case - увеличить/уменьшить на %/Сум
+    obj['price_change_case'] = masschangePriceCase.value;
+    if (masschangePriceCase.value == "priceUpPercent") {
+        dataCase = 'увеличены на ';
+        unit = ' %';
+    } else if (masschangePriceCase.value == "priceDownPercent") {
+        dataCase = 'уменьшены на ';
+        unit = ' %';
+    } else if (masschangePriceCase.value == "priceUpSoums") {
+        dataCase = 'увеличены на ';
+        unit = ' Сум';
+    } else if (masschangePriceCase.value == "priceDownSoums") {
+        dataCase = 'уменьшены на ';
+        unit = ' Сум';
+    }
+
+    // выбранные характеристики изменяемого товара
+    let categoryIdMasschange = document.getElementById('category_id_masschange');
+    let categoryIdMasschangeOption = categoryIdMasschange.querySelectorAll('option');
+    console.log(categoryIdMasschangeOption[1]);
+    let brandIdMasschange = document.getElementById('brand_id_masschange');
+    let brandIdMasschangeOption = brandIdMasschange.querySelectorAll('option');
+
+    if (categoryIdMasschange.value && brandIdMasschange.value) {
+        obj['products_kind'] = 'category_id=' + categoryIdMasschange.value +';brand_id=' + brandIdMasschange.value;
+        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText + " и бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+    } else if (categoryIdMasschange.value) {
+        obj['products_kind'] = 'category_id=' + categoryIdMasschange.value;
+        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText;
+    } else if (brandIdMasschange.value) {
+        obj['products_kind'] = 'brand_id=' + brandIdMasschange.value;
+        dataProductsKind = "бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+    }
+
+    // величина изменения цен
+    let magnitudeEl = document.getElementById('change-price-value');
+
+    if (!magnitudeEl.value) {
+        alert('Введите величину изменения цен!');
+        return;
+    }
+
+    
+    // соберём текст подтверждения
+    let masschangePriceConfirmText = dataPriceKind + "всех товаров " + dataProductsKind + " будут " + dataCase + unit; 
+    
+    
+    let confirmChange = window.confirm(masschangePriceConfirmText);
 }
+
+// изменение innerText % или Сум в зависимости от выбранной единицы измерения
+masschangePriceCase.addEventListener('change', () => {
+    if(masschangePriceCase.value == 'priceUpPercent' || masschangePriceCase.value == 'priceDownPercent') {
+        masschangePriceUnitEl.innerText = '%';
+    } else if(masschangePriceCase.value == 'priceUpSoums' || masschangePriceCase.value == 'priceDownSoums') {
+        masschangePriceUnitEl.innerText = 'Сум';
+    }
+})
+
