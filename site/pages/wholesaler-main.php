@@ -35,11 +35,11 @@ if($role !== 3) {
 
         //соберём данные для отображения в форме 
         $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?vendor_deleted=0');
-        $data = json_decode($dataJson, true); 
+        $data = json_decode($dataJson, true);
         //print_r($data);
 
         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-        $totalEntries = $data['count'];
+        //$totalEntries = $data['count']; ВЕРНУТЬ
 
         //если на странице уже заданы гет-параметры сортировки
         if(isset($_GET['orderby'])) {
@@ -72,32 +72,8 @@ if($role !== 3) {
         }
     ?>
 
-    <?php
-        //достанем актуальный телефон для отображения
-        $dataJsonPhone = file_get_contents($nginxUrl . '/api/settings.php?name=phone');
-        $phone = json_decode($dataJsonPhone, true); 
-        $phone = $phone[0]['value'];
-
-    ?>
-
     <p class="page-title">Главная</p>
 
-    <br>
-    <div class="id-block">
-        <p>Телефон для связи:</p>
-        <div class="phone-block">
-
-            <p id="phone-number" class="phone"><?= $phone ?></p>
-
-            <span class="edit" onclick="changePhone()">&#9998;</span>
-            <span class="save d-none"><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1716 1C18.702 1 19.2107 1.21071 19.5858 1.58579L22.4142 4.41421C22.7893 4.78929 23 5.29799 23 5.82843V20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20V4C1 2.34315 2.34315 1 4 1H18.1716ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21L5 21L5 15C5 13.3431 6.34315 12 8 12L16 12C17.6569 12 19 13.3431 19 15V21H20C20.5523 21 21 20.5523 21 20V6.82843C21 6.29799 20.7893 5.78929 20.4142 5.41421L18.5858 3.58579C18.2107 3.21071 17.702 3 17.1716 3H17V5C17 6.65685 15.6569 8 14 8H10C8.34315 8 7 6.65685 7 5V3H4ZM17 21V15C17 14.4477 16.5523 14 16 14L8 14C7.44772 14 7 14.4477 7 15L7 21L17 21ZM9 3H15V5C15 5.55228 14.5523 6 14 6H10C9.44772 6 9 5.55228 9 5V3Z" fill="#009900"></path> </g></svg></span>
-            <span class="cancel d-none" onclick="cancel()"><svg width="25px" height="25px" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.56189 13.5L4.14285 13.9294L4.5724 14.3486L4.99144 13.9189L4.56189 13.5ZM9.92427 15.9243L15.9243 9.92427L15.0757 9.07574L9.07574 15.0757L9.92427 15.9243ZM9.07574 9.92426L15.0757 15.9243L15.9243 15.0757L9.92426 9.07574L9.07574 9.92426ZM19.9 12.5C19.9 16.5869 16.5869 19.9 12.5 19.9V21.1C17.2496 21.1 21.1 17.2496 21.1 12.5H19.9ZM5.1 12.5C5.1 8.41309 8.41309 5.1 12.5 5.1V3.9C7.75035 3.9 3.9 7.75035 3.9 12.5H5.1ZM12.5 5.1C16.5869 5.1 19.9 8.41309 19.9 12.5H21.1C21.1 7.75035 17.2496 3.9 12.5 3.9V5.1ZM5.15728 13.4258C5.1195 13.1227 5.1 12.8138 5.1 12.5H3.9C3.9 12.8635 3.92259 13.2221 3.9665 13.5742L5.15728 13.4258ZM12.5 19.9C9.9571 19.9 7.71347 18.6179 6.38048 16.6621L5.38888 17.3379C6.93584 19.6076 9.54355 21.1 12.5 21.1V19.9ZM4.99144 13.9189L7.42955 11.4189L6.57045 10.5811L4.13235 13.0811L4.99144 13.9189ZM4.98094 13.0706L2.41905 10.5706L1.58095 11.4294L4.14285 13.9294L4.98094 13.0706Z" fill="#444444"></path> </g></svg></span>
-            <!-- <button id="btn-phone" class="btn btn-ok d-iblock" onclick="changePhone()">Изменить</button> -->
-
-        </div>
-
-
-    </div>
 
     <!-- далее отрисовываем таблицу заказов за период -->
     
@@ -257,7 +233,47 @@ if($role !== 3) {
     <?php
         //теперь сокращаем выдачу данных в массиве до products
         $data = $data['products'];
+
+        // УБРАТЬ ______
         //print_r($data);
+
+        ?> 
+        
+        <!-- <br><br> -->
+
+        <?php
+
+        //достаем из БД categories данного залогинившегося поставщика
+        $categoriesJSON = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?id=' . $profile['id']);
+        $categories = json_decode($categoriesJSON, true);
+        $categories = $categories[0]['categories'];
+        $categoriesArr = json_decode($categories, true);
+        //print_r($categoriesArr);
+
+        ?> 
+        
+        <!-- <br><br> -->
+
+        <?php
+
+        //фильтруем массив только по нужным категориям
+        $byCategory = [];
+        for ($i = 0; $i <  count($data); $i++) { 
+            for ($k = 0; $k < count($categoriesArr); $k++) {
+                if ($data[$i]['category_id'] == $categoriesArr[$k]) {
+                    array_push($byCategory, $data[$i]);
+                }
+            }
+
+        }
+
+        //print_r($byCategory);
+        $data = $byCategory;
+
+        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+        $totalEntries = count($data);
+
+        // ______ УБРАТЬ 
 
         //проверяем, выбран ли лимит на кол-во отображаемых элементов
         if (isset($_GET['limit'])) {
@@ -326,6 +342,23 @@ if($role !== 3) {
                     $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?' . $params);
                     $data = json_decode($dataJson, true); 
                     $data = $data['products'];
+
+                    // УБРАТЬ _______
+                    //фильтруем массив только по нужным категориям
+                    $byCategory = [];
+                    for ($i = 0; $i <  count($data); $i++) { 
+                        for ($k = 0; $k < count($categoriesArr); $k++) {
+                            if ($data[$i]['category_id'] == $categoriesArr[$k]) {
+                                array_push($byCategory, $data[$i]);
+                            }
+                        }
+
+                    }
+
+                    //print_r($byCategory);
+                    $data = $byCategory;
+                    // _______ УБРАТЬ 
+
                     for ($l = 0; $l < count($data); $l++) {
                         $totalSum += $data[$l]['total_price'];
                     }
@@ -336,6 +369,23 @@ if($role !== 3) {
                         $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                         $data = json_decode($dataJson, true); 
                         $data = $data['products'];
+
+                        // УБРАТЬ _______
+                        //фильтруем массив только по нужным категориям
+                        $byCategory = [];
+                        for ($i = 0; $i <  count($data); $i++) { 
+                            for ($k = 0; $k < count($categoriesArr); $k++) {
+                                if ($data[$i]['category_id'] == $categoriesArr[$k]) {
+                                    array_push($byCategory, $data[$i]);
+                                }
+                            }
+
+                        }
+
+                        //print_r($byCategory);
+                        $data = $byCategory;
+                        // _______ УБРАТЬ
+                        
                         //print_r($data);
                         //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
@@ -348,6 +398,23 @@ if($role !== 3) {
                             $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true); 
                             $data = $data['products'];
+
+                            // УБРАТЬ _______
+                            //фильтруем массив только по нужным категориям
+                            $byCategory = [];
+                            for ($i = 0; $i <  count($data); $i++) { 
+                                for ($k = 0; $k < count($categoriesArr); $k++) {
+                                    if ($data[$i]['category_id'] == $categoriesArr[$k]) {
+                                        array_push($byCategory, $data[$i]);
+                                    }
+                                }
+
+                            }
+
+                            //print_r($byCategory);
+                            $data = $byCategory;
+                            // _______ УБРАТЬ
+
                             //print_r($data);
                             //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
                         }

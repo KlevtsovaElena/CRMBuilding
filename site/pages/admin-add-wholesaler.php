@@ -10,12 +10,14 @@ if($role !== 1) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
+        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>",
+        "<link rel='stylesheet' href='./../assets/css/admin.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
         "<script src='./../assets/js/imask.min.js'></script>",
-        "<script src='./../assets/js/add-vendor.js'></script>"
+        "<script src='./../assets/js/add-vendor.js'></script>",
+        "<script src='./../assets/js/add-wholesaler.js'></script>"
     ];
 ?>
 
@@ -94,6 +96,25 @@ if($role !== 1) {
                 <div class="error-info d-none"></div>
             </div> 
 
+            <!-- категории -->
+            <div class="form-add-vendor__item">
+                <p>Категории</p>
+
+                <?php 
+                    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+                    $categories = json_decode($categoriesJson, true);
+
+                    foreach($categories as $category) { ?>
+                        <label class="multiple-checkbox">
+                            <input data-category="<?= $category['category_name']; ?>" type="checkbox" value="<?= $category['id']; ?>">
+                            <?= $category['category_name']; ?>
+                        </label>
+                    <?php }; ?>
+                
+                <div class="error-info d-none"></div>
+            </div>
+
+            <br>
             <div>
                 <button class="btn btn-ok" onclick="addWholesaler()">Сохранить</button>
             </div>

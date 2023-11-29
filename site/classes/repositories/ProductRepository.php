@@ -84,6 +84,55 @@ class ProductRepository extends BaseRepository
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
+    // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
+    //                                     p.`name` as `name`,
+    //                                     p.`name2` as `name2`,
+    //                                     p.`name3` as `name3`,
+    //                                     p.`description` as `description`,
+    //                                     p.`description2` as `description2`,
+    //                                     p.`description3` as `description3`,
+    //                                     p.`photo` as `photo`,
+    //                                     p.`article` as `article`,
+    //                                     p.`category_id` as `category_id`,
+    //                                     c.`category_name` as `category_name`,
+    //                                     p.`brand_id` as `brand_id`,
+    //                                     b.`brand_name` as `brand_name`,
+    //                                     p.`vendor_id` as `vendor_id`,
+    //                                     v.`name` as `vendor_name`,
+    //                                     v.`currency_dollar` as `vendor_currency_dollar`,
+    //                                     v.`rate` as `vendor_rate`,
+    //                                     p.`quantity_available` as `quantity_available`,
+    //                                     p.`price` as `price`,
+    //                                     p.`price_dollar` as `price_dollar`,
+    //                                     p.`max_price` as `max_price`,
+    //                                     p.`max_price_dollar` as `max_price_dollar`,
+    //                                     p.`unit_id` as `unit_id`,
+    //                                     u.`name` as `unit_name`,
+    //                                     u.`name_short`as `unit_name_short`,
+    //                                     p.`deleted` as `deleted`,
+    //                                     c.`deleted` as `category_deleted`,
+    //                                     b.`deleted` as `brand_deleted`,
+    //                                     v.`deleted` as `vendor_deleted`,
+    //                                     v.`is_active` as `vendor_active`,
+    //                                     v.`city_id` as `city_id`,
+    //                                     cit.`name` as `city_name`,
+    //                                     v.`price_confirmed` as `price_confirmed`,
+    //                                     p.`is_active` as `is_active`,
+    //                                     p.`is_confirm` as `is_confirm`
+    //                                 FROM products p
+    //                                     INNER JOIN categories c ON
+    //                                         c.`id` = p.`category_id`
+    //                                     INNER JOIN brands b ON 
+    //                                         b.`id` = p.`brand_id`
+    //                                     INNER JOIN vendors v ON
+    //                                         v.`id` = p.`vendor_id`
+    //                                     INNER JOIN cities cit ON
+    //                                         cit.`id` = v.`city_id`
+    //                                     INNER JOIN units u ON
+    //                                         u.`id` = p.`unit_id`
+    //                                     WHERE p.`category_id` IN (' . $category_arr . ')
+    //                                     %s';
+
     private static array $productDetailsAccosiations = [
         'id' => 'p.id',
         'name' => 'p.name',
