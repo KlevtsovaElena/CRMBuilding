@@ -169,7 +169,7 @@ if($role !== 1) {
 
         <!-- таблица поставщиков -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-vendors"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> >
+            <table id="list-orders" data-section="admin-wholesalers"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> >
 
                 <thead>
                     <tr role="row">

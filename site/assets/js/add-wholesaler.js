@@ -56,23 +56,25 @@ function addWholesaler() {
     }
 
     //категории
+    //вынимаем данные по категориям в 2 индексных массива
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    let checkboxesChecked = [];
+    let checkboxesChecked = []; // массив для id категорий
+    let categoriesNames = []; // массив для названий категорий
     for (let i = 0; i< checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             checkboxesChecked.push(checkboxes[i].value);
+            categoriesNames.push(document.getElementsByClassName('category')[i].getAttribute('data-category'));
         }
     }
 
-    // let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    // let checkboxesChecked = {};
-    // for (let i = 0; i< checkboxes.length; i++) {
-    //     if (checkboxes[i].checked) {
-    //         checkboxesChecked.push(checkboxes[i].value);
-    //     }
-    // }
+    //объединяем id и названия в единый ассотиативный массив
+    let categoriesArr = {};
 
-    let categories = JSON.stringify(checkboxesChecked);
+    for (let m = 0; m < checkboxesChecked.length; m++) {
+        categoriesArr[checkboxesChecked[m]] = categoriesNames[m];
+    }
+
+    let categories = JSON.stringify(categoriesArr);
     console.log(categories);
 
     // соберём json для передачи на сервер
@@ -126,7 +128,7 @@ function addWholesaler() {
     formAddVendor.reset();
 }
 
-function editWholesaler(id) {
+function editWholesaler1(id) {
         
     // проверяем корректность токена
     check();
@@ -183,13 +185,26 @@ function editWholesaler(id) {
     }
 
     //категории
+    //вынимаем данные по категориям в 2 индексных массива
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    let checkboxesChecked = [];
+    let checkboxesChecked = []; // массив для id категорий
+    let categoriesNames = []; // массив для названий категорий
     for (let i = 0; i< checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             checkboxesChecked.push(checkboxes[i].value);
+            categoriesNames.push(document.getElementsByClassName('category')[i].getAttribute('data-category'));
         }
     }
+
+    //объединяем id и названия в единый ассотиативный массив
+    let categoriesArr = {};
+
+    for (let m = 0; m < checkboxesChecked.length; m++) {
+        categoriesArr[checkboxesChecked[m]] = categoriesNames[m];
+    }
+
+    let categories = JSON.stringify(categoriesArr);
+    console.log(categories);
 
     // соберём json для передачи на сервер
     let obj = JSON.stringify({
@@ -224,4 +239,44 @@ function editWholesaler(id) {
      
     // перезагрузим страницу
     window.location.href = window.location.href;
+}
+
+// удаление оптовика админом
+function deleteWholesalerFromEditForm(id) {
+        
+    // проверяем корректность токена
+    check();
+
+    // запрашиваем подтверждение удаления
+    let isDelete = false;
+
+    isDelete = window.confirm('Вы действительно хотите удалить этого оптовика?');
+
+    if(!isDelete) {
+        return;
+    }
+
+    // соберём json
+    let obj = JSON.stringify({
+        'id': id,
+        'is_active': 0,
+        'deleted':  1
+    });
+
+    // делаем запрос на удаление оптовика по id
+    sendRequestPOST(mainUrl + '/api/vendors/delete-vendor-with-products.php', obj);
+
+    // делаем запрос на удаление оптовика по id
+    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
+
+    alert("Оптовик удалён");
+
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    // переход обратно на странницу списка оптовиков с прежними параметрами
+    window.location.href = mainUrl + '/pages/admin-wholesalers.php?' + params;
+    
 }

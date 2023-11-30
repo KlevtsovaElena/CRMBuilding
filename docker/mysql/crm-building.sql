@@ -380,17 +380,18 @@ CREATE TABLE `vendors` (
   `price_confirmed` tinyint unsigned DEFAULT '1',
   `currency_dollar` tinyint unsigned DEFAULT '0',
   `rate` int unsigned DEFAULT '1',
+  `categories` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `debt`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	185400,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1,	0,	1),
-(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	1),
-(4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1),
-(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'tohgaUWNrk0E',	1,	0,	1,	0,	1),
-(6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050),
-(9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	0,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	NULL,	1,	0,	1,	0,	1),
-(10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1);
+INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `debt`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`, `categories`) VALUES
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	185400,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1,	0,	1,	NULL),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1,	NULL),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	1,	NULL),
+(4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1,	NULL),
+(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'tohgaUWNrk0E',	1,	0,	1,	0,	1,	NULL),
+(6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050,	NULL),
+(9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	0,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	NULL,	1,	0,	1,	0,	1,	NULL),
+(10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1,	NULL);
 
 -- 2023-11-19 12:16:40

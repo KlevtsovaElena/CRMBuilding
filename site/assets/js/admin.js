@@ -858,6 +858,16 @@ window.location.href = mainUrl + "/pages/admin-edit-vendor.php?id=" + id + "&del
     
 }
 
+/* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
+function editWholesaler(id) {
+
+    let getParam = window.location.search;
+    
+    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+    window.location.href = mainUrl + "/pages/admin-edit-wholesaler.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
+        
+    }
+
 //функция для изменения номера телефона для связи в боте на Главной
 function changePhone() {
 

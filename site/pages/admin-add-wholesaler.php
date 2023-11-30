@@ -106,7 +106,7 @@ if($role !== 1) {
 
                     foreach($categories as $category) { ?>
                         <label class="multiple-checkbox">
-                            <input data-category="<?= $category['category_name']; ?>" type="checkbox" value="<?= $category['id']; ?>">
+                            <input class="category" data-category="<?= $category['category_name']; ?>" type="checkbox" value="<?= $category['id']; ?>">
                             <?= $category['category_name']; ?>
                         </label>
                     <?php }; ?>

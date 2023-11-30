@@ -10,12 +10,14 @@ if($role !== 1) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
+        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>",
+        "<link rel='stylesheet' href='./../assets/css/admin.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
         "<script src='./../assets/js/imask.min.js'></script>",
-        "<script src='./../assets/js/add-vendor.js'></script>"
+        "<script src='./../assets/js/add-vendor.js'></script>",
+        "<script src='./../assets/js/add-wholesaler.js'></script>"
     ];
 ?>
 
@@ -138,6 +140,32 @@ if($role !== 1) {
 
             <!-- координаты -->
             <div class="form-add-vendor__item">
+                <p>Категории:</p> 
+                <?php
+                    //достаем все категории из БД, кроме удаленных
+                    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+                    $categories = json_decode($categoriesJson, true);
+
+                    foreach($categories as $category) { 
+                        //если у этого оптовика уже есть отмеченные категории
+                        if(isset($vendor[0]['categories']) && $vendor[0]['categories'] != '{}')  {
+                            //print_r($vendor[0]['categories']);
+                            //достаем из БД список его категорий и отмечаем их галочкой 
+                            $categoriesChecked = json_decode($vendor[0]['categories'], true); 
+                        } else {
+                            $categoriesChecked = false;
+                        } ?>
+                            <label class="multiple-checkbox">
+                                <input class="category" data-category="<?= $category['category_name']; ?>" type="checkbox" value="<?= $category['id']; ?>" <?php if ($categoriesChecked) {foreach ($categoriesChecked as $key => $value) { if ($key == $category['id']) {echo 'checked';} } } ?>>
+                                <?= $category['category_name']; ?>
+                            </label>
+                    <?php 
+                    } ?>
+
+            </div> <br>
+
+            <!-- координаты -->
+            <div class="form-add-vendor__item">
                 <p>Координаты: 
                     <?php 
                     if(isset($vendor[0]['coordinates']['latitude']) && isset($vendor[0]['coordinates']['longitude']))  {
@@ -155,11 +183,11 @@ if($role !== 1) {
         </form>
         <div class="btn-group-3">
             <div>
-                <button class="btn btn-ok" onclick="editVendor(<?= $id; ?>)">Сохранить</button>
-                <a href="admin-edit-vendor.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
+                <button class="btn btn-ok" onclick="editWholesaler1(<?= $id; ?>)">Сохранить</button>
+                <a href="admin-edit-wholesaler.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
             </div>
         
-            <div class="btn btn-delete" onclick="deleteVendorFromEditForm(<?= $id; ?>)">Удалить</div>
+            <div class="btn btn-delete" onclick="deleteWholesalerFromEditForm(<?= $id; ?>)">Удалить</div>
         </div>
  
 
