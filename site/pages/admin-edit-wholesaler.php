@@ -57,9 +57,9 @@ if($role !== 1) {
                 </div>
 
             <?php }  ?>
-            <div class="link-text">
+            <!-- <div class="link-text">
              <a href="admin-list-products.php?vendor_id=<?= $id; ?>">Посмотреть товары оптовика</a>
-            </div>
+            </div> -->
             <!-- название -->
             <div class="form-add-vendor__item">
                 <p>Название</p><input type="text" id="name" name="name" value="<?= $vendor[0]['name']?>" required>

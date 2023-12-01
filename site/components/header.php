@@ -320,7 +320,7 @@
                         <span id="header-main" data-vendor="">Мои данные</span>
                     </a>
                 </li>
-                <li class="menu-left__item"  data-page-name = "/pages/vendor-list-orders.php">
+                <!-- <li class="menu-left__item"  data-page-name = "/pages/vendor-list-orders.php">
                 
                     <a href="./../pages/vendor-list-orders.php" class="menu-left__item-link">
                         <svg class="fill" viewBox="0 0 1024 1024" fill="#ced4da" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -351,7 +351,7 @@
                         </svg>
                         <span>Товары</span>
                     </a>
-                </li>
+                </li> -->
 
             </ul>
 

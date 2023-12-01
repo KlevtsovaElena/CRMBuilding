@@ -224,7 +224,7 @@ if($role !== 3) {
             </div> -->
 
             <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
-            <button onclick="applyInMain()" class="btn btn-ok d-iblock">Применить</button>
+            <button onclick="applyInWholesalerMain()" class="btn btn-ok d-iblock">Применить</button>
         </div>
 
     </section>
@@ -259,12 +259,11 @@ if($role !== 3) {
         //фильтруем массив только по нужным категориям
         $byCategory = [];
         for ($i = 0; $i <  count($data); $i++) { 
-            for ($k = 0; $k < count($categoriesArr); $k++) {
-                if ($data[$i]['category_id'] == $categoriesArr[$k]) {
-                    array_push($byCategory, $data[$i]);
+            foreach ($categoriesArr as $key => $value) {
+                if ($data[$i]['category_id'] == $key) {
+                array_push($byCategory, $data[$i]);
                 }
             }
-
         }
 
         //print_r($byCategory);
@@ -293,7 +292,7 @@ if($role !== 3) {
 
         <!-- таблица заказанных товаров за указанный период -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-main" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>">
+            <table id="list-orders" data-section="wholesaler-main" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>">
 
                 <thead>
                     <tr role="row">
@@ -347,12 +346,11 @@ if($role !== 3) {
                     //фильтруем массив только по нужным категориям
                     $byCategory = [];
                     for ($i = 0; $i <  count($data); $i++) { 
-                        for ($k = 0; $k < count($categoriesArr); $k++) {
-                            if ($data[$i]['category_id'] == $categoriesArr[$k]) {
-                                array_push($byCategory, $data[$i]);
+                        foreach ($categoriesArr as $key => $value) {
+                            if ($data[$i]['category_id'] == $key) {
+                            array_push($byCategory, $data[$i]);
                             }
                         }
-
                     }
 
                     //print_r($byCategory);
@@ -362,6 +360,9 @@ if($role !== 3) {
                     for ($l = 0; $l < count($data); $l++) {
                         $totalSum += $data[$l]['total_price'];
                     }
+
+                    //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                    $totalEntries = count($data);
 
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
@@ -374,17 +375,19 @@ if($role !== 3) {
                         //фильтруем массив только по нужным категориям
                         $byCategory = [];
                         for ($i = 0; $i <  count($data); $i++) { 
-                            for ($k = 0; $k < count($categoriesArr); $k++) {
-                                if ($data[$i]['category_id'] == $categoriesArr[$k]) {
-                                    array_push($byCategory, $data[$i]);
+                            foreach ($categoriesArr as $key => $value) {
+                                if ($data[$i]['category_id'] == $key) {
+                                array_push($byCategory, $data[$i]);
                                 }
                             }
-
                         }
 
                         //print_r($byCategory);
                         $data = $byCategory;
                         // _______ УБРАТЬ
+
+                        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                        $totalEntries = count($data);
                         
                         //print_r($data);
                         //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -403,17 +406,18 @@ if($role !== 3) {
                             //фильтруем массив только по нужным категориям
                             $byCategory = [];
                             for ($i = 0; $i <  count($data); $i++) { 
-                                for ($k = 0; $k < count($categoriesArr); $k++) {
-                                    if ($data[$i]['category_id'] == $categoriesArr[$k]) {
-                                        array_push($byCategory, $data[$i]);
+                                foreach ($categoriesArr as $key => $value) {
+                                    if ($data[$i]['category_id'] == $key) {
+                                    array_push($byCategory, $data[$i]);
                                     }
                                 }
-
                             }
 
                             //print_r($byCategory);
                             $data = $byCategory;
                             // _______ УБРАТЬ
+                            //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                            $totalEntries = count($data);
 
                             //print_r($data);
                             //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
