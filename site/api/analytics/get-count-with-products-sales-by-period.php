@@ -54,6 +54,7 @@ class GetProductsSalesByPeriodController extends BaseController
                         $orderVendorsWithProductData[$key]['products'][$id]['price'] = $existProduct->price;
                         $orderVendorsWithProductData[$key]['products'][$id]['total_price'] = $orderVendorsWithProductData[$key]['products'][$id]['quantity'] * $orderVendorsWithProductData[$key]['products'][$id]['price'];
                         $orderVendorsWithProductData[$key]['products'][$id]['name'] = $existProduct->name;
+                        $orderVendorsWithProductData[$key]['products'][$id]['category_id'] = $existProduct->category_id;
                         break;
                     }
                 }
@@ -71,7 +72,8 @@ class GetProductsSalesByPeriodController extends BaseController
                     'name' => $orderVendorsWithProductDataItemProduct['name'],
                     'quantity' => $orderVendorsWithProductDataItemProduct['quantity'],
                     'price' => $orderVendorsWithProductDataItemProduct['price'],
-                    'total_price' => $orderVendorsWithProductDataItemProduct['total_price']
+                    'total_price' => $orderVendorsWithProductDataItemProduct['total_price'],
+                    'category_id' => $orderVendorsWithProductDataItemProduct['category_id'],
                 ];
             }
         }

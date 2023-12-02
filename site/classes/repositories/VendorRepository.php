@@ -39,7 +39,8 @@ class VendorRepository extends BaseRepository
                                     v.`debt` as `debt`,
                                     v.`price_confirmed` as `price_confirmed`,
                                     v.`currency_dollar` as `currency_dollar`,
-                                    v.`rate` as `rate`
+                                    v.`rate` as `rate`,
+                                    v.`categories` as `categories`
                                 FROM vendors v
                                     INNER JOIN cities c ON
                                     c.`id` = v.`city_id`
@@ -68,7 +69,8 @@ class VendorRepository extends BaseRepository
         'city_deleted' => 'c.deleted',
         'price_confirmed' => 'v.price_confirmed',
         'currency_dollar' => 'v.currency_dollar',
-        'rate' => 'v.rate'
+        'rate' => 'v.rate',
+        'categories' => 'v.categories'
     ];
 
     //Настя: добавила __construct для координат
@@ -96,6 +98,10 @@ class VendorRepository extends BaseRepository
             if ($key == 'coordinates') //Настя: добавила врутреннее условие для coordinates
             {
                 $item->$key = isset($value) && strlen($value) > 0 ? $this->coordinateRepository->map(json_decode($value, true)) : new Coordinate();
+                continue;
+            }
+            elseif ($key == 'categories') {
+                $item->$key = isset($value) ? json_decode($value, true) : [];
                 continue;
             }
 
