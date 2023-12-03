@@ -84,6 +84,10 @@ class ProductRepository extends BaseRepository
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
+    const UPDATE_PRICE_MASS_BY_VENDOR = 'UPDATE products p
+                                        SET p.is_confirm = 0, %s
+                                         %s';
+
     // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
     //                                     p.`name` as `name`,
     //                                     p.`name2` as `name2`,
@@ -306,6 +310,13 @@ class ProductRepository extends BaseRepository
         $statement->execute([
             'vendor_id' => $vendorId
         ]);
+    }
+
+    public function updatePriceMassByVendor(array $inputParams) 
+    {
+        $query = sprintf(static::UPDATE_PRICE_MASS_BY_VENDOR, $inputParams['set_string'], $inputParams['where_string']);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute();
     }
 }
 ?>
