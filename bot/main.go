@@ -1106,8 +1106,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				} else {
 
 					buttons := [][]map[string]interface{}{
+
 						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
 						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
@@ -1145,8 +1147,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				} else {
 
 					buttons := [][]map[string]interface{}{
+
 						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
 						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 					}
 
