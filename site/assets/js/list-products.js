@@ -95,7 +95,13 @@ function startRenderPage(priceConfirmed) {
     // 5. добавим параметры в адресную строку
     history.replaceState(history.length, null, 'vendor-list-products.php?vendor_id=' + vendor_id + "&deleted=0" + params);
 
-    // 6. покажем инфу подтверждены ли цены
+    // 6. сохраним гет-параметры в локал сторедж
+    let localStorageObj = {
+        "getParams": window.location.search
+    }
+    localStorage.setItem(window.location.pathname, JSON.stringify(localStorageObj));
+
+    // 7. покажем инфу подтверждены ли цены
     if (priceConfirmed == 0) {
         priceConfirmedEl.innerHTML = tmplPriceNotConfirm;
     } else if (priceConfirmed == 1) {
@@ -962,3 +968,8 @@ masschangePriceCase.addEventListener('change', () => {
     }
 })
 
+function hhh() {
+    alert('изменили href    ' );
+    console.log('kfvdvflf');
+}
+window.onreplaceState = hhh;
