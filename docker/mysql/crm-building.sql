@@ -226,10 +226,10 @@ CREATE TABLE `price_changes` (
 DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `name` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `name2` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `name3` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
   `description2` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
   `description3` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
   `photo` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
@@ -396,4 +396,4 @@ INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`,
 (11,	'Оптовик 1',	2,	'998876006809',	'sdndfnb@fb.ru',	NULL,	NULL,	NULL,	3,	2,	500,	'',	1701310809,	'hairMjVdU9JXc',	'crR76rgNfytk',	'',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"4\": \"Грунтовка\"}'),
 (12,	'Оптовик 2',	3,	'998465467688',	'sdndfnb@djg.ru',	NULL,	NULL,	NULL,	3,	1,	0,	'',	1701389901,	'hae9gWFPPuJ6',	'crAQDBLYhT9w',	'totbqfyxs93Z',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"8\": \"Плиточный клей\", \"9\": \"Наливной пол и Гидроизоляция\"}');
 
--- 2023-11-19 12:16:40
+-- 2023-12-07 15:33:29
