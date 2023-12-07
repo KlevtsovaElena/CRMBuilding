@@ -10,12 +10,14 @@ if($role !== 1) {
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
-        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>"
+        "<link rel='stylesheet' href='./../assets/css/add-edit-vendor.css'>",
+        "<link rel='stylesheet' href='./../assets/css/admin.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
         "<script src='./../assets/js/imask.min.js'></script>",
-        "<script src='./../assets/js/add-vendor.js'></script>"
+        "<script src='./../assets/js/add-vendor.js'></script>",
+        "<script src='./../assets/js/add-wholesaler.js'></script>"
     ];
 ?>
 
@@ -33,9 +35,9 @@ if($role !== 1) {
 
 ?>
 
-    <p class="page-title">Редактирование поставщика</p>
+    <p class="page-title">Редактирование оптовика</p>
 
-        <!-- Редактирование поставщика -->
+        <!-- Редактирование оптовика -->
         <section class="add-vendor">
         <form class="form-add-vendor form-elements-container">
 
@@ -44,20 +46,20 @@ if($role !== 1) {
             
                 <div class="price-confirm-container" confirm-price="1">              
                     <svg onclick="changePriceConfirm()" fill="#009933" width="20px" height="20px" viewBox="0 0 32.00 32.00" enable-background="new 0 0 32 32" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#009933" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#66FF99" stroke-width="0.256"></g><g id="SVGRepo_iconCarrier"> <g id="Approved"></g> <g id="Approved_1_"> <g> <path d="M30,1H2C1.448,1,1,1.448,1,2v28c0,0.552,0.448,1,1,1h28c0.552,0,1-0.448,1-1V2C31,1.448,30.552,1,30,1z M29,29H3V3h26V29z "></path> <path d="M12.629,21.73c0.192,0.18,0.438,0.27,0.683,0.27s0.491-0.09,0.683-0.27l10.688-10c0.403-0.377,0.424-1.01,0.047-1.413 c-0.377-0.404-1.01-0.425-1.413-0.047l-10.004,9.36l-4.629-4.332c-0.402-0.377-1.035-0.356-1.413,0.047 c-0.377,0.403-0.356,1.036,0.047,1.413L12.629,21.73z"></path> </g> </g> <g id="File_Approve"></g> <g id="Folder_Approved"></g> <g id="Security_Approved"></g> <g id="Certificate_Approved"></g> <g id="User_Approved"></g> <g id="ID_Card_Approved"></g> <g id="Android_Approved"></g> <g id="Privacy_Approved"></g> <g id="Approved_2_"></g> <g id="Message_Approved"></g> <g id="Upload_Approved"></g> <g id="Download_Approved"></g> <g id="Email_Approved"></g> <g id="Data_Approved"></g> </g></svg>
-                    <span class="price-confirm">Поставщик подтвердил цены</span>
+                    <span class="price-confirm">Оптовик подтвердил цены</span>
                 </div> 
             
             <?php } else { ?>
 
                 <div class="price-confirm-container" confirm-price="0">              
                     <svg onclick="changePriceConfirm()" fill="#d2323d" width="20px" height="20px" viewBox="0 0 128 128" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon points="82.4,40 64,58.3 45.6,40 40,45.6 58.3,64 40,82.4 45.6,88 64,69.7 82.4,88 88,82.4 69.7,64 88,45.6 "></polygon> <path d="M1,127h126V1H1V127z M9,9h110v110H9V9z"></path> </g> </g></svg>
-                    <span class="price-not-confirm">Поставщик не подтвердил цены</span>
+                    <span class="price-not-confirm">Оптовик не подтвердил цены</span>
                 </div>
 
             <?php }  ?>
-            <div class="link-text">
-             <a href="admin-list-products.php?vendor_id=<?= $id; ?>">Посмотреть товары поставщика</a>
-            </div>
+            <!-- <div class="link-text">
+             <a href="admin-list-products.php?vendor_id=<?= $id; ?>">Посмотреть товары оптовика</a>
+            </div> -->
             <!-- название -->
             <div class="form-add-vendor__item">
                 <p>Название</p><input type="text" id="name" name="name" value="<?= $vendor[0]['name']?>" required>
@@ -138,6 +140,32 @@ if($role !== 1) {
 
             <!-- координаты -->
             <div class="form-add-vendor__item">
+                <p>Категории:</p> 
+                <?php
+                    //достаем все категории из БД, кроме удаленных
+                    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+                    $categories = json_decode($categoriesJson, true);
+
+                    foreach($categories as $category) { 
+                        //если у этого оптовика уже есть отмеченные категории
+                        if(isset($vendor[0]['categories']) && $vendor[0]['categories'] != '{}')  {
+                            //print_r($vendor[0]['categories']);
+                            //достаем из БД список его категорий и отмечаем их галочкой 
+                            $categoriesChecked = json_decode($vendor[0]['categories'], true); 
+                        } else {
+                            $categoriesChecked = false;
+                        } ?>
+                            <label class="multiple-checkbox">
+                                <input class="category" data-category="<?= $category['category_name']; ?>" type="checkbox" value="<?= $category['id']; ?>" <?php if ($categoriesChecked) {foreach ($categoriesChecked as $key => $value) { if ($key == $category['id']) {echo 'checked';} } } ?>>
+                                <?= $category['category_name']; ?>
+                            </label>
+                    <?php 
+                    } ?>
+
+            </div> <br>
+
+            <!-- координаты -->
+            <div class="form-add-vendor__item">
                 <p>Координаты: 
                     <?php 
                     if(isset($vendor[0]['coordinates']['latitude']) && isset($vendor[0]['coordinates']['longitude']))  {
@@ -155,18 +183,18 @@ if($role !== 1) {
         </form>
         <div class="btn-group-3">
             <div>
-                <button class="btn btn-ok" onclick="editVendor(<?= $id; ?>)">Сохранить</button>
-                <a href="admin-edit-vendor.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
+                <button class="btn btn-ok" onclick="editWholesaler1(<?= $id; ?>)">Сохранить</button>
+                <a href="admin-edit-wholesaler.php?id=<?= $id; ?>" class="btn btn-neutral">Сбросить изменения</a> 
             </div>
         
-            <div class="btn btn-delete" onclick="deleteVendorFromEditForm(<?= $id; ?>)">Удалить</div>
+            <div class="btn btn-delete" onclick="deleteWholesalerFromEditForm(<?= $id; ?>)">Удалить</div>
         </div>
  
 
 
         <div class="vendor-info">
 
-            <p>Логин и пароль поставщика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
+            <p>Логин и пароль оптовика <b> <?= $vendor[0]['name']; ?> </b> <br> Скопируйте и отправьте пользователю:</p>
             <br>
             <p><b>Вход в CRM</b></p>
             <div class="vendor-info-text d-flex">
@@ -188,13 +216,13 @@ if($role !== 1) {
     <!-- шаблон цены подтверждены -->
     <template id="tmpl-price-confirm">
         <svg onclick="changePriceConfirm()" fill="#009933" width="20px" height="20px" viewBox="0 0 32.00 32.00" enable-background="new 0 0 32 32" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#009933" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#66FF99" stroke-width="0.256"></g><g id="SVGRepo_iconCarrier"> <g id="Approved"></g> <g id="Approved_1_"> <g> <path d="M30,1H2C1.448,1,1,1.448,1,2v28c0,0.552,0.448,1,1,1h28c0.552,0,1-0.448,1-1V2C31,1.448,30.552,1,30,1z M29,29H3V3h26V29z "></path> <path d="M12.629,21.73c0.192,0.18,0.438,0.27,0.683,0.27s0.491-0.09,0.683-0.27l10.688-10c0.403-0.377,0.424-1.01,0.047-1.413 c-0.377-0.404-1.01-0.425-1.413-0.047l-10.004,9.36l-4.629-4.332c-0.402-0.377-1.035-0.356-1.413,0.047 c-0.377,0.403-0.356,1.036,0.047,1.413L12.629,21.73z"></path> </g> </g> <g id="File_Approve"></g> <g id="Folder_Approved"></g> <g id="Security_Approved"></g> <g id="Certificate_Approved"></g> <g id="User_Approved"></g> <g id="ID_Card_Approved"></g> <g id="Android_Approved"></g> <g id="Privacy_Approved"></g> <g id="Approved_2_"></g> <g id="Message_Approved"></g> <g id="Upload_Approved"></g> <g id="Download_Approved"></g> <g id="Email_Approved"></g> <g id="Data_Approved"></g> </g></svg>
-        <span class="price-confirm">Поставщик подтвердил цены</span>
+        <span class="price-confirm">Оптовик подтвердил цены</span>
     </template>
 
     <!-- шаблон цены не подтверждены -->
     <template id="tmpl-price-not-confirm">
         <svg onclick="changePriceConfirm()" fill="#d2323d" width="20px" height="20px" viewBox="0 0 128 128" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon points="82.4,40 64,58.3 45.6,40 40,45.6 58.3,64 40,82.4 45.6,88 64,69.7 82.4,88 88,82.4 69.7,64 88,45.6 "></polygon> <path d="M1,127h126V1H1V127z M9,9h110v110H9V9z"></path> </g> </g></svg>
-        <span class="price-not-confirm">Поставщик не подтвердил цены</span>
+        <span class="price-not-confirm">Оптовик не подтвердил цены</span>
     </template>
 
 <!-- подключим футер -->

@@ -243,6 +243,14 @@ function renderListProducts(totalProducts) {
         } else {
             checked = '';
         }
+
+        let isConfirmProduct;
+        if (totalProducts['products'][i]['is_confirm'] == '1') {
+            isConfirmProduct = '<svg fill="#009933" width="20px" height="20px" viewBox="0 0 32.00 32.00" enable-background="new 0 0 32 32" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#009933" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#66FF99" stroke-width="0.256"></g><g id="SVGRepo_iconCarrier"> <g id="Approved"></g> <g id="Approved_1_"> <g> <path d="M30,1H2C1.448,1,1,1.448,1,2v28c0,0.552,0.448,1,1,1h28c0.552,0,1-0.448,1-1V2C31,1.448,30.552,1,30,1z M29,29H3V3h26V29z "></path> <path d="M12.629,21.73c0.192,0.18,0.438,0.27,0.683,0.27s0.491-0.09,0.683-0.27l10.688-10c0.403-0.377,0.424-1.01,0.047-1.413 c-0.377-0.404-1.01-0.425-1.413-0.047l-10.004,9.36l-4.629-4.332c-0.402-0.377-1.035-0.356-1.413,0.047 c-0.377,0.403-0.356,1.036,0.047,1.413L12.629,21.73z"></path> </g> </g> <g id="File_Approve"></g> <g id="Folder_Approved"></g> <g id="Security_Approved"></g> <g id="Certificate_Approved"></g> <g id="User_Approved"></g> <g id="ID_Card_Approved"></g> <g id="Android_Approved"></g> <g id="Privacy_Approved"></g> <g id="Approved_2_"></g> <g id="Message_Approved"></g> <g id="Upload_Approved"></g> <g id="Download_Approved"></g> <g id="Email_Approved"></g> <g id="Data_Approved"></g> </g></svg>';
+        } else {
+            isConfirmProduct = '<span title="товар на рассмотрении у Администратора"><svg  fill="#d2323d" width="20px" height="20px" viewBox="0 0 128 128" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon points="82.4,40 64,58.3 45.6,40 40,45.6 58.3,64 40,82.4 45.6,88 64,69.7 82.4,88 88,82.4 69.7,64 88,45.6 "></polygon> <path d="M1,127h126V1H1V127z M9,9h110v110H9V9z"></path> </g> </g></svg></span>';
+        }
+
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
@@ -274,10 +282,23 @@ function renderListProducts(totalProducts) {
                                                         .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
                                                         .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
                                                         .replace('${rate}', totalProducts['products'][i]['vendor_rate'])
-                                                        .replace('${rate}', totalProducts['products'][i]['vendor_rate']);
+                                                        .replace('${rate}', totalProducts['products'][i]['vendor_rate'])
+                                                        .replace('${is_confirm_product}', totalProducts['products'][i]['is_confirm'])
+                                                        .replace('${is_confirm}', isConfirmProduct);
+    
+        // если totalProducts['products'][i]['max_price'] меньше, чем totalProducts['products'][i]['price'], то выделим цены красным
+        if(Number(totalProducts['products'][i]['max_price']) <= Number(totalProducts['products'][i]['price'])) {
+            let priceElColor =  document.querySelectorAll('.price-mark');
+            let lengthPriceElColor = priceElColor.length;
+
+            priceElColor[lengthPriceElColor-1].style.color = "red";
+            priceElColor[lengthPriceElColor-2].style.color = "red";
+
+        }
                                                         
     }
 
+    
 
     // выведем внизу таблицы сколько всего записей 
     info.innerText = "Всего " + totalProductsCount.toLocaleString('ru') + declinationWord(totalProductsCount, [' запись', ' записи', ' записей']);
@@ -403,7 +424,7 @@ headTableProducts.forEach(item => {
 
 
 /* ---------- НАЖАТИЕ НА ПРИМЕНИТЬ (Выборка по фильтрам) ---------- */
-const sendChangeData = document.querySelector('.form-filters').querySelector('button');
+const sendChangeData = document.querySelector('.form-filters').querySelector('#btn-apply-filters');
 
 function applyFilters() {
 
@@ -469,7 +490,6 @@ activeCheckEl.onclick = function(){
         activeEl.value = "is_active=1";  
     }
 
-    console.log(activeEl.value);
 }
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
@@ -567,7 +587,7 @@ function resetChangePrice(currency_dollar) {
 function saveChangePrice(currency_dollar, rate) {
 
     // проверяем корректность токена
-    check();
+    priceConfirmed = check()['price_confirmed'];
 
     // строка продукта
     let rowProduct = event.target.closest('.list-products__row');
@@ -648,6 +668,7 @@ function saveChangePrice(currency_dollar, rate) {
 
         // если всё ок, то собираем данные и отправляем в БД (изменение цены)
         obj['id'] = idProduct;
+        obj['is_confirm'] = 0;
         let objJson = JSON.stringify(obj);
 
         // отправка запроса на запись (изменение цены)
@@ -655,14 +676,14 @@ function saveChangePrice(currency_dollar, rate) {
 
         // отправим запрос на изменение статуса подтверждения цен поставщика
         // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
-        let objVendor = JSON.stringify({
-            'id': vendor_id,
-            'price_confirmed':  0
-        });
-        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+        // let objVendor = JSON.stringify({
+        //     'id': vendor_id,
+        //     'price_confirmed':  0
+        // });
+        // sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
 
         // перерисовка страницы
-        startRenderPage(0);
+        startRenderPage(priceConfirmed);
 
         return;
     }
@@ -727,8 +748,6 @@ function checkboxChangedProductActive(id) {
         });
     }
 
-    console.log(obj);
-
     // отправим запрос на изменение 
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
@@ -736,4 +755,210 @@ function checkboxChangedProductActive(id) {
     startRenderPage(priceConfirmed);
 
 }
+
+/* ---------- ПОКАЗАТЬ ИНФОРМАЦИЮ О ЕЖЕДНЕВНОМ ПОДТВЕРЖДЕНИИ ЦЕН ---------- */
+function showConfirmPriceDailyInfo() {
+    let infoConfirmPriceDailyText = document.querySelector('.confirm-price-daily__info-text');
+    infoConfirmPriceDailyText.style.opacity = '1';
+    setTimeout(() => {
+
+        infoConfirmPriceDailyText.style.opacity = '0';
+
+    }, 3000);
+}
+
+
+
+// ВРЕМЕННО при нажатии на кнопку Подтвердить Цены  в поле price_confirmed таблицы vendors записываем 1
+// потом заменить на передачу id поставщика в новую таблицу
+
+function confirmPriceDaily() {
+    // проверка корректности токена
+    check(); 
+
+    //собираем параметры для передачи в бд
+    obj = JSON.stringify({
+        'id': vendor_id,
+        'price_confirmed': 1
+    });
+
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/vendors.php', obj);
+
+    // перезагрузим страницу
+    window.location.href = window.location.href;
+
+}
+
+/* ---------- МАССОВОЕ ИЗМЕНЕНИЕ ЦЕН ---------- */
+
+// найдём кнопку, при нажатии на которую, будем открывать модальное окно-форму для изменения цен
+const massChangePriceBtn = document.querySelector('.form-filters').querySelector('#btn-masschange-price');
+
+// найдём модальное окно и форму для изменения сумм в этом окне
+const modalMassChangePrice = document.querySelector(".modalbox");
+const massChangePriceForm = modalMassChangePrice.querySelector('form');
+// элемент, куда будем отрисовывать ед изм
+const masschangePriceUnitEl = document.querySelector('.masschange-price-value__unit');
+// select выбора случая изменения цен (увел/уменьш)
+const masschangePriceCase = document.querySelector('#case');
+
+// клик по 'Массовое изменение цен' открывает модальное окно
+function showMassChangePriceForm() {
+
+    // проверяем корректность токена
+    check();
+
+    // покажем модальное окно
+    modalMassChangePrice.classList.remove('d-none');
+
+}
+if(massChangePriceBtn) {massChangePriceBtn.addEventListener("click", showMassChangePriceForm);}
+
+// закрытие модального окна по скликиванию (клик по области модального окна, свободной от формы)
+function closeMassChangePriceForm() {
+    if (this === event.target) {
+        modalMassChangePrice.classList.add('d-none');
+    }
+}
+if(massChangePriceBtn) {modalMassChangePrice.addEventListener("click", closeMassChangePriceForm);}
+
+// закрытие модального окна по нажатию Х на форме
+function closeMassChangePriceFormIcon() {
+    modalMassChangePrice.classList.add('d-none');
+}
+
+// нажатие на кнопку Выполнить
+function massChangePriceClick() {
+    
+    //предотвратить дефолтные действия, отмена отправки формы (чтобы страница не перезагружалась)
+    event.preventDefault(); 
+
+    // соберём данные с формы и на основании их текст запроса и текст подтверждения изменения цен
+    // переменные для пост-запроса
+    let obj = {};
+
+    // переменные для текста предупреждения
+    let dataCase = '';
+    let dataPriceKind = '';
+    let dataProductsKind = '';
+    let unit = '';
+    let magnitude = '';
+
+    // выбранные цены
+    let formElValuePriceKind = document.getElementById('kind-price');
+    let formElValuePriceMaxKind = document.getElementById('kind-price-max');
+
+    if (!formElValuePriceKind.checked && !formElValuePriceMaxKind.checked) {
+        alert('Выберите галочкой какие цены изменить!');
+        return;
+    } else if (formElValuePriceKind.checked && formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Цены и среднерыночные цены ';
+        obj['price_change_kind'] = 'price;max_price';
+    } else if (formElValuePriceKind.checked && !formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Цены ';
+        obj['price_change_kind'] = 'price';
+    } else if (!formElValuePriceKind.checked && formElValuePriceMaxKind.checked) {
+        dataPriceKind = 'Cреднерыночные цены ';
+        obj['price_change_kind'] = 'max_price';
+    }
+
+    // величина изменения цен
+    let magnitudeEl = document.getElementById('change-price-value');
+    // величина ждолжна иметь ЦЕЛОЕ значение больше 0
+    if (!magnitudeEl.value || magnitudeEl.value <= 0 || !(/^\d+$/.test(magnitudeEl.value))) {
+        alert('Введите величину изменения цен!');
+        return;
+    } else if(masschangePriceCase.value == 'priceDownPercent' && magnitudeEl.value >= 100) {
+        alert('Цена не может быть снижена больше, чем на 99%!');
+        return;
+    } else {
+        magnitude = magnitudeEl.value;
+        obj['magnitude'] = magnitudeEl.value;
+    }
+
+    // выбранный case - увеличить/уменьшить на %/Сум
+    obj['price_change_case'] = masschangePriceCase.value;
+    if (masschangePriceCase.value == "priceUpPercent") {
+        dataCase = 'увеличены на ';
+        unit = ' %';
+    } else if (masschangePriceCase.value == "priceDownPercent") {
+        dataCase = 'уменьшены на ';
+        unit = ' %';
+    } else if (masschangePriceCase.value == "priceUpSoums") {
+        dataCase = 'увеличены на ';
+        unit = ' Сум';
+    } else if (masschangePriceCase.value == "priceDownSoums") {
+        dataCase = 'уменьшены на ';
+        unit = ' Сум';
+    }
+
+    // выбранные характеристики изменяемого товара
+    let categoryIdMasschange = document.getElementById('category_id_masschange');
+    let categoryIdMasschangeOption = categoryIdMasschange.querySelectorAll('option');
+
+    let brandIdMasschange = document.getElementById('brand_id_masschange');
+    let brandIdMasschangeOption = brandIdMasschange.querySelectorAll('option');
+
+    if (categoryIdMasschange.value && brandIdMasschange.value) {
+        obj['products_kind'] = 'category_id=' + categoryIdMasschange.value +';brand_id=' + brandIdMasschange.value;
+        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText + " и бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+    } else if (categoryIdMasschange.value) {
+        obj['products_kind'] = 'category_id=' + categoryIdMasschange.value;
+        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText;
+    } else if (brandIdMasschange.value) {
+        obj['products_kind'] = 'brand_id=' + brandIdMasschange.value;
+        dataProductsKind = "бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+    } 
+
+    obj['vendor_id'] = vendor_id;
+
+    // соберём текст подтверждения
+    let masschangePriceConfirmText = dataPriceKind + "всех товаров " + dataProductsKind + " будут " + dataCase + magnitude + unit; 
+
+    // выведем окно подтверждения изменения цен
+    let confirmChange = window.confirm(masschangePriceConfirmText);
+    //  если не подтвердил - выходим из функции, если подтведил - отправляем запрос на сервер
+    if (!confirmChange) {
+        return;
+    } 
+    // подготовим JSON, для оправки POST запроса в апишку 
+    let objJson = JSON.stringify(obj);
+
+    // отправим запрос на изменение цен
+    // при этом все товары, в которых будет меняться цена - уйдут на одобрение админу
+    let resultJSON = sendRequestPOST(mainUrl + '/api/price/masschange-price.php', objJson);
+    let result;
+    // проверим ответ с сервера после запроса
+    // если в ответ пришла неизв ошибка, то выводим сообщение Ошибка! Попробуйте позже!
+    // иначе - распарсим результат и считаем данные
+    try {
+        result  = JSON.parse(resultJSON);
+    } catch(e) {
+        alert ('Ошибка! Попробуйте позже!');
+        return;
+    }
+
+    // если запрос не выполнен , то показываем alert, но не закрываем модальное окно
+    // иначе - закрываем модальное окно и выводим alert, что цены изменены
+    if (!result.success) {
+        alert(result.message);
+        return;
+    } else {
+        modalMassChangePrice.classList.add('d-none');
+        alert(result.message);
+    }
+
+    // перезагрузим страницу
+    window.location.href = window.location.href;
+}
+
+// изменение innerText % или Сум в зависимости от выбранной единицы измерения
+masschangePriceCase.addEventListener('change', () => {
+    if(masschangePriceCase.value == 'priceUpPercent' || masschangePriceCase.value == 'priceDownPercent') {
+        masschangePriceUnitEl.innerText = '%';
+    } else if(masschangePriceCase.value == 'priceUpSoums' || masschangePriceCase.value == 'priceDownSoums') {
+        masschangePriceUnitEl.innerText = 'Сум';
+    }
+})
 

@@ -108,14 +108,14 @@ td:nth-last-child(1) {
     max-width: unset;
 }
 
+.change-price-el {
+    text-wrap: nowrap;
+}
+
 .save-price, .reset-price {
     display: inline-block;
     vertical-align: middle;
     cursor: pointer;
-}
-
-.price-confirm-container {
-    margin-top: 15px;
 }
 
 .price-confirm-container svg {
@@ -138,27 +138,252 @@ td:nth-last-child(1) {
 }
 
 .list-products__row[is-active='0'] {
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
-.active-check {
+.list-products__row[is-confirm='0'] {
+    opacity: 0.5;
+}
+
+.active-check{
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.active-check input {
+.container-status-filter{
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 150px;
+}
+
+.active-check input,
+.container-status-filter input {
     appearance: auto;
     height: 15px;
     width: 15px;
 }
 
-.active-check input:focus {
+.active-check input:focus,
+.container-status-filter input:focus {
     outline: none;
 }
 
-@media(max-width: 1024px) {
+.units {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    width: 100%; 
+    padding: 10px;
+    overflow-x: auto;
+}
+
+
+#list-units th[data-sort]:after {
+    right: 0;
+    top: calc(50% - 0.9rem/2);
+    content: "↓";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort]:before {
+    right: 6px;
+    top: calc(50% - 0.9rem/2);
+    content: "↑";
+    opacity: 0.3;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+#list-units th[data-sort="desc"]:after {
+    opacity: 1;
+}
+
+#list-units th[data-sort="asc"]:before {
+    opacity: 1;
+}
+
+.save-unit, .reset-unit {
+    display: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.edit-unit {
+    display: inline-block;
+    transform: rotate(90deg);
+    cursor: pointer;
+    vertical-align: middle;
+}
+.edit-unit.active
+
+.list-units__row {
+    font-size: 1rem;
+}
+
+.confirm-price-daily {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.confirm-price-daily__info {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--border-form-elem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: help;
+    position: relative;
+}
+
+.confirm-price-daily__info-text {
+    opacity: 0;
+    position: absolute;
+    top: -15px;
+    left: 120%;
+    width: 150px;
+    height: 54px;
+    background-color: #fff9e6;
+    color: #5b0000;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 5px;
+    cursor: unset;
+    transition: all 0.5s;
+}
+
+.confirm-price-daily__info:hover .confirm-price-daily__info-text {
+    opacity: 1;
+}
+
+#btn-masschange-price {
+    width: 120px;
+    font-size: 12px;
+    padding: 9px;
+}
+
+/* modalbox */
+.modalbox {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    z-index: 11;
+}
+
+.modal-form {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    padding: 22px;
+    width: 500px;
+    min-height: 300px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    color: var(--dark-color);;
+}
+
+.modal-form select {
+    max-width: unset;
+    min-width: unset;
+    width: 220px;
+}
+
+.masschange-price-case__text {
+    margin-right: 10px;
+}
+
+.masschange-price__title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.close-icon-flex {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close-icon {
+    width: 15px;
+    height: 25px;
+    font-weight: 700;
+    text-align: right;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.result-masschange-price {
+    font-size: 12px;
+    padding-top: 10px;
+    color: rgb(255, 0, 0);
+}
+
+/* .masschange-price-kind {
+    position: relative;
+    display: flex;
+    align-items: center;
+} */
+.masschange-price-case,
+.masschange-price-kind,
+.masschange-price-choose-products,
+.masschange-price-value {
+    margin-bottom: 8px;
+}
+
+.masschange-price-kind__input {
+    margin-bottom: 5px;
+    margin-left: 15px;
+}
+
+.masschange-price-kind input {
+    appearance: auto;
+    min-width: unset;
+    height: 15px;
+    width: 15px;
+    vertical-align: middle;
+}
+
+.masschange-price-kind lable {
+    margin-left: 10px;
+}
+
+.masschange-price-kind input:focus {
+    outline: none;
+}
+
+.masschange-price-choose-products__title {
+    margin-bottom: 8px;
+}
+.masschange-price-choose-products__check{
+    margin-left: 15px;
+}
+
+.masschange-price-value input {
+    width: 100px;
+    min-width: unset;
+}
+/* /modalbox */
+
+@media(max-width: 1420px) {
     .filters-container-flex {
         flex-wrap: wrap;
     }
 }
+

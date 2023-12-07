@@ -5,7 +5,11 @@
     {
         public int $id;
         public string $name;
-        public ?string $description;
+        public ?string $name2;
+        public ?string $name3;
+        public string $description;
+        public ?string $description2;
+        public ?string $description3;
         public string $photo;
         public ?int $article;
         public int $category_id;
@@ -19,5 +23,6 @@
         public ?int $price_dollar;
         public ?int $max_price_dollar;
         public ?int $is_active;
+        public ?int $is_confirm;
     }
 ?>

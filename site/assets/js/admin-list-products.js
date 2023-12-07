@@ -17,6 +17,7 @@ let currentPage = 1;
 
 let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0';
 
+let city_idEl = document.getElementById('city_id');
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
 let searchEl = document.getElementById('search');
@@ -24,8 +25,15 @@ let limitEl = document.getElementById('limit');
 let vendor_idEl = document.getElementById('vendor_id');
 let offsetEl = containerPagination.getAttribute('offset');
 
-let activeCheckEl = document.querySelector('.active-check');
-let activeEl = activeCheckEl.querySelector('input');
+// let activeCheckEl = document.querySelector('.active-check');
+// let activeEl = activeCheckEl.querySelector('input');
+
+let confirmCheckEl = document.getElementById('is_confirm');
+let activeCheckEl = document.getElementById('is_active');
+
+// чекбоксы активен/неактивен, утверждён/неутверждён
+// let statusProductEl = document.querySelector('.status-list-items').querySelectorAll('input');
+// let statusProductIdArray = []; 
 
 let prevButton;
 let nextButton;
@@ -37,10 +45,10 @@ let resetPriceEl;
 let savePriceEl;
 let changeInputsEl;
 
-let brands = {};
-let categories = {};
-let vendors = {};
-let units = {};
+// let brands = {};
+// let categories = {};
+// let vendors = {};
+// let units = {};
 
 let orderby = "";
 let filters = "";
@@ -59,7 +67,7 @@ let totalProductsJson;
 
 let garbage;
 
-// // закэшируем значения брендов и категорий и поставщиков
+// закэшируем значения брендов и категорий и поставщиков
 // brand_idEl.querySelectorAll('option').forEach(item => {
 //     brands[item.value] = item.innerText;
 // })
@@ -99,8 +107,6 @@ function startRenderPage() {
     // 5. добавим параметры в адресную строку
     history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
 
- 
-
 }
 
 
@@ -136,7 +142,7 @@ function getFilters() {
     // проверим значение бренда, категории и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
     // и добавляем в параметр строки запроса 
-    [brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
+    [city_idEl, brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
                 params += "&search=name:" + item.value + ";description:" + item.value;
@@ -147,9 +153,35 @@ function getFilters() {
     })
 
     // проверим чекбокс неактивных товаров
-    if(activeEl.value) {
-        params += "&" + activeEl.value;
+    // if(activeEl.value) {
+    //     params += "&" + activeEl.value;
+    // }
+
+    // проверим утверждённость товаров
+    if(confirmCheckEl.value) {
+        params += "&" + confirmCheckEl.value;
     }
+
+    // проверим активность товаров
+    if(activeCheckEl.value) {
+        params += "&" + activeCheckEl.value;
+    }
+
+    // проверим выбранные чекбоксы активный/неактивный, утверждённый/неутверждённый
+    // запишем id всех выделенных чекбоксов
+    // statusProductEl.forEach(statusId => {
+    //     if(statusId.hasAttribute('checked')) {
+    //         statusProductIdArray.push(statusId.id);
+    //     }  
+    // })
+    // // если выделены и активные и неактивные
+    // if(statusProductIdArray.indexOf('') && statusProductIdArray.indexOf('')) {
+    //     alert('выделены акт-неакт')
+    // } else if(!statusProductIdArray.indexOf('') && !statusProductIdArray.indexOf('')) {
+    //     alert('не выделены акт-неакт')
+    // }
+    // console.log(statusProductIdArray);
+
 
     // вернём параметры
     return params;
@@ -242,9 +274,17 @@ function renderListProducts(totalProducts) {
             checked = '';
         }
 
+        let checkedConfirm;
+        if (totalProducts['products'][i]['is_confirm'] == '1') {
+            checkedConfirm = 'checked';
+        } else {
+            checkedConfirm = '';
+        }
+
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
-            
+            //  для сумовых поставщиков
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
@@ -253,6 +293,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${name}', totalProducts['products'][i]['name'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
+                                                                .replace('${city_name}', totalProducts['products'][i]['city_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
                                                                 .replace('${is_active}', totalProducts['products'][i]['is_active'])
@@ -262,11 +303,15 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${price_format}', totalProducts['products'][i]['price'].toLocaleString('ru'))
                                                                 .replace('${max_price}', totalProducts['products'][i]['max_price'])
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
-                                                                .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'));
+                                                                .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
+                                                                .replace('${checked-confirm}', checkedConfirm)
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+                                                                
         
         } else if (totalProducts['products'][i]['vendor_currency_dollar'] == "1"){
-
+            // для долларовых поставщиков
             containerListProducts.innerHTML += tmplRowProductDollar.replace('${id}', totalProducts['products'][i]['id'])
+                                                                .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${id}', totalProducts['products'][i]['id'])
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
@@ -275,6 +320,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${name}', totalProducts['products'][i]['name'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
+                                                                .replace('${city_name}', totalProducts['products'][i]['city_name'])
                                                                 .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
                                                                 .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
                                                                 .replace('${is_active}', totalProducts['products'][i]['is_active'])
@@ -295,11 +341,19 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${price_dollar_format}', totalProducts['products'][i]['price_dollar'].toLocaleString('ru'))
                                                                 .replace('${max_price_dollar}', totalProducts['products'][i]['max_price_dollar'])
                                                                 .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
-                                                                .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'));
-                                                                
-                                                                
-                                                                
-                                                                
+                                                                .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
+                                                                .replace('${checked-confirm}', checkedConfirm)
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+ 
+        }
+
+        // если totalProducts['products'][i]['max_price'] меньше, чем totalProducts['products'][i]['price'], то выделим цены красным
+        if(Number(totalProducts['products'][i]['max_price']) <= Number(totalProducts['products'][i]['price'])) {
+            let priceElColor =  document.querySelectorAll('.price-mark');
+            let lengthPriceElColor = priceElColor.length;
+
+            priceElColor[lengthPriceElColor-1].style.color = "red";
+            priceElColor[lengthPriceElColor-2].style.color = "red";  
 
         }
     }
@@ -484,16 +538,16 @@ function deleteProduct() {
 // если выбрана галочка, то не нужен параметр is_active
 // если же галочки нет, то запрашиваем только is_active=1
 // для этого меняем значение атрибута value  у чекбокса
-activeCheckEl.onclick = function(){
-    if(activeEl.checked) {
-        activeEl.value = ""
+// activeCheckEl.onclick = function(){
+//     if(activeEl.checked) {
+//         activeEl.value = ""
         
-    } else {
-        activeEl.value = "is_active=1";  
-    }
+//     } else {
+//         activeEl.value = "is_active=1";  
+//     }
 
-    console.log(activeEl.value);
-}
+//     console.log(activeEl.value);
+// }
 
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
@@ -743,7 +797,66 @@ function checkboxChangedProductActive(id) {
         });
     }
 
-    console.log(obj);
+    // отправим запрос на изменение 
+    sendRequestPOST(mainUrl + '/api/products.php', obj);
+
+    // перерисовка страницы
+    startRenderPage();
+
+}
+
+/* ---------- РЕДАКТИРОВАНИЕ ТОВАРА ЧЕРЕЗ ЧЕКБОКС (утверждён/неутверждён) ---------- */
+
+function checkboxChangedProductConfirm(id) {
+    // проверяем корректность токена
+    check();
+
+    let isChecked = window.confirm('Вы действительно хотите изменить статус товара?');
+
+    if(!isChecked) {
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
+        } else {
+            event.target.checked = true;
+        }
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        
+        // доп проверим , чтобы среднерын цена была больше, чем цена поставщика
+        // если это не так, то запрещаем одобрять товар ии выводим сообщение
+
+        // найдем родителя-строку таблицы
+        let parentRow = event.target.closest('.list-products__row');
+        // и элементы, где прописаны цены
+        let tdPriceEl = parentRow.querySelectorAll('.price-mark');
+
+        //сравним цены
+        if(Number(tdPriceEl[0].getAttribute('data-price-num')) >= Number(tdPriceEl[1].getAttribute('data-price-num')))  {
+            alert('У данного товара цена больше среднерыночной! Товар не будет подтверждён');
+            event.target.checked = false;
+            return;
+        }   
+        
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_confirm': 1
+        });
+        
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_confirm': 0
+        });
+    }
 
     // отправим запрос на изменение 
     sendRequestPOST(mainUrl + '/api/products.php', obj);

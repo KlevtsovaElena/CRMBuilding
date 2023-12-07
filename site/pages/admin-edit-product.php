@@ -32,7 +32,7 @@ if($role !== 1) {
         $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents($nginxUrl . "/api/units.php");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0");
         $units = json_decode($unitsJson, true);
 
         $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2?deleted=0");
@@ -62,10 +62,42 @@ if($role !== 1) {
                 </p>
                 <br>
 
-                <!-- наименование -->
+                <!-- наименование-->
                 <div class="form-add-product__elements-item">
-                    <p>Наименование</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
-                    <div class="error-info d-none"></div>
+                    <p>Наименование</p>
+                    <div class="name-container">        
+                        <!-- наименование Русский-->
+                        <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
+                        <div class="error-info d-none"></div>
+
+                        <?php 
+                            if($product[0]['name2'] == NULL || $product[0]['name2'] == '') {$name2='';} else {$name2=$product[0]['name2'];}
+                            if($product[0]['name3'] == NULL || $product[0]['name3'] == '') {$name3='';} else {$name3=$product[0]['name3'];}
+                        ?>
+                        <!-- наименование Оʻzbekcha-->
+                        <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="<?= $name2; ?>">
+                        <!-- наименование, Ўзбекча -->
+                        <p>Ўзбекча</p><input type="text" id="name3" name="name3" value="<?= $name3; ?>">
+                    </div>
+                </div>            
+
+                <!-- описание-->
+                <div class="form-add-product__elements-item">
+                    <p>Описание</p>
+                    <div class="description-container">    
+                        <!-- описание Русский -->
+                        <p>Русский (обязательно)</p><textarea id="description" name="description" required><?= $product[0]['description']; ?></textarea>
+                        <div class="error-info d-none"></div> 
+
+                        <?php 
+                            if($product[0]['description2'] == NULL || $product[0]['description2'] == '') {$description2='';} else {$description2=$product[0]['description2'];}
+                            if($product[0]['description3'] == NULL || $product[0]['description3'] == '') {$description3='';} else {$description3=$product[0]['description3'];}
+                        ?>
+                        <!-- описание Оʻzbekcha-->
+                        <p>Оʻzbekcha</p><textarea id="description2" name="description2"><?= $description2; ?></textarea>
+                        <!-- описание Ўзбекча-->
+                        <p>Ўзбекча</p><textarea id="description3" name="description3"><?= $description3; ?></textarea> 
+                    </div> 
                 </div>
 
                 <!-- фото -->
@@ -108,12 +140,6 @@ if($role !== 1) {
                     <div class="error-info d-none"></div> 
                 </div>
 
-                <!-- описание -->
-                <div class="form-add-product__elements-item d-none">
-                    <p>Описание</p><textarea id="description" name="description"><?= $product[0]['description']; ?></textarea>
-                    <div class="error-info d-none"></div> 
-                </div>
-
                 <!-- артикул -->
                 <div class="form-add-product__elements-item d-none">
                     <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="<?= $product[0]['article']; ?>" placeholder="0">
@@ -148,6 +174,16 @@ if($role !== 1) {
                     <div class="error-info d-none"></div>
                 </div> 
 
+
+                <!-- статус -->
+                <div class="form-add-product__elements-item">
+                    
+                    <select id="is_confirm" name="is_confirm" value="" required>
+                        <option value="1" <?php if($product[0]['is_confirm'] == 1) {echo 'selected';} ?>>Утверждён</option>
+                        <option value="0" <?php if($product[0]['is_confirm'] == 0) {echo 'selected';} ?>>Не утверждён</option>
+                    </select>
+                    <div class="error-info d-none"></div>
+                </div> 
 
             <!-- в зависимости от валюты поставщика -->
             <?php if ($product[0]['vendor_currency_dollar'] == "0") { ?>

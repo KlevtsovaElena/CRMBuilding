@@ -35,6 +35,9 @@ if($role !== 1) {
     $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
     $categories = json_decode($categoriesJson, true);
 
+    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
+    $cities = json_decode($citiesJson, true);
+
     $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
     $vendors = json_decode($vendorsJson, true);
  
@@ -51,6 +54,18 @@ if($role !== 1) {
 
             <div class="form-elements-container filters-container-flex">
 
+                <!-- выбор города -->
+                <div class="d-iblock">
+                    <div>Город</div>
+                    <select id="city_id" name="city_id" value="">
+                        
+                        <option value="">Все</option>
+                        <?php foreach($cities as $city) { ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
+                        <?php }; ?>
+
+                    </select>
+                </div>
                 <!-- выбор поставщика -->
                 <div class="d-iblock">
                     <div>Поставщик</div>
@@ -108,13 +123,71 @@ if($role !== 1) {
                     <input type="search" id="search" name="search" value="" placeholder="Поиск">
                 </div>
               
-                <!-- показывать неактивные -->
+
+                <!-- утверждённые/неутверждённые -->
+                <div class="d-iblock">
+                    <div>Утверждены</div>
+                    <select id="is_confirm" name="is_confirm" value="">
+                        
+                        <option value="">Все</option>
+                        <option value="is_confirm=1">Утверждены</option>
+                        <option value="is_confirm=0">Не утверждены</option>
+                        
+                    </select>
+                </div>
+
+
+                <!-- активные/неактивные -->
+                <div class="d-iblock">
+                    <div>Активные</div>
+                    <select id="is_active" name="is_active" value="">
+
+                        <option value="is_active=1">Активные</option>
+                        <option value="is_active=0">Неактивные</option>
+                        <option value="">Все</option>
+ 
+                    </select>
+                </div>
+                <!-- показывать неактивные
                 <div class="active-check">
                     <div >
-                        <input type="checkbox" id="active-check" name="active-check" checked value="">
+                        <input type="checkbox" id="active-check" name="active-check" value="is_active=1">
                     </div>
                     <lable>Неактивные</lable>
-                </div>
+                </div> -->
+
+
+                <!-- выбрать какие товары показывать из активных, неактивных, утверждённых, неутверждённых или все сразу, множ выбор -->
+                <!-- <div class="container-status-filter">
+
+                    <ul class="status-list-items">
+                        <li class="item"> 
+                            <input type="checkbox" class="t" id="confirm-product-check" name="confirm-product-check" checked value="is_confirm=1">
+                            <lable>Утверждены</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" id="notconfirm-product-check" name="notconfirm-product-check" checked value="is_confirm=0">
+                            <lable>Не утверждены</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" id="active-product-check" name="active-product-check" checked value="is_active=1">
+                            <lable>Активные</lable>
+                        </li>
+                        <li class="item"> 
+                            <input type="checkbox" class="t" id="notactive-product-check" name="notactive-product-check" value="is_active=0">
+                            <lable>Неактивные</lable>
+                        </li>
+                    </ul>
+                </div> -->
+
+
+
+
+
+
+
+
+
 
                 <button class="btn btn-ok d-iblock">Применить</button>
 
@@ -129,6 +202,7 @@ if($role !== 1) {
                     <thead>
                         <tr role="row">
 
+                            <th data-id="city_id" data-sort="">Город</th>
                             <th data-id="vendor_id" data-sort="">Поставщик</th>
                             <th data-id="name" data-sort="">Наименование</th>
                             <th data-id="category_id" data-sort="">Категория</th>
@@ -136,7 +210,8 @@ if($role !== 1) {
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
                             <th data-id="max_price" data-sort="">Цена рынок</th>
-                            <th data-id="is_active" data-sort="">Активен</th>
+                            <!-- <th data-id="is_active" data-sort="">Активен</th> -->
+                            <th data-id="is_confirm" data-sort="">Утверждён</th>
                             
                         </tr>
                     </thead>
@@ -188,6 +263,34 @@ if (count($_GET) !== 0) {
     <section class="form-filters">
 
         <div class="form-elements-container filters-container-flex">
+
+            <!-- выбор города -->
+            <div class="d-iblock">
+                <div>Город</div>
+                <select id="city_id" name="city_id" value="">
+                    
+                    <option value="">Все</option>
+ 
+                    <?php foreach($cities as $city) {
+                        if (!isset($_GET['city_id'])) {
+                        ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
+                        <?php
+                        } else if ($_GET['city_id'] == $city['id']) {
+                        ?>
+                            <option value="<?= $city['id']; ?>" selected><?= $city['name']; ?></option>
+
+                        <?php
+                        } else {
+                        ?>
+                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>;
+                        <?php 
+                        }
+                    }; ?>  
+
+                </select>
+            </div>
+
             <!-- выбор поставщика -->
             <div class="d-iblock">
                 <div>Поставщик</div>
@@ -296,21 +399,30 @@ if (count($_GET) !== 0) {
                 <input type="search" id="search" name="search" value="<?= $searchText; ?>" placeholder="Поиск">
             </div>
             
-            
-            <!-- показывать неактивные -->
-            <div class="active-check">
-                <div >
-                    <input type="checkbox" id="active-check" name="active-check" 
-                        <?php 
-                            if(isset($_GET['is_active']) && $_GET['is_active']=='1') {
-                                echo 'value="is_active=1"';
-                            } else {
-                                echo 'checked value=""';
-                            }?>
-                    >
-                </div>
-                <lable>Неактивные</lable>
+            <!-- утверждённые/неутверждённые -->
+            <div class="d-iblock">
+                <div>Утверждены</div>
+                <select id="is_confirm" name="is_confirm" value="">
+                    
+                    <option value="">Все</option>
+                    <option value="is_confirm=1" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '1') {echo 'selected';} ?>>Утверждены</option>
+                    <option value="is_confirm=0" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '0') {echo 'selected';} ?>>Не утверждены</option>
+                    
+                </select>
             </div>
+            
+            <!-- активные/неактивные -->
+            <div class="d-iblock">
+                <div>Активные</div>
+                <select id="is_active" name="is_active" value="">
+
+                    <option value="is_active=1" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '1') {echo 'selected';} ?>>Активные</option>
+                    <option value="is_active=0" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '0') {echo 'selected';} ?>>Неактивные</option>
+                    <option value="">Все</option>
+
+                </select>
+            </div>
+
 
             <button class="btn btn-ok d-iblock">Применить</button>
             
@@ -324,6 +436,7 @@ if (count($_GET) !== 0) {
             <thead>
                 <tr role="row">
 
+                    <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
                     <th data-id="vendor_id" data-sort="<?php if ($sortBy == 'vendor_id')  {echo $mark; } ?>">Поставщик</th>
                     <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
@@ -331,7 +444,8 @@ if (count($_GET) !== 0) {
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок</th>
-                    <th data-id="is_active" data-sort="<?php if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th>
+                    <!-- <th data-id="is_active" data-sort="<?php //if ($sortBy == 'is_active')  {echo $mark; } ?>">Активен</th> -->
+                    <th data-id="is_confirm" data-sort="<?php if ($sortBy == 'is_confirm')  {echo $mark; } ?>">Утверждён</th>
                     
                 </tr>
             </thead>
@@ -355,8 +469,9 @@ if (count($_GET) !== 0) {
     <!-- шаблон строки таблицы Сум -->
     <template id="template-body-table-uzs">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
             
+            <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
@@ -365,7 +480,7 @@ if (count($_GET) !== 0) {
 
             <td>
                 <input type="text" name="price" class="change-price-el change-price-input d-none" placeholder="${price_format}" value="" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
-                <div class="change-price" title="Изменить цены"  data-price-num="${price}">${price_format} Сум</div>
+                <div class="change-price price-mark" title="Изменить цены"  data-price-num="${price}">${price_format} Сум</div>
             </td>
 
             <td>
@@ -374,11 +489,12 @@ if (count($_GET) !== 0) {
                     <span class="save-price" title="Сохранить цены" onclick="saveChangePrice(0, 0)"><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1716 1C18.702 1 19.2107 1.21071 19.5858 1.58579L22.4142 4.41421C22.7893 4.78929 23 5.29799 23 5.82843V20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20V4C1 2.34315 2.34315 1 4 1H18.1716ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21L5 21L5 15C5 13.3431 6.34315 12 8 12L16 12C17.6569 12 19 13.3431 19 15V21H20C20.5523 21 21 20.5523 21 20V6.82843C21 6.29799 20.7893 5.78929 20.4142 5.41421L18.5858 3.58579C18.2107 3.21071 17.702 3 17.1716 3H17V5C17 6.65685 15.6569 8 14 8H10C8.34315 8 7 6.65685 7 5V3H4ZM17 21V15C17 14.4477 16.5523 14 16 14L8 14C7.44772 14 7 14.4477 7 15L7 21L17 21ZM9 3H15V5C15 5.55228 14.5523 6 14 6H10C9.44772 6 9 5.55228 9 5V3Z" fill="#009900"></path> </g></svg></span>
                     <span class="reset-price" title="Сбросить изменения" onclick="resetChangePrice(0)"><svg width="25px" height="25px" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.56189 13.5L4.14285 13.9294L4.5724 14.3486L4.99144 13.9189L4.56189 13.5ZM9.92427 15.9243L15.9243 9.92427L15.0757 9.07574L9.07574 15.0757L9.92427 15.9243ZM9.07574 9.92426L15.0757 15.9243L15.9243 15.0757L9.92426 9.07574L9.07574 9.92426ZM19.9 12.5C19.9 16.5869 16.5869 19.9 12.5 19.9V21.1C17.2496 21.1 21.1 17.2496 21.1 12.5H19.9ZM5.1 12.5C5.1 8.41309 8.41309 5.1 12.5 5.1V3.9C7.75035 3.9 3.9 7.75035 3.9 12.5H5.1ZM12.5 5.1C16.5869 5.1 19.9 8.41309 19.9 12.5H21.1C21.1 7.75035 17.2496 3.9 12.5 3.9V5.1ZM5.15728 13.4258C5.1195 13.1227 5.1 12.8138 5.1 12.5H3.9C3.9 12.8635 3.92259 13.2221 3.9665 13.5742L5.15728 13.4258ZM12.5 19.9C9.9571 19.9 7.71347 18.6179 6.38048 16.6621L5.38888 17.3379C6.93584 19.6076 9.54355 21.1 12.5 21.1V19.9ZM4.99144 13.9189L7.42955 11.4189L6.57045 10.5811L4.13235 13.0811L4.99144 13.9189ZM4.98094 13.0706L2.41905 10.5706L1.58095 11.4294L4.14285 13.9294L4.98094 13.0706Z" fill="#444444"></path> </g></svg></span>
                 </div>
-                <div class="change-price" title="Изменить цены" data-price-num="${max_price}">${max_price_format} Сум</div>
+                <div class="change-price price-mark" title="Изменить цены" data-price-num="${max_price}">${max_price_format} Сум</div>
             </td>
 
             <td>
-                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>             
+                <!-- <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>              -->
+                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductConfirm(${id})" ${checked-confirm}></div>             
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
         </tr>
@@ -388,8 +504,9 @@ if (count($_GET) !== 0) {
      <!-- шаблон строки таблицы Доллар -->
     <template id="template-body-table-dollar">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}">
+        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
             
+            <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>
@@ -401,7 +518,7 @@ if (count($_GET) !== 0) {
                 <div class="price-uzs change-price-el d-none" data-price-dollar="${price_dollar}" style="font-size: 0.65rem" data-price-num="${price}">(${price_format} Сум)</div>
                     
                 <div class="change-price" title="Изменить цены">${price_dollar_format} $ </div>
-                <div title="Изменить цены" class="change-price" data-price-num="${price}" style="font-size: 0.65rem">(${price_format} Сум)</div>
+                <div title="Изменить цены" class="change-price price-mark" data-price-num="${price}" style="font-size: 0.65rem">(${price_format} Сум)</div>
             </td>
 
             <td>
@@ -412,11 +529,13 @@ if (count($_GET) !== 0) {
                 </div>
                 <div class="price-uzs change-price-el d-none" data-price-dollar="${max_price_dollar}" style="font-size: 0.65rem" data-price-num="${max_price}">(${max_price_format} Сум)</div>
                 <div class="change-price" title="Изменить цены">${max_price_dollar_format} $</div>
-                <div title="Изменить цены" class="change-price" data-price-num="${max_price}" style="font-size: 0.65rem">(${max_price_format} Сум)</div>
+                <div title="Изменить цены" class="change-price price-mark" data-price-num="${max_price}" style="font-size: 0.65rem">(${max_price_format} Сум)</div>
             </td>
 
             <td>
-                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>            
+                
+                <!-- <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductActive(${id})" ${checked}></div>     -->
+                <div class="ta-center"><input type="checkbox" class="checkbox-product" onclick="checkboxChangedProductConfirm(${id})" ${checked-confirm}></div>                 
                 <span title="Удалить товар"><svg class="garbage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="20px" viewBox="0 0 32 32" id="icons" version="1.0" xml:space="preserve" fill="#000000"><g id="SVGRepo_iconCarrier"><rect class="garbage-svg" height="22" id="XMLID_14_" width="16" x="8" y="7"/><line class="garbage-svg" id="XMLID_4_" x1="16" x2="16" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_118_" x1="20" x2="20" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_3_" x1="12" x2="12" y1="10" y2="26"/><line class="garbage-svg" id="XMLID_5_" x1="5" x2="27" y1="7" y2="7"/><rect class="garbage-svg" height="4" id="XMLID_6_" width="6" x="13" y="3"/><g id="XMLID_386_"/></g></svg></span>          
             </td>
         </tr>

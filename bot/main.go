@@ -577,7 +577,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 						},
 					},
 					"resize_keyboard":   true,
-					"one_time_keyboard": true,
+					"one_time_keyboard": false,
 				}
 
 				// Создаем GET-запрос
@@ -751,7 +751,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					},
 				},
 				"resize_keyboard":   true,
-				"one_time_keyboard": true,
+				"one_time_keyboard": false,
 			}
 
 			// Создаем GET-запрос
@@ -800,7 +800,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					},
 				},
 				"resize_keyboard":   true,
-				"one_time_keyboard": true,
+				"one_time_keyboard": false,
 			}
 
 			// Создаем GET-запрос
@@ -1106,7 +1106,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				} else {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": "Оформить заказ", "callback_data": "buy"}},
+
+						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
+						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
@@ -1144,7 +1147,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				} else {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": "Оформить заказ", "callback_data": "buy"}},
+
+						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
+						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 					}
 
@@ -1292,7 +1298,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 									},
 								},
 								"resize_keyboard":   true,
-								"one_time_keyboard": true,
+								"one_time_keyboard": false,
 							}
 
 							// обнуляем корзину
@@ -1351,7 +1357,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 									},
 								},
 								"resize_keyboard":   true,
-								"one_time_keyboard": true,
+								"one_time_keyboard": false,
 							}
 
 							// обнуляем корзину
@@ -1623,6 +1629,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					break
 				}
 			}
+		}
+
+		if button == "dropCart" {
+
+			user := usersDB[chatId]
+			// обнуляем корзину
+			user.Cart = map[int]int{}
+			usersDB[chatId] = user
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Корзина отчищена", nil)
+
 		}
 
 		// кейс при нажатии на кнопку актуальные цены

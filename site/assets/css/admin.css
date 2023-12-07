@@ -58,3 +58,10 @@ input[type="checkbox"] {
     display: inline;
     max-width: 200px;
 }
+
+.multiple-checkbox {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+    font-size: 14px;
+}

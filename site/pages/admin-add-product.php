@@ -31,7 +31,7 @@ if($role !== 1) {
         $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents($nginxUrl . "/api/units.php");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0");
         $units = json_decode($unitsJson, true);
 
         $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
@@ -43,7 +43,7 @@ if($role !== 1) {
        
         <div class="form-add-product__elements form-elements-container">
 
-             <!-- наименование -->
+             <!-- поставщик -->
              <div class="form-add-product__elements-item">
                 <p>Поставщик</p>
                 <select id="vendor_id" name="vendor_id" value="" required onchange="renderPriceBlock()">
@@ -57,12 +57,69 @@ if($role !== 1) {
                 <div class="error-info d-none"></div> 
             </div>
 
-             <!-- наименование -->
+            <!-- наименование-->
             <div class="form-add-product__elements-item">
-                <p>Наименование</p><input type="text" id="name" name="name" value="" required>
+                <p>Наименование</p>
+                <div class="name-container">        
+                    <!-- наименование Русский-->
+                    <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="" required>
+                    <div class="error-info d-none"></div>
+
+                    <!-- наименование Оʻzbekcha-->
+                    <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="">
+                    <!-- наименование, Ўзбекча -->
+                    <p>Ўзбекча</p><input type="text" id="name3" name="name3" value="">
+                </div>
+            </div>            
+
+            <!-- описание-->
+            <div class="form-add-product__elements-item">
+                <p>Описание</p>
+                <div class="description-container">    
+                    <!-- описание Русский -->
+                    <p>Русский (обязательно)</p><textarea id="description" name="description" required></textarea>
+                    <div class="error-info d-none"></div> 
+
+                    <!-- описание Оʻzbekcha-->
+                    <p>Оʻzbekcha</p><textarea id="description2" name="description2"></textarea>
+                    <!-- описание Ўзбекча-->
+                    <p>Ўзбекча</p><textarea id="description3" name="description3"></textarea> 
+                </div> 
+            </div>  
+
+<!--
+             
+             <div class="form-add-product__elements-item">
+                <p>Наименование, Русский (обязательно)</p><input type="text" id="name" name="name" value="" required>
                 <div class="error-info d-none"></div>
             </div>
-
+           
+            <div class="form-add-product__elements-item">
+                <p>Наименование, Оʻzbekcha</p><input type="text" id="name2" name="name2" value="">
+                <div class="error-info d-none"></div>
+            </div>
+           
+            <div class="form-add-product__elements-item">
+                <p>Наименование, Ўзбекча</p><input type="text" id="name3" name="name3" value="">
+                <div class="error-info d-none"></div>
+            </div>
+-->
+<!-- описание Русский
+            <div class="form-add-product__elements-item">
+                <p>Описание, Русский (обязательно)</p><textarea id="description" name="description"  required></textarea>
+                <div class="error-info d-none"></div> 
+            </div>
+            
+            <div class="form-add-product__elements-item">
+                <p>Описание, Оʻzbekcha</p><textarea id="description2" name="description2"></textarea>
+                <div class="error-info d-none"></div> 
+            </div>
+            
+            <div class="form-add-product__elements-item">
+                <p>Описание, Ўзбекча</p><textarea id="description3" name="description3"></textarea>
+                <div class="error-info d-none"></div> 
+            </div>                        
+-->
             <!-- фото -->
             <div class="form-add-product__elements-item">
                 <p>Изображениe для карточки</p> 
@@ -106,12 +163,6 @@ if($role !== 1) {
                 <div class="error-info d-none"></div> 
             </div>
 
-            <!-- описание -->
-            <div class="form-add-product__elements-item d-none">
-                <p>Описание</p><textarea id="description" name="description"></textarea>
-                <div class="error-info d-none"></div> 
-            </div>
-
             <!-- артикул -->
             <div class="form-add-product__elements-item d-none">
                 <p>Артикул (число)</p><input type="number" id="article" name="article" min="0" value="0" placeholder="0">
@@ -144,6 +195,16 @@ if($role !== 1) {
                 <select id="is_active" name="is_active" value="" required>
                     <option value="1">Активен</option>
                     <option value="0">Не активен</option>
+                </select>
+                <div class="error-info d-none"></div>
+            </div> 
+
+            <!-- статус -->
+            <div class="form-add-product__elements-item">
+                
+                <select id="is_confirm" name="is_confirm" value="" required>
+                    <option value="1">Утверждён</option>
+                    <option value="0">Не утверждён</option>
                 </select>
                 <div class="error-info d-none"></div>
             </div> 

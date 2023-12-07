@@ -30,8 +30,8 @@ function addNew(section_name) {
             });
         }
 
-        //для городов или поставщиков
-        if (section_name == 'cities' || section_name == 'vendors') {
+        //для городов
+        if (section_name == 'cities') {
             obj = JSON.stringify({
                 'name': name,
                 'deleted': 0
@@ -99,6 +99,50 @@ function edit(id, section_name) {
     }
 }
 
+function editOnClick(id, section_name) {
+
+    //достаем массив всех элементов, содержащих редактируемое название
+    let nameElements = document.querySelectorAll('.list-orders_status');
+    //console.log(nameElements);
+
+    //переменная для обновленного значения
+    //let changedValue = '';
+
+    //переменная для исходного значения
+    let uneditedValue = '';
+
+    //меняем поле с названием на редактируемый инпут
+    for (let i = 0; i < nameElements.length; i++) {
+        //ищем среди них то, у котого атрибут совпадает с нужным id
+        if (nameElements[i].getAttribute('data-id') == id) {
+
+            //копируем из нередактируемого поля текстовое значение, которое будет редактироваться в инпуте
+            uneditedValue = nameElements[i].innerHTML;
+            console.log(uneditedValue);
+            //скрываем нередактируемое поле
+            nameElements[i].classList.add('d-none');
+            //достаем инпут, который надо сделать видимым
+            let inputBlock = document.querySelectorAll('.input')[i];
+            //console.log(inputBlock);
+            //открываем инпут
+            inputBlock.classList.remove('d-none');
+            //кладем внутрь инпута значение, которое будем редактировать
+            inputBlock.querySelector('input').value = uneditedValue;
+            input = inputBlock.querySelector('input');
+
+            // //скрываем блок с карандашом
+            // document.getElementsByClassName('edit')[i].classList.add('d-none');
+            //открываем блок с отменой
+            document.getElementsByClassName('cancel')[i].classList.remove('d-none');
+            //открываем блок с сохранением
+            document.getElementsByClassName('save')[i].classList.remove('d-none');
+
+        }
+
+
+    }
+}
+
 //функция отмены редактирования (по нажатию на крестик)
 function cancel(id, name) {
     
@@ -127,8 +171,11 @@ function cancel(id, name) {
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.add('d-none');
-            //открываем блок с карандашом
-            document.getElementsByClassName('edit')[i].classList.remove('d-none');
+
+            if (document.getElementsByClassName('edit')[i]) {
+                //открываем блок с карандашом
+                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+            }
             
         }
     }
@@ -147,9 +194,10 @@ function save(id, uneditedValue, section_name) {
     for (let i = 0; i < nameElements.length; i++) {
         if (nameElements[i].getAttribute('data-id') == id) {
 
+            let changedValue0 = '';
             //если назначен дата-атрибут с измененным названием, достаем его
             if(nameElements[i].getAttribute('data-new-name')) {
-                changedValue = nameElements[i].getAttribute('data-new-name');
+                changedValue0 = nameElements[i].getAttribute('data-new-name');
             }
 
             //достаем инпут, который надо скрыть
@@ -159,16 +207,22 @@ function save(id, uneditedValue, section_name) {
 
             //копируем измененное значение
             changedValue = inputBlock.querySelector('input').value;
+            console.log(changedValue);
 
             //если итоговое значение совпадает с исходным, то оно не было изменено, запрос не отправляем
-            if (changedValue.trim() === uneditedValue) {
+            if (changedValue.trim() === uneditedValue && changedValue.trim() === changedValue0) {
+                console.log(uneditedValue);
                 console.log('значение не было обновлено');
                 //скрываем инпут
                 inputBlock.classList.add('d-none');
                 //возвращаем нередактируемое поле
                 nameElements[i].classList.remove('d-none');
-                //возвращаем блок с карандашом
-                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+
+                if (section_name !== 'vendors') {
+                    //возвращаем блок с карандашом
+                    document.getElementsByClassName('edit')[i].classList.remove('d-none');
+                }
+
                 //скрываем блок с отменой
                 document.getElementsByClassName('cancel')[i].classList.add('d-none');
                 //скрываем блок с сохранением
@@ -244,9 +298,11 @@ function save(id, uneditedValue, section_name) {
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.add('d-none');
-            //открываем блок с карандашом
-            document.getElementsByClassName('edit')[i].classList.remove('d-none');
-            
+
+            if (section_name !== 'vendors') {
+                //открываем блок с карандашом
+                document.getElementsByClassName('edit')[i].classList.remove('d-none');
+            }
         }
     }
 }
@@ -271,14 +327,14 @@ function deleteOne(section_name, id) {
 
     // собираем ссылку для запроса
     //для удаления поставщиков персональная апишка, чтобы вместе с поставщиком скрывались его товары
-    if (section_name == 'vendors') {
+    if (section_name == 'admin-vendors') {
         link = mainUrl + '/api/vendors/delete-vendor-with-products.php';
     } else {
         link = mainUrl + '/api/'+ section_name + '.php';
     }
     
 
-    if (section_name == 'vendors') {
+    if (section_name == 'admin-vendors') {
         // соберём json для передачи на сервер
         obj = JSON.stringify({
             'id': id,
@@ -301,7 +357,7 @@ function deleteOne(section_name, id) {
     //вынимаем информацию о номере текущей страницы
     let currentPage = document.getElementById('pages-info').getAttribute('data-current-page');
 
-    if (section_name == 'vendors') {
+    if (section_name == 'admin-vendors') {
         //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
         history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + currentPage);
 
@@ -317,7 +373,7 @@ function deleteOne(section_name, id) {
 }
 
 //функция при нажатии на кнопку "Применить"
-function apply(section_name) {
+function apply(section_name, filters) {
 
     console.log(limit.value);
 
@@ -333,18 +389,18 @@ function apply(section_name) {
         if (section_name == 'admin-vendors') {
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + searchQuery.trim());
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + searchQuery.trim() + filters);
 
-            document.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' +  searchQuery.trim();
+            document.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' +  searchQuery.trim() + filters;
 
         } else {
 
             let key = document.querySelector('.page-title').getAttribute('data-name');
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin.php?section=all&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
+            history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
 
-            document.location.href = mainUrl + '/pages/admin.php?section=all&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
+            document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
         }
 
         
@@ -355,9 +411,9 @@ function apply(section_name) {
         if (section_name == 'admin-vendors') {
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value);
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + filters);
 
-            document.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value;
+            document.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + filters;
 
         } else {
 
@@ -379,6 +435,10 @@ function applyInOrders() {
     //получим селект "поставщик"
     let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
     console.log(vendorSel);
+
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
 
     //получим селект "статус"
     let statusSel = document.getElementById('status').querySelectorAll('option:checked')[0].value;
@@ -420,6 +480,11 @@ function applyInOrders() {
     //если задан поставщик
     if (vendorSel) {
         filters += '&vendor_name=' + vendorSel;
+    }
+
+    //если задан город
+    if (citySel) {
+        filters += '&vendor_city=' + citySel;
     }
 
     //если задан статус
@@ -509,6 +574,14 @@ function applyInMain() {
     // let searchQuery = document.getElementById('search').value;
     // let dataSearch = searchQuery.trim();
 
+    //получим селект "поставщик"
+    let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
+    console.log(vendorSel);
+
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
     //и даты "с"
     let from = sortByDateFrom();
     console.log(from);
@@ -532,10 +605,20 @@ function applyInMain() {
         } 
     }
 
+    //если задан поставщик
+    if (vendorSel) {
+        filters += '&vendor_name=' + vendorSel;
+    }
+
+    //если задан город
+    if (citySel) {
+        filters += '&vendor_city=' + citySel;
+    }
+
     //если задан поиск
     // if (dataSearch) {
     //     limit.value = 'all';
-    //     filters += '&search=name' + dataSearch;
+    //     filters += '&search=name:' + dataSearch;
     // }
 
     //собираем сортировку
@@ -581,10 +664,114 @@ function applyInMain() {
 
 }
 
+//функция при нажатии на кнопку "Применить" для wholesaler-main!!!
+function applyInWholesalerMain() {
+
+    console.log(limit.value);
+
+    //лимит задан всегда, поэтому проверяем наличие поискового запроса
+    //получим введенное в поиск значение
+    // let searchQuery = document.getElementById('search').value;
+    // let dataSearch = searchQuery.trim();
+
+    //получим селект "поставщик"
+    let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
+    console.log(vendorSel);
+
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
+    //и даты "с"
+    let from = sortByDateFrom();
+    console.log(from);
+
+    //и даты "по"
+    let till = sortByDateTill();
+    console.log(till);
+
+    //собираем фильтры (дата + поиск)
+    let filters = '';
+
+    //если задана дата
+    if (from || till) {
+        //если  С
+        if (from) {
+            filters += '&date_from=' + from;
+        } 
+        if (till) {
+            //если ДО
+            filters += '&date_till=' + till;
+        } 
+    }
+
+    //если задан поставщик
+    if (vendorSel) {
+        filters += '&vendor_name=' + vendorSel;
+    }
+
+    //если задан город
+    if (citySel) {
+        filters += '&vendor_city=' + citySel;
+    }
+
+    //если задан поиск
+    // if (dataSearch) {
+    //     limit.value = 'all';
+    //     filters += '&search=name:' + dataSearch;
+    // }
+
+    //собираем сортировку
+    // получим значение атрибута data-sort
+    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
+    console.log(allTitlesElems);
+
+    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
+    let dataSort = '';
+    //переменная для ключа, соответствующего названию сортируемого поля в БД
+    let key = '';
+
+    //в цикле вынимаем эти два элемента
+    for (let i = 0; i < allTitlesElems.length; i++) {
+        if (allTitlesElems[i].getAttribute('data-sort')) {
+            //вынимаем заданное значение ключа
+            dataSort = allTitlesElems[i].getAttribute('data-sort');
+            console.log(dataSort);
+            //вынимаем ключ
+            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
+            console.log(key);
+        }
+    }
+    
+    // получим значение атрибута data-page, содержащего номер текущей страницы
+    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
+    console.log(dataPage);
+
+    let sorting = '';
+
+    //если активировано значение asc
+    if (dataSort && dataSort === "asc") {
+        sorting += '&orderby=' + key + ':asc';
+    //если активировано значение desc
+    } else if (dataSort === "desc") {
+        sorting += '&orderby=' + key + ':desc';
+    }
+
+    //вносим изменение в адресную строку страницы
+    history.replaceState(history.length, null, 'wholesaler-main.php?limit=' + limit.value + filters + sorting);
+
+    document.location.href = mainUrl + '/pages/wholesaler-main.php?limit=' + limit.value + filters + sorting;
+
+}
+
 //функция при нажатии на кнопку "Применить" для admin-vendors!!!
 function applyInVendors() {
 
     console.log(limit.value);
+
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
 
     //лимит задан всегда, поэтому проверяем только наличие поискового запроса
     //получим введенное в поиск значение
@@ -612,6 +799,14 @@ function applyInVendors() {
         }
     }
 
+    //собираем фильтры (город)
+    let filters = '';
+
+    //если задан город
+    if (citySel) {
+        filters += '&city_name=' + citySel;
+    }
+
     // получим значение атрибута data-page, содержащего номер текущей страницы
     let dataPage = document.getElementById('list-orders').getAttribute('data-page');
     console.log(dataPage);
@@ -624,20 +819,20 @@ function applyInVendors() {
         //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
         //если в гет-параметрах нет ни поиска, ни страницы
         if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':asc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':asc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть поиск, но не страница
         } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':asc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':asc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':asc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть страница, но не поиск
         } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
         }
     //если активировано значение desc
     } else if (dataSort === "desc") {
@@ -647,23 +842,23 @@ function applyInVendors() {
         //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
         //если в гет-параметрах нет ни поиска, ни страницы
         if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':desc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':desc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть поиск, но не страница
         } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':desc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':desc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть страница, но не поиск
         } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc');
-            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc';
+            history.replaceState(history.length, null, 'admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/admin-vendors.php?limit=all&search=name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
         }
     } else if (!dataSort) {
-        apply('admin-vendors');
+        apply('admin-vendors', filters);
     }
 
 }
@@ -765,6 +960,16 @@ let getParam = window.location.search;
 window.location.href = mainUrl + "/pages/admin-edit-vendor.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
     
 }
+
+/* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
+function editWholesaler(id) {
+
+    let getParam = window.location.search;
+    
+    // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
+    window.location.href = mainUrl + "/pages/admin-edit-wholesaler.php?id=" + id + "&deleted=0" + getParam.replace('?', '&'); 
+        
+    }
 
 //функция для изменения номера телефона для связи в боте на Главной
 function changePhone() {

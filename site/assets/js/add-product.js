@@ -4,11 +4,15 @@ const formAddProduct = document.getElementById('form-add-product');
 
 // запишем значения полей формы в переменные
 let  vendor_id = formAddProduct.querySelector('#vendor_id');
-let  nameProduct = formAddProduct.querySelector('#name');
+let  nameProduct = formAddProduct.querySelector('#name');  //название продукта русский
+let  nameProduct2 = formAddProduct.querySelector('#name2'); //название продукта Оʻzbekcha
+let  nameProduct3 = formAddProduct.querySelector('#name3'); //название продукта Ўзбекча
 let  new_photo = formAddProduct.querySelector('#new_photo');
 let  brand_id = formAddProduct.querySelector('#brand_id');
 let  category_id = formAddProduct.querySelector('#category_id');
-let  description = formAddProduct.querySelector('#description');
+let  description = formAddProduct.querySelector('#description'); //описание русский
+let  description2 = formAddProduct.querySelector('#description2'); //описание Оʻzbekcha
+let  description3 = formAddProduct.querySelector('#description3'); //описание Ўзбекча
 let  article = formAddProduct.querySelector('#article');
 let  quantity_available = formAddProduct.querySelector('#quantity_available');
 let  price = formAddProduct.querySelector('#price');
@@ -23,6 +27,7 @@ let hasError;
 let file; 
 let photoFileData;
 let photoFileName;
+let confirmProduct;
 
 
 /* ---------- ДОБАВЛЕНИЕ ТОВАРОВ ---------- */
@@ -42,6 +47,7 @@ function addProduct(role) {
         return;
     }
 
+    // валидация полей
     hasError = validationAdd();
 
     // если были ошибки, то выходим
@@ -51,12 +57,26 @@ function addProduct(role) {
     }
     
     // соберём json для передачи на сервер
+
+    // утверждён ли продукт?
+    // если товар добавляет поставщик, а не админ, то этот товар переводим в 0 до утверждения админом (поле is_confirm)
+    // а если Админ - берем данные из селекта
+    if (role !== 1) {
+        confirmProduct = 0;
+    } else {
+        confirmProduct = formAddProduct.querySelector('#is_confirm').value;
+    }
+
     let obj = JSON.stringify({
         'vendor_id': vendor_id.value,
         'name':  nameProduct.value,
+        'name2':  nameProduct2.value,
+        'name3':  nameProduct3.value,
         'brand_id': brand_id.value,
         'category_id': category_id.value,
         'description': description.value,
+        'description2': description2.value,
+        'description3': description3.value,
         'article': article.value,
         'quantity_available': quantity_available.value,
         'price': price.value,
@@ -66,22 +86,24 @@ function addProduct(role) {
         'unit_id': unit_id.value,
         'deleted': 0,
         'is_active': is_active.value,
+        'is_confirm': confirmProduct,
         photoFileData,
         photoFileName
     });
+
 
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
     // если товар добавляет поставщик, а не админ, то поставщика переводим в 0 до подтверждения цен
-    if (role == 2) {
-        // отправим запрос на изменение статуса подтверждения цен поставщика
-        let objVendor = JSON.stringify({
-            'id': vendor_id.value,
-            'price_confirmed':  0
-        });
-        sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-    }
+    // if (role == 2) {
+    //     // отправим запрос на изменение статуса подтверждения цен поставщика
+    //     let objVendor = JSON.stringify({
+    //         'id': vendor_id.value,
+    //         'price_confirmed':  0
+    //     });
+    //     sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+    // }
 
     alert("Данные отправлены");
     // перезагрузим страницу
@@ -99,7 +121,7 @@ function validationAdd() {
     } else {priceValue = 0;}
 
     // валидация полей (кроме vendorId)
-    [nameProduct, new_photo, brand_id, category_id, unit_id,
+    [nameProduct, description, new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price, vendor_id, is_active].forEach(item => {
     
             const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');
