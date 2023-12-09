@@ -24,8 +24,7 @@
             if(isset($_GET['language'])) {
                 if($_GET['language'] == '1') {
                     // если выбран русский язык
-                    echo 'русский';
-
+                  
                     for($i=0; $i < count($products); $i++) {
                         if($products[$i]['name'] !== null && $products[$i]['name'] !== '') {
 
@@ -44,13 +43,12 @@
 
                         } else {
                             $products[$i]['name_language'] =  $products[$i]['name'];
-                            $products[$i]['description_language'] =  $products[$i]['description']; 
+                            $products[$i]['description_language'] =  $products[$i]['description'];
                         }
                     } 
 
                 } else if($_GET['language'] == '2') {
                     // если выбран язык Оʻzbekcha
-                    echo 'озбек';
 
                     for($i=0; $i < count($products); $i++) {
                         if($products[$i]['name2'] !== null && $products[$i]['name2'] !== '') {
@@ -58,25 +56,24 @@
                             $products[$i]['name_language'] =  $products[$i]['name2'];
                             $products[$i]['description_language'] =  $products[$i]['description2']; 
 
-                        }  else if ($products[$i]['name3'] !== null && $products[$i]['name3'] !== '') {
-
-                            $products[$i]['name_language'] =  $products[$i]['name3'];
-                            $products[$i]['description_language'] =  $products[$i]['description3']; 
-
                         }  else if ($products[$i]['name'] !== null && $products[$i]['name'] !== '') {
 
                             $products[$i]['name_language'] =  $products[$i]['name'];
                             $products[$i]['description_language'] =  $products[$i]['description']; 
 
+                        }  else if ($products[$i]['name3'] !== null && $products[$i]['name3'] !== '') {
+
+                            $products[$i]['name_language'] =  $products[$i]['name3'];
+                            $products[$i]['description_language'] =  $products[$i]['description3']; 
+
                         } else {
-                            $products[$i]['name_language'] =  $products[$i]['name2'];
-                            $products[$i]['description_language'] =  $products[$i]['description2']; 
+                            $products[$i]['name_language'] =  $products[$i]['name'];
+                            $products[$i]['description_language'] =  $products[$i]['description'];
                         }
                     } 
 
                 } else if($_GET['language'] == '3') {
                     // если выбран язык Ўзбекча
-                    echo 'Ўзбекча';
 
                     for($i=0; $i < count($products); $i++) {
                         if($products[$i]['name3'] !== null && $products[$i]['name3'] !== '') {
@@ -84,19 +81,19 @@
                             $products[$i]['name_language'] =  $products[$i]['name3'];
                             $products[$i]['description_language'] =  $products[$i]['description3']; 
 
-                        }  else if ($products[$i]['name2'] !== null && $products[$i]['name2'] !== '') {
-
-                            $products[$i]['name_language'] =  $products[$i]['name2'];
-                            $products[$i]['description_language'] =  $products[$i]['description2']; 
-
                         }  else if ($products[$i]['name'] !== null && $products[$i]['name'] !== '') {
 
                             $products[$i]['name_language'] =  $products[$i]['name'];
                             $products[$i]['description_language'] =  $products[$i]['description']; 
 
+                        }  else if ($products[$i]['name2'] !== null && $products[$i]['name2'] !== '') {
+
+                            $products[$i]['name_language'] =  $products[$i]['name2'];
+                            $products[$i]['description_language'] =  $products[$i]['description2']; 
+
                         } else {
-                            $products[$i]['name_language'] =  $products[$i]['name3'];
-                            $products[$i]['description_language'] =  $products[$i]['description3']; 
+                            $products[$i]['name_language'] =  $products[$i]['name'];
+                            $products[$i]['description_language'] =  $products[$i]['description'];
                         }
                     } 
                 }
@@ -107,9 +104,6 @@
                 } 
             }
                 
-            
-
-
             echo json_encode($products, JSON_UNESCAPED_UNICODE);
         }
     }

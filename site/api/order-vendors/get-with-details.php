@@ -34,7 +34,7 @@
 
             $uniqueProductIds = array_unique($orderVendorsProducts);
 
-            $products = $this->productRepository->getAllByIds($uniqueProductIds); 
+            $products = $this->productRepository->getAllByIdsWithNameFront($uniqueProductIds); 
 
             $result = [];
 
@@ -66,11 +66,11 @@
 
                         foreach ($products as $product) 
                         {
-                            if ($product->id == $newProduct['id']) 
+                            if ($product['id'] == $newProduct['id']) 
                             {
-                                $newProduct['name'] = $product->name;
-                                $newProduct['price'] = $product->price;
-                                $newProduct['available'] = $product->quantity_available;
+                                $newProduct['name'] = $product['name_front'];
+                                $newProduct['price'] = $product['price'];
+                                $newProduct['available'] = $product['quantity_available'];
                                 break;
                             }
                         }
