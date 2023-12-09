@@ -99,7 +99,7 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `t
 (21,	'Timon',	'Decathlon',	'79672772550',	1,	223054377,	'timondecathlon'),
 (22,	'S',	'R',	'998903480305',	1,	601131024,	'skidkabor'),
 (23,	'GsmServer™',	'',	'998981282810',	1,	197583494,	'unlockservers'),
-(25,	'Леночка',	'',	'998778886699',	1,	1752911328,	'KlevtsovaEV'),
+(25,	'Леночка',	'',	'79060685310',	3,	1752911328,	'KlevtsovaEV'),
 (27,	'Игорь',	'',	'79152032125',	1,	5677540667,	'LogunovIgor'),
 (28,	'Лол',	'',	'998777777777',	2,	892205925,	'rodionaka'),
 (29,	'Catherine',	'',	'79854377397',	3,	443133309,	'cazerine_hg'),
@@ -117,7 +117,9 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `t
 (41,	'',	'',	'',	3,	34404845,	'Miraziz_Xadichabegim'),
 (42,	'A.',	'N.',	'',	3,	302995860,	''),
 (43,	'Olimjon',	'Isomov',	'',	3,	769918709,	'isamovolim'),
-(44,	'ЭЛЁР',	'',	'998915882002',	3,	1232585433,	'');
+(44,	'ЭЛЁР',	'',	'998915882002',	3,	1232585433,	''),
+(45,	'Olesik',	'',	'79036616687',	3,	1061474542,	'Olesik_404'),
+(46,	'Мася Че',	'',	'79175577254',	3,	1638101427,	'');
 
 DROP TABLE IF EXISTS `order_vendors`;
 CREATE TABLE `order_vendors` (
@@ -156,7 +158,7 @@ INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`
 (19,	16,	1,	'{\"65\":10}',	0,	0,	680000,	7053.75,	4,	0),
 (20,	17,	1,	'{\"67\":11}',	0,	0,	600600,	0.01,	4,	0),
 (21,	20,	1,	'{\"67\":10,\"71\":10}',	4,	0,	1106000,	0.01,	5,	1),
-(22,	22,	3,	'{\"96\":10}',	0,	0,	200000,	24.35,	4,	0),
+(22,	22,	3,	'{\"96\":10}',	1,	0,	200000,	24.35,	5,	0),
 (23,	23,	1,	'{\"69\":46}',	1,	0,	2070000,	7053.75,	5,	0),
 (24,	24,	1,	'{\"65\":10,\"69\":10,\"79\":3}',	1,	0,	1331000,	2792.82,	5,	0),
 (25,	27,	1,	'{\"71\":10}',	2,	0,	560000,	7053.75,	3,	0),
@@ -164,7 +166,12 @@ INSERT INTO `order_vendors` (`id`, `order_id`, `vendor_id`, `products`, `status`
 (27,	29,	1,	'{\"65\":10}',	1,	0,	680000,	7053.75,	5,	0),
 (28,	30,	1,	'{\"65\":14}',	3,	1,	952000,	574.23,	5,	0),
 (29,	31,	10,	'{\"100\":10,\"107\":10}',	0,	0,	850000,	0,	0,	0),
-(30,	33,	2,	'{\"66\":1}',	0,	0,	67000,	0,	0,	0);
+(30,	33,	2,	'{\"66\":1}',	0,	0,	67000,	0,	0,	0),
+(31,	34,	3,	'{\"134\":1,\"135\":1,\"136\":1,\"139\":1,\"141\":1}',	2,	0,	8300,	9.09,	1,	0),
+(32,	39,	3,	'{\"139\":10}',	1,	0,	13000,	9.09,	1,	0),
+(34,	43,	1,	'{\"140\":1}',	1,	0,	1000,	33.45,	5,	0),
+(37,	46,	3,	'{\"137\":1,\"138\":1,\"139\":1}',	4,	0,	4300,	9.09,	2,	1),
+(42,	58,	3,	'{\"141\":2}',	4,	0,	2000,	9.09,	1,	1);
 
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
@@ -210,7 +217,18 @@ INSERT INTO `orders` (`id`, `customer_id`, `order_date`, `products`, `location`,
 (30,	37,	1694719776,	'{\"65\":14}',	'{\"latitude\":59.899858,\"longitude\":43.103967}',	952000),
 (31,	30,	1696660408,	'{\"100\":10,\"107\":10}',	'{\"latitude\":0,\"longitude\":0}',	850000),
 (32,	30,	1696660409,	'[]',	'{\"latitude\":0,\"longitude\":0}',	0),
-(33,	28,	1699025200,	'{\"66\":1}',	'{\"latitude\":0,\"longitude\":0}',	67000);
+(33,	28,	1699025200,	'{\"66\":1}',	'{\"latitude\":0,\"longitude\":0}',	67000),
+(34,	25,	1702115825,	'{\"134\":1,\"135\":1,\"136\":1,\"139\":1,\"141\":1}',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	8300),
+(35,	25,	1702115825,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(36,	25,	1702115826,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(37,	25,	1702115826,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(38,	25,	1702115827,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(39,	25,	1702116055,	'{\"139\":10}',	'{\"latitude\":55.877671,\"longitude\":37.932779}',	13000),
+(43,	25,	1702116220,	'{\"140\":1}',	'{\"latitude\":55.877671,\"longitude\":37.932779}',	1000),
+(46,	45,	1702117131,	'{\"137\":1,\"138\":1,\"139\":1}',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	4300),
+(47,	45,	1702117131,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(48,	45,	1702117132,	'[]',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	0),
+(58,	46,	1702117820,	'{\"141\":2}',	'{\"latitude\":55.877656,\"longitude\":37.932814}',	2000);
 
 DROP TABLE IF EXISTS `price_changes`;
 CREATE TABLE `price_changes` (
@@ -255,7 +273,7 @@ INSERT INTO `products` (`id`, `name`, `name2`, `name3`, `description`, `descript
 (66,	'Гипсокартон Форус потолочный влагостойкий (4.5мм)',	'',	'',	'',	'',	'',	'/upload/93638b48f683420a4a07935dadc49301.jpg',	0,	1,	1,	2,	564,	67000,	0,	80000,	0,	1,	0,	1,	1),
 (67,	'Гипсокартон Форус потолочный влагостойкий (9.5мм)',	'',	'',	'',	'',	'',	'/upload/d4736aa8275e5e3703a590e088917168.jpg',	0,	1,	1,	1,	464,	54600,	0,	55000,	0,	1,	0,	1,	1),
 (68,	'Штукатурка VERO потолочный влагостойкий (4.5мм)',	'',	'',	'',	'',	'',	'/upload/20217b3a3341825670074dd9b43aad41.jpg',	0,	2,	4,	2,	4564,	65600,	0,	70000,	0,	1,	0,	1,	1),
-(69,	'Штукатурка VERO потолочный влагостойкий (12.5мм)',	'',	'',	'',	'',	'',	'/upload/434dd1daff29e50d9fed8a1c5eafeb79.jpg',	0,	2,	4,	1,	454,	45000,	0,	55000,	0,	1,	0,	1,	1),
+(69,	'Штукатурка VERO потолочный влагостойкий (12.5мм)',	'',	'',	'',	'',	'',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	1,	454,	45000,	0,	55000,	0,	1,	0,	1,	1),
 (70,	'Штукатурка AZIA потолочный влагостойкий (4.5мм)',	'',	'',	'',	'',	'',	'/upload/c8368ec16ccd05c5d06bdeded5e5496e.jpg',	0,	2,	2,	2,	345,	46460,	0,	60000,	0,	1,	0,	1,	1),
 (71,	'Штукатурка AZIA потолочный влагостойкий (7.5мм)',	'',	'',	'',	'',	'',	'/upload/02a4ed4a4af6fb208fc29d7bb333c965.jpg',	0,	2,	2,	1,	55,	56000,	0,	70000,	0,	1,	0,	1,	1),
 (72,	'Шпаклёвка Форус потолочный влагостойкий (4.5мм)',	'',	'',	'',	'',	'',	'/upload/ddc4627b65fd2ca38d3c9f592e60890f.jpg',	0,	3,	1,	2,	46,	55000,	0,	70000,	0,	1,	0,	1,	1),
@@ -327,7 +345,8 @@ INSERT INTO `products` (`id`, `name`, `name2`, `name3`, `description`, `descript
 (138,	'nameRUS (RUS + Ўзбекча)',	'',	'nameЎзбекча (RUS + Ўзбекча)',	'descriptionRUS (RUS + Ўзбекча)',	'',	'descriptionЎзбекча (RUS + Ўзбекча)',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	3,	30,	1500,	0,	2000,	0,	4,	0,	1,	1),
 (139,	'',	'nameОʻzbekcha (Оʻzbekcha + Ўзбекча)',	'nameЎзбекча (Оʻzbekcha + Ўзбекча)',	'',	'descriptionОʻzbekcha (Оʻzbekcha + Ўзбекча)',	'descriptionЎзбекча (Оʻzbekcha + Ўзбекча)',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	3,	20,	1300,	0,	1500,	0,	1,	0,	1,	1),
 (140,	'товар поставщик1 рус+Ўзбек',	'',	'товар поставщик1 рус+Ўзбек',	'описание рус+Ўзбек',	'',	'описание рус+Ўзбек',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	1,	1,	1,	8,	1000,	0,	2000,	0,	2,	0,	1,	1),
-(141,	'nameRUS (RUS+Оʻzbekcha + Ўзбекча)',	'nameОʻzbekcha (RUS+Оʻzbekcha + Ўзбекча)',	'nameЎзбекча (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionRUS (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionОʻzbekcha (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionЎзбекча (RUS+Оʻzbekcha + Ўзбекча)',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	3,	15,	1000,	0,	1199,	0,	3,	0,	1,	1);
+(141,	'nameRUS (RUS+Оʻzbekcha + Ўзбекча)',	'nameОʻzbekcha (RUS+Оʻzbekcha + Ўзбекча)',	'nameЎзбекча (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionRUS (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionОʻzbekcha (RUS+Оʻzbekcha + Ўзбекча)',	'descriptionЎзбекча (RUS+Оʻzbekcha + Ўзбекча)',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	3,	15,	1000,	0,	1199,	0,	3,	0,	1,	1),
+(142,	'test Ташкент',	'',	'',	'test Ташкент (описание)',	'',	'',	'https://cdn.vseinstrumenti.ru/images/goods/stroitelnye-materialy/stroitelnaya-himiya/7478731/560x504/102576788.jpg',	0,	2,	4,	9,	15,	1000,	0,	1999,	0,	2,	0,	1,	1);
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
@@ -386,15 +405,15 @@ CREATE TABLE `vendors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `debt`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`, `categories`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	1854111,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'toPM44L6JWvsM',	1,	0,	1,	0,	1,	NULL),
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	1854111,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1,	0,	1,	NULL),
 (2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	NULL,	NULL,	NULL,	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1,	NULL),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'',	1,	0,	1,	0,	1,	NULL),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'tocoGvpzeAQIM',	1,	0,	1,	0,	1,	NULL),
 (4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	NULL,	NULL,	NULL,	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1,	NULL),
-(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'tosjZpK2WCPnk',	1,	0,	1,	0,	1,	NULL),
+(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	NULL,	998903480305,	NULL,	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'toT5Hjco99AMU',	1,	0,	1,	0,	1,	NULL),
 (6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050,	NULL),
-(9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	0,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	NULL,	1,	0,	1,	0,	1,	NULL),
+(9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	100,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	'',	1,	0,	1,	0,	1,	NULL),
 (10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1,	NULL),
 (11,	'Оптовик 1',	2,	'998876006809',	'sdndfnb@fb.ru',	NULL,	NULL,	NULL,	3,	2,	500,	'',	1701310809,	'hairMjVdU9JXc',	'crR76rgNfytk',	'',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"4\": \"Грунтовка\"}'),
 (12,	'Оптовик 2',	3,	'998465467688',	'sdndfnb@djg.ru',	NULL,	NULL,	NULL,	3,	1,	0,	'',	1701389901,	'hae9gWFPPuJ6',	'crAQDBLYhT9w',	'totbqfyxs93Z',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"8\": \"Плиточный клей\", \"9\": \"Наливной пол и Гидроизоляция\"}');
 
--- 2023-12-08 09:21:49
+-- 2023-12-09 12:22:22
