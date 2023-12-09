@@ -4,10 +4,10 @@
     class Product
     {
         public int $id;
-        public string $name;
+        public ?string $name;
         public ?string $name2;
         public ?string $name3;
-        public string $description;
+        public ?string $description;
         public ?string $description2;
         public ?string $description3;
         public string $photo;

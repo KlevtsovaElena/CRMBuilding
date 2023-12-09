@@ -63,12 +63,11 @@ if($role !== 2) {
 
                <!-- наименование-->
                 <div class="form-add-product__elements-item">
-                    <p>Наименование</p>
+                    <p>Наименование (заполните хотя бы 1 вариант)</p>
                     <div class="name-container">        
                         <!-- наименование Русский-->
-                        <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
-                        <div class="error-info d-none"></div>
-
+                        <p>Русский</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
+                        
                         <?php 
                             if($product[0]['name2'] == NULL || $product[0]['name2'] == '') {$name2='';} else {$name2=$product[0]['name2'];}
                             if($product[0]['name3'] == NULL || $product[0]['name3'] == '') {$name3='';} else {$name3=$product[0]['name3'];}
@@ -82,12 +81,11 @@ if($role !== 2) {
 
                 <!-- описание-->
                 <div class="form-add-product__elements-item">
-                    <p>Описание</p>
+                    <p>Описание (заполните хотя бы 1 вариант)</p>
                     <div class="description-container">    
                         <!-- описание Русский -->
-                        <p>Русский (обязательно)</p><textarea id="description" name="description" required><?= $product[0]['description']; ?></textarea>
-                        <div class="error-info d-none"></div> 
-
+                        <p>Русский</p><textarea id="description" name="description" required><?= $product[0]['description']; ?></textarea>
+                       
                         <?php 
                             if($product[0]['description2'] == NULL || $product[0]['description2'] == '') {$description2='';} else {$description2=$product[0]['description2'];}
                             if($product[0]['description3'] == NULL || $product[0]['description3'] == '') {$description3='';} else {$description3=$product[0]['description3'];}

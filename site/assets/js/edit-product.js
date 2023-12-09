@@ -29,10 +29,6 @@ function editProduct(role) {
     let obj;
     
     // соберём json для передачи на сервер
-    console.log('priceOld', priceOld);
-    console.log('maxPriceOld', maxPriceOld);
-    console.log('price', price.value);
-    console.log('max_price', max_price.value);
 
     if (!new_photo.value) {
         obj = {
@@ -124,8 +120,29 @@ function validationEdit() {
         priceValue = Number(price.value);
     } else {priceValue = 0;}
 
+    // валидация наименования и описания
+    // должно быть заполнено хотя бы одно поле наименования и соответвующее поле описания, 
+    // могут быть заполнены все
+    if(!nameProduct.value.trim() && !nameProduct2.value.trim() && !nameProduct3.value.trim()) {
+        alert("Нет наименования");
+        hasError = true;
+        return hasError;
+    } else if(!description.value.trim() && !description2.value.trim() && !description3.value.trim()) {
+        alert("Нет описания");
+        hasError = true;
+        return hasError;
+    } else if((nameProduct.value.trim() && !description.value.trim()) || (nameProduct2.value.trim() && !description2.value.trim()) || (nameProduct3.value.trim() && !description3.value.trim())) {
+        alert("Нет подходящего описания");
+        hasError = true;
+        return hasError;
+    } else if((!nameProduct.value.trim() && description.value.trim()) || (!nameProduct2.value.trim() && description2.value.trim()) || (!nameProduct3.value.trim() && description3.value.trim())) {
+        alert("Нет подходящего наименования");
+        hasError = true;
+        return hasError;
+    } 
+
    // валидация полей (кроме vendorId)
-   [nameProduct, description, brand_id, category_id, unit_id, 
+   [brand_id, category_id, unit_id, 
     quantity_available, price, max_price, is_active].forEach(item => {
 
         // console.log(item.getAttribute('name') + "    " + item.value);

@@ -256,7 +256,7 @@ function renderListProducts(totalProducts) {
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${photo}',  totalProducts['products'][i]['photo'])
-                                                        .replace('${name}', totalProducts['products'][i]['name'])
+                                                        .replace('${name}', totalProducts['products'][i]['name_front'])
                                                         .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                         .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'].toLocaleString('ru'))
