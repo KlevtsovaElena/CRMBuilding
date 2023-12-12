@@ -1,0 +1,14 @@
+.wholesaler-to-admin {
+    margin-bottom: 10px;
+}
+
+.feedback {
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.title-send:hover {
+    text-decoration: underline;
+    transition: all 0.4s;
+    cursor: pointer;
+}
