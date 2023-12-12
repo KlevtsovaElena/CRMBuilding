@@ -120,8 +120,29 @@ function validationAdd() {
         priceValue = Number(price.value);
     } else {priceValue = 0;}
 
-    // валидация полей (кроме vendorId)
-    [nameProduct, description, new_photo, brand_id, category_id, unit_id,
+    // валидация наименования и описания
+    // должно быть заполнено хотя бы одно поле наименования и соответвующее поле описания, 
+    // могут быть заполнены все
+    if(!nameProduct.value.trim() && !nameProduct2.value.trim() && !nameProduct3.value.trim()) {
+        alert("Нет наименования");
+        hasError = true;
+        return hasError;
+    } else if(!description.value.trim() && !description2.value.trim() && !description3.value.trim()) {
+        alert("Нет описания");
+        hasError = true;
+        return hasError;
+    } else if((nameProduct.value.trim() && !description.value.trim()) || (nameProduct2.value.trim() && !description2.value.trim()) || (nameProduct3.value.trim() && !description3.value.trim())) {
+        alert("Нет подходящего описания");
+        hasError = true;
+        return hasError;
+    } else if((!nameProduct.value.trim() && description.value.trim()) || (!nameProduct2.value.trim() && description2.value.trim()) || (!nameProduct3.value.trim() && description3.value.trim())) {
+        alert("Нет подходящего наименования");
+        hasError = true;
+        return hasError;
+    } 
+
+    // валидация других полей (кроме vendorId)
+    [new_photo, brand_id, category_id, unit_id,
         quantity_available, price, max_price, vendor_id, is_active].forEach(item => {
     
             const errorInfoContainer = item.closest('.form-add-product__elements-item').querySelector('.error-info');

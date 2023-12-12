@@ -195,55 +195,163 @@ type Product struct {
 // словарь с переводом на разные языки
 var languages = map[string]map[string]string{
 	"ru": {
-		"change_number":         "Изменить номер",
-		"change_city":           "Изменить город",
-		"change_language":       "Изменить язык",
-		"public_offer":          "Публичная офферта",
-		"information":           "Информация",
-		"become_partner":        "Стать партнером",
-		"back":                  "Назад",
-		"main_menu":             "Главное меню",
-		"order":                 "Заказать",
-		"my_orders":             "Мои заказы",
-		"settings":              "Настройки",
-		"contact":               "Связаться",
-		"cart":                  "Корзина",
-		"current_prices":        "Актуальные Цены на строительные материалы",
-		"current_exchange_rate": "Актуальный курс валют",
+		"change_number":                          "Изменить номер",
+		"change_city":                            "Изменить город",
+		"change_language":                        "Изменить язык",
+		"public_offer":                           "Публичная офферта",
+		"information":                            "Информация",
+		"become_partner":                         "Стать партнёром",
+		"back":                                   "Назад",
+		"main_menu":                              "Главное меню",
+		"order":                                  "Заказать",
+		"my_orders":                              "Мои заказы",
+		"settings":                               "Настройки",
+		"contact":                                "Связаться",
+		"cart":                                   "Корзина",
+		"current_prices":                         "Актуальные Цены на строительные материалы",
+		"current_exchange_rate":                  "Актуальный курс валют",
+		"order_to_your_address":                  "Заказать на свой адрес",
+		"order_to_another_address":               "Заказать на другой адрес",
+		"specify_convenient_address":             "Укажите удобный для Вас адрес",
+		"share_location":                         "Поделится местоположением?",
+		"decline":                                "Отказаться",
+		"send_required_geoposition_via_telegram": "Отправьте нужную геопозицию через телеграмм",
+		"your_city":                              "Ваш город",
+		"product_location_city":                  "Город, в котором находится товар",
+		"cant_order_these_products":              "Вы не сможете заказать эти товары, выберите другие",
+		"thank_you_for_choosing_stroybot":        "Благодарим Вас за то, что выбрали Стройбот, с вами свяжутся в течении часа",
+		"confirm_order":                          "Оформить заказ",
+		"empty_cart":                             "Корзина пуста",
+		"average_market_price":                   "Итого средняя цена на рынке",
+		"bot_total_price":                        "Итого цена бота",
+		"you_saved":                              "Вы сэкономили",
+		"yes":                                    "Да",
+		"no":                                     "Нет",
+		"share_phone_number":                     "Поделится номером телефона",
+		"unable_to_continue_without_phone":       "К сожалению вы не сможете пройти дальше, если не укажите номер телефона",
+		"choose_your_city":                       "Выберите свой город",
+		"no_products_for_your_request":           "Товаров по вашему запросу нет",
+		"choose_material":                        "Выберите материал",
+		"choose_brand":                           "Выберите бренд",
+		"go_to_cart":                             "Перейти в корзину",
+		"go_to":                                  "Перейти",
+		"feedback":                               "Обратная связь",
+		"choose_language":                        "Выберите язык",
+		"market_price":                           "Среднерыночная цена",
+		"bot_price":                              "STROYBOT цена",
+		"drop_cart":                              "Очистить корзину",
+		"dropped_cart":                           "Корзина очищена",
+		"by_phone":                               "С помощью звонка",
+		"by_chat":                                "Написать в чате",
+		"choose_way":                             "Выберите удобный способ связи",
+		"go_to_chat":                             "Перейти в чат",
+		"send_your_number":                       "Введите свой номер телефона в формате +998 00 000 00 00 без '+' и пробелов",
 	},
 	"uzbek": {
-		"change_number":         "Raqamni o’zgartirish",
-		"change_city":           "Shaharni o’zgartirish",
-		"change_language":       "Tilni o’zgartirish",
-		"public_offer":          "Ommaviy taklif",
-		"information":           "Ma'lumot",
-		"become_partner":        "Hamkor bo'lish",
-		"back":                  "Ortga",
-		"main_menu":             "Asosiy menyu",
-		"order":                 "Buyurtma berish",
-		"my_orders":             "Mening buyurtmalarim",
-		"settings":              "Sozlamalar",
-		"contact":               "Bog'lanish",
-		"cart":                  "Savat",
-		"current_prices":        "Qurilish materiallarining amaldagi narxlari",
-		"current_exchange_rate": "Joriy valyuta kursi",
+		"change_number":                          "Raqamni o’zgartirish",
+		"change_city":                            "Shaharni o’zgartirish",
+		"change_language":                        "Tilni o’zgartirish",
+		"public_offer":                           "Ommaviy taklif",
+		"information":                            "Ma'lumot",
+		"become_partner":                         "Hamkor bo'lish",
+		"back":                                   "Ortga",
+		"main_menu":                              "Asosiy menyu",
+		"order":                                  "Buyurtma berish",
+		"my_orders":                              "Mening buyurtmalarim",
+		"settings":                               "Sozlamalar",
+		"contact":                                "Bog'lanish",
+		"cart":                                   "Savat",
+		"current_prices":                         "Qurilish materiallarining amaldagi narxlari",
+		"current_exchange_rate":                  "Joriy valyuta kursi",
+		"order_to_your_address":                  "O’z manzilga buyurtma berish",
+		"order_to_another_address":               "Boshqa manzilga buyurtma berish",
+		"specify_convenient_address":             "O’zingizga qulay bo’lgan manzilni ko’rsating",
+		"share_location":                         "Joylashuvingizni baham koʻrasizmi?",
+		"decline":                                "Rad etish",
+		"send_required_geoposition_via_telegram": "Telegram orqali kerakli geografik joylashuv (geopozitsiya)ni yuboring",
+		"your_city":                              "Shahringiz",
+		"product_location_city":                  "Tovar joylashgan shahar",
+		"cant_order_these_products":              "Ushbu tovarlarga buyurtma bera olmaysiz, boshqalarni tanlang",
+		"thank_you_for_choosing_stroybot":        "Stroybotni tanlaganingiz uchun tashakkur, siz bilan bir soat ichida bog'lanishadi",
+		"confirm_order":                          "Buyurtmani rasmiylashtirish",
+		"empty_cart":                             "Savat bo'sh",
+		"average_market_price":                   "Bozorda jami o'rtacha narx",
+		"bot_total_price":                        "Botning umumiy narxi",
+		"you_saved":                              "Tejab qoldingiz",
+		"yes":                                    "Ha",
+		"no":                                     "Yo’q",
+		"share_phone_number":                     "Telefon raqamini ulashish",
+		"unable_to_continue_without_phone":       "Afsuski, agar siz telefon raqamini ko'rsatmasangiz, keyinchalik davom eta olmaysiz",
+		"choose_your_city":                       "Shahringizni tanlang",
+		"no_products_for_your_request":           "So'rovingiz bo'yicha tovarlar yo'q",
+		"choose_material":                        "Materialni tanlang",
+		"choose_brand":                           "Brendni tanlang",
+		"go_to_cart":                             "Savatga o’tish",
+		"go_to":                                  "O’tish",
+		"feedback":                               "Fikr-muolоҳaza",
+		"choose_language":                        "Tilni tanlang",
+		"market_price":                           "O’rtacha bozor narxi",
+		"bot_price":                              "STROYBOT narxi",
+		"drop_cart":                              "Savatni tozalash",
+		"dropped_cart":                           "Savat tozalangan",
+		"by_phone":                               "Qo’ng’iroq yordamida",
+		"by_chat":                                "Chatga yozish",
+		"choose_way":                             "Qulay bo’lgan aloqa usulini tanlang",
+		"go_to_chat":                             "Chatga o’tish",
+		"send_your_number":                       "Telefon raqamingizni +998 00 000 00 00 formatda kiriting, '+' siz va bo’shliqlarsiz",
 	},
 	"uzbekcha": {
-		"change_number":         "Рақамни ўзгартириш",
-		"change_city":           "Шаҳарни ўзгартириш",
-		"change_language":       "Тилни ўзгартириш",
-		"public_offer":          "Оммавий таклиф",
-		"information":           "Маълумот",
-		"become_partner":        "Хамкор бўлиш)",
-		"back":                  "Ортга",
-		"main_menu":             "Асосий меню",
-		"order":                 "Буюртма бериш",
-		"my_orders":             "Mенинг буюртмаларим",
-		"settings":              "Созламалар",
-		"contact":               "Боғланиш",
-		"cart":                  "Сават",
-		"current_prices":        "Қурилиш материалларининг амалдаги нархлари",
-		"current_exchange_rate": "Жорий валюта курси",
+		"change_number":                          "Рақамни ўзгартириш",
+		"change_city":                            "Шаҳарни ўзгартириш",
+		"change_language":                        "Тилни ўзгартириш",
+		"public_offer":                           "Оммавий таклиф",
+		"information":                            "Маълумот",
+		"become_partner":                         "Хамкор бўлиш)",
+		"back":                                   "Ортга",
+		"main_menu":                              "Асосий меню",
+		"order":                                  "Буюртма бериш",
+		"my_orders":                              "Mенинг буюртмаларим",
+		"settings":                               "Созламалар",
+		"contact":                                "Боғланиш",
+		"cart":                                   "Сават",
+		"current_prices":                         "Қурилиш материалларининг амалдаги нархлари",
+		"current_exchange_rate":                  "Жорий валюта курси",
+		"order_to_your_address":                  "Ўз манзилга буюртма бериш",
+		"order_to_another_address":               "Бошқа манзилга буюртма бериш",
+		"specify_convenient_address":             "Ўзингизга қулай бўлган манзилни кўрсатинг",
+		"share_location":                         "Жойлашувингизни баҳам кўрасизми?",
+		"decline":                                "Рад этиш",
+		"send_required_geoposition_via_telegram": "Telegram орқали керакли географик жойлашув (геопозиция)ни юборинг",
+		"your_city":                              "Шаҳрингиз",
+		"product_location_city":                  "Товар жойлашган шаҳар",
+		"cant_order_these_products":              "Ушбу товарларга буюртма бера олмаисиз, бошқаларни танланг",
+		"thank_you_for_choosing_stroybot":        "Стройботни танлаганингиз учун ташаккур, сиз билан бир соат ичида боғланишади",
+		"confirm_order":                          "Буюртмани расмийлаштириш",
+		"empty_cart":                             "Сават бўш",
+		"average_market_price":                   "Бозорда жами ўртача нарх",
+		"bot_total_price":                        "Ботнинг умумий нархи",
+		"you_saved":                              "Тежаб қолдингиз",
+		"yes":                                    "Ҳа",
+		"no":                                     "Йўқ",
+		"share_phone_number":                     "Телефон рақамини улашиш",
+		"unable_to_continue_without_phone":       "Афсуски, агар сиз телефон рақамини кўрсатмасангиз, кейинчалик давом эта олмайсиз",
+		"choose_your_city":                       "Шаҳрингизни танланг",
+		"no_products_for_your_request":           "Сўровингиз бўйича товарлар йўқ",
+		"choose_material":                        "Материални танланг",
+		"choose_brand":                           "Брендни танланг",
+		"go_to_cart":                             "Саватга ўтиш",
+		"go_to":                                  "Ўтиш",
+		"feedback":                               "Фикр-мулоҳаза",
+		"choose_language":                        "Тилни танланг",
+		"market_price":                           "Ўртача бозор нархи",
+		"bot_price":                              "СТРОЙБОТ нархи",
+		"drop_cart":                              "Саватни тозалаш",
+		"dropped_cart":                           "Сават тозаланган",
+		"by_phone":                               "Қўнғироқ ёрдамида",
+		"by_chat":                                "Чатга ёзиш",
+		"choose_way":                             "Қулай бўлган алоқа усулини танланг",
+		"go_to_chat":                             "Чатга ўтиш",
+		"send_your_number":                       "Телефон рақамингизни +998 00 000 00 00 форматда киритинг, «+» сиз ва бўшлиқларсиз",
 	},
 }
 
@@ -596,7 +704,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				// Используем полученные данные и подставляем их в кнопки
 				for _, userdetail := range userdetails {
 
-					menuText := url.QueryEscape("\nВаш город: ")
+					menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
 					sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
@@ -615,13 +723,13 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"keyboard": [][]map[string]interface{}{
 					{
 						{
-							"text":            "Да",
+							"text":            languages[usersDB[chatId].Language]["yes"],
 							"request_contact": true,
 						},
 					},
 					{
 						{
-							"text": "Нет",
+							"text": languages[usersDB[chatId].Language]["no"],
 						},
 					},
 				},
@@ -630,7 +738,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится номером телефона", keyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["share_phone_number"], keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			user.Language = button
@@ -650,7 +758,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "К сожалению вы не сможете пройти дальше, если не укажите номер телефона", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["unable_to_continue_without_phone"], inlineKeyboard)
 			user := usersDB[chatId]
 			user.Step -= 1
 			usersDB[chatId] = user
@@ -695,7 +803,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите свой город 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_your_city"]+" 👇", inlineKeyboard)
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -770,7 +878,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
-				menuText := url.QueryEscape("\nВаш город: ")
+				menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
 				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
@@ -819,7 +927,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
-				menuText := url.QueryEscape("\nВаш город: ")
+				menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
 				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
@@ -855,7 +963,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					"inline_keyboard": buttons,
 				}
 
-				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
+				sendMessage(chatId, languages[usersDB[chatId].Language]["no_products_for_your_request"], inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -881,7 +989,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите материал 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_material"]+" 👇", inlineKeyboard)
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -915,7 +1023,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					"inline_keyboard": buttons,
 				}
 
-				sendMessage(chatId, "Товаров по вашему запросу нет", inlineKeyboard)
+				sendMessage(chatId, languages[usersDB[chatId].Language]["no_products_for_your_request"], inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -941,7 +1049,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите бренд 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_brand"]+" 👇", inlineKeyboard)
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -966,7 +1074,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			for _, userdetail := range userdetails {
 
 				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
+				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -989,7 +1097,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
 						},
-						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1003,7 +1111,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					fmt.Println(product.Photo)
 
 					//создание запроса
-					caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + "Цена среднерыночная \n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\nЦена Стройбота \n<b>" + strconv.Itoa(product.Price) + " сум</b>")
+					caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + languages[usersDB[chatId].Language]["market_price"] + "\n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\n" + languages[usersDB[chatId].Language]["bot_price"] + "\n<b>" + strconv.Itoa(product.Price) + " сум</b>")
 					apiURL := ""
 
 					if strings.Contains(product.Photo, "http") {
@@ -1102,12 +1210,14 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 						"inline_keyboard": buttons,
 					}
 
-					sendMessage(chatId, "Корзина пуста", inlineKeyboard)
+					sendMessage(chatId, languages[usersDB[chatId].Language]["empty_cart"], inlineKeyboard)
 				} else {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
-						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
+						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
@@ -1117,7 +1227,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					}
 
 					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					encodedText := url.QueryEscape(languages[usersDB[chatId].Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[usersDB[chatId].Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
 					finalText := encodedCartText + encodedText
 
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
@@ -1140,13 +1250,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 						"inline_keyboard": buttons,
 					}
 
-					sendMessage(chatId, "Корзина пуста", inlineKeyboard)
+					sendMessage(chatId, languages[usersDB[chatId].Language]["empty_cart"], inlineKeyboard)
 
 				} else {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
-						{{"text": "Отчистить корзину ❌", "callback_data": "dropCart"}},
+
+						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+
 						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 					}
 
@@ -1156,7 +1268,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					}
 
 					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape("Итого средняя цена на рынке\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\nИтого цена бота \n"+strconv.Itoa(finalPrice)+" сум\nВы сэкономили\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					encodedText := url.QueryEscape(languages[usersDB[chatId].Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[usersDB[chatId].Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
 					finalText := encodedCartText + encodedText
 
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
@@ -1171,8 +1283,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс для покупки выбранных товаров пользователем
 		case usersDB[chatId].Step == 9 && button == "buy":
 			buttons := [][]map[string]interface{}{
-				{{"text": "Заказать на свой адрес", "callback_data": "myAdress"}},
-				{{"text": "Заказать на другой адрес", "callback_data": "anotherAdress"}},
+				{{"text": languages[usersDB[chatId].Language]["order_to_your_address"], "callback_data": "myAdress"}},
+				{{"text": languages[usersDB[chatId].Language]["order_to_another_address"], "callback_data": "anotherAdress"}},
 			}
 
 			// Создаем объект инлайн клавиатуры
@@ -1181,7 +1293,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Укажите удобный для Вас адрес", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["specify_convenient_address"], inlineKeyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1195,13 +1307,13 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"keyboard": [][]map[string]interface{}{
 					{
 						{
-							"text":             "Да",
+							"text":             languages[usersDB[chatId].Language]["yes"],
 							"request_location": true,
 						},
 					},
 					{
 						{
-							"text": "Нет",
+							"text": languages[usersDB[chatId].Language]["no"],
 						},
 					},
 				},
@@ -1210,7 +1322,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится местоположением?", keyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["share_location"], keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1223,7 +1335,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"keyboard": [][]map[string]interface{}{
 					{
 						{
-							"text": "Отказаться",
+							"text": languages[usersDB[chatId].Language]["decline"],
 						},
 					},
 				},
@@ -1232,7 +1344,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Отправьте нужную геопозицию через телеграмм", keyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["send_required_geoposition_via_telegram"], keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			usersDB[chatId] = user
@@ -1299,7 +1411,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 							// обнуляем корзину
 							user.Cart = map[int]int{}
-							errorText := url.QueryEscape("\nВаш город: " + userdetail.CityName + "\nГород, в котором находится товар: " + product.CityName + "\nВы не сможете заказать эти товары, выберите другие 🙏")
+							errorText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": " + userdetail.CityName + "\n" + languages[usersDB[chatId].Language]["product_location_city"] + ": " + product.CityName + "\n" + languages[usersDB[chatId].Language]["cant_order_these_products"] + " 🙏")
 							// Отправляем сообщение с клавиатурой и перезаписываем шаг
 							sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+errorText, keyboard)
 
@@ -1360,7 +1472,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							user.Cart = map[int]int{}
 
 							// Отправляем сообщение с клавиатурой и перезаписываем шаг
-							sendMessage(chatId, "Благодарим Вас за то, что выбрали Стройбот, с вами свяжутся в течении часа", keyboard)
+							sendMessage(chatId, languages[usersDB[chatId].Language]["thank_you_for_choosing_stroybot"], keyboard)
 							user.Step = 5
 							usersDB[chatId] = user
 							break
@@ -1398,7 +1510,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1437,7 +1549,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 						{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+					{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 				}
 
 				// Создаем объект клавиатуры
@@ -1480,7 +1592,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1519,7 +1631,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 						{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+					{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 				}
 
 				// Создаем объект клавиатуры
@@ -1563,7 +1675,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
-						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					inlineKeyboard := map[string]interface{}{
@@ -1609,7 +1721,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
-						{{"text": "Перейти в корзину 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					inlineKeyboard := map[string]interface{}{
@@ -1635,7 +1747,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			usersDB[chatId] = user
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Корзина отчищена", nil)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["dropped_cart"], nil)
 
 		}
 
@@ -1657,7 +1769,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 			buttons := [][]map[string]interface{}{
-				{{"text": "Перейти 🌐", "url": channelURL}},
+				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": channelURL}},
 				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
@@ -1687,7 +1799,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 			buttons := [][]map[string]interface{}{
-				{{"text": "Перейти 🌐", "url": channelURL}},
+				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": channelURL}},
 				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
@@ -1718,9 +1830,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if text == languages[usersDB[chatId].Language]["contact"]+" 📞" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": "С помощью звонка 📲", "callback_data": "withPhone"}},
-				{{"text": "Написать в чате 💬", "callback_data": "withСhat"}},
-				{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[usersDB[chatId].Language]["by_phone"] + " 📲", "callback_data": "withPhone"}},
+				{{"text": languages[usersDB[chatId].Language]["by_chat"] + " 💬", "callback_data": "withСhat"}},
+				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1728,7 +1840,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите удобный способ связи 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_way"]+" 👇", inlineKeyboard)
 
 		}
 
@@ -1771,8 +1883,8 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "withСhat" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": "Перейти 🌐", "url": "https://arzongo.uz"}},
-				{{"text": "Назад 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": "https://arzongo.uz"}},
+				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1780,7 +1892,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Перейти в чат 💬", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["go_to_chat"]+" 💬", inlineKeyboard)
 
 			user := usersDB[chatId]
 			user.Step = 4
@@ -1804,9 +1916,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					{"text": languages[usersDB[chatId].Language]["public_offer"], "callback_data": "oferta"}},
 
 				{{"text": languages[usersDB[chatId].Language]["information"], "callback_data": "info"},
-					{"text": "Стать партнёром", "callback_data": "partnership"}},
+					{"text": languages[usersDB[chatId].Language]["become_partner"], "callback_data": "partnership"}},
 
-				{{"text": "Обратная связь", "callback_data": "book"}},
+				{{"text": languages[usersDB[chatId].Language]["feedback"], "callback_data": "book"}},
 			}
 
 			buttons = append(buttons, []map[string]interface{}{
@@ -1851,7 +1963,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Стать партнёром", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["become_partner"], inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку обратная связь
@@ -1866,7 +1978,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Обратная связь", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["feedback"], inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку оферта
@@ -1899,7 +2011,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите язык 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_language"]+" 👇", inlineKeyboard)
 
 			user := usersDB[chatId]
 			user.Step = 4
@@ -1940,7 +2052,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Выберите свой город 👇", inlineKeyboard)
+			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_your_city"]+" 👇", inlineKeyboard)
 			user := usersDB[chatId]
 			user.Step = 4
 			usersDB[chatId] = user
@@ -1950,7 +2062,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "number" {
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, url.QueryEscape("Введите свой номер телефона в формате +998 00 000 00 00 без '+' и пробелов"), nil)
+			sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["send_your_number"]), nil)
 
 			user := usersDB[chatId]
 			user.Step = 4

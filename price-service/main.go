@@ -86,7 +86,7 @@ func makeGoodsList() {
 
 		fmt.Println("enter in categories")
 
-		var caption string = "<b>" + category.CategoryName + "</b>"
+		var caption string = "<b>#" + category.CategoryName + "</b>"
 		var product_photo string
 		var link string = "<b>#" + category.CategoryName + "</b>"
 

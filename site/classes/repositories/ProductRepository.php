@@ -13,6 +13,13 @@ class ProductRepository extends BaseRepository
     const TABLE_NAME = 'products';
     const CLASS_NAME = 'models\Product';
 
+    const GET_BY_PREDICATE_QUERY_WITH_NAME_FRONT = 'SELECT *, 
+                                    CASE WHEN `name` <> "" THEN `name`
+                                        WHEN `name2` <> "" THEN `name2` 
+                                        WHEN `name3` <> "" THEN `name3`
+                                        ELSE "Наименование"
+                                    END AS `name_front`  FROM `%s` %s';
+
     const GET_COUNT_WITH_DETAILS = 'SELECT COUNT(*) as `count`
                                         FROM products p
                                         INNER JOIN categories c ON
@@ -59,7 +66,13 @@ class ProductRepository extends BaseRepository
                                         cit.`name` as `city_name`,
                                         v.`price_confirmed` as `price_confirmed`,
                                         p.`is_active` as `is_active`,
-                                        p.`is_confirm` as `is_confirm`
+                                        p.`is_confirm` as `is_confirm`,
+                                    CASE 
+                                        WHEN p.`name` <> ""  THEN p.`name`
+                                        WHEN p.`name2` <> "" THEN p.`name2`
+                                        WHEN p.`name3` <> "" THEN p.`name3`
+                                        ELSE "Наименование"
+                                    END  AS `name_front`
                                     FROM products p
                                         INNER JOIN categories c ON
                                             c.`id` = p.`category_id`
@@ -83,6 +96,10 @@ class ProductRepository extends BaseRepository
                                         p.is_confirm = 0 
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
+
+    const UPDATE_PRICE_MASS_BY_VENDOR = 'UPDATE products p
+                                        SET p.is_confirm = 0, %s
+                                         %s';
 
     // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
     //                                     p.`name` as `name`,
@@ -166,7 +183,8 @@ class ProductRepository extends BaseRepository
         'city_name' => 'cit.name', 
         'price_confirmed' => 'v.price_confirmed',
         'is_active' => 'p.is_active',
-        'is_confirm' => 'p.is_confirm'
+        'is_confirm' => 'p.is_confirm',
+        'name_front' => 'p.name_front'
     ];
 
     public function getTableName(): string
@@ -256,6 +274,25 @@ class ProductRepository extends BaseRepository
         return array_map([$this, 'map'], $statement->fetchAll());
     }
 
+    public function getAllByIdsWithNameFront(array $ids): array
+    {
+        if (is_null($ids) || count($ids) == 0)
+            return [];
+
+        $queryParams = $this->getQueryIdsArrayParams($ids);
+        $query = sprintf(static::GET_BY_PREDICATE_QUERY_WITH_NAME_FRONT, $this->getTableName(), 'WHERE `id` IN (' . implode(',', array_keys($queryParams)) . ')');
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute($queryParams);
+
+        $result = $statement->fetchAll();
+        
+        return $result;
+    }
+
+
+
+
     private function getQueryIdsArrayParams(array $ids)
     {
         $resultArray = [];
@@ -306,6 +343,13 @@ class ProductRepository extends BaseRepository
         $statement->execute([
             'vendor_id' => $vendorId
         ]);
+    }
+
+    public function updatePriceMassByVendor(array $inputParams) 
+    {
+        $query = sprintf(static::UPDATE_PRICE_MASS_BY_VENDOR, $inputParams['set_string'], $inputParams['where_string']);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute();
     }
 }
 ?>

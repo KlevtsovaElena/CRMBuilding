@@ -290,7 +290,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
                                                                 .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                                 .replace('${photo}',  totalProducts['products'][i]['photo'])
-                                                                .replace('${name}', totalProducts['products'][i]['name'])
+                                                                .replace('${name}', totalProducts['products'][i]['name_front'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                                 .replace('${city_name}', totalProducts['products'][i]['city_name'])
@@ -317,7 +317,7 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${vendor_id}', totalProducts['products'][i]['vendor_id'])
                                                                 .replace('${vendor_name}', totalProducts['products'][i]['vendor_name'])
                                                                 .replace('${photo}',  totalProducts['products'][i]['photo'])
-                                                                .replace('${name}', totalProducts['products'][i]['name'])
+                                                                .replace('${name}', totalProducts['products'][i]['name_front'])
                                                                 .replace('${category_id}', totalProducts['products'][i]['category_name'])
                                                                 .replace('${brand_id}', totalProducts['products'][i]['brand_name'])
                                                                 .replace('${city_name}', totalProducts['products'][i]['city_name'])
@@ -345,6 +345,16 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${checked-confirm}', checkedConfirm)
                                                                 .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
  
+        }
+
+        // если totalProducts['products'][i]['max_price'] меньше, чем totalProducts['products'][i]['price'], то выделим цены красным
+        if(Number(totalProducts['products'][i]['max_price']) <= Number(totalProducts['products'][i]['price'])) {
+            let priceElColor =  document.querySelectorAll('.price-mark');
+            let lengthPriceElColor = priceElColor.length;
+
+            priceElColor[lengthPriceElColor-1].style.color = "red";
+            priceElColor[lengthPriceElColor-2].style.color = "red";  
+
         }
     }
 
@@ -787,8 +797,6 @@ function checkboxChangedProductActive(id) {
         });
     }
 
-    console.log(obj);
-
     // отправим запрос на изменение 
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
@@ -801,7 +809,7 @@ function checkboxChangedProductActive(id) {
 
 function checkboxChangedProductConfirm(id) {
     // проверяем корректность токена
-    check()
+    check();
 
     let isChecked = window.confirm('Вы действительно хотите изменить статус товара?');
 
@@ -818,11 +826,28 @@ function checkboxChangedProductConfirm(id) {
     //если при нажатии чекбокс активировн
     if (event.target.checked) {
 
+        
+        // доп проверим , чтобы среднерын цена была больше, чем цена поставщика
+        // если это не так, то запрещаем одобрять товар ии выводим сообщение
+
+        // найдем родителя-строку таблицы
+        let parentRow = event.target.closest('.list-products__row');
+        // и элементы, где прописаны цены
+        let tdPriceEl = parentRow.querySelectorAll('.price-mark');
+
+        //сравним цены
+        if(Number(tdPriceEl[0].getAttribute('data-price-num')) >= Number(tdPriceEl[1].getAttribute('data-price-num')))  {
+            alert('У данного товара цена больше среднерыночной! Товар не будет подтверждён');
+            event.target.checked = false;
+            return;
+        }   
+        
         //собираем параметры для передачи в бд
         obj = JSON.stringify({
             'id': id,
             'is_confirm': 1
         });
+        
 
     //если при нажатии чекбокс деактивирован
     } else {
@@ -832,8 +857,6 @@ function checkboxChangedProductConfirm(id) {
             'is_confirm': 0
         });
     }
-
-    console.log(obj);
 
     // отправим запрос на изменение 
     sendRequestPOST(mainUrl + '/api/products.php', obj);

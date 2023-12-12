@@ -45,16 +45,16 @@ class GetProductsSalesByPeriodController extends BaseController
             }
         }
 
-        $existsProductInfo = $this->productRepository->getAllByIds(array_keys($orderVendorsProducts));
+        $existsProductInfo = $this->productRepository->getAllByIdsWithNameFront(array_keys($orderVendorsProducts));
 
         foreach ($orderVendorsWithProductData as $key => $value) {
             foreach ($orderVendorsWithProductData[$key]['products'] as $id => $value) {
                 foreach ($existsProductInfo as $existProduct) {
-                    if ($existProduct->id == $id) {
-                        $orderVendorsWithProductData[$key]['products'][$id]['price'] = $existProduct->price;
+                    if ($existProduct['id'] == $id) {
+                        $orderVendorsWithProductData[$key]['products'][$id]['price'] = $existProduct['price'];
                         $orderVendorsWithProductData[$key]['products'][$id]['total_price'] = $orderVendorsWithProductData[$key]['products'][$id]['quantity'] * $orderVendorsWithProductData[$key]['products'][$id]['price'];
-                        $orderVendorsWithProductData[$key]['products'][$id]['name'] = $existProduct->name;
-                        $orderVendorsWithProductData[$key]['products'][$id]['category_id'] = $existProduct->category_id;
+                        $orderVendorsWithProductData[$key]['products'][$id]['name'] = $existProduct['name_front'];
+                        $orderVendorsWithProductData[$key]['products'][$id]['category_id'] = $existProduct['category_id'];
                         break;
                     }
                 }
