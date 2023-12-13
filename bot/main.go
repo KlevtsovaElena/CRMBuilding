@@ -1074,7 +1074,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			for _, userdetail := range userdetails {
 
 				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
+				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -1215,7 +1215,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 					buttons := [][]map[string]interface{}{
 
-						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
 						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
 						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
@@ -1257,7 +1256,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 					buttons := [][]map[string]interface{}{
 
-						{{"text": "Оформить заказ ✅", "callback_data": "buy"}},
 						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
 						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
