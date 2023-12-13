@@ -59,12 +59,10 @@ if($role !== 1) {
 
             <!-- наименование-->
             <div class="form-add-product__elements-item">
-                <p>Наименование</p>
+                <p>Наименование (заполните хотя бы 1 вариант)</p>
                 <div class="name-container">        
                     <!-- наименование Русский-->
-                    <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="" required>
-                    <div class="error-info d-none"></div>
-
+                    <p>Русский</p><input type="text" id="name" name="name" value="" required>
                     <!-- наименование Оʻzbekcha-->
                     <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="">
                     <!-- наименование, Ўзбекча -->
@@ -74,12 +72,10 @@ if($role !== 1) {
 
             <!-- описание-->
             <div class="form-add-product__elements-item">
-                <p>Описание</p>
+                <p>Описание (заполните хотя бы 1 вариант)</p>
                 <div class="description-container">    
                     <!-- описание Русский -->
-                    <p>Русский (обязательно)</p><textarea id="description" name="description" required></textarea>
-                    <div class="error-info d-none"></div> 
-
+                    <p>Русский</p><textarea id="description" name="description" required></textarea>
                     <!-- описание Оʻzbekcha-->
                     <p>Оʻzbekcha</p><textarea id="description2" name="description2"></textarea>
                     <!-- описание Ўзбекча-->
