@@ -109,3 +109,16 @@ services:
       bot_token: ${BOT_TOKEN}
       server_uri: ${SERVER_URI}
       api_link: ${API_LINK}
+
+  confirm-price-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-confirm-price-service
+    env_file:
+      - .env
+    volumes:
+      - ./../confirm-price-service/:/app/
+    environment:
+      bot_token: ${BOT_TOKEN}
+      api_link: ${API_LINK}
+    restart: always

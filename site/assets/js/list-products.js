@@ -768,18 +768,19 @@ function showConfirmPriceDailyInfo() {
 }
 
 
-
-// ВРЕМЕННО при нажатии на кнопку Подтвердить Цены  в поле price_confirmed таблицы vendors записываем 1
-// потом заменить на передачу id поставщика в новую таблицу
-
+/* ---------- НАЖАТИЕ НА КНОПКУ ПОДТВЕРДИТЬ ЦЕНЫ ---------- */
 function confirmPriceDaily() {
     // проверка корректности токена
     check(); 
 
+    // время подтверждения цен
+    let timePriceConfirm = Math.ceil(Date.now()/1000)
+    
     //собираем параметры для передачи в бд
     obj = JSON.stringify({
         'id': vendor_id,
-        'price_confirmed': 1
+        'price_confirmed': 1,
+        'time_price_confirm': timePriceConfirm
     });
 
     // отправим запрос на изменение 

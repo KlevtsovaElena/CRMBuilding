@@ -25,5 +25,6 @@
         public ?int $currency_dollar;
         public ?int $rate;
         public ?array $categories;
+        public ?int $time_price_confirm;
     }
 ?>
