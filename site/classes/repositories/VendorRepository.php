@@ -40,6 +40,7 @@ class VendorRepository extends BaseRepository
                                     v.`price_confirmed` as `price_confirmed`,
                                     v.`currency_dollar` as `currency_dollar`,
                                     v.`rate` as `rate`,
+                                    v.`time_price_confirm` as `time_price_confirm`,
                                     v.`categories` as `categories`
                                 FROM vendors v
                                     INNER JOIN cities c ON
@@ -70,6 +71,7 @@ class VendorRepository extends BaseRepository
         'price_confirmed' => 'v.price_confirmed',
         'currency_dollar' => 'v.currency_dollar',
         'rate' => 'v.rate',
+        'time_price_confirm' => 'v.time_price_confirm',
         'categories' => 'v.categories'
     ];
 
