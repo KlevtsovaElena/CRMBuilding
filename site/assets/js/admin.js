@@ -927,10 +927,14 @@ function checkboxChangedVendorPrice(id) {
     //если при нажатии чекбокс активировн
     if (event.target.checked) {
 
+        // время подтверждения цен
+        let timePriceConfirm = Math.ceil(Date.now()/1000)
+
         //собираем параметры для передачи в бд
         obj = JSON.stringify({
             'id': id,
-            'price_confirmed': 1
+            'price_confirmed': 1,
+            'time_price_confirm': timePriceConfirm
         });
 
     //если при нажатии чекбокс деактивирован

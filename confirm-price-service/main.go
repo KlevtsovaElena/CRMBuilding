@@ -47,8 +47,8 @@ var apiLink string = os.Getenv("api_link")
 var botToken string = os.Getenv("bot_token")
 
 // час и минуты начала проверки (Узбекистан +5 часов, поэтому проверка в 5 часов по 000 UTC, в Ташкенте будет 10 часов)
-var hour int = 7
-var minute int = 46
+var hour int = 5
+var minute int = 0
 
 func main() {
 	
@@ -75,13 +75,14 @@ func main() {
 
 		// ПРОВЕРКА ПОДТВЕРЖДЕНИЯ ЦЕН
 
-		// получим всех Поставщиков активных и неудалённых
+		// получим всех Поставщиков активных, неудалённых и с активным городом
 		vendorsAll := getAllVendors()
+		fmt.Println(vendorsAll)
+
 		// получим данные админа
 		admin := getAdmin()
 		adminChatId := admin[0].TgID
 
-		fmt.Println(adminChatId)
 		// если поставщики есть:
 		// 1. у каждого проверим время подтверждения, оно должно быть позже 8:59 (Узбекистан +5) текущего дня 
 		// 2. если это не так, то price_confirmed=0 этого поставщика
@@ -148,8 +149,8 @@ fmt.Println(chatId)
 func getAllVendors() []Vendor {
 	var vendors []Vendor
 
-	// получаем всех поставщиков активных, неудалённых и с ролью 2 (поставщик)
-	resp, err := http.Get("http://" + apiLink + "/api/vendors/get-with-details.php?deleted=0&is_active=1&role=2")
+	// получаем всех поставщиков активных, неудалённых, c активным и неудалённым городом и с ролью 2 (поставщик)
+	resp, err := http.Get("http://" + apiLink + "/api/vendors/get-with-details.php?deleted=0&is_active=1&city_deleted=0&city_active=1&role=2")
 
 	if err != nil {
 		fmt.Println("Произошла ошибка http.Get: ", err)

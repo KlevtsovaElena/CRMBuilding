@@ -21,9 +21,11 @@ let phoneNumber = "";
 let priceConfirmedEl;
 let tmplPriceConfirm;
 let tmplPriceNotConfirm;
+let priceConfirmedOld;
 
 if (document.querySelector('.price-confirm-container')) {
     priceConfirmedEl = document.querySelector('.price-confirm-container');
+    priceConfirmedOld = priceConfirmedEl.getAttribute('confirm-price');
     tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
     tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
 }
@@ -265,10 +267,7 @@ function editVendor(id) {
         phoneNumber = phoneDb.replace(/\D/g, "");
     }
 
-
-    // соберём json для передачи на сервер
-    let obj = JSON.stringify({
-        'id': id,
+    let obj = {'id': id,
         'name': nameVendor.value.trim(),
         'city_id': cityId.value,
         'comment': comment.value.trim(),
@@ -277,8 +276,20 @@ function editVendor(id) {
         'percent': percent.value,
         'currency_dollar': currencyDollar,
         'price_confirmed':  priceConfirmedEl.getAttribute('confirm-price'),
-        'is_active': is_active.value
-    });
+        'is_active': is_active.value,
+    }
+
+    // если админ подтвердил цены за поставщика, то добавим в базу время подтверждения
+    let priceConfirmedNow = priceConfirmedEl.getAttribute('confirm-price');
+
+    if (priceConfirmedNow == '1' && priceConfirmedOld == '0') {
+        // время подтверждения цен
+        let timePriceConfirm = Math.ceil(Date.now()/1000)
+        // соберём json для передачи на сервер
+        obj['time_price_confirm'] = timePriceConfirm
+    }
+    // соберём json для передачи на сервер
+    obj = JSON.stringify(obj);
 
     // передаём данные на сервер
     sendRequestPOST(mainUrl + '/api/vendors.php', obj);
@@ -297,7 +308,7 @@ function editVendor(id) {
     }
      
     // перезагрузим страницу
-    window.location.href = window.location.href;
+    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;;
 }
 
 // вывести предупреждение при смене Сум на $
@@ -331,12 +342,12 @@ function deleteVendorFromEditForm(id) {
     let obj = JSON.stringify({
         'id': id,
         'is_active': 0,
-        'deleted':  1
+        'deleted':  1,
+        'price_confirmed': 0
     });
 
     // делаем запрос на удаление поставщика по id
     sendRequestPOST(mainUrl + '/api/vendors/delete-vendor-with-products.php', obj);
-
 
     // делаем запрос на удаление поставщика по id
     // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);

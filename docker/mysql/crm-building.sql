@@ -95,7 +95,6 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`) VALUES
 (5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch'),
-(20,	'Andrei',	'',	'79144098250',	1,	479734807,	'OkiTokiA'),
 (21,	'Timon',	'Decathlon',	'79672772550',	1,	223054377,	'timondecathlon'),
 (22,	'S',	'R',	'998903480305',	1,	601131024,	'skidkabor'),
 (23,	'GsmServer™',	'',	'998981282810',	1,	197583494,	'unlockservers'),
@@ -119,7 +118,8 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `t
 (43,	'Olimjon',	'Isomov',	'',	3,	769918709,	'isamovolim'),
 (44,	'ЭЛЁР',	'',	'998915882002',	3,	1232585433,	''),
 (45,	'Olesik',	'',	'79036616687',	3,	1061474542,	'Olesik_404'),
-(46,	'Мася Че',	'',	'79175577254',	3,	1638101427,	'');
+(46,	'Мася Че',	'',	'79175577254',	3,	1638101427,	''),
+(47,	'Andrei',	'Tokaiskii',	'998970098250',	1,	479734807,	'');
 
 DROP TABLE IF EXISTS `order_vendors`;
 CREATE TABLE `order_vendors` (
@@ -401,20 +401,20 @@ CREATE TABLE `vendors` (
   `currency_dollar` tinyint unsigned DEFAULT '0',
   `rate` int unsigned DEFAULT '1',
   `categories` json DEFAULT NULL,
-  `time_price_confirm` bigint NOT NULL,
+  `time_price_confirm` bigint DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`, `tg_id`, `coordinates`, `role`, `percent`, `debt`, `comment`, `date_reg`, `hash_string`, `password`, `token`, `is_active`, `deleted`, `price_confirmed`, `currency_dollar`, `rate`, `categories`, `time_price_confirm`) VALUES
-(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	1854111,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	0,	0,	1,	NULL,	1702293300),
-(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	'',	NULL,	'',	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1,	NULL,	1702294200),
-(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'tocoGvpzeAQIM',	1,	0,	1,	0,	1,	NULL,	1702295100),
-(4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	'',	NULL,	'',	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1,	NULL,	1702296120),
-(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	'',	998903480305,	'',	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'toT5Hjco99AMU',	1,	0,	1,	0,	1,	NULL,	1702292460),
-(6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	'',	NULL,	'',	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050,	NULL,	1702288800),
-(9,	'test',	1,	'79999999999',	'test@bk.ru',	'',	NULL,	'',	2,	10,	100,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	'',	1,	0,	1,	0,	1,	NULL,	1702285200),
-(10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	'',	NULL,	'',	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1,	NULL,	1702292460),
+(1,	'Поставщик1',	1,	'79996667788',	'first@bk.ru',	'rodionaka',	223054377,	'{\"latitude\":55.657049,\"longitude\":37.569306}',	2,	10,	1854111,	'Первый поставщик',	1689507890,	'haVuGqrLCiM1A',	'crK8GaB5k/z6A',	'',	1,	0,	1,	0,	1,	NULL,	1702483299),
+(2,	'Поставщик2',	2,	'79168881122',	'second@bk.ru',	'',	NULL,	'',	2,	10,	197000,	'Второй поставщик',	1689507982,	'haMCdWzHNM9hc',	'crF3z6ZLaP79c',	'toiWcZzTq83Bs',	1,	0,	1,	0,	1,	NULL,	1702482000),
+(3,	'Поставщик3',	3,	'76663334455',	'third@bk.ru',	'KlevtsovaEV',	1752911328,	'{\"latitude\":55.819855,\"longitude\":37.829782}',	2,	0,	0,	'Третий поставщик',	1689508041,	'hahUrbGggMKc',	'cr9Oe/o1K7r0o',	'tokDPEZfWq0Ao',	1,	0,	1,	0,	1,	NULL,	1702481168),
+(4,	'Поставщик4',	4,	'998903555444',	'fourth@bk.ru',	'',	NULL,	'',	2,	0,	0,	'Четвёртый постащик',	1689508156,	'haa5ulKzPo6g6',	'crtdJGYGWRn1k',	'',	1,	0,	1,	0,	1,	NULL,	1702481090),
+(5,	'Админ',	5,	'998903480305 ',	'admin@bk.ru',	'',	1752911328,	'',	1,	0,	0,	'Админ',	1688636888,	'hazetypXJkIIk',	'vendor',	'toPE8j7627lyg',	1,	0,	1,	0,	1,	NULL,	0),
+(6,	'папарпа',	2,	'43421210101',	'цпычрпрыцо@hwhsg.com',	'',	NULL,	'',	2,	3,	0,	'',	1692701415,	'hazTJvvfTq1T',	'crQnh5B1fshs',	'',	1,	0,	0,	1,	14050,	NULL,	1702481089),
+(9,	'test',	5,	'79999999999',	'test@bk.ru',	'',	NULL,	'',	2,	10,	100,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	'',	1,	0,	1,	0,	1,	NULL,	1702500000),
+(10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	'',	NULL,	'',	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1,	NULL,	1702481086),
 (11,	'Оптовик 1',	2,	'998876006809',	'sdndfnb@fb.ru',	'',	NULL,	'',	3,	2,	500,	'',	1701310809,	'hairMjVdU9JXc',	'crR76rgNfytk',	'',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"4\": \"Грунтовка\"}',	0),
 (12,	'Оптовик 2',	3,	'998465467688',	'sdndfnb@djg.ru',	'',	NULL,	'',	3,	1,	0,	'',	1701389901,	'hae9gWFPPuJ6',	'crAQDBLYhT9w',	'totbqfyxs93Z',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"8\": \"Плиточный клей\", \"9\": \"Наливной пол и Гидроизоляция\"}',	0);
 
--- 2023-12-11 11:53:40
+-- 2023-12-13 16:02:32
