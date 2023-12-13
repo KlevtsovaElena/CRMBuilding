@@ -12,12 +12,14 @@ if($role !== 3) {
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
         "<link rel='stylesheet' href='./../assets/css/list-products.css'>",
         "<link rel='stylesheet' href='./../assets/css/list-orders.css'>",
-        "<link rel='stylesheet' href='./../assets/css/admin.css'>"
+        "<link rel='stylesheet' href='./../assets/css/admin.css'>",
+        "<link rel='stylesheet' href='./../assets/css/wholesaler.css'>"
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
         "<script src='./../assets/js/joint.js'></script>",
-        "<script src='./../assets/js/admin.js'></script>"
+        "<script src='./../assets/js/admin.js'></script>",
+        "<script src='./../assets/js/wholesaler.js'></script>"
     ];
 ?>
 
@@ -73,6 +75,18 @@ if($role !== 3) {
     ?>
 
     <p class="page-title">Главная</p>
+    <br>
+
+    <!-- Форма для обращения к админу -->
+    <p class="title-send" onclick="toggleOfferToAdmin()">Отправить свое предложение администратору</p>
+    <div id="form-offer" class="form-offer-to-admin d-none">
+        <div class="wholesaler-to-admin">
+            <p class="feedback">Форма обратной связи</p>
+            <textarea id="text-offer" name="" id="" cols="30" rows="10" placeholder="Введите текст..."></textarea>
+        </div>
+        <button class="btn btn-ok" onclick="sendOfferToAdmin(<?= $profile['id']?>)">Отправить</button>
+        <button class="btn btn-neutral" onclick="cancelOfferToAdmin()">Отмена</button>
+    </div>
 
 
     <!-- далее отрисовываем таблицу заказов за период -->
