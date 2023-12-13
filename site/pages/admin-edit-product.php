@@ -64,16 +64,15 @@ if($role !== 1) {
 
                 <!-- наименование-->
                 <div class="form-add-product__elements-item">
-                    <p>Наименование</p>
-                    <div class="name-container">        
-                        <!-- наименование Русский-->
-                        <p>Русский (обязательно)</p><input type="text" id="name" name="name" value="<?= $product[0]['name']; ?>" required>
-                        <div class="error-info d-none"></div>
-
+                    <p>Наименование (заполните хотя бы 1 вариант)</p>
+                    <div class="name-container"> 
                         <?php 
+                            if($product[0]['name'] == NULL || $product[0]['name'] == '') {$name='';} else {$name=$product[0]['name'];}
                             if($product[0]['name2'] == NULL || $product[0]['name2'] == '') {$name2='';} else {$name2=$product[0]['name2'];}
                             if($product[0]['name3'] == NULL || $product[0]['name3'] == '') {$name3='';} else {$name3=$product[0]['name3'];}
-                        ?>
+                        ?>       
+                        <!-- наименование Русский-->
+                        <p>Русский</p><input type="text" id="name" name="name" value="<?= $name; ?>" required>
                         <!-- наименование Оʻzbekcha-->
                         <p>Оʻzbekcha</p><input type="text" id="name2" name="name2" value="<?= $name2; ?>">
                         <!-- наименование, Ўзбекча -->
@@ -83,16 +82,15 @@ if($role !== 1) {
 
                 <!-- описание-->
                 <div class="form-add-product__elements-item">
-                    <p>Описание</p>
-                    <div class="description-container">    
-                        <!-- описание Русский -->
-                        <p>Русский (обязательно)</p><textarea id="description" name="description" required><?= $product[0]['description']; ?></textarea>
-                        <div class="error-info d-none"></div> 
-
+                    <p>Описание (заполните хотя бы 1 вариант)</p>
+                    <div class="description-container"> 
                         <?php 
+                            if($product[0]['description'] == NULL || $product[0]['description'] == '') {$description='';} else {$description=$product[0]['description'];}
                             if($product[0]['description2'] == NULL || $product[0]['description2'] == '') {$description2='';} else {$description2=$product[0]['description2'];}
                             if($product[0]['description3'] == NULL || $product[0]['description3'] == '') {$description3='';} else {$description3=$product[0]['description3'];}
-                        ?>
+                        ?>   
+                        <!-- описание Русский -->
+                        <p>Русский</p><textarea id="description" name="description" required><?= $description; ?></textarea>
                         <!-- описание Оʻzbekcha-->
                         <p>Оʻzbekcha</p><textarea id="description2" name="description2"><?= $description2; ?></textarea>
                         <!-- описание Ўзбекча-->
