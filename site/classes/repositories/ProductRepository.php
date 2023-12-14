@@ -257,6 +257,10 @@ class ProductRepository extends BaseRepository
        // Получаем часть строки запроса с сортировкой
        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
 
+       if(str_contains($orderByString, 'p.name_front')) {
+            $orderByString = str_replace("p.", "", $orderByString);
+       }
+
        // Получаем часть строки запроса с лимитом и оффсетом
        $limitString = SqlHelper::getLimitString($inputParams);
 

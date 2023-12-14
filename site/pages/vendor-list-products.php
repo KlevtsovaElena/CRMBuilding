@@ -134,7 +134,7 @@ if($role !== 2) {
                     <thead>
                         <tr role="row">
 
-                            <th data-id="name" data-sort="">Наименование</th>
+                            <th data-id="name_front" data-sort="">Наименование</th>
                             <th data-id="category_id" data-sort="">Категория</th>
                             <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
@@ -308,7 +308,7 @@ if (count($_GET) !== 0) {
             <thead>
                 <tr role="row">
 
-                    <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
+                    <th data-id="name_front" data-sort="<?php if ($sortBy == 'name_front')  {echo $mark; } ?>">Наименование</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
                     <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
