@@ -145,7 +145,7 @@ function getFilters() {
     [city_idEl, brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
-                params += "&search=name:" + item.value + ";description:" + item.value;
+                params += "&search=name_front:" + item.value + ";description_front:" + item.value;
             } else {
                 params += "&" + item.id + "=" + item.value;
             }
@@ -865,3 +865,9 @@ function checkboxChangedProductConfirm(id) {
     startRenderPage();
 
 }
+
+function changeVendorsFilterByCityId() {
+    alert('меняем поставиков')
+}
+
+city_idEl.addEventListener('change', changeVendorsFilterByCityId);

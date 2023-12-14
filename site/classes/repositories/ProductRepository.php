@@ -200,7 +200,7 @@ class ProductRepository extends BaseRepository
         'price_confirmed' => 'v.price_confirmed',
         'is_active' => 'p.is_active',
         'is_confirm' => 'p.is_confirm',
-        'name_front' => 'p.name_front'
+        'name_front' => 'name_front'
     ];
 
     public function getTableName(): string
@@ -240,6 +240,19 @@ class ProductRepository extends BaseRepository
 
        // Все переданные параметры для поиска (не зависимо от полей объекта)
        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+       if (array_key_exists('name_front', $allSearchParams)) {
+            $allSearchParams['name'] = $allSearchParams['name_front'];
+            $allSearchParams['name2'] = $allSearchParams['name_front'];
+            $allSearchParams['name3'] = $allSearchParams['name_front'];
+            unset($allSearchParams['name_front']);
+        } 
+
+        if (array_key_exists('description_front', $allSearchParams)) {
+            $allSearchParams['description'] = $allSearchParams['description_front'];
+            $allSearchParams['description2'] = $allSearchParams['description_front'];
+            $allSearchParams['description3'] = $allSearchParams['description_front'];
+            unset($allSearchParams['description_front']);
+        } 
        // Параметры подходящие к нашему объекту
        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allSearchParams);
        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
@@ -256,10 +269,6 @@ class ProductRepository extends BaseRepository
        $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allOrderByParams);
        // Получаем часть строки запроса с сортировкой
        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
-
-       if(str_contains($orderByString, 'p.name_front')) {
-            $orderByString = str_replace("p.", "", $orderByString);
-       }
 
        // Получаем часть строки запроса с лимитом и оффсетом
        $limitString = SqlHelper::getLimitString($inputParams);
@@ -323,11 +332,27 @@ class ProductRepository extends BaseRepository
     // ЛЕНА добавила только этот метод сюда
     public function getCountWithDetails(array $inputParams): int
     {
+        // if ($inputParams['search'] && str_contains($inputParams['search'], 'name_front')) {echo $inputParams['search'];}
         // Параметры однозначного совпадения (WHERE)
         $whereParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $inputParams);
 
         // Все переданные параметры для поиска (не зависимо от полей объекта)
         $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        
+        if (array_key_exists('name_front', $allSearchParams)) {
+            $allSearchParams['name'] = $allSearchParams['name_front'];
+            $allSearchParams['name2'] = $allSearchParams['name_front'];
+            $allSearchParams['name3'] = $allSearchParams['name_front'];
+            unset($allSearchParams['name_front']);
+        } 
+
+        if (array_key_exists('description_front', $allSearchParams)) {
+            $allSearchParams['description'] = $allSearchParams['description_front'];
+            $allSearchParams['description2'] = $allSearchParams['description_front'];
+            $allSearchParams['description3'] = $allSearchParams['description_front'];
+            unset($allSearchParams['description_front']);
+        } 
+
         // Параметры подходящие к нашему объекту
         $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allSearchParams);
         // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)

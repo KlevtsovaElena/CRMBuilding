@@ -140,7 +140,7 @@ function getFilters() {
     [brand_idEl, category_idEl, searchEl].forEach(item => {
         if (item.value.trim()) {
             if  (item.id === 'search') {
-                params += "&search=name:" + item.value + ";description:" + item.value;
+                params += "&search=name_front:" + item.value + ";description_front:" + item.value;
             } else {
                 params += "&" + item.id + "=" + item.value;
             }

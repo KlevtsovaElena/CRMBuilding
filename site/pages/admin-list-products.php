@@ -29,16 +29,16 @@ if($role !== 1) {
 <!-- соберём данные для отображения в форме -->
 
 <?php
-    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
+    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
     $brands = json_decode($brandsJson, true);
 
-    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
     $categories = json_decode($categoriesJson, true);
 
-    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
+    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1&orderby=name:asc");
     $cities = json_decode($citiesJson, true);
 
-    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
+    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0&orderby=name:asc");
     $vendors = json_decode($vendorsJson, true);
  
 ?>
@@ -202,11 +202,11 @@ if($role !== 1) {
                     <thead>
                         <tr role="row">
 
-                            <th data-id="city_id" data-sort="">Город</th>
-                            <th data-id="vendor_id" data-sort="">Поставщик</th>
+                            <th data-id="city_name" data-sort="">Город</th>
+                            <th data-id="vendor_name" data-sort="">Поставщик</th>
                             <th data-id="name_front" data-sort="">Наименование</th>
-                            <th data-id="category_id" data-sort="">Категория</th>
-                            <th data-id="brand_id" data-sort="">Бренд</th>
+                            <th data-id="category_name" data-sort="">Категория</th>
+                            <th data-id="brand_name" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена</th>
                             <th data-id="max_price" data-sort="">Цена рынок</th>
@@ -237,7 +237,7 @@ if($role !== 1) {
 if (count($_GET) !== 0) {
     if(isset($_GET['search'])) {
         $searchText = $_GET['search'];
-        $search = explode(";description:", $searchText);
+        $search = explode(";description_front:", $searchText);
         $searchText = $search[1];
     } else {
         $searchText = "";
@@ -436,11 +436,11 @@ if (count($_GET) !== 0) {
             <thead>
                 <tr role="row">
 
-                    <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
-                    <th data-id="vendor_id" data-sort="<?php if ($sortBy == 'vendor_id')  {echo $mark; } ?>">Поставщик</th>
+                    <th data-id="city_name" data-sort="<?php if ($sortBy == 'city_name')  {echo $mark; } ?>">Город</th>
+                    <th data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
                     <th data-id="name_front" data-sort="<?php if ($sortBy == 'name_front')  {echo $mark; } ?>">Наименование</th>
-                    <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
-                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
+                    <th data-id="category_name" data-sort="<?php if ($sortBy == 'category_name')  {echo $mark; } ?>">Категория</th>
+                    <th data-id="brand_name" data-sort="<?php if ($sortBy == 'brand_name')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена</th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок</th>

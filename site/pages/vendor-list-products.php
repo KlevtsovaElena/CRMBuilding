@@ -29,10 +29,10 @@ if($role !== 2) {
 <!-- соберём данные для отображения в форме -->
 
 <?php
-    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
+    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
     $brands = json_decode($brandsJson, true);
 
-    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
     $categories = json_decode($categoriesJson, true);
 ?>
 
@@ -135,8 +135,8 @@ if($role !== 2) {
                         <tr role="row">
 
                             <th data-id="name_front" data-sort="">Наименование</th>
-                            <th data-id="category_id" data-sort="">Категория</th>
-                            <th data-id="brand_id" data-sort="">Бренд</th>
+                            <th data-id="category_name" data-sort="">Категория</th>
+                            <th data-id="brand_name" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             <th data-id="max_price" data-sort="">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
@@ -166,7 +166,7 @@ if($role !== 2) {
 if (count($_GET) !== 0) {
     if(isset($_GET['search'])) {
         $searchText = $_GET['search'];
-        $search = explode(";description:", $searchText);
+        $search = explode(";description_front:", $searchText);
         $searchText = $search[1];
     } else {
         $searchText = "";
@@ -309,8 +309,8 @@ if (count($_GET) !== 0) {
                 <tr role="row">
 
                     <th data-id="name_front" data-sort="<?php if ($sortBy == 'name_front')  {echo $mark; } ?>">Наименование</th>
-                    <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
-                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
+                    <th data-id="category_name" data-sort="<?php if ($sortBy == 'category_name')  {echo $mark; } ?>">Категория</th>
+                    <th data-id="brand_name" data-sort="<?php if ($sortBy == 'brand_name')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
