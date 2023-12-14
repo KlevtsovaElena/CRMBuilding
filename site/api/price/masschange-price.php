@@ -55,7 +55,7 @@ class ChangePriceMassController extends BaseController
         }
 
         // строка where
-        $post['where_string'] = 'WHERE vendor_id=' . $post['vendor_id'] ;
+        $post['where_string'] = 'WHERE is_active=1 AND deleted=0 AND vendor_id=' . $post['vendor_id'] ;
 
         if ($productsKind <> []) {
             foreach($productsKind as $products) { 

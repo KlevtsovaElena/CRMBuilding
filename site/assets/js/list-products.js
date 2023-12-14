@@ -915,7 +915,7 @@ function massChangePriceClick() {
     obj['vendor_id'] = vendor_id;
 
     // соберём текст подтверждения
-    let masschangePriceConfirmText = dataPriceKind + "всех товаров " + dataProductsKind + " будут " + dataCase + magnitude + unit; 
+    let masschangePriceConfirmText = dataPriceKind + "всех активных товаров " + dataProductsKind + " будут " + dataCase + magnitude + unit; 
 
     // выведем окно подтверждения изменения цен
     let confirmChange = window.confirm(masschangePriceConfirmText);

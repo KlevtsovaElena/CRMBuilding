@@ -180,6 +180,7 @@ if($role !== 1) {
                         <th class="cell-title" data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
                         <th class="cell-title" data-id="email" data-sort="<?php if ($sortBy == 'email')  {echo $mark; } ?>">Email</th>
                         <th data-id="confirmed">Подтвердил</th>
+                        <th class="ta-center">Утвердить товары</th>
                         <th class="cell-title" data-id="debt"  data-sort="<?php if ($sortBy == 'debt')  {echo $mark; } ?>">Должен</th>
                         <th></th>
                         <th class="cell-title" data-id="percent" data-sort="<?php if ($sortBy == 'percent')  {echo $mark; } ?>">Процент</th>                      
@@ -297,6 +298,7 @@ if($role !== 1) {
                                 <td class="checkbox-cell ta-center">
                                     <input type="checkbox" onclick="checkboxChangedVendorPrice(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["price_confirmed"] == 1) {?> checked <?php } ?>>
                                 </td>
+                                <td class="ta-center"><div class="btn-ok btn-product-confirm"  onclick="confirmProductsVendor(<?= $data[$i]['id'] ?>, '<?= $data[$i]['name'] ?>')">Утвердить</div></td>
                                 <td class="ta-center list-orders_status digit" ondblclick="editOnClick(<?= $data[$i]['id'] ?>, 'vendors')" data-id="<?= $data[$i]['id'] ?>"><?= $data[$i]['debt'] ?></td>
                                 <td class="input d-none"><input id="input-debt" type="text" oninput="restrictInput(this)"></td>
                                 <td class="actions-with-cell">

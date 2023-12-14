@@ -98,9 +98,23 @@ class ProductRepository extends BaseRepository
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
 
+    const UPDATE_CONFIRM_PRODUCTS_BY_VENDOR = 'UPDATE products p
+                                               SET p.is_confirm = 1
+                                               WHERE p.`vendor_id` = %s
+                                                AND p.`deleted`=0
+                                                AND p.`is_active`=1
+                                                AND p.`price`<p.`max_price`';                     
+
     const UPDATE_PRICE_MASS_BY_VENDOR = 'UPDATE products p
                                         SET p.is_confirm = 0, %s
                                          %s';
+
+    const COUNT_NOT_CONFIRM_PRODUCT_BY_VENDOR = 'SELECT COUNT(*) as `count`
+                                                    FROM products p   
+                                                    WHERE p.`vendor_id` = %s
+                                                        AND p.`deleted`=0
+                                                        AND p.`is_active`=1 
+                                                        AND p.`is_confirm` = 0';                             
 
     // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
     //                                     p.`name` as `name`,
@@ -292,9 +306,6 @@ class ProductRepository extends BaseRepository
         return $result;
     }
 
-
-
-
     private function getQueryIdsArrayParams(array $ids)
     {
         $resultArray = [];
@@ -353,5 +364,24 @@ class ProductRepository extends BaseRepository
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute();
     }
+
+    public function updateConfirmProductByVendor(array $inputParams) 
+    {
+        $query = sprintf(static::UPDATE_CONFIRM_PRODUCTS_BY_VENDOR, $inputParams['vendor_id']);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute();
+    }
+
+    public function countNotConfirmProductByVendor(array $inputParams): int
+    {
+        $query = sprintf(static::COUNT_NOT_CONFIRM_PRODUCT_BY_VENDOR, $inputParams['vendor_id']);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute();
+        if (!$data = $statement->fetch())
+            return 0;
+
+        return $data['count'];
+    }
+    
 }
 ?>
