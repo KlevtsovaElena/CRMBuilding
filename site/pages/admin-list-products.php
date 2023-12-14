@@ -204,7 +204,7 @@ if($role !== 1) {
 
                             <th data-id="city_id" data-sort="">Город</th>
                             <th data-id="vendor_id" data-sort="">Поставщик</th>
-                            <th data-id="name" data-sort="">Наименование</th>
+                            <th data-id="name_front" data-sort="">Наименование</th>
                             <th data-id="category_id" data-sort="">Категория</th>
                             <th data-id="brand_id" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
@@ -438,7 +438,7 @@ if (count($_GET) !== 0) {
 
                     <th data-id="city_id" data-sort="<?php if ($sortBy == 'city_id')  {echo $mark; } ?>">Город</th>
                     <th data-id="vendor_id" data-sort="<?php if ($sortBy == 'vendor_id')  {echo $mark; } ?>">Поставщик</th>
-                    <th data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
+                    <th data-id="name_front" data-sort="<?php if ($sortBy == 'name_front')  {echo $mark; } ?>">Наименование</th>
                     <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
                     <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
