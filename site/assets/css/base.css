@@ -285,6 +285,14 @@ input:focus, textarea:focus, select:focus {
     justify-content: space-between;
 }
 
+.btn-product-confirm {
+    border-radius: var(--border-radius);
+    padding: 2px;
+    width: 90px;
+    transition: all var(--speed-transition);
+    cursor: pointer;
+    display: inline-block;
+}
 
 .page-title {
     margin-bottom: 10px;

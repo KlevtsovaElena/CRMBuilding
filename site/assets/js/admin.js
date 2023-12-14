@@ -1116,3 +1116,42 @@ function changeTagName(el, newTagName) {
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 document.cookie = 'time_zone=' + timeZone;
 console.log(document.cookie);
+
+/*-------УТВЕРЖДЕНИЕ ВСЕХ ТОВАРОВ ПОСТАВЩИКА КНОПКОЙ-------*/
+// утверждение всех товаров поставщика кнопкой
+function confirmProductsVendor(id, nameVendor) {
+    // запрашиваем подтверждение
+    let yes = window.confirm('Одобрить все активные товары для Поставщика ' + nameVendor + '?');
+
+    // если подтверждения нет, то выходим из функции
+    if(!yes) { return; }
+
+    // передаём на сервер id поставщика и одобряем все активные, неудалённые товары, кроме тех, где среднерыночная цена меньше цены поставщика
+    //ссылка
+    let link = mainUrl + '/api/products/all-products-confirm-for-vendor.php';
+
+    //соберем json для передачи на сервер
+    obj = JSON.stringify({
+        'vendor_id': id
+    });
+
+    //отправка на сервер
+    let resultJSON = sendRequestPOST(link, obj);
+
+    let result;
+    // проверим ответ с сервера после запроса
+    // если в ответ пришла неизв ошибка, то выводим сообщение Ошибка!
+    // иначе - распарсим результат и считаем данные
+    try {
+        result  = JSON.parse(resultJSON);
+    } catch(e) {
+        alert ('Ошибка! Попробуйте позже!');
+        return;
+    }
+
+    // если запрос выполнен, показываем ответ с сервера
+    if (result) {
+        alert(result.message);
+    }
+
+}
