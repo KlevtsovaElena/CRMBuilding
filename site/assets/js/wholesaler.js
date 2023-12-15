@@ -43,17 +43,12 @@ function sendOfferToAdmin(id) {
 
         //очищаем текстовое поле
         document.getElementById('text-offer').value = '';
+
+        //выдаем оповещение, что сообщение отправлено
+        alert('Ваше сообщение отправлено');
+
+        //скрываем форму
+        toggleOfferToAdmin();
     }
 
-    // //вытащить из БД телеграм айди админа по номеру роли
-
-    // if (text == '') {
-    //     alert("Текстовое поле не может быть пустым");
-    // } else {
-    //     //формирование ссылки
-    //     let link = 'https://api.telegram.org/bot6251938024:AAG84w6ZyxcVqUxmRRUW0Ro8d4ej7FpU83o/sendMessage?chat_id=' + customer_tg_id + '&text=' + text;
-
-    //     //отправляем гет-запрос
-    //     sendRequestGET(link);
-    // }
 }
