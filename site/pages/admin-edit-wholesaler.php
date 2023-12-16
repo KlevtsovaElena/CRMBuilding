@@ -112,12 +112,6 @@ if($role !== 1) {
                 <div class="error-info d-none"></div>
             </div>
 
-            <!-- процент -->
-            <div class="form-add-vendor__item">
-                <p>Установленная % ставка</p><input type="number" id="percent" name="percent"  min="0" max="100" value="<?= $vendor[0]['percent']; ?>" placeholder="0" onchange="percentValid(this)">
-                <div class="error-info d-none"></div>
-            </div>
-
             <!-- валюта поставщика -->
             <div class="form-add-vendor__item" currency="<?= $vendor[0]['currency_dollar']; ?>">
                 <p>Валюта цен</p>
