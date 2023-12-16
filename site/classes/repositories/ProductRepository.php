@@ -28,6 +28,8 @@ class ProductRepository extends BaseRepository
                                             b.`id` = p.`brand_id`
                                         INNER JOIN vendors v ON
                                             v.`id` = p.`vendor_id`
+                                        INNER JOIN cities cit ON
+                                            cit.`id` = v.`city_id`
                                         INNER JOIN units u ON
                                             u.`id` = p.`unit_id`
                                         %s';
@@ -62,6 +64,7 @@ class ProductRepository extends BaseRepository
                                         b.`deleted` as `brand_deleted`,
                                         v.`deleted` as `vendor_deleted`,
                                         cit.`is_active` as `city_active`,
+                                        cit.`deleted` as `city_deleted`,
                                         v.`is_active` as `vendor_active`,
                                         v.`city_id` as `city_id`,
                                         cit.`name` as `city_name`,
@@ -114,8 +117,77 @@ class ProductRepository extends BaseRepository
                                                     WHERE p.`vendor_id` = %s
                                                         AND p.`deleted`=0
                                                         AND p.`is_active`=1 
-                                                        AND p.`is_confirm` = 0';                             
+                                                        AND p.`is_confirm` = 0';   
+                                                        
+    const GET_UNIQ_CITIES = 'SELECT DISTINCT 
+                                    cit.`id` as `city_id`,
+                                    cit.`name` as `city_name`,
+                                    cit.`deleted` as `city_deleted`,
+                                    cit.`is_active` as `city_active`
+                                FROM products p
+                                    INNER JOIN categories c ON
+                                        c.`id` = p.`category_id`
+                                    INNER JOIN brands b ON 
+                                        b.`id` = p.`brand_id`
+                                    INNER JOIN vendors v ON
+                                        v.`id` = p.`vendor_id`
+                                    INNER JOIN cities cit ON
+                                        cit.`id` = v.`city_id`
+                                    INNER JOIN units u ON
+                                        u.`id` = p.`unit_id`
+                                    %s';   
+                                    
+    const GET_UNIQ_VENDORS = 'SELECT DISTINCT 
+                                    v.`id` as `vendor_id`,
+                                    v.`name` as `vendor_name`,
+                                    v.`deleted` as `vendor_deleted`,
+                                    v.`is_active` as `vendor_active`
+                                FROM products p
+                                    INNER JOIN categories c ON
+                                        c.`id` = p.`category_id`
+                                    INNER JOIN brands b ON 
+                                        b.`id` = p.`brand_id`
+                                    INNER JOIN vendors v ON
+                                        v.`id` = p.`vendor_id`
+                                    INNER JOIN cities cit ON
+                                        cit.`id` = v.`city_id`
+                                    INNER JOIN units u ON
+                                        u.`id` = p.`unit_id`
+                                    %s';  
 
+const GET_UNIQ_CATEGORIES = 'SELECT DISTINCT 
+                                c.`id` as `category_id`,
+                                c.`category_name` as `category_name`,
+                                c.`deleted` as `category_deleted`
+                                FROM products p
+                                INNER JOIN categories c ON
+                                    c.`id` = p.`category_id`
+                                INNER JOIN brands b ON 
+                                    b.`id` = p.`brand_id`
+                                INNER JOIN vendors v ON
+                                    v.`id` = p.`vendor_id`
+                                INNER JOIN cities cit ON
+                                    cit.`id` = v.`city_id`
+                                INNER JOIN units u ON
+                                    u.`id` = p.`unit_id`
+                                %s';  
+
+const GET_UNIQ_BRANDS = 'SELECT DISTINCT 
+                                b.`id` as `brand_id`,
+                                b.`brand_name` as `brand_name`,
+                                b.`deleted` as `brand_deleted`
+                                FROM products p
+                                INNER JOIN categories c ON
+                                    c.`id` = p.`category_id`
+                                INNER JOIN brands b ON 
+                                    b.`id` = p.`brand_id`
+                                INNER JOIN vendors v ON
+                                    v.`id` = p.`vendor_id`
+                                INNER JOIN cities cit ON
+                                    cit.`id` = v.`city_id`
+                                INNER JOIN units u ON
+                                    u.`id` = p.`unit_id`
+                                %s';  
     // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
     //                                     p.`name` as `name`,
     //                                     p.`name2` as `name2`,
@@ -197,6 +269,7 @@ class ProductRepository extends BaseRepository
         'city_id' => 'v.city_id',
         'city_name' => 'cit.name', 
         'city_active' => 'cit.is_active',
+        'city_deleted' => 'cit.deleted',
         'price_confirmed' => 'v.price_confirmed',
         'is_active' => 'p.is_active',
         'is_confirm' => 'p.is_confirm',
@@ -284,6 +357,118 @@ class ProductRepository extends BaseRepository
        return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
     }
 
+    public function getWithDetailsForFront(array $inputParams): array
+    {
+       // Параметры однозначного совпадения (WHERE)
+       $whereParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $inputParams);
+
+       // Все переданные параметры для поиска (не зависимо от полей объекта)
+       $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+       if (array_key_exists('name_front', $allSearchParams)) {
+            $allSearchParams['name'] = $allSearchParams['name_front'];
+            $allSearchParams['name2'] = $allSearchParams['name_front'];
+            $allSearchParams['name3'] = $allSearchParams['name_front'];
+            unset($allSearchParams['name_front']);
+        } 
+
+        if (array_key_exists('description_front', $allSearchParams)) {
+            $allSearchParams['description'] = $allSearchParams['description_front'];
+            $allSearchParams['description2'] = $allSearchParams['description_front'];
+            $allSearchParams['description3'] = $allSearchParams['description_front'];
+            unset($allSearchParams['description_front']);
+        } 
+       // Параметры подходящие к нашему объекту
+       $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allSearchParams);
+       // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+       $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+       // Часть WHERE строки запроса
+       $whereString = SqlHelper::getWhereString($whereParams);
+       // Вторая часть WHERE (для поиска 'LIKE')
+       $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // проверим есть ли параметр off_product в запросе
+        // если есть и 0, то нужны только активные товары (город, поставщик и товар не отключен)
+        // если есть и 1, то нужны только неактивные товары (город, поставщик или товар отключен)
+        // если нет, то нужны все товары 
+        if (isset($inputParams['off_product']) && $inputParams['off_product'] == '1') {
+            $whereString .= ' AND (p.`is_active` = 0 OR cit.`is_active` = 0 OR v.`is_active` = 0)';
+        } else  if (isset($inputParams['off_product']) && $inputParams['off_product'] == '0') {
+            $whereString .= ' AND p.`is_active` = 1 AND cit.`is_active` = 1 AND v.`is_active` = 1';
+        }
+
+       // Получаем все параметры для сортировки
+       $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+       // Отбираем только подходящие для объекта
+       $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allOrderByParams);
+       // Получаем часть строки запроса с сортировкой
+       $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+       // Получаем часть строки запроса с лимитом и оффсетом
+       $limitString = SqlHelper::getLimitString($inputParams);
+
+       $query = sprintf(static::GET_WITH_DETAILS, implode(' ', [$whereString, $searchString, $orderByString, $limitString]));
+
+       $whereParams = SqlHelper::convertToSqlParam($whereParams);
+       $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+       $statement = \DbContext::getConnection()->prepare($query);
+       $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+       return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
+
+    //получение уникальных элементов
+    // найдём все товары, удовл поиску и выберем из них уникальный город, поставщика, категорию или бренда
+    // в зависимости от запроса
+    public function getUniqElementsByProducts(array $inputParams, string $element): array
+    {
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $inputParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);
+
+        // проверим есть ли параметр off_product в запросе
+        // если есть и 0, то нужны только активные товары (город, поставщик и товар не отключен)
+        // если есть и 1, то нужны только неактивные товары (город, поставщик или товар отключен)
+        // если нет, то нужны все товары 
+        if (isset($inputParams['off_product']) && $inputParams['off_product'] == '1') {
+            $whereString .= ' AND (p.`is_active` = 0 OR cit.`is_active` = 0 OR v.`is_active` = 0)';
+        } else  if (isset($inputParams['off_product']) && $inputParams['off_product'] == '0') {
+            $whereString .= ' AND p.`is_active` = 1 AND cit.`is_active` = 1 AND v.`is_active` = 1';
+        }
+
+        // Получаем все параметры для сортировки
+        $allOrderByParams = SqlHelper::getAllOrderByParams($inputParams);
+        // Отбираем только подходящие для объекта
+        $orderByObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allOrderByParams);
+        // Получаем часть строки запроса с сортировкой
+        $orderByString = SqlHelper::getOrderByString($orderByObjectParams);
+
+
+        if ($element == 'city') {
+                echo 'ищем города';
+                $query = sprintf(static::GET_UNIQ_CITIES, implode(' ', [$whereString, $orderByString]));
+        } else if ($element == 'vendor') {
+                echo 'ищем поставщиков';
+                $query = sprintf(static::GET_UNIQ_VENDORS, implode(' ', [$whereString, $orderByString]));
+        } else if ($element == 'category') {
+                echo 'ищем категории';
+                $query = sprintf(static::GET_UNIQ_CATEGORIES, implode(' ', [$whereString, $orderByString]));
+        } else if ($element == 'brand') {
+            echo 'ищем бренды';
+            $query = sprintf(static::GET_UNIQ_BRANDS, implode(' ', [$whereString, $orderByString]));
+        }
+
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute($whereParams);
+
+        return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
+    }
+
+
     public function getById(int $id): Product|null
     {
         return $this->get(["id" => $id]);
@@ -328,8 +513,6 @@ class ProductRepository extends BaseRepository
         return $resultArray;
     }
 
-    
-    // ЛЕНА добавила только этот метод сюда
     public function getCountWithDetails(array $inputParams): int
     {
         // if ($inputParams['search'] && str_contains($inputParams['search'], 'name_front')) {echo $inputParams['search'];}
@@ -362,6 +545,65 @@ class ProductRepository extends BaseRepository
         $whereString = SqlHelper::getWhereString($whereParams);
         // Вторая часть WHERE (для поиска 'LIKE')
         $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        $whereParams = SqlHelper::convertToSqlParam($whereParams);
+        $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+        // Формируем результирующую строку запроса
+        $query = sprintf(static::GET_COUNT_WITH_DETAILS, implode(' ', [$whereString, $searchString]));
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+
+        if (!$data = $statement->fetch())
+            return 0;
+
+        return $data['count'];
+    }
+
+    public function getCountWithDetailsForFront(array $inputParams): int
+    {
+        // if ($inputParams['search'] && str_contains($inputParams['search'], 'name_front')) {echo $inputParams['search'];}
+        // Параметры однозначного совпадения (WHERE)
+        $whereParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $inputParams);
+
+        // Все переданные параметры для поиска (не зависимо от полей объекта)
+        $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+        
+        if (array_key_exists('name_front', $allSearchParams)) {
+            $allSearchParams['name'] = $allSearchParams['name_front'];
+            $allSearchParams['name2'] = $allSearchParams['name_front'];
+            $allSearchParams['name3'] = $allSearchParams['name_front'];
+            unset($allSearchParams['name_front']);
+        } 
+
+        if (array_key_exists('description_front', $allSearchParams)) {
+            $allSearchParams['description'] = $allSearchParams['description_front'];
+            $allSearchParams['description2'] = $allSearchParams['description_front'];
+            $allSearchParams['description3'] = $allSearchParams['description_front'];
+            unset($allSearchParams['description_front']);
+        } 
+
+        // Параметры подходящие к нашему объекту
+        $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allSearchParams);
+        // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+        $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+        // Часть WHERE строки запроса
+        $whereString = SqlHelper::getWhereString($whereParams);     
+        // Вторая часть WHERE (для поиска 'LIKE')
+        $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+        // проверим есть ли параметр off_product в запросе
+        // если есть и 0, то нужны только активные товары (город, поставщик и товар не отключен)
+        // если есть и 1, то нужны только неактивные товары (город, поставщик или товар отключен)
+        // если нет, то нужны все товары 
+        if (isset($inputParams['off_product']) && $inputParams['off_product'] == '1') {
+            $whereString .= ' AND (p.`is_active` = 0 OR cit.`is_active` = 0 OR v.`is_active` = 0)';
+        } else  if (isset($inputParams['off_product']) && $inputParams['off_product'] == '0') {
+            $whereString .= ' AND p.`is_active` = 1 AND cit.`is_active` = 1 AND v.`is_active` = 1';
+        }
 
         $whereParams = SqlHelper::convertToSqlParam($whereParams);
         $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);

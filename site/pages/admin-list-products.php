@@ -26,29 +26,29 @@ if($role !== 1) {
 
 <a href="javascript: addProduct()" class="btn btn-ok d-iblock">+ Добавить товар</a>
 
-<!-- соберём данные для отображения в форме -->
-
-<?php
-    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
-    $brands = json_decode($brandsJson, true);
-
-    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
-    $categories = json_decode($categoriesJson, true);
-
-    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1&orderby=name:asc");
-    $cities = json_decode($citiesJson, true);
-
-    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0&orderby=name:asc");
-    $vendors = json_decode($vendorsJson, true);
- 
-?>
-
 <!-- если параметры get пустые -->
 <!-- отрисовываем страницу по дефолту -->
         <?php 
         if (count($_GET) == 0)  {
         ?>
 
+        <!-- соберём данные для отображения в форме -->
+
+        <?php
+            $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
+            $brands = json_decode($brandsJson, true);
+
+            $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
+            $categories = json_decode($categoriesJson, true);
+
+            // города по умолчанию отображаются неудалённые и не отключенные
+            $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1&orderby=city_name:asc");
+            $cities = json_decode($citiesJson, true);
+            // поставщики по умолчанию отображаются неудалённые и не отключенные, у которых город не удален и не отключен
+            $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&is_active=1&city_deleted=0&city_active=1&orderby=name:asc");
+            $vendors = json_decode($vendorsJson, true);
+        
+        ?>
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
@@ -61,6 +61,7 @@ if($role !== 1) {
                         
                         <option value="">Все</option>
                         <?php foreach($cities as $city) { ?>
+
                             <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
                         <?php }; ?>
 
@@ -69,7 +70,7 @@ if($role !== 1) {
                 <!-- выбор поставщика -->
                 <div class="d-iblock">
                     <div>Поставщик</div>
-                    <select id="vendor_id" name="vendor_id" value="">
+                    <select id="vendor_id" name="vendor_id" value="" class="vendor-filter">
                         
                         <option value="">Все</option>
                         <?php foreach($vendors as $vendor) { ?>
@@ -141,9 +142,11 @@ if($role !== 1) {
                 <div class="d-iblock">
                     <div>Активные</div>
                     <select id="is_active" name="is_active" value="">
-
-                        <option value="is_active=1">Активные</option>
-                        <option value="is_active=0">Неактивные</option>
+                        <!-- неактивные - это все товары, которые отключены поставщиком, 
+                        у которых поставщик отключен или
+                        у которых город отключен -->
+                        <option value="off_product=0">Активные</option>
+                        <option value="off_product=1">Неактивные</option>
                         <option value="">Все</option>
  
                     </select>
@@ -179,15 +182,6 @@ if($role !== 1) {
                         </li>
                     </ul>
                 </div> -->
-
-
-
-
-
-
-
-
-
 
                 <button class="btn btn-ok d-iblock">Применить</button>
 
@@ -257,6 +251,28 @@ if (count($_GET) !== 0) {
         $offset = 0;
     }
 
+    // <!-- соберём данные для отображения в форме -->
+
+    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
+    $brands = json_decode($brandsJson, true);
+
+    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
+    $categories = json_decode($categoriesJson, true);
+
+    if(isset($_GET['off_product'])) {
+        // получим все уникальные города, соответсвующие запросу
+        $citiesJson = file_get_contents($nginxUrl . "/api/cities/get-cities-for-filter-front.php?deleted=0&brand_deleted=0&category_deleted=0&vendor_deleted=0&off_product=" . $_GET['off_product'] . "&orderby=city_name:asc");
+        $cities = json_decode($citiesJson, true);
+
+    } else {
+        // получим все уникальные города, соответсвующие запросу
+        $citiesJson = file_get_contents($nginxUrl . "/api/cities/get-cities-for-filter-front.php?deleted=0&brand_deleted=0&category_deleted=0&vendor_deleted=0&orderby=city_name:asc");
+        $cities = json_decode($citiesJson, true);
+    }
+
+    // получим все 
+    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0&orderby=name:asc");
+    $vendors = json_decode($vendorsJson, true);
 ?>
 
     <!-- Выбор фильтров -->
@@ -274,16 +290,16 @@ if (count($_GET) !== 0) {
                     <?php foreach($cities as $city) {
                         if (!isset($_GET['city_id'])) {
                         ?>
-                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
+                            <option value="<?= $city['city_id']; ?>"><?= $city['city_name']; ?></option>
                         <?php
-                        } else if ($_GET['city_id'] == $city['id']) {
+                        } else if ($_GET['city_id'] == $city['city_id']) {
                         ?>
-                            <option value="<?= $city['id']; ?>" selected><?= $city['name']; ?></option>
+                            <option value="<?= $city['city_id']; ?>" selected><?= $city['city_name']; ?></option>
 
                         <?php
                         } else {
                         ?>
-                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>;
+                            <option value="<?= $city['city_id']; ?>"><?= $city['city_name']; ?></option>;
                         <?php 
                         }
                     }; ?>  
@@ -294,7 +310,7 @@ if (count($_GET) !== 0) {
             <!-- выбор поставщика -->
             <div class="d-iblock">
                 <div>Поставщик</div>
-                <select id="vendor_id" name="vendor_id" value="">
+                <select id="vendor_id" name="vendor_id" value=""  class="vendor-filter">
                     
                     <option value="">Все</option>
 
@@ -416,8 +432,8 @@ if (count($_GET) !== 0) {
                 <div>Активные</div>
                 <select id="is_active" name="is_active" value="">
 
-                    <option value="is_active=1" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '1') {echo 'selected';} ?>>Активные</option>
-                    <option value="is_active=0" <?php if(isset($_GET['is_active']) && $_GET['is_active'] == '0') {echo 'selected';} ?>>Неактивные</option>
+                    <option value="off_product=0" <?php if(isset($_GET['off_product']) && $_GET['off_product'] == '0') {echo 'selected';} ?>>Активные</option>
+                    <option value="off_product=1" <?php if(isset($_GET['off_product']) && $_GET['off_product'] == '1') {echo 'selected';} ?>>Неактивные</option>
                     <option value="">Все</option>
 
                 </select>

@@ -28,7 +28,7 @@ if($role !== 1) {
     $vendorJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?deleted=0&id=" . $id);
     $vendor = json_decode($vendorJson, true);
 
-    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1");
+    $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1&orderby=name:asc");
     $cities = json_decode($citiesJson, true);
 
 ?>

@@ -25,16 +25,16 @@ if($role !== 1) {
 
     <!-- соберём данные для отображения в форме -->
     <?php
-        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
+        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
         $brands = json_decode($brandsJson, true);
 
-        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0&orderby=name:asc");
         $units = json_decode($unitsJson, true);
 
-        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2&deleted=0");
+        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0&orderby=name:asc");
         $vendors = json_decode($vendorsJson, true);
     ?>
                         

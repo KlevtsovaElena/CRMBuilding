@@ -42,6 +42,11 @@
     width: 100px;
 }
 
+.form-filters .vendor-filter {
+    width: 120px;
+    font-size: 12px;
+}
+
 .form-filters input[type="search"] {
     width: 180px;
 }
