@@ -14,6 +14,7 @@ if($role !== 2) {
     ];
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
+        "<script src='./../assets/js/admin.js'></script>",
         "<script src='./../assets/js/list-products.js'></script>"
     ];
 ?>

@@ -1112,6 +1112,30 @@ function changeTagName(el, newTagName) {
     el.parentNode.replaceChild(n, el);
   }
 
+
+//функция оповещения админа о неутвержденных товарах
+function notifyAdminInactiveGoods() {
+
+    //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
+    let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+
+    //собираем ссылку на нужный эндпойнт
+    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+
+    //формируем параметры для передачи в апишку
+    let obj = JSON.stringify({
+        "text" : text
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+    console.log('уведомление отправлено');
+    
+    alert('Уведомление отправлено админу');
+
+}
+
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 document.cookie = 'time_zone=' + timeZone;

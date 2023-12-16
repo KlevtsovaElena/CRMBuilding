@@ -746,6 +746,9 @@ function checkboxChangedProductActive(id) {
             'id': id,
             'is_active': 0
         });
+
+        //отправляем уведомление админу о том, что товары стали неактивными
+        notifyAdminInactiveGoods();
     }
 
     // отправим запрос на изменение 
