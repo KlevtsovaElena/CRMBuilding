@@ -46,25 +46,10 @@ class TelegramSendLocationController extends BaseController
             echo $response;
             return;
         }
-
-        // $reply = "Следующие товары больше не активны:";
-
-
-        // $keyboard = array(
-        //     "inline_keyboard" => array(array(array("text" => "X", "url" => urlencode($post['text']))))
-        // );
-
-        // $keyboard = json_encode($keyboard, true);
-
-        // $sendto = "https://api.telegram.org/bot" . $_ENV['BOT_TOKEN'] . "/sendMessage?chat_id=". urlencode($chat_id) ."&text=". $reply ."&parse_mode=HTML&reply_markup=" .$keyboard;
-
-        // file_get_contents($sendto);
-
-        file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id='.$chat_id.'&text=Следующие товары больше не активны: &reply_markup={"inline_keyboard":[[{"text":"Press here to open URL","url": ' . urlencode($post['text']) . '}]]}');
         
-        //отправляем админу предложение оптовика через бота
-        // file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id='. urlencode($chat_id) . 
-        // '&text=' . 'Следующие товары больше не активны: ' . '&parse_mode=HTML&text=' . urlencode($post['text']));
+        //отправляем админу ссылку на неактивные товары через бота
+        file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id='. urlencode($chat_id) . 
+        '&parse_mode=HTML&text=' . 'Следующие товары больше не активны: ' . urlencode($post['text']));
     }
 }
 

@@ -1157,7 +1157,10 @@ function changeTagName(el, newTagName) {
 function notifyAdminInactiveGoods() {
 
     //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
-    let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
+    let text = 'https://qna.habr.com/q/518740';
 
     //собираем ссылку на нужный эндпойнт
     let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
