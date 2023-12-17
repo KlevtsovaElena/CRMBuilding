@@ -116,7 +116,8 @@ class ProductRepository extends BaseRepository
                                                         AND p.`is_active`=1 
                                                         AND p.`is_confirm` = 0';                             
 
-    // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
+    // const GET_BY_CATEGORY = 'SELECT COUNT(*) as `count`
+    //                                     p.`id` as `id`,
     //                                     p.`name` as `name`,
     //                                     p.`name2` as `name2`,
     //                                     p.`name3` as `name3`,
@@ -162,8 +163,7 @@ class ProductRepository extends BaseRepository
     //                                         cit.`id` = v.`city_id`
     //                                     INNER JOIN units u ON
     //                                         u.`id` = p.`unit_id`
-    //                                     WHERE p.`category_id` IN (' . $category_arr . ')
-    //                                     %s';
+    //                                     WHERE p.`category_id` IN (1, 3, 4)';
 
     private static array $productDetailsAccosiations = [
         'id' => 'p.id',
@@ -386,6 +386,40 @@ class ProductRepository extends BaseRepository
 
         return $data['count'];
     }
+
+    // // Подборка товаров по id оптовика???
+    // public function getProductsByCategories(array $inputParams): int
+    // {
+    //     // Параметры однозначного совпадения (WHERE)
+    //     $whereParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $inputParams);
+
+    //     // Все переданные параметры для поиска (не зависимо от полей объекта)
+    //     $allSearchParams = SqlHelper::getAllSearchParams($inputParams);
+    //     // Параметры подходящие к нашему объекту
+    //     $searchObjectParams = SqlHelper::filterParamsWithReplace(static::$productDetailsAccosiations, $allSearchParams);
+    //     // Преобразуем в параметры поиска (добавляем префикс для параметров 'search_' и '%value%' в значение)
+    //     $formattedSearchParams = SqlHelper::convertObjectSearchParams($searchObjectParams);
+
+    //     // Часть WHERE строки запроса
+    //     $whereString = SqlHelper::getWhereString($whereParams);
+    //     // Вторая часть WHERE (для поиска 'LIKE')
+    //     $searchString = SqlHelper::getSearchString($searchObjectParams);
+
+    //     $whereParams = SqlHelper::convertToSqlParam($whereParams);
+    //     $formattedSearchParams = SqlHelper::convertToSqlParam($formattedSearchParams);
+
+    //     // Формируем результирующую строку запроса
+    //     $query = sprintf(static::GET_BY_CATEGORY, implode(' ', [$whereString, $searchString]));
+
+    //     $statement = \DbContext::getConnection()->prepare($query);
+    //     $statement->execute(array_merge($whereParams, $formattedSearchParams));
+
+
+    //     if (!$data = $statement->fetch())
+    //         return 0;
+
+    //     return $data['count'];
+    // }
     
 }
 ?>
