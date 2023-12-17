@@ -36,12 +36,12 @@ if($role !== 3) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?vendor_deleted=0');
+        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id']);
         $data = json_decode($dataJson, true);
         //print_r($data);
 
         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-        //$totalEntries = $data['count']; ВЕРНУТЬ
+        $totalEntries = $data['count'];
 
         //если на странице уже заданы гет-параметры сортировки
         if(isset($_GET['orderby'])) {
@@ -88,10 +88,8 @@ if($role !== 3) {
         <button class="btn btn-neutral" onclick="cancelOfferToAdmin()">Отмена</button>
     </div>
 
-
     <!-- далее отрисовываем таблицу заказов за период -->
     
-
     <br>
     <!-- сортировка по дате -->
     <div class="id-block ta-center">
@@ -122,88 +120,6 @@ if($role !== 3) {
                     <input id="till" type="date" class="middle-input" onchange="sortByDateTill()"  value="<?php if (isset($_GET['date_till'])) { ?><?= convertUnixForCalendar($_GET['date_till']); ?><?php } ?>">
                         
                 <?php } ?>
-            </div>
-
-            <!-- фильтрация по поставщику -->
-            <div class="d-iblock">
-                <div>Поставщик</div> 
-                <select id="vendor" name="vendor" value="" required>
-                <?php
-                    //запрашиваем данные по поставщикам из БД
-                    $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0');
-                    $dataV = json_decode($dataJsonV, true);
-
-                    //если поставщик не был задан, устанавливаем в селекте выбранное значение "все"
-                    if (!isset($_GET['vendor_name'])) {
-                        
-                    ?>
-                        <option value="" <?= 'selected' ?> >все</option>
-                        <?php for ($v = 0; $v < count($dataV); $v++) { ?>
-                            <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                        <?php }
-                    //если поставщик уже задан в гет-параметрах, выводим его
-                    } else {
-                        $vendor = $_GET['vendor_name']; 
-                        ?>
-
-                        <option value="" <?php if($vendor == 'all') { echo 'selected'; } ?> >все</option>
-                        <?php 
-                        for ($v = 0; $v < count($dataV); $v++) { 
-                            if($vendor == $dataV[$v]['name']) {?>
-                            
-                            <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
-                        <?php 
-                            } else { ?>
-                                
-                            <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                        <?php 
-                            }
-                        ?>
-                    <?php 
-                        }
-                    } ?> 
-                </select>
-            </div>
-
-            <!-- фильтрация по городу -->
-            <div class="d-iblock">
-                <div>Город</div> 
-                <select id="city" name="city" value="" required>
-                <?php
-                    //запрашиваем данные по городам из БД
-                    $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
-                    $dataV = json_decode($dataJsonV, true);
-
-                    //если город не был задан, устанавливаем в селекте выбранное значение "все"
-                    if (!isset($_GET['vendor_city'])) {
-                        
-                    ?>
-                        <option value="" <?= 'selected' ?> >все</option>
-                        <?php for ($v = 0; $v < count($dataV); $v++) { ?>
-                            <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                        <?php }
-                    //если город уже задан в гет-параметрах, выводим его
-                    } else {
-                        $city = $_GET['vendor_city']; 
-                        ?>
-
-                        <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
-                        <?php 
-                        for ($v = 0; $v < count($dataV); $v++) { 
-                            if($city == $dataV[$v]['name']) {?>
-                            
-                            <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
-                        <?php 
-                            } else { ?>
-                                
-                            <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                        <?php 
-                            }
-                        ?>
-                    <?php 
-                        }
-                    } ?> 
-                </select>
             </div>
 
             <div class="d-iblock">Показывать по
@@ -245,48 +161,9 @@ if($role !== 3) {
 
     
     <?php
+
         //теперь сокращаем выдачу данных в массиве до products
         $data = $data['products'];
-
-        // УБРАТЬ ______
-        //print_r($data);
-
-        ?> 
-        
-        <!-- <br><br> -->
-
-        <?php
-
-        //достаем из БД categories данного залогинившегося поставщика
-        $categoriesJSON = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?id=' . $profile['id']);
-        $categories = json_decode($categoriesJSON, true);
-        $categories = $categories[0]['categories'];
-        $categoriesArr = json_decode($categories, true);
-        //print_r($categoriesArr);
-
-        ?> 
-        
-        <!-- <br><br> -->
-
-        <?php
-
-        //фильтруем массив только по нужным категориям
-        $byCategory = [];
-        for ($i = 0; $i <  count($data); $i++) { 
-            foreach ($categoriesArr as $key => $value) {
-                if ($data[$i]['category_id'] == $key) {
-                array_push($byCategory, $data[$i]);
-                }
-            }
-        }
-
-        //print_r($byCategory);
-        $data = $byCategory;
-
-        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-        $totalEntries = count($data);
-
-        // ______ УБРАТЬ 
 
         //проверяем, выбран ли лимит на кол-во отображаемых элементов
         if (isset($_GET['limit'])) {
@@ -313,8 +190,8 @@ if($role !== 3) {
 
                         <!-- <th class="ta-center cell-title" data-id="id" data-sort="<?php if ($sortBy == 'id')  {echo $mark; } ?>">№</th> -->
                         <!-- <th class="ta-center">№</th> -->
-                        <th class="ta-center cell-title" data-id="vendor_city" data-sort="<?php if ($sortBy == 'vendor_city')  {echo $mark; } ?>">Город</th>
-                        <th class="ta-center cell-title" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th>
+                        <!-- <th class="ta-center cell-title" data-id="vendor_city" data-sort="<?php if ($sortBy == 'vendor_city')  {echo $mark; } ?>">Город</th> -->
+                        <!-- <th class="ta-center cell-title" data-id="vendor_name" data-sort="<?php if ($sortBy == 'vendor_name')  {echo $mark; } ?>">Поставщик</th> -->
                         <th class="ta-center cell-title" data-id="name" data-sort="<?php if ($sortBy == 'name')  {echo $mark; } ?>">Наименование</th>
                         <th class="ta-center cell-title" data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена за 1 ед.
                         <th class="ta-center cell-title" data-id="quantity" data-sort="<?php if ($sortBy == 'quantity')  {echo $mark; } ?>">Кол-во
@@ -340,68 +217,29 @@ if($role !== 3) {
                         }
                     }
 
-                    //если заданы гет-параметры поставщика, собираем в переменную
-                    if (isset($_GET['vendor_name'])) {
-                        $params = $params . '&vendor_name=' . $_GET['vendor_name'];
-                    }
-
-                    //если заданы гет-параметры города, собираем в переменную
-                    if (isset($_GET['vendor_city'])) {
-                        $params = $params . '&vendor_city=' . $_GET['vendor_city'];
-                    }
-
                     //считаем суммарную стоимость всех товаров за весь период, чтобы вывести ее отдельно
                     $totalSum = 0;
-                    $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?' . $params);
+                    $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . $params);
                     $data = json_decode($dataJson, true); 
+                    
+                    //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                    $totalEntries = $data['count'];
                     $data = $data['products'];
-
-                    // УБРАТЬ _______
-                    //фильтруем массив только по нужным категориям
-                    $byCategory = [];
-                    for ($i = 0; $i <  count($data); $i++) { 
-                        foreach ($categoriesArr as $key => $value) {
-                            if ($data[$i]['category_id'] == $key) {
-                            array_push($byCategory, $data[$i]);
-                            }
-                        }
-                    }
-
-                    //print_r($byCategory);
-                    $data = $byCategory;
-                    // _______ УБРАТЬ 
 
                     for ($l = 0; $l < count($data); $l++) {
                         $totalSum += $data[$l]['total_price'];
                     }
 
-                    //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-                    $totalEntries = count($data);
 
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //соберём данные для отображения в форме 
-                        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
+                        $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . '&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                         $data = json_decode($dataJson, true); 
-                        $data = $data['products'];
-
-                        // УБРАТЬ _______
-                        //фильтруем массив только по нужным категориям
-                        $byCategory = [];
-                        for ($i = 0; $i <  count($data); $i++) { 
-                            foreach ($categoriesArr as $key => $value) {
-                                if ($data[$i]['category_id'] == $key) {
-                                array_push($byCategory, $data[$i]);
-                                }
-                            }
-                        }
-
-                        //print_r($byCategory);
-                        $data = $byCategory;
-                        // _______ УБРАТЬ
-
+                        
                         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-                        $totalEntries = count($data);
+                        $totalEntries = $data['count'];
+                        $data = $data['products'];
                         
                         //print_r($data);
                         //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -412,26 +250,11 @@ if($role !== 3) {
                         if (!isset($_GET['search'])) {
                             //print_r('not 1');
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . '&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true); 
-                            $data = $data['products'];
-
-                            // УБРАТЬ _______
-                            //фильтруем массив только по нужным категориям
-                            $byCategory = [];
-                            for ($i = 0; $i <  count($data); $i++) { 
-                                foreach ($categoriesArr as $key => $value) {
-                                    if ($data[$i]['category_id'] == $key) {
-                                    array_push($byCategory, $data[$i]);
-                                    }
-                                }
-                            }
-
-                            //print_r($byCategory);
-                            $data = $byCategory;
-                            // _______ УБРАТЬ
                             //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-                            $totalEntries = count($data);
+                            $totalEntries = $data['count'];
+                            $data = $data['products'];
 
                             //print_r($data);
                             //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -465,9 +288,6 @@ if($role !== 3) {
                                 
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
-                                <!-- <td class="ta-center"><a href="vendor-order.php?id=<?= $data[$i]['id'] ?>&role=1"><strong><?= $data[$i]['id'] ?></strong></a></td> -->
-                                <td class="ta-center"><?= $data[$i]['vendor_city'] ?></td>
-                                <td class="ta-center"><?= $data[$i]['vendor_name'] ?></td>
                                 <td><?= $data[$i]['name'] ?></td>
                                 <td class="ta-center"><?= number_format($data[$i]['price'], 0, ',', ' '); ?></td>
                                 <td class="ta-center"><?= $data[$i]['quantity'] ?></td>

@@ -362,7 +362,16 @@ function renderListProducts(totalProducts) {
                                                         .replace('${rate}', totalProducts['products'][i]['vendor_rate'])
                                                         .replace('${rate}', totalProducts['products'][i]['vendor_rate'])
                                                         .replace('${is_confirm_product}', totalProducts['products'][i]['is_confirm'])
-                                                        .replace('${is_confirm}', isConfirmProduct);
+                                                        .replace('${is_confirm}', isConfirmProduct)
+                                                        //добавлено для функции изменения остатка по двойному клику в vendor-list-products
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${unit}', totalProducts['products'][i]['unit_name_short'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
+                                                        .replace('${id}', totalProducts['products'][i]['id'])
+                                                        .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
+                                                        ;
     
         // если totalProducts['products'][i]['max_price'] меньше, чем totalProducts['products'][i]['price'], то выделим цены красным
         if(Number(totalProducts['products'][i]['max_price']) <= Number(totalProducts['products'][i]['price'])) {

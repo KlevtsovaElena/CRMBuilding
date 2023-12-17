@@ -118,6 +118,15 @@ function editOnClick(id, section_name) {
 
             //копируем из нередактируемого поля текстовое значение, которое будет редактироваться в инпуте
             uneditedValue = nameElements[i].innerHTML;
+
+            //если это products, то доп. шаги для обозгачения unit
+            if (section_name == 'products') {
+                //вынимаем unit
+                let unit = nameElements[i].getAttribute('data-unit');
+                //отрезаем unit
+                uneditedValue = uneditedValue.replace(' ' + unit, '');
+            }
+
             console.log(uneditedValue);
             //скрываем нередактируемое поле
             nameElements[i].classList.add('d-none');
@@ -144,7 +153,7 @@ function editOnClick(id, section_name) {
 }
 
 //функция отмены редактирования (по нажатию на крестик)
-function cancel(id, name) {
+function cancel(id, name, section_name) {
     
     //достаем массив всех элементов, содержащих редактируемое название
     let nameElements = document.querySelectorAll('.list-orders_status');
@@ -165,8 +174,17 @@ function cancel(id, name) {
             //скрываем инпут и возвращаем нередактируемое поле с названием
             inputBlock.classList.add('d-none');
             nameElements[i].classList.remove('d-none');
+
             //возвращаем в него изначальное название до редактирования
-            nameElements[i].innerHTML = name;
+            //если у нас в ячейке unit
+            if (section_name == 'products') {
+                //вынимаем unit
+                let unit = nameElements[i].getAttribute('data-unit');
+                nameElements[i].innerHTML = name + ' ' + unit;
+            } else {
+                nameElements[i].innerHTML = name;
+            }
+            
             //скрываем блок с отменой
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
@@ -198,37 +216,43 @@ function save(id, uneditedValue, section_name) {
             //если назначен дата-атрибут с измененным названием, достаем его
             if(nameElements[i].getAttribute('data-new-name')) {
                 changedValue0 = nameElements[i].getAttribute('data-new-name');
+                console.log(changedValue0);
             }
 
             //достаем инпут, который надо скрыть
             let inputBlock = document.querySelectorAll('.input')[i];
             //console.log(inputBlock);
             //console.log(nameElements[i]);
+            console.log(uneditedValue);
+            console.log(changedValue0);
 
             //копируем измененное значение
             changedValue = inputBlock.querySelector('input').value;
-            console.log(changedValue);
 
             //если итоговое значение совпадает с исходным, то оно не было изменено, запрос не отправляем
-            if (changedValue.trim() === uneditedValue && changedValue.trim() === changedValue0) {
-                console.log(uneditedValue);
-                console.log('значение не было обновлено');
-                //скрываем инпут
-                inputBlock.classList.add('d-none');
-                //возвращаем нередактируемое поле
-                nameElements[i].classList.remove('d-none');
+            if (changedValue.trim() == uneditedValue) {
+                //но нужно дополнительно проверить свежеизмененное значение
+                if (changedValue.trim() && changedValue.trim() == changedValue0) {
+                    console.log(uneditedValue);
+                    console.log(changedValue);
+                    console.log('значение не было обновлено');
+                    //скрываем инпут
+                    inputBlock.classList.add('d-none');
+                    //возвращаем нередактируемое поле
+                    nameElements[i].classList.remove('d-none');
 
-                if (section_name !== 'vendors') {
-                    //возвращаем блок с карандашом
-                    document.getElementsByClassName('edit')[i].classList.remove('d-none');
-                }
+                    if (section_name !== 'vendors' && section_name !== 'products') {
+                        //возвращаем блок с карандашом
+                        document.getElementsByClassName('edit')[i].classList.remove('d-none');
+                    }
 
-                //скрываем блок с отменой
-                document.getElementsByClassName('cancel')[i].classList.add('d-none');
-                //скрываем блок с сохранением
-                document.getElementsByClassName('save')[i].classList.add('d-none');
-                return;
-            //если в поле вместо значения пустота
+                    //скрываем блок с отменой
+                    document.getElementsByClassName('cancel')[i].classList.add('d-none');
+                    //скрываем блок с сохранением
+                    document.getElementsByClassName('save')[i].classList.add('d-none');
+                    return;
+                //если в поле вместо значения пустота
+                } 
             } else if (changedValue.trim() === '') {
                 alert('Поле не может быть пустым');
                 return;
@@ -281,6 +305,14 @@ function save(id, uneditedValue, section_name) {
                 });
             }
 
+            //для vendor-products
+            if (section_name == 'products') {
+                obj = JSON.stringify({
+                    'id': id,
+                    'quantity_available': changedValue
+                });
+            }
+
             console.log(obj);
 
             //передаем на сервер в пост-запросе
@@ -293,13 +325,21 @@ function save(id, uneditedValue, section_name) {
             inputBlock.classList.add('d-none');
             nameElements[i].classList.remove('d-none');
             //кладем в него измененное значение
-            nameElements[i].innerHTML = changedValue;
+            //если у нас в ячейке unit
+            if (section_name == 'products') {
+                //вынимаем unit
+                let unit = nameElements[i].getAttribute('data-unit');
+                nameElements[i].innerHTML = changedValue + ' ' + unit;
+            } else {
+                nameElements[i].innerHTML = changedValue;
+            }
+            
             //скрываем блок с отменой
             document.getElementsByClassName('cancel')[i].classList.add('d-none');
             //скрываем блок с сохранением
             document.getElementsByClassName('save')[i].classList.add('d-none');
 
-            if (section_name !== 'vendors') {
+            if (section_name !== 'vendors' && section_name !== 'products') {
                 //открываем блок с карандашом
                 document.getElementsByClassName('edit')[i].classList.remove('d-none');
             }
@@ -675,12 +715,12 @@ function applyInWholesalerMain() {
     // let dataSearch = searchQuery.trim();
 
     //получим селект "поставщик"
-    let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
-    console.log(vendorSel);
+    // let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
+    // console.log(vendorSel);
 
     //получим селект "город"
-    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
-    console.log(citySel);
+    // let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    // console.log(citySel);
 
     //и даты "с"
     let from = sortByDateFrom();
@@ -706,14 +746,14 @@ function applyInWholesalerMain() {
     }
 
     //если задан поставщик
-    if (vendorSel) {
-        filters += '&vendor_name=' + vendorSel;
-    }
+    // if (vendorSel) {
+    //     filters += '&vendor_name=' + vendorSel;
+    // }
 
     //если задан город
-    if (citySel) {
-        filters += '&vendor_city=' + citySel;
-    }
+    // if (citySel) {
+    //     filters += '&vendor_city=' + citySel;
+    // }
 
     //если задан поиск
     // if (dataSearch) {
