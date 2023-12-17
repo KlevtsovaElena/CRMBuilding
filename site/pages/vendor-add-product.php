@@ -25,13 +25,13 @@ if($role !== 2) {
 
     <!-- соберём данные для отображения в форме -->
     <?php
-        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
+        $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
         $brands = json_decode($brandsJson, true);
 
-        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
+        $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
         $categories = json_decode($categoriesJson, true);
 
-        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0");
+        $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0&orderby=name:asc");
         $units = json_decode($unitsJson, true);
     ?>
                         

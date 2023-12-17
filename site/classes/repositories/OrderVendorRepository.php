@@ -127,7 +127,7 @@ class OrderVendorRepository extends BaseRepository
         $item = [];
         foreach ($row as $key => $value) {
             if ($key == 'products' || $key == 'order_location' || $key == 'vendor_location') {
-                $item[$key] = isset($value) ? json_decode($value, true) : [];
+                $item[$key] = (isset($value) && strlen($value) > 0) ? json_decode($value, true) : [];
                 continue;
             }
 
