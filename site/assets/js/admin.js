@@ -715,12 +715,12 @@ function applyInWholesalerMain() {
     // let dataSearch = searchQuery.trim();
 
     //получим селект "поставщик"
-    let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
-    console.log(vendorSel);
+    // let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
+    // console.log(vendorSel);
 
     //получим селект "город"
-    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
-    console.log(citySel);
+    // let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    // console.log(citySel);
 
     //и даты "с"
     let from = sortByDateFrom();
@@ -746,14 +746,14 @@ function applyInWholesalerMain() {
     }
 
     //если задан поставщик
-    if (vendorSel) {
-        filters += '&vendor_name=' + vendorSel;
-    }
+    // if (vendorSel) {
+    //     filters += '&vendor_name=' + vendorSel;
+    // }
 
     //если задан город
-    if (citySel) {
-        filters += '&vendor_city=' + citySel;
-    }
+    // if (citySel) {
+    //     filters += '&vendor_city=' + citySel;
+    // }
 
     //если задан поиск
     // if (dataSearch) {

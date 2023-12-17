@@ -32,8 +32,12 @@ function sortChange() {
     let dataVendor = document.getElementById('list-orders').getAttribute('data-vendor-select');
 
     //получим селект "город"
-    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
-    console.log(citySel);
+    if (document.getElementById('city')) {
+        let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+        console.log(citySel);
+    } else {
+        citySel = null;
+    }
 
     // получим значение атрибута data-status-select, содержащего выбранный статус
     let dataStatus = document.getElementById('list-orders').getAttribute('data-status-select');
