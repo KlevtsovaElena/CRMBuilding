@@ -1,4 +1,11 @@
 console.log('подключили admin-list-products', mainUrl);
+
+// основной url для запроса товаров
+// urlStaticString - это неменяющиеся параметры поиска, те товары всегда неудаленные, 
+// роль поставщика 2, поставщик не удален, город не удален, бренд не удален, категория не удалена
+let urlStaticString = "deleted=0&city_deleted=0&vendor_role=2&vendor_deleted=0&category_deleted=0&brand_deleted=0"
+let url = mainUrl + '/api/products/products-with-count-for-list-products.php?' + urlStaticString;
+
 // найдём шаблон и контейнер для отрисовки товаров
 const tmplRowProduct = document.getElementById('template-body-table-uzs').innerHTML;
 const tmplRowProductDollar = document.getElementById('template-body-table-dollar').innerHTML;
@@ -26,17 +33,9 @@ let offsetEl = containerPagination.getAttribute('offset');
 let vendorCheckName;
 let vendorCheckId;
 
-let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&city_deleted=0';
-
-// let activeCheckEl = document.querySelector('.active-check');
-// let activeEl = activeCheckEl.querySelector('input');
-
 let confirmCheckEl = document.getElementById('is_confirm');
 let activeCheckEl = document.getElementById('is_active');
-
-// чекбоксы активен/неактивен, утверждён/неутверждён
-// let statusProductEl = document.querySelector('.status-list-items').querySelectorAll('input');
-// let statusProductIdArray = []; 
+let isOffProduct;
 
 let prevButton;
 let nextButton;
@@ -47,11 +46,6 @@ let changePriceInputEl;
 let resetPriceEl;
 let savePriceEl;
 let changeInputsEl;
-
-// let brands = {};
-// let categories = {};
-// let vendors = {};
-// let units = {};
 
 let orderby = "";
 let filters = "";
@@ -69,24 +63,6 @@ let totalProductsCount;
 let totalProductsJson;
 
 let garbage;
-
-// закэшируем значения брендов и категорий и поставщиков
-// brand_idEl.querySelectorAll('option').forEach(item => {
-//     brands[item.value] = item.innerText;
-// })
-// category_idEl.querySelectorAll('option').forEach(item => {
-//     categories[item.value] = item.innerText;
-// })
-// vendor_idEl.querySelectorAll('option').forEach(item => {
-//     vendors[item.value] = item.innerText;
-// })
-
-// // закэшируем значения единиц измерения (временно, пока нет апишки)
-// let unitsJson = sendRequestGET(mainUrl + '/api/units.php');
-// let unitsData = JSON.parse(unitsJson);
-// unitsData.forEach(item => {
-//    units[item['id']] = item['name_short'];
-// })
 
 // заполним страницу данными
 startRenderPage();
@@ -108,7 +84,7 @@ function startRenderPage() {
     renderListProducts(totalProducts);
 
     // 5. добавим параметры в адресную строку
-    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
+    history.replaceState(history.length, null, 'admin-list-products.php?' + params);
 }
 
 
@@ -131,8 +107,8 @@ function getParams() {
     // добавим лимит
     limit = limitEl.value;
     limitParams = "&limit=" + limit + "&offset=" + offset;
-    params = filters + orderby + limitParams;
 
+    params = filters + orderby + limitParams;
     return params;
 }
 
@@ -140,19 +116,22 @@ function getFilters() {
 
     // сбросим параметры строки запроса
     params = "";
+    isOffProduct = "";
 
-    // проверим активность товаров
+    // проверим активность товаров (активные те , у которых город, поставщик или товар не отключены)
     if(activeCheckEl.value) {
         params += "&" + activeCheckEl.value;
+        isOffProduct = "&" + activeCheckEl.value;
     }
 
-    // перерисуем фильтр поставщиков в зависимости от города
-    updateVendorFilterByCity();
+    // перерисуем фильтры
+    updateFilters();
 
-    // проверим значение бренда, категории и поиска
+    // проверим значение города, бренда, категории, поставщика и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
     // и добавляем в параметр строки запроса 
     [city_idEl, brand_idEl, category_idEl, searchEl, vendor_idEl].forEach(item => {
+
         if (item.value.trim()) {
             if  (item.id === 'search') {
                 params += "&search=name_front:" + item.value + ";description_front:" + item.value;
@@ -162,136 +141,163 @@ function getFilters() {
         }
     })
 
-    // проверим чекбокс неактивных товаров
-    // if(activeEl.value) {
-    //     params += "&" + activeEl.value;
-    // }
-
     // проверим утверждённость товаров
     if(confirmCheckEl.value) {
         params += "&" + confirmCheckEl.value;
     }
 
-
-
-    // проверим выбранные чекбоксы активный/неактивный, утверждённый/неутверждённый
-    // запишем id всех выделенных чекбоксов
-    // statusProductEl.forEach(statusId => {
-    //     if(statusId.hasAttribute('checked')) {
-    //         statusProductIdArray.push(statusId.id);
-    //     }  
-    // })
-    // // если выделены и активные и неактивные
-    // if(statusProductIdArray.indexOf('') && statusProductIdArray.indexOf('')) {
-    //     alert('выделены акт-неакт')
-    // } else if(!statusProductIdArray.indexOf('') && !statusProductIdArray.indexOf('')) {
-    //     alert('не выделены акт-неакт')
-    // }
-    // console.log(statusProductIdArray);
-
-
     // вернём параметры
+    console.log(params);
     return params;
 }
 
-// перерисовка фильтра поставщиков в зависимости от города
-function updateVendorFilterByCity() {
+/* ---------- ПЕРЕРИСОВКА ФИЛЬТРОВ ---------- */
+// запуск перерисовки фильтров updateFilters();
+function updateFilters() {
 
-    // сохраняем параметры выбранного поставщика во время нажатием кнопки
-    vendorCheckName = vendor_idEl.querySelector('option[value="' + vendor_idEl.value + '"]').innerText; 
-    vendorCheckId = vendor_idEl.value;
-    isOffProduct = activeCheckEl.value;
-    let vendorsByCityJSON;
-    let vendorsByCity;
-    let cityNotActiveJSON;
-    let cityNotActive;
+    updateCityFilter();
 
-// если есть значение города и нужны неактивные товары
-// добавим города, которые неактивны, но в них есть товары 
-    if (city_idEl.value.trim()) {
-        if (isOffProduct == "off_product=1") {
-            cityNotActiveJSON = sendRequestGET(mainUrl + '/api/cities/get-cities-for-filter-front.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&city_deleted=0&' + isOffProduct);
-            
-            
-            
-            
-            
-            
-            // сделаем запрос с параметрами, запишем данные в переменную vendorByCity
-            vendorsByCityJSON = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?role=2&deleted=0&city_id=' + city_idEl.value.trim());
-        }
-        // сделаем запрос с параметрами, запишем данные в переменную vendorByCity
-        vendorsByCityJSON = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?role=2&deleted=0&city_id=' + city_idEl.value.trim());
+    updateVendorFilter();
 
-    } else {
-        // сделаем запрос с параметрами, запишем данные в переменную vendorByCity
+    updateCategoryFilter();
 
-        vendorsByCityJSON = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0');
-    }
+    updateBrandFilter();
+}
 
-    if (vendorsByCityJSON) {
-        vendorsByCity = JSON.parse(vendorsByCityJSON);
-       
-        // перерисовываем начинку фильтра
-        // при этом если выбранный поставщик отсутствует в списке
-        // то фильтр будет сброшен на ВСЕ
+// перерисовка фильтра города
+function updateCityFilter() {
 
-        vendor_idEl.innerHTML = `<option value="">Все</option>`
-                                    
-        for (let i = 0; i < vendorsByCity.length; i++) {
-            if (vendorCheckId == vendorsByCity[i]['id']) {
-                vendor_idEl.innerHTML += `<option value="${vendorsByCity[i]['id']}" selected>${vendorsByCity[i]['name']}</option>`  
-            } else {
-                vendor_idEl.innerHTML += `<option value="${vendorsByCity[i]['id']}">${vendorsByCity[i]['name']}</option>`
-            }
+    // сохраняем параметры выбранного города во время нажатия кнопки
+    cityCheckId = city_idEl.value;
+    cityCheckName = city_idEl.querySelector('option[value="' + city_idEl.value + '"]').innerText; 
+    console.log("перерисовка городов", cityCheckName);
+    // отберём все города, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр городов
+    let citiesListJSON = sendRequestGET(mainUrl + '/api/cities/get-uniq-cities-by-products.php?' + urlStaticString + isOffProduct + '&orderby=city_name:asc');
+    let citiesList;
+
+    // перерисовываем начинку фильтра
+    // при этом если выбранный город отсутствует в списке
+    // то он будет показан, но его не будет в списке для выбора
+    city_idEl.innerHTML = `<option value="">Все</option>
+                            <option value="${cityCheckId}" selected hidden>${cityCheckName}</option>`
+
+    if (citiesListJSON) {
+        citiesList = JSON.parse(citiesListJSON);
+                                 
+        for (let i = 0; i < citiesList.length; i++) {
+            city_idEl.innerHTML += `<option value="${citiesList[i]['city_id']}">${citiesList[i]['city_name']}</option>`
         }
 
-    } else {
-        vendorsByCity = [];
-        vendor_idEl.innerHTML = `<option value="">Все</option>`;
     }
 }
 
-// перерисовка фильтра категории в зависимости от города и поставщика
-function updateVendorFilterByCity() {
+// перерисовка фильтра поставщика в зависимости от города
+function updateVendorFilter() {
 
     // сохраняем параметры выбранного поставщика во время нажатием кнопки
-    vendorCheckName = vendor_idEl.querySelector('option[value="' + vendor_idEl.value + '"]').innerText; 
     vendorCheckId = vendor_idEl.value;
+    vendorCheckName = vendor_idEl.querySelector('option[value="' + vendor_idEl.value + '"]').innerText; 
+    console.log("перерисовка поставщиков", vendorCheckName);
+    let paramsTemp = "";
 
-    // если значение города !== '', то сделаем запрос на получение всех поставщиков этого города
-    // иначе - всех поставщиков
+    if (city_idEl.value.trim()) {paramsTemp += "&city_id=" + city_idEl.value.trim();}
+
+    // отберём всех поставщиков, у которых есть товары, удовлетв условию
     // и перерисуем фильтр поставщика
-    if (city_idEl.value.trim()) {
-        // сделаем запрос с параметрами, запишем данные в переменную vendorByCity
-        vendorsByCityJSON = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?role=2&deleted=0&city_id=' + city_idEl.value.trim());
 
-    } else {
-        // сделаем запрос с параметрами, запишем данные в переменную vendorByCity
-        vendorsByCityJSON = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0');
-    }
+    // сделаем запрос с параметрами, запишем данные в переменную vendorsList
+    let vendorsListJSON = sendRequestGET(mainUrl + '/api/vendors/get-uniq-vendors-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=vendor_name:asc');
+    let vendorsList;
 
-    if (vendorsByCityJSON) {
-        vendorsByCity = JSON.parse(vendorsByCityJSON);
-       
-        // перерисовываем начинку фильтра
-        // при этом если выбранный поставщик отсутствует в списке
-        // то фильтр будет сброшен на ВСЕ
+    // перерисовываем начинку фильтра
+    // при этом если выбранный поставщик отсутствует в списке
+    // то он будет показан, но его не будет в списке для выбора
+    vendor_idEl.innerHTML = `   <option value="">Все</option>
+                                <option value="${vendorCheckId}" selected hidden>${vendorCheckName}</option>`
 
-        vendor_idEl.innerHTML = `<option value="">Все</option>`
-                                    
-        for (let i = 0; i < vendorsByCity.length; i++) {
-            if (vendorCheckId == vendorsByCity[i]['id']) {
-                vendor_idEl.innerHTML += `<option value="${vendorsByCity[i]['id']}" selected>${vendorsByCity[i]['name']}</option>`  
-            } else {
-                vendor_idEl.innerHTML += `<option value="${vendorsByCity[i]['id']}">${vendorsByCity[i]['name']}</option>`
-            }
+    if (vendorsListJSON) {
+        vendorsList = JSON.parse(vendorsListJSON);
+                               
+        for (let i = 0; i < vendorsList.length; i++) {
+            vendor_idEl.innerHTML += `<option value="${vendorsList[i]['vendor_id']}">${vendorsList[i]['vendor_name']}</option>`
         }
 
-    } else {
-        vendorsByCity = [];
-        vendor_idEl.innerHTML = `<option value="">Все</option>`;
-    }
+    } 
+}
+
+// перерисовка фильтра категории в зависимости от города и поставщика
+function updateCategoryFilter() {
+
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    categoryCheckId = category_idEl.value;
+    categoryCheckName = category_idEl.querySelector('option[value="' + category_idEl.value + '"]').innerText; 
+    console.log("перерисовка категории", categoryCheckName);
+    let paramsTemp = "";
+
+    if (city_idEl.value.trim()) {paramsTemp += "&city_id=" + city_idEl.value.trim();}
+    if (vendor_idEl.value.trim()) {paramsTemp += "&vendor_id=" + vendor_idEl.value.trim();}
+
+    // отберём все категории, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр категорий
+
+    // сделаем запрос с параметрами
+    let categoriesListJSON = sendRequestGET(mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=category_name:asc');
+    let categoriesList;
+
+    // перерисовываем начинку фильтра
+    // при этом если выбранная категория отсутствует в списке
+    // то она будет показана, но её не будет в списке для выбора
+    category_idEl.innerHTML = `<option value="">Все</option>
+                                <option value="${categoryCheckId}" selected hidden>${categoryCheckName}</option>`
+
+    if (categoriesListJSON) {
+        categoriesList = JSON.parse(categoriesListJSON);
+                                  
+        for (let i = 0; i < categoriesList.length; i++) {
+            category_idEl.innerHTML += `<option value="${categoriesList[i]['category_id']}">${categoriesList[i]['category_name']}</option>`
+        }
+
+    } 
+
+}
+
+// перерисовка фильтра бренда в зависимости от города и поставщика и категории
+function updateBrandFilter() {
+
+    // сохраняем параметры выбранного бренда во время нажатия кнопки
+    brandCheckId = brand_idEl.value;
+    brandCheckName = brand_idEl.querySelector('option[value="' + brand_idEl.value + '"]').innerText; 
+    console.log("перерисовка бренда", brandCheckName);
+
+    let paramsTemp = "";
+
+    if (city_idEl.value.trim()) {paramsTemp += "&city_id=" + city_idEl.value.trim();}
+    if (vendor_idEl.value.trim()) {paramsTemp += "&vendor_id=" + vendor_idEl.value.trim();}
+    if (category_idEl.value.trim()) {paramsTemp += "&category_id=" + category_idEl.value.trim();}
+
+    // отберём все бренды, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр брендов
+
+    // сделаем запрос с параметрами
+    let brandsListJSON = sendRequestGET(mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=brand_name:asc');
+    let brandsList;
+
+    // перерисовываем начинку фильтра
+    // при этом если выбранная категория отсутствует в списке
+    // то он будет показан, но его не будет в списке для выбора
+    brand_idEl.innerHTML = `<option value="">Все</option>
+                            <option value="${brandCheckId}" selected hidden>${brandCheckName}</option>`
+
+    if (brandsListJSON) {
+        brandsList = JSON.parse(brandsListJSON);
+                                     
+        for (let i = 0; i < brandsList.length; i++) {
+            brand_idEl.innerHTML += `<option value="${brandsList[i]['brand_id']}">${brandsList[i]['brand_name']}</option>`
+        }
+
+    } 
+
 }
 
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ДАННЫХ В ОТВЕТЕ ---------- */
@@ -543,7 +549,7 @@ function switchPage(variance) {
 
     // и офсет
     offset = (currentPage - 1) * limit;
-   
+
     // отрисуем страничку
     startRenderPage();
 
@@ -640,43 +646,27 @@ function deleteProduct() {
 
 }
 
-/* ---------- НАЖАТИЕ НА ГАЛОЧКУ НЕАКТИВНЫЕ В МЕНЮ ФИЛЬТРАЦИИ ---------- */
-
-// если выбрана галочка, то не нужен параметр is_active
-// если же галочки нет, то запрашиваем только is_active=1
-// для этого меняем значение атрибута value  у чекбокса
-// activeCheckEl.onclick = function(){
-//     if(activeEl.checked) {
-//         activeEl.value = ""
-        
-//     } else {
-//         activeEl.value = "is_active=1";  
-//     }
-
-//     console.log(activeEl.value);
-// }
-
-
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ редактирования---------- */
 function editProduct(id) {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
+    history.replaceState(history.length, null, 'admin-list-products.php?' + params);
 
     // при переходе на страницу редактирования товара передаём ещё и параметры фильтрации в get
-    window.location.href = mainUrl + "/pages/admin-edit-product.php?id=" + id + "&deleted=0"+ params ; 
+    window.location.href = mainUrl + "/pages/admin-edit-product.php?id=" + id + params ; 
 }
+
 
 /* ---------- ПЕРЕХОД И ПЕРЕДАЧА ПАРАМЕТРОВ ФИЛЬТРАЦИИ НА СТРАНИЦУ добавления товара---------- */
 function addProduct() {
 
     // заменяем в истории браузера стр на стр с get параметрами
     // для того, чтобы при переходе по кнопке НАЗАД мы увидели контент по параметрам
-    history.replaceState(history.length, null, 'admin-list-products.php?deleted=0' + params);
+    history.replaceState(history.length, null, 'admin-list-products.php?' + params);
 
     // при переходе на страницу добавления товара передаём ещё и параметры фильтрации в get
-    window.location.href = mainUrl + "/pages/admin-add-product.php?deleted=0" + params; 
+    window.location.href = mainUrl + "/pages/admin-add-product.php?" + params; 
 }
 
 
@@ -972,9 +962,3 @@ function checkboxChangedProductConfirm(id) {
     startRenderPage();
 
 }
-
-// function changeVendorsFilterByCityId() {
-//     alert('меняем поставиков')
-// }
-
-// city_idEl.addEventListener('change', changeVendorsFilterByCityId);

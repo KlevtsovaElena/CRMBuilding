@@ -18,7 +18,7 @@
 
         protected function onGet()
         {
-            $result = $this->productRepository->getUniqElementsByProducts($_GET, 'category');
+            $result = $this->productRepository->getUniqElementsByProducts($_GET, 'vendor');
 
             if ($result)
                 echo json_encode($result, JSON_UNESCAPED_UNICODE);

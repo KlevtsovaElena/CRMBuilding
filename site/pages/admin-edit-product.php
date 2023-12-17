@@ -35,8 +35,6 @@ if($role !== 1) {
         $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0&orderby=name:asc");
         $units = json_decode($unitsJson, true);
 
-        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors.php?role=2?deleted=0&orderby=name:asc");
-        $vendors = json_decode($vendorsJson, true);
     ?>
                         
     <!-- Форма редактирования товара -->

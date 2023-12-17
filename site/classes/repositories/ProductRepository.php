@@ -71,6 +71,7 @@ class ProductRepository extends BaseRepository
                                         v.`price_confirmed` as `price_confirmed`,
                                         p.`is_active` as `is_active`,
                                         p.`is_confirm` as `is_confirm`,
+                                        v.`role` as `vendore_role`,
                                     CASE 
                                         WHEN p.`name` <> ""  THEN p.`name`
                                         WHEN p.`name2` <> "" THEN p.`name2`
@@ -155,39 +156,39 @@ class ProductRepository extends BaseRepository
                                         u.`id` = p.`unit_id`
                                     %s';  
 
-const GET_UNIQ_CATEGORIES = 'SELECT DISTINCT 
-                                c.`id` as `category_id`,
-                                c.`category_name` as `category_name`,
-                                c.`deleted` as `category_deleted`
-                                FROM products p
-                                INNER JOIN categories c ON
-                                    c.`id` = p.`category_id`
-                                INNER JOIN brands b ON 
-                                    b.`id` = p.`brand_id`
-                                INNER JOIN vendors v ON
-                                    v.`id` = p.`vendor_id`
-                                INNER JOIN cities cit ON
-                                    cit.`id` = v.`city_id`
-                                INNER JOIN units u ON
-                                    u.`id` = p.`unit_id`
-                                %s';  
+    const GET_UNIQ_CATEGORIES = 'SELECT DISTINCT 
+                                    c.`id` as `category_id`,
+                                    c.`category_name` as `category_name`,
+                                    c.`deleted` as `category_deleted`
+                                    FROM products p
+                                    INNER JOIN categories c ON
+                                        c.`id` = p.`category_id`
+                                    INNER JOIN brands b ON 
+                                        b.`id` = p.`brand_id`
+                                    INNER JOIN vendors v ON
+                                        v.`id` = p.`vendor_id`
+                                    INNER JOIN cities cit ON
+                                        cit.`id` = v.`city_id`
+                                    INNER JOIN units u ON
+                                        u.`id` = p.`unit_id`
+                                    %s';  
 
-const GET_UNIQ_BRANDS = 'SELECT DISTINCT 
-                                b.`id` as `brand_id`,
-                                b.`brand_name` as `brand_name`,
-                                b.`deleted` as `brand_deleted`
-                                FROM products p
-                                INNER JOIN categories c ON
-                                    c.`id` = p.`category_id`
-                                INNER JOIN brands b ON 
-                                    b.`id` = p.`brand_id`
-                                INNER JOIN vendors v ON
-                                    v.`id` = p.`vendor_id`
-                                INNER JOIN cities cit ON
-                                    cit.`id` = v.`city_id`
-                                INNER JOIN units u ON
-                                    u.`id` = p.`unit_id`
-                                %s';  
+    const GET_UNIQ_BRANDS = 'SELECT DISTINCT 
+                                    b.`id` as `brand_id`,
+                                    b.`brand_name` as `brand_name`,
+                                    b.`deleted` as `brand_deleted`
+                                    FROM products p
+                                    INNER JOIN categories c ON
+                                        c.`id` = p.`category_id`
+                                    INNER JOIN brands b ON 
+                                        b.`id` = p.`brand_id`
+                                    INNER JOIN vendors v ON
+                                        v.`id` = p.`vendor_id`
+                                    INNER JOIN cities cit ON
+                                        cit.`id` = v.`city_id`
+                                    INNER JOIN units u ON
+                                        u.`id` = p.`unit_id`
+                                    %s';  
     // const GET_BY_CATEGORY = 'SELECT p.`id` as `id`,
     //                                     p.`name` as `name`,
     //                                     p.`name2` as `name2`,
@@ -273,7 +274,8 @@ const GET_UNIQ_BRANDS = 'SELECT DISTINCT
         'price_confirmed' => 'v.price_confirmed',
         'is_active' => 'p.is_active',
         'is_confirm' => 'p.is_confirm',
-        'name_front' => 'name_front'
+        'name_front' => 'name_front',
+        'vendore_role' => 'v.role'
     ];
 
     public function getTableName(): string
@@ -434,8 +436,8 @@ const GET_UNIQ_BRANDS = 'SELECT DISTINCT
         // если есть и 1, то нужны только неактивные товары (город, поставщик или товар отключен)
         // если нет, то нужны все товары 
         if (isset($inputParams['off_product']) && $inputParams['off_product'] == '1') {
-            $whereString .= ' AND (p.`is_active` = 0 OR cit.`is_active` = 0 OR v.`is_active` = 0)';
-        } else  if (isset($inputParams['off_product']) && $inputParams['off_product'] == '0') {
+            $whereString .= ' AND (p.`is_active` = 0 OR cit.`is_active` = 0 OR v.`is_active` = 0)';            
+        } else  if (isset($inputParams['off_product']) && $inputParams['off_product'] == '0') {            
             $whereString .= ' AND p.`is_active` = 1 AND cit.`is_active` = 1 AND v.`is_active` = 1';
         }
 
@@ -448,20 +450,17 @@ const GET_UNIQ_BRANDS = 'SELECT DISTINCT
 
 
         if ($element == 'city') {
-                echo 'ищем города';
-                $query = sprintf(static::GET_UNIQ_CITIES, implode(' ', [$whereString, $orderByString]));
+            $query = sprintf(static::GET_UNIQ_CITIES, implode(' ', [$whereString, $orderByString]));
         } else if ($element == 'vendor') {
-                echo 'ищем поставщиков';
-                $query = sprintf(static::GET_UNIQ_VENDORS, implode(' ', [$whereString, $orderByString]));
+            $query = sprintf(static::GET_UNIQ_VENDORS, implode(' ', [$whereString, $orderByString]));
         } else if ($element == 'category') {
-                echo 'ищем категории';
-                $query = sprintf(static::GET_UNIQ_CATEGORIES, implode(' ', [$whereString, $orderByString]));
+            $query = sprintf(static::GET_UNIQ_CATEGORIES, implode(' ', [$whereString, $orderByString]));
         } else if ($element == 'brand') {
-            echo 'ищем бренды';
             $query = sprintf(static::GET_UNIQ_BRANDS, implode(' ', [$whereString, $orderByString]));
         }
 
         $whereParams = SqlHelper::convertToSqlParam($whereParams);
+
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute($whereParams);
 

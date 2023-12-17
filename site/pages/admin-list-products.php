@@ -32,23 +32,8 @@ if($role !== 1) {
         if (count($_GET) == 0)  {
         ?>
 
-        <!-- соберём данные для отображения в форме -->
-
-        <?php
-            $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
-            $brands = json_decode($brandsJson, true);
-
-            $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
-            $categories = json_decode($categoriesJson, true);
-
-            // города по умолчанию отображаются неудалённые и не отключенные
-            $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&is_active=1&orderby=city_name:asc");
-            $cities = json_decode($citiesJson, true);
-            // поставщики по умолчанию отображаются неудалённые и не отключенные, у которых город не удален и не отключен
-            $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&is_active=1&city_deleted=0&city_active=1&orderby=name:asc");
-            $vendors = json_decode($vendorsJson, true);
+            <!-- данные для отображения в форме (без гет параметров не нужны, тк при отрисовке таблицы будут перерисованы фильтры) -->
         
-        ?>
             <!-- Выбор фильтров -->
             <section class="form-filters">
 
@@ -57,38 +42,22 @@ if($role !== 1) {
                 <!-- выбор города -->
                 <div class="d-iblock">
                     <div>Город</div>
-                    <select id="city_id" name="city_id" value="">
-                        
-                        <option value="">Все</option>
-                        <?php foreach($cities as $city) { ?>
-
-                            <option value="<?= $city['id']; ?>"><?= $city['name']; ?></option>
-                        <?php }; ?>
-
+                    <select id="city_id" name="city_id" value="">  
+                        <option value="" selected>Все</option>
                     </select>
                 </div>
                 <!-- выбор поставщика -->
                 <div class="d-iblock">
                     <div>Поставщик</div>
                     <select id="vendor_id" name="vendor_id" value="" class="vendor-filter">
-                        
-                        <option value="">Все</option>
-                        <?php foreach($vendors as $vendor) { ?>
-                            <option value="<?= $vendor['id']; ?>"><?= $vendor['name']; ?></option>
-                        <?php }; ?>
-
+                        <option value="" selected>Все</option>
                     </select>
                 </div>
                 <!-- выбор категории -->
                 <div class="d-iblock">
                     <div>Категория</div>
                     <select id="category_id" name="category_id" value="">
-                        
-                        <option value="">Все</option>
-                        <?php foreach($categories as $category) { ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                        <?php }; ?>
-
+                        <option value="" selected>Все</option>
                     </select>
                 </div>
 
@@ -96,12 +65,7 @@ if($role !== 1) {
                 <div class="d-iblock">
                     <div>Бренд</div>
                     <select id="brand_id" name="brand_id" value="">
-
-                        <option value="">Все</option>
-                        <?php foreach($brands as $brand) { ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                        <?php }; ?>
-
+                        <option value="" selected>Все</option>
                     </select>
                 </div>
 
@@ -130,7 +94,7 @@ if($role !== 1) {
                     <div>Утверждены</div>
                     <select id="is_confirm" name="is_confirm" value="">
                         
-                        <option value="">Все</option>
+                        <option value="" selected>Все</option>
                         <option value="is_confirm=1">Утверждены</option>
                         <option value="is_confirm=0">Не утверждены</option>
                         
@@ -145,43 +109,12 @@ if($role !== 1) {
                         <!-- неактивные - это все товары, которые отключены поставщиком, 
                         у которых поставщик отключен или
                         у которых город отключен -->
-                        <option value="off_product=0">Активные</option>
-                        <option value="off_product=1">Неактивные</option>
+                        <option value="off_product=0" selected>Активные</option>
+                        <option title="отключен сам товар, поставщик или город" value="off_product=1">Отключены</option>
                         <option value="">Все</option>
  
                     </select>
                 </div>
-                <!-- показывать неактивные
-                <div class="active-check">
-                    <div >
-                        <input type="checkbox" id="active-check" name="active-check" value="is_active=1">
-                    </div>
-                    <lable>Неактивные</lable>
-                </div> -->
-
-
-                <!-- выбрать какие товары показывать из активных, неактивных, утверждённых, неутверждённых или все сразу, множ выбор -->
-                <!-- <div class="container-status-filter">
-
-                    <ul class="status-list-items">
-                        <li class="item"> 
-                            <input type="checkbox" class="t" id="confirm-product-check" name="confirm-product-check" checked value="is_confirm=1">
-                            <lable>Утверждены</lable>
-                        </li>
-                        <li class="item"> 
-                            <input type="checkbox" id="notconfirm-product-check" name="notconfirm-product-check" checked value="is_confirm=0">
-                            <lable>Не утверждены</lable>
-                        </li>
-                        <li class="item"> 
-                            <input type="checkbox" id="active-product-check" name="active-product-check" checked value="is_active=1">
-                            <lable>Активные</lable>
-                        </li>
-                        <li class="item"> 
-                            <input type="checkbox" class="t" id="notactive-product-check" name="notactive-product-check" value="is_active=0">
-                            <lable>Неактивные</lable>
-                        </li>
-                    </ul>
-                </div> -->
 
                 <button class="btn btn-ok d-iblock">Применить</button>
 
@@ -251,29 +184,17 @@ if (count($_GET) !== 0) {
         $offset = 0;
     }
 
-    // <!-- соберём данные для отображения в форме -->
-
-    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&orderby=brand_name:asc");
-    $brands = json_decode($brandsJson, true);
-
-    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&orderby=category_name:asc");
-    $categories = json_decode($categoriesJson, true);
-
     if(isset($_GET['off_product'])) {
-        // получим все уникальные города, соответсвующие запросу
-        $citiesJson = file_get_contents($nginxUrl . "/api/cities/get-cities-for-filter-front.php?deleted=0&brand_deleted=0&category_deleted=0&vendor_deleted=0&off_product=" . $_GET['off_product'] . "&orderby=city_name:asc");
-        $cities = json_decode($citiesJson, true);
-
+        $offProduct = "&off_product=" . $_GET['off_product'];
     } else {
-        // получим все уникальные города, соответсвующие запросу
-        $citiesJson = file_get_contents($nginxUrl . "/api/cities/get-cities-for-filter-front.php?deleted=0&brand_deleted=0&category_deleted=0&vendor_deleted=0&orderby=city_name:asc");
-        $cities = json_decode($citiesJson, true);
+        $offProduct = "";
     }
 
-    // получим все 
-    $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0&orderby=name:asc");
-    $vendors = json_decode($vendorsJson, true);
+
 ?>
+
+    <!--запрашиваем  данные для отображения в форме толкьо в том случае если есть гет-параметр этого элемента -->
+    <!--и рисуем его <option value="значение" selected>имя</option> -->
 
     <!-- Выбор фильтров -->
     <section class="form-filters">
@@ -285,24 +206,15 @@ if (count($_GET) !== 0) {
                 <div>Город</div>
                 <select id="city_id" name="city_id" value="">
                     
-                    <option value="">Все</option>
- 
-                    <?php foreach($cities as $city) {
-                        if (!isset($_GET['city_id'])) {
-                        ?>
-                            <option value="<?= $city['city_id']; ?>"><?= $city['city_name']; ?></option>
-                        <?php
-                        } else if ($_GET['city_id'] == $city['city_id']) {
-                        ?>
-                            <option value="<?= $city['city_id']; ?>" selected><?= $city['city_name']; ?></option>
-
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $city['city_id']; ?>"><?= $city['city_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>  
+                    <?php if (isset($_GET['city_id']) && $_GET['city_id'] !== "" ) {    
+                        $cityJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0&id=" . $_GET['city_id']);
+                        $city = json_decode($cityJson, true);
+                    ?>
+                        <option value="<?= $_GET['city_id']; ?>" selected><?= $city['name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -311,25 +223,16 @@ if (count($_GET) !== 0) {
             <div class="d-iblock">
                 <div>Поставщик</div>
                 <select id="vendor_id" name="vendor_id" value=""  class="vendor-filter">
-                    
-                    <option value="">Все</option>
 
-                    <?php foreach($vendors as $vendor) {
-                        if (!isset($_GET['vendor_id'])) {
-                        ?>
-                            <option value="<?= $vendor['id']; ?>"><?= $vendor['name']; ?></option>
-                        <?php
-                        } else if ($_GET['vendor_id'] == $vendor['id']) {
-                        ?>
-                            <option value="<?= $vendor['id']; ?>" selected><?= $vendor['name']; ?></option>
-
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $vendor['id']; ?>"><?= $vendor['name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
+                    <?php if (isset($_GET['vendor_id'])  && $_GET['vendor_id'] !== "" ) {  
+                        $vendorJson = file_get_contents($nginxUrl . "/api/vendors.php?deleted=0&id=" . $_GET['vendor_id']);
+                        $vendor = json_decode($vendorJson, true);  
+                    ?>
+                        <option value="<?= $_GET['vendor_id']; ?>" selected><?= $vendor['name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -337,24 +240,16 @@ if (count($_GET) !== 0) {
             <div class="d-iblock">
                 <div>Категория</div>
                 <select id="category_id" name="category_id" value="">
-                    
-                    <option value="">Все</option>
-                    <?php foreach($categories as $category) {
-                        if (!isset($_GET['category_id'])) {
-                        ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                        <?php
-                        } else if ($_GET['category_id'] == $category['id']) {
-                        ?>
-                            <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
 
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
+                    <?php if (isset($_GET['category_id']) && $_GET['category_id'] !== "" ) {    
+                        $categoryJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&id=" . $_GET['category_id']);
+                        $category = json_decode($categoryJson, true);  
+                    ?>
+                        <option value="<?= $_GET['category_id']; ?>" selected><?= $category['category_name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -364,23 +259,15 @@ if (count($_GET) !== 0) {
                 <div>Бренд</div>
                 <select id="brand_id" name="brand_id" value="">
 
-                    <option value="">Все</option>
-                    <?php foreach($brands as $brand) {
-                        if (!isset($_GET['brand_id'])) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                        <?php
-                        } else if ($_GET['brand_id'] == $brand['id']) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
-
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
+                    <?php if (isset($_GET['brand_id']) && $_GET['brand_id'] !== "" ) {    
+                        $brandJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&id=" . $_GET['brand_id']);
+                        $brand = json_decode($brandJson, true);                          
+                    ?>
+                        <option value="<?= $_GET['brand_id']; ?>" selected><?= $brand['brand_name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -420,7 +307,7 @@ if (count($_GET) !== 0) {
                 <div>Утверждены</div>
                 <select id="is_confirm" name="is_confirm" value="">
                     
-                    <option value="">Все</option>
+                    <option value="" <?php if(!isset($_GET['is_confirm'])) {echo 'selected';} ?>>Все</option>
                     <option value="is_confirm=1" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '1') {echo 'selected';} ?>>Утверждены</option>
                     <option value="is_confirm=0" <?php if(isset($_GET['is_confirm']) && $_GET['is_confirm'] == '0') {echo 'selected';} ?>>Не утверждены</option>
                     
@@ -433,8 +320,8 @@ if (count($_GET) !== 0) {
                 <select id="is_active" name="is_active" value="">
 
                     <option value="off_product=0" <?php if(isset($_GET['off_product']) && $_GET['off_product'] == '0') {echo 'selected';} ?>>Активные</option>
-                    <option value="off_product=1" <?php if(isset($_GET['off_product']) && $_GET['off_product'] == '1') {echo 'selected';} ?>>Неактивные</option>
-                    <option value="">Все</option>
+                    <option title="отключен сам товар, поставщик или город" value="off_product=1" <?php if(isset($_GET['off_product']) && $_GET['off_product'] == '1') {echo 'selected';} ?>>Отключены</option>
+                    <option value="" <?php if(!isset($_GET['off_product'])) {echo 'selected';} ?>>Все</option>
 
                 </select>
             </div>
@@ -477,8 +364,6 @@ if (count($_GET) !== 0) {
     <section class="pagination-wrapper" offset="<?= $offset; ?>"><!-- пагинация --></section>
 
 <?php }?>
-
-
 
 
     <!-- ШАБЛОНЫ -->

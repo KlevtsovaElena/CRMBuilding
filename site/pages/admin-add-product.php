@@ -34,7 +34,7 @@ if($role !== 1) {
         $unitsJson = file_get_contents($nginxUrl . "/api/units.php?deleted=0&orderby=name:asc");
         $units = json_decode($unitsJson, true);
 
-        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&city_deleted=0&orderby=name:asc");
+        $vendorsJson = file_get_contents($nginxUrl . "/api/vendors/get-with-details.php?role=2&deleted=0&is_active=1&city_deleted=0&city_active=1&orderby=name:asc");
         $vendors = json_decode($vendorsJson, true);
     ?>
                         

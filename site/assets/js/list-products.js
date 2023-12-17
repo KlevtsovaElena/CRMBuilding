@@ -14,7 +14,11 @@ const headTableProducts = document.getElementById('list-products').querySelector
 let currentPage = 1;
 let vendor_id = document.getElementById('vendor_id').value;
 
-let url = mainUrl + '/api/products/products-with-count.php?deleted=0&category_deleted=0&brand_deleted=0&vendor_deleted=0&vendor_id=' + vendor_id;
+// основной url для запроса товаров
+// urlStaticString - это неменяющиеся параметры поиска, те товары всегда неудаленные, 
+// роль поставщика 2, поставщик не удален, город не удален, бренд не удален, категория не удалена
+let urlStaticString = "deleted=0&city_deleted=0&vendor_role=2&vendor_deleted=0&category_deleted=0&brand_deleted=0&city_active=1&vendor_active=1&vendor_id=" + vendor_id;
+let url = mainUrl + '/api/products/products-with-count-for-list-products.php?' + urlStaticString;
 
 let brand_idEl = document.getElementById('brand_id');
 let category_idEl = document.getElementById('category_id');
@@ -60,22 +64,14 @@ let totalProductsJson;
 
 let garbage;
 
-// // закэшируем значения брендов и категорий
-// brand_idEl.querySelectorAll('option').forEach(item => {
-//     brands[item.value] = item.innerText;
-// })
-// category_idEl.querySelectorAll('option').forEach(item => {
-//     categories[item.value] = item.innerText;
-// })
-// // закэшируем значения единиц измерения (временно, пока нет апишки)
-// let unitsJson = sendRequestGET(mainUrl + '/api/units.php');
-// let unitsData = JSON.parse(unitsJson);
-// unitsData.forEach(item => {
-//    units[item['id']] = item['name_short'];
-// })
+let categoryIdMasschange = document.getElementById('category_id_masschange');
+let brandIdMasschange = document.getElementById('brand_id_masschange');
+
 // заполним страницу данными
 startRenderPage(priceConfirmedEl.getAttribute('confirm-price'));
 
+// отрисуем фильтры в окне массового изменения цен
+updateFiltersForMassChangePrice();
 
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
 function startRenderPage(priceConfirmed) {
@@ -134,6 +130,9 @@ function getFilters() {
     // сбросим параметры строки запроса
     params = "";
 
+    // перерисуем фильтры
+    updateFilters();
+
     // проверим значение бренда, категории и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
     // и добавляем в параметр строки запроса 
@@ -153,9 +152,88 @@ function getFilters() {
     }
 
     // вернём параметры
+    console.log(params);
     return params;
 }
 
+/* ---------- ПЕРЕРИСОВКА ФИЛЬТРОВ ---------- */
+// запуск перерисовки фильтров updateFilters();
+function updateFilters() {
+
+    updateCategoryFilter(category_idEl);
+
+    updateBrandFilter(category_idEl, brand_idEl);
+}
+
+
+
+// перерисовка фильтра категории
+function updateCategoryFilter(categoryEl) {
+
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    categoryCheckId = categoryEl.value;
+    categoryCheckName = categoryEl.querySelector('option[value="' + categoryEl.value + '"]').innerText; 
+    console.log("перерисовка категории", categoryCheckName);
+
+    // отберём все категории, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр категорий
+
+    // сделаем запрос с параметрами
+    let categoriesListJSON = sendRequestGET(mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + '&orderby=category_name:asc');
+    let categoriesList;
+
+    // перерисовываем начинку фильтра
+    // при этом если выбранная категория отсутствует в списке
+    // то она будет показана, но её не будет в списке для выбора
+    categoryEl.innerHTML = `<option value="">Все</option>
+                            <option value="${categoryCheckId}" selected hidden>${categoryCheckName}</option>`
+
+    if (categoriesListJSON) {
+        categoriesList = JSON.parse(categoriesListJSON);
+                                  
+        for (let i = 0; i < categoriesList.length; i++) {
+            categoryEl.innerHTML += `<option value="${categoriesList[i]['category_id']}">${categoriesList[i]['category_name']}</option>`
+        }
+
+    } 
+
+}
+
+// перерисовка фильтра бренда в зависимости категории
+function updateBrandFilter(categoryEl, brandEl) {
+
+    // сохраняем параметры выбранного бренда во время нажатия кнопки
+    brandCheckId = brandEl.value;
+    brandCheckName = brandEl.querySelector('option[value="' + brandEl.value + '"]').innerText; 
+    console.log("перерисовка бренда", brandCheckName);
+
+    let paramsTemp = "";
+
+    if (categoryEl.value.trim()) {paramsTemp += "&category_id=" + categoryEl.value.trim();}
+
+    // отберём все бренды, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр брендов
+
+    // сделаем запрос с параметрами
+    let brandsListJSON = sendRequestGET(mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + '&orderby=brand_name:asc');
+    let brandsList;
+
+    // перерисовываем начинку фильтра
+    // при этом если выбранная категория отсутствует в списке
+    // то он будет показан, но его не будет в списке для выбора
+    brandEl.innerHTML = `<option value="">Все</option>
+                            <option value="${brandCheckId}" selected hidden>${brandCheckName}</option>`
+
+    if (brandsListJSON) {
+        brandsList = JSON.parse(brandsListJSON);
+                                     
+        for (let i = 0; i < brandsList.length; i++) {
+            brandEl.innerHTML += `<option value="${brandsList[i]['brand_id']}">${brandsList[i]['brand_name']}</option>`
+        }
+
+    } 
+
+}
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ДАННЫХ В ОТВЕТЕ ---------- */
 function changeData() {
 
@@ -895,10 +973,8 @@ function massChangePriceClick() {
     }
 
     // выбранные характеристики изменяемого товара
-    let categoryIdMasschange = document.getElementById('category_id_masschange');
     let categoryIdMasschangeOption = categoryIdMasschange.querySelectorAll('option');
 
-    let brandIdMasschange = document.getElementById('brand_id_masschange');
     let brandIdMasschangeOption = brandIdMasschange.querySelectorAll('option');
 
     if (categoryIdMasschange.value && brandIdMasschange.value) {
@@ -963,3 +1039,8 @@ masschangePriceCase.addEventListener('change', () => {
     }
 })
 
+// функция отрисовки фильтров в окне Массовое изменение цен
+function updateFiltersForMassChangePrice() {
+    updateCategoryFilter(categoryIdMasschange);
+    updateBrandFilter(categoryIdMasschange, brandIdMasschange);
+}

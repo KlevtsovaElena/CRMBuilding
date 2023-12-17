@@ -56,7 +56,22 @@ if($role !== 1) {
 
             <?php }  ?>
             <div class="link-text">
-             <a href="admin-list-products.php?vendor_id=<?= $id; ?>">Посмотреть товары поставщика</a>
+            <?php
+                    // запросим наличие товаров у поставщика
+                    // если они есть (неудаленные, неудаленного города, неудаленного бренда, неудаленной категории)
+                    // если есть товары, то ссылку на стр товаров
+                    // если нет товаров, то просто текст Нет товаров
+                    $productsVendorCount = file_get_contents($nginxUrl . "/api/products/get-count-products.php?deleted=0&city_deleted=0&brand_deleted=0&category_deleted=0&vendor_id=" . $id);
+
+                    if ($productsVendorCount > 0) { 
+            ?>
+
+                    <a href="admin-list-products.php?vendor_id=<?= $id; ?>">Посмотреть товары поставщика</a>
+                    
+            <?php }  else { ?>
+                    <span>Нет товаров</span>
+                        
+            <?php }?>
             </div>
             <!-- название -->
             <div class="form-add-vendor__item">
