@@ -29,14 +29,6 @@ if($role !== 2) {
 
 <!-- соберём данные для отображения в форме -->
 
-<?php
-    $brandsJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0");
-    $brands = json_decode($brandsJson, true);
-
-    $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
-    $categories = json_decode($categoriesJson, true);
-?>
-
     <!-- инфа о подтверждении цен -->
     <div class="confirm-price-daily">
         <div  class="price-confirm-container" confirm-price="<?= $profile['price_confirmed']; ?>">
@@ -67,12 +59,7 @@ if($role !== 2) {
                     <div class="d-iblock">
                         <div>Категория</div>
                         <select id="category_id" name="category_id" value="">
-                            
-                            <option value="">Все</option>
-                            <?php foreach($categories as $category) { ?>
-                                <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                            <?php }; ?>
-
+                            <option value="" selected>Все</option>
                         </select>
                     </div>
 
@@ -80,12 +67,7 @@ if($role !== 2) {
                     <div class="d-iblock">
                         <div>Бренд</div>
                         <select id="brand_id" name="brand_id" value="">
-
-                            <option value="">Все</option>
-                            <?php foreach($brands as $brand) { ?>
-                                <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                            <?php }; ?>
-
+                            <option value="" selected>Все</option>
                         </select>
                     </div>
 
@@ -136,8 +118,8 @@ if($role !== 2) {
                         <tr role="row">
 
                             <th data-id="name_front" data-sort="">Наименование</th>
-                            <th data-id="category_id" data-sort="">Категория</th>
-                            <th data-id="brand_id" data-sort="">Бренд</th>
+                            <th data-id="category_name" data-sort="">Категория</th>
+                            <th data-id="brand_name" data-sort="">Бренд</th>
                             <th data-id="quantity_available" data-sort="">Остаток</th>
                             <th data-id="price" data-sort="">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                             <th data-id="max_price" data-sort="">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
@@ -167,7 +149,7 @@ if($role !== 2) {
 if (count($_GET) !== 0) {
     if(isset($_GET['search'])) {
         $searchText = $_GET['search'];
-        $search = explode(";description:", $searchText);
+        $search = explode(";description_front:", $searchText);
         $searchText = $search[1];
     } else {
         $searchText = "";
@@ -201,24 +183,16 @@ if (count($_GET) !== 0) {
             <div class="d-iblock">
                 <div>Категория</div>
                 <select id="category_id" name="category_id" value="">
-                    
-                    <option value="">Все</option>
-                    <?php foreach($categories as $category) {
-                        if (!isset($_GET['category_id'])) {
-                        ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>
-                        <?php
-                        } else if ($_GET['category_id'] == $category['id']) {
-                        ?>
-                            <option value="<?= $category['id']; ?>" selected><?= $category['category_name']; ?></option>
 
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $category['id']; ?>"><?= $category['category_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
+                    <?php if (isset($_GET['category_id']) && $_GET['category_id'] !== "" ) {    
+                        $categoryJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0&id=" . $_GET['category_id']);
+                        $category = json_decode($categoryJson, true);  
+                    ?>
+                        <option value="<?= $_GET['category_id']; ?>" selected><?= $category['category_name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -228,23 +202,15 @@ if (count($_GET) !== 0) {
                 <div>Бренд</div>
                 <select id="brand_id" name="brand_id" value="">
 
-                    <option value="">Все</option>
-                    <?php foreach($brands as $brand) {
-                        if (!isset($_GET['brand_id'])) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>
-                        <?php
-                        } else if ($_GET['brand_id'] == $brand['id']) {
-                        ?>
-                            <option value="<?= $brand['id']; ?>" selected><?= $brand['brand_name']; ?></option>
-
-                        <?php
-                        } else {
-                        ?>
-                            <option value="<?= $brand['id']; ?>"><?= $brand['brand_name']; ?></option>;
-                        <?php 
-                        }
-                    }; ?>
+                    <?php if (isset($_GET['brand_id']) && $_GET['brand_id'] !== "" ) {    
+                        $brandJson = file_get_contents($nginxUrl . "/api/brands.php?deleted=0&id=" . $_GET['brand_id']);
+                        $brand = json_decode($brandJson, true);                          
+                    ?>
+                        <option value="<?= $_GET['brand_id']; ?>" selected><?= $brand['brand_name']; ?></option>
+                        <option value="">Все</option>
+                    <?php } else { ?> 
+                        <option value="" selected>Все</option>
+                    <?php } ?> 
 
                 </select>
             </div>
@@ -310,8 +276,8 @@ if (count($_GET) !== 0) {
                 <tr role="row">
 
                     <th data-id="name_front" data-sort="<?php if ($sortBy == 'name_front')  {echo $mark; } ?>">Наименование</th>
-                    <th data-id="category_id" data-sort="<?php if ($sortBy == 'category_id')  {echo $mark; } ?>">Категория</th>
-                    <th data-id="brand_id" data-sort="<?php if ($sortBy == 'brand_id')  {echo $mark; } ?>">Бренд</th>
+                    <th data-id="category_name" data-sort="<?php if ($sortBy == 'category_name')  {echo $mark; } ?>">Категория</th>
+                    <th data-id="brand_name" data-sort="<?php if ($sortBy == 'brand_name')  {echo $mark; } ?>">Бренд</th>
                     <th data-id="quantity_available" data-sort="<?php if ($sortBy == 'quantity_available')  {echo $mark; } ?>">Остаток</th>
                     <th data-id="price" data-sort="<?php if ($sortBy == 'price')  {echo $mark; } ?>">Цена, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
                     <th data-id="max_price" data-sort="<?php if ($sortBy == 'max_price')  {echo $mark; } ?>">Цена рынок, <?php if ($profile['currency_dollar'] == '0') {echo 'Сум';} else {echo '$';} ?></th>
