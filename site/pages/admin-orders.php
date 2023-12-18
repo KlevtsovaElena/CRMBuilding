@@ -121,6 +121,47 @@ if($role !== 1) {
                 </div>
                 <?php } ?>
 
+                <!-- фильтрация по городу -->
+                <div class="d-iblock">
+                    <div>Город</div> 
+                    <select id="city" name="city" value="" required>
+                    <?php
+                        //запрашиваем данные по городам из БД
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
+                        $dataV = json_decode($dataJsonV, true);
+
+                        //если город не был задан, устанавливаем в селекте выбранное значение "все"
+                        if (!isset($_GET['vendor_city'])) {
+                            
+                        ?>
+                            <option value="" <?= 'selected' ?>  onclick="cityChanged('')">все</option>
+                            <?php for ($v = 0; $v < count($dataV); $v++) { ?>
+                                <option value="<?= $dataV[$v]['name'] ?>" onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <?php }
+                        //если город уже задан в гет-параметрах, выводим его
+                        } else {
+                            $city = $_GET['vendor_city']; 
+                            ?>
+
+                            <option value="" <?php if($city == 'all') { echo 'selected'; } ?>  onclick="cityChanged('')">все</option>
+                            <?php 
+                            for ($v = 0; $v < count($dataV); $v++) { 
+                                if($city == $dataV[$v]['name']) {?>
+                                
+                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?> onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                } else { ?>
+                                    
+                                <option value="<?= $dataV[$v]['name'] ?>" onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <?php 
+                                }
+                            ?>
+                        <?php 
+                            }
+                        } ?> 
+                    </select>
+                </div>
+
                 <!-- фильтрация по поставщику -->
                 <div class="d-iblock">
                     <div>Поставщик</div> 
@@ -147,47 +188,6 @@ if($role !== 1) {
                             <?php 
                             for ($v = 0; $v < count($dataV); $v++) { 
                                 if($vendor == $dataV[$v]['name']) {?>
-                                
-                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
-                            <?php 
-                                } else { ?>
-                                    
-                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                            <?php 
-                                }
-                            ?>
-                        <?php 
-                            }
-                        } ?> 
-                    </select>
-                </div>
-
-                <!-- фильтрация по городу -->
-                <div class="d-iblock">
-                    <div>Город</div> 
-                    <select id="city" name="city" value="" required>
-                    <?php
-                        //запрашиваем данные по городам из БД
-                        $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
-                        $dataV = json_decode($dataJsonV, true);
-
-                        //если город не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['vendor_city'])) {
-                            
-                        ?>
-                            <option value="" <?= 'selected' ?> >все</option>
-                            <?php for ($v = 0; $v < count($dataV); $v++) { ?>
-                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
-                            <?php }
-                        //если город уже задан в гет-параметрах, выводим его
-                        } else {
-                            $city = $_GET['vendor_city']; 
-                            ?>
-
-                            <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
-                            <?php 
-                            for ($v = 0; $v < count($dataV); $v++) { 
-                                if($city == $dataV[$v]['name']) {?>
                                 
                                 <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
                             <?php 
@@ -323,7 +323,7 @@ if($role !== 1) {
 
         <!-- таблица заказов -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>" data-status-select="<?php if (isset($_GET['status'])) { echo $_GET['status']; } ?>" data-archive-select="<?php if(isset($_GET['archive'])) { ?><?= $_GET['archive'] ?><?php } ?>">
+            <table id="list-orders" data-section="admin-orders" data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-vendor-select="<?php if (isset($_GET['vendor_name'])) { echo $_GET['vendor_name']; } ?>" data-status-select="<?php if (isset($_GET['status'])) { echo $_GET['status']; } ?>" data-archive-select="<?php if(isset($_GET['archive'])) { ?><?= $_GET['archive'] ?><?php } ?>" data-city-select="<?php if (isset($_GET['vendor_city'])) { echo $_GET['vendor_city']; } ?>">
 
                 <thead>
                     <tr role="row">
