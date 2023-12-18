@@ -32,12 +32,13 @@ function sortChange() {
     let dataVendor = document.getElementById('list-orders').getAttribute('data-vendor-select');
 
     //получим селект "город"
-    if (document.getElementById('city')) {
-        let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
-        console.log(citySel);
-    } else {
-        citySel = null;
-    }
+    let citySel = document.getElementById('list-orders').getAttribute('data-city-select');
+    // if (document.getElementById('city')) {
+    //     let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    //     console.log(citySel);
+    // } else {
+    //     citySel = null;
+    // }
 
     // получим значение атрибута data-status-select, содержащего выбранный статус
     let dataStatus = document.getElementById('list-orders').getAttribute('data-status-select');
