@@ -1,5 +1,35 @@
 console.log('подключили add-wholesaler.js');
 
+// определим основные переменные
+const formAddVendor = document.querySelector('.form-add-vendor');
+const vendorInfo = document.querySelector('.vendor-info');
+const copyBtn = document.querySelectorAll('.copy-result');
+let errorVendor = document.querySelector('.vendor-info-error');
+
+// запишем значения полей формы в переменные
+const nameVendor = formAddVendor.querySelector('#name');
+const cityId = formAddVendor.querySelector('#city_id');
+const comment = formAddVendor.querySelector('#comment');
+const phone = formAddVendor.querySelector('#phone');
+const email = formAddVendor.querySelector('#email');
+// const percent = formAddVendor.querySelector('#percent');
+const is_active = formAddVendor.querySelector('#is_active');
+let phoneNumber = "";
+
+
+// подтверждение цены инфа
+let priceConfirmedEl;
+let tmplPriceConfirm;
+let tmplPriceNotConfirm;
+let priceConfirmedOld;
+
+if (document.querySelector('.price-confirm-container')) {
+    priceConfirmedEl = document.querySelector('.price-confirm-container');
+    priceConfirmedOld = priceConfirmedEl.getAttribute('confirm-price');
+    tmplPriceConfirm = document.getElementById('tmpl-price-confirm').innerHTML;
+    tmplPriceNotConfirm = document.getElementById('tmpl-price-not-confirm').innerHTML;
+}
+
 function addWholesaler() {
         
     // проверяем корректность токена
@@ -85,7 +115,7 @@ function addWholesaler() {
         'phone': phoneNumber,
         'email': email.value.trim(),
         'is_active': is_active.value,
-        'percent': percent.value, 
+        // 'percent': percent.value, 
         'currency_dollar': currencyDollar,
         'price_confirmed': priceConf,
         'role': 3, // соответствует роли оптовика
@@ -126,6 +156,77 @@ function addWholesaler() {
                             </div>`
                             
     formAddVendor.reset();
+}
+
+function validationAddVendor() {
+    hasError = false;
+
+    [nameVendor, cityId, email, is_active].forEach(item =>  {
+    
+        const errorInfoContainer = item.closest('.form-add-vendor__item').querySelector('.error-info');
+        
+        if (!(item.value.trim())) {
+            // пустое поле
+            item.classList.add('error');   
+            errorInfoContainer.innerText = "Заполните данные!";
+            errorInfoContainer.classList.remove('d-none');
+            hasError = true;                
+        } else if (item.id === "email") {
+            // если поле email, то проверяем с пом регулярных выражений
+            if (!emailValidation(item.value.trim())) {
+                item.classList.add('error');   
+                errorInfoContainer.innerText = "Неверный формат email!";
+                errorInfoContainer.classList.remove('d-none');
+                hasError = true; 
+            } else {
+                item.classList.remove('error');
+                errorInfoContainer.innerText = "";
+                errorInfoContainer.classList.add('d-none'); 
+            }
+        } else {
+            item.classList.remove('error');
+            errorInfoContainer.innerText = "";
+            errorInfoContainer.classList.add('d-none');
+        }
+    
+    })
+
+    return hasError;
+
+}
+
+function emailValidation(emailValue) {
+    const EMAIL_REGEXP = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu;
+    console.log("emailValue " + emailValue + "   " + EMAIL_REGEXP.test(emailValue)); 
+    return EMAIL_REGEXP.test(emailValue);
+}
+
+function copyText() {
+    const copyTextEl = event.target.closest('.vendor-info-text').querySelector('.copy-text');
+
+    const tempInput = document.createElement('input');
+    tempInput.setAttribute('value', copyTextEl.innerText);
+
+    document.body.appendChild(tempInput);
+
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+
+    document.body.removeChild(tempInput);
+
+    const alert = document.createElement('div');
+    alert.classList.add('alert');
+    alert.textContent = "Скопировано";
+
+    document.body.appendChild(alert);
+
+    setTimeout(() => {
+
+        document.body.removeChild(alert);
+
+    }, 1500);
+
 }
 
 function editWholesaler1(id) {
@@ -196,7 +297,7 @@ function editWholesaler1(id) {
         }
     }
 
-    //объединяем id и названия в единый ассотиативный массив
+    //объединяем id и названия в единый ассоциативный массив
     let categoriesArr = {};
 
     for (let m = 0; m < checkboxesChecked.length; m++) {
@@ -214,7 +315,7 @@ function editWholesaler1(id) {
         'comment': comment.value.trim(),
         'phone': phoneNumber,
         'email': email.value.trim(),
-        'percent': percent.value,
+        // 'percent': percent.value,
         'currency_dollar': currencyDollar,
         'price_confirmed':  priceConfirmedEl.getAttribute('confirm-price'),
         'is_active': is_active.value,
@@ -239,6 +340,16 @@ function editWholesaler1(id) {
      
     // переход обратно на странницу списка поставщиков с прежними параметрами
     returnPageListWholesalers();
+}
+
+// вывести предупреждение при смене Сум на $
+function checkCurrency() {
+    const parentEl = event.target.closest('.form-add-vendor__item');
+    if (parentEl.getAttribute('currency') !== '1') {
+        const infoCurrency = parentEl.querySelector('.error-info');
+        infoCurrency.classList.remove('d-none');
+        infoCurrency.innerText = "! При изменении Сум на $ цены обнулятся";
+    }
 }
 
 // удаление оптовика админом
@@ -276,6 +387,74 @@ function deleteWholesalerFromEditForm(id) {
     returnPageListWholesalers();
     
 }
+
+// меняем отображение подтверждения цен при нажатии на галочку или крестик
+function changePriceConfirm() {
+
+    let confirmPrice = priceConfirmedEl.getAttribute('confirm-price');
+
+    if (confirmPrice == 1) {
+        priceConfirmedEl.setAttribute('confirm-price', '0');
+        priceConfirmedEl.innerHTML = tmplPriceNotConfirm;
+    } else {
+        priceConfirmedEl.setAttribute('confirm-price', '1');
+        priceConfirmedEl.innerHTML = tmplPriceConfirm;
+    }
+
+}
+
+
+/* ---------- МАСКА ДЛЯ ТЕЛЕФОНА ---------- */
+// Подключена маска imask.js 
+
+let maskOptions = {
+    mask: '+998-00-000-00-00',
+    lazy: false  
+} 
+
+let mask = new IMask(phone, maskOptions);
+// при скликивании, если шаблон не меняли, то очищаем поле
+phone.addEventListener('blur', (e) => {
+    console.log('blur');
+    if (document.querySelector('.phone-edit')) {
+        if (!document.querySelector('.phone-edit').classList.contains('change')) {
+            phone.type = "hidden";
+            document.getElementById('phoneOld').type = "tel"
+        }
+    }
+    if (phone.value.replace(/\D/g, "").length == 3) {
+        console.log('nhb');
+        phone.value = ""
+    }
+})
+
+// при фокусе, если поле было очищено, то покажем шаблон маски
+phone.addEventListener('focus', (e) => {
+    if (phone.value.replace(/\D/g, "").length == 0) {
+        phone.value = "+998-__-___-__-__";
+    }
+})
+
+function test() {
+    event.target.type = 'hidden';
+    phone.type = 'tel';
+    phone.focus()
+}
+phone.addEventListener("change", (e) => {
+    phone.classList.add('change');
+});
+
+
+function returnPageListVendors() {
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;
+
+}
+
 
 function returnPageListWholesalers() {
     // получим гет параметры страницы без id

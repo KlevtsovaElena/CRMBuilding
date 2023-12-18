@@ -335,6 +335,14 @@ if($role !== 1) {
                         //соберём данные для отображения в форме 
                         $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                         $data = json_decode($dataJson, true); 
+
+                        //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                        $dataJsonN = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?&orderby=' . $_GET['orderby'] . $params);
+                        $dataN = json_decode($dataJsonN, true); 
+                        $totalEntries = $dataN['count'];
+                        //и об общем кол-ве страниц
+                        $totalPages = ceil((int)$dataN['count'] / $limit);
+
                         $data = $data['products'];
                         //print_r($data);
                         //$num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
@@ -345,8 +353,16 @@ if($role !== 1) {
                         if (!isset($_GET['search'])) {
                             //print_r('not 1');
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true); 
+
+                            //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
+                            $dataJsonN = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period.php?&orderby=' . $_GET['orderby'] . $params);
+                            $dataN = json_decode($dataJsonN, true); 
+                            $totalEntries = $dataN['count'];
+                            //и об общем кол-ве страниц
+                            $totalPages = ceil((int)$dataN['count'] / $limit);
+
                             $data = $data['products'];
                             //print_r($data);
                             //$num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
