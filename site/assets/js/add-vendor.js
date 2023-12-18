@@ -307,8 +307,8 @@ function editVendor(id) {
         sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', objPrice);
     }
      
-    // перезагрузим страницу
-    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;;
+    // перейдём на страницу списка поставщиков
+    returnPageListVendors();
 }
 
 // вывести предупреждение при смене Сум на $
@@ -349,18 +349,10 @@ function deleteVendorFromEditForm(id) {
     // делаем запрос на удаление поставщика по id
     sendRequestPOST(mainUrl + '/api/vendors/delete-vendor-with-products.php', obj);
 
-    // делаем запрос на удаление поставщика по id
-    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
-
     alert("Поставщик удалён");
 
-    // получим гет параметры страницы без id
-    let paramsArr = window.location.href.split('?')[1].split('&');
-    paramsArr.splice(0, 1);
-    let params = paramsArr.join('&');
-
     // переход обратно на странницу списка поставщиков с прежними параметрами
-    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;
+    returnPageListVendors();
     
 }
 
@@ -428,6 +420,18 @@ function test() {
 phone.addEventListener("change", (e) => {
     phone.classList.add('change');
 });
+
+
+function returnPageListVendors() {
+    // получим гет параметры страницы без id
+    let paramsArr = window.location.href.split('?')[1].split('&');
+    paramsArr.splice(0, 1);
+    let params = paramsArr.join('&');
+
+    window.location.href = mainUrl + '/pages/admin-vendors.php?' + params;
+
+}
+
 
 // function maskTel(event) {
 
