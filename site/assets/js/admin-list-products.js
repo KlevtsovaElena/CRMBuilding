@@ -125,7 +125,7 @@ function getFilters() {
     }
 
     // перерисуем фильтры
-    updateFilters();
+    updateFilters('saveIdEl');
 
     // проверим значение города, бренда, категории, поставщика и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
@@ -153,122 +153,89 @@ function getFilters() {
 
 /* ---------- ПЕРЕРИСОВКА ФИЛЬТРОВ ---------- */
 // запуск перерисовки фильтров updateFilters();
-function updateFilters() {
+function updateFilters(isSaveIdElement) {
 
-    updateCityFilter();
+    updateCityFilter(isSaveIdElement);
 
-    updateVendorFilter();
+    updateVendorFilter(isSaveIdElement);
 
-    updateCategoryFilter();
+    updateCategoryFilter(isSaveIdElement);
 
-    updateBrandFilter();
+    updateBrandFilter(isSaveIdElement);
 }
 
 // перерисовка фильтра города
-function updateCityFilter() {
+function updateCityFilter(isSaveIdElement) {
+    console.log("перерисовка города");
 
-    // сохраняем параметры выбранного города во время нажатия кнопки
-    cityCheckId = city_idEl.value;
-    cityCheckName = city_idEl.querySelector('option[value="' + city_idEl.value + '"]').innerText; 
-    console.log("перерисовка городов", cityCheckName);
-    // отберём все города, у которых есть товары, удовлетв условию
-    // и перерисуем фильтр городов
-    let citiesListJSON = sendRequestGET(mainUrl + '/api/cities/get-uniq-cities-by-products.php?' + urlStaticString + isOffProduct + '&orderby=city_name:asc');
-    let citiesList;
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    arrayParams = { 'checkId': city_idEl.value,
+                    'checkName': city_idEl.querySelector('option[value="' + city_idEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/cities/get-uniq-cities-by-products.php?' + urlStaticString + isOffProduct + '&orderby=city_name:asc',
+                    'changeEl': city_idEl,
+                    'idName': 'city_id',
+                    'nameName': 'city_name'
+                    }
 
-    // перерисовываем начинку фильтра
-    // при этом если выбранный город отсутствует в списке
-    // то он будет показан, но его не будет в списке для выбора
-    city_idEl.innerHTML = `<option value="">Все</option>
-                            <option value="${cityCheckId}" selected hidden>${cityCheckName}</option>`
+    // отберём все категории, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр категорий
+    updateThisFilter(arrayParams);
 
-    if (citiesListJSON) {
-        citiesList = JSON.parse(citiesListJSON);
-                                 
-        for (let i = 0; i < citiesList.length; i++) {
-            city_idEl.innerHTML += `<option value="${citiesList[i]['city_id']}">${citiesList[i]['city_name']}</option>`
-        }
-
-    }
 }
 
 // перерисовка фильтра поставщика в зависимости от города
-function updateVendorFilter() {
+function updateVendorFilter(isSaveIdElement) {
+    console.log("перерисовка поставщика");
 
-    // сохраняем параметры выбранного поставщика во время нажатием кнопки
-    vendorCheckId = vendor_idEl.value;
-    vendorCheckName = vendor_idEl.querySelector('option[value="' + vendor_idEl.value + '"]').innerText; 
-    console.log("перерисовка поставщиков", vendorCheckName);
     let paramsTemp = "";
 
     if (city_idEl.value.trim()) {paramsTemp += "&city_id=" + city_idEl.value.trim();}
 
-    // отберём всех поставщиков, у которых есть товары, удовлетв условию
-    // и перерисуем фильтр поставщика
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    arrayParams = { 'checkId': vendor_idEl.value,
+                    'checkName': vendor_idEl.querySelector('option[value="' + vendor_idEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/vendors/get-uniq-vendors-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=vendor_name:asc',
+                    'changeEl': vendor_idEl,
+                    'idName': 'vendor_id',
+                    'nameName': 'vendor_name'
+                    }
 
-    // сделаем запрос с параметрами, запишем данные в переменную vendorsList
-    let vendorsListJSON = sendRequestGET(mainUrl + '/api/vendors/get-uniq-vendors-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=vendor_name:asc');
-    let vendorsList;
+    // отберём все категории, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр категорий
+    updateThisFilter(arrayParams);
 
-    // перерисовываем начинку фильтра
-    // при этом если выбранный поставщик отсутствует в списке
-    // то он будет показан, но его не будет в списке для выбора
-    vendor_idEl.innerHTML = `   <option value="">Все</option>
-                                <option value="${vendorCheckId}" selected hidden>${vendorCheckName}</option>`
-
-    if (vendorsListJSON) {
-        vendorsList = JSON.parse(vendorsListJSON);
-                               
-        for (let i = 0; i < vendorsList.length; i++) {
-            vendor_idEl.innerHTML += `<option value="${vendorsList[i]['vendor_id']}">${vendorsList[i]['vendor_name']}</option>`
-        }
-
-    } 
 }
 
 // перерисовка фильтра категории в зависимости от города и поставщика
-function updateCategoryFilter() {
+function updateCategoryFilter(isSaveIdElement) {
+    console.log("перерисовка категории");
 
-    // сохраняем параметры выбранной категории во время нажатия кнопки
-    categoryCheckId = category_idEl.value;
-    categoryCheckName = category_idEl.querySelector('option[value="' + category_idEl.value + '"]').innerText; 
-    console.log("перерисовка категории", categoryCheckName);
     let paramsTemp = "";
 
     if (city_idEl.value.trim()) {paramsTemp += "&city_id=" + city_idEl.value.trim();}
     if (vendor_idEl.value.trim()) {paramsTemp += "&vendor_id=" + vendor_idEl.value.trim();}
 
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    arrayParams = { 'checkId': category_idEl.value,
+                    'checkName': category_idEl.querySelector('option[value="' + category_idEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=category_name:asc',
+                    'changeEl': category_idEl,
+                    'idName': 'category_id',
+                    'nameName': 'category_name'
+                    }
+
     // отберём все категории, у которых есть товары, удовлетв условию
     // и перерисуем фильтр категорий
-
-    // сделаем запрос с параметрами
-    let categoriesListJSON = sendRequestGET(mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=category_name:asc');
-    let categoriesList;
-
-    // перерисовываем начинку фильтра
-    // при этом если выбранная категория отсутствует в списке
-    // то она будет показана, но её не будет в списке для выбора
-    category_idEl.innerHTML = `<option value="">Все</option>
-                                <option value="${categoryCheckId}" selected hidden>${categoryCheckName}</option>`
-
-    if (categoriesListJSON) {
-        categoriesList = JSON.parse(categoriesListJSON);
-                                  
-        for (let i = 0; i < categoriesList.length; i++) {
-            category_idEl.innerHTML += `<option value="${categoriesList[i]['category_id']}">${categoriesList[i]['category_name']}</option>`
-        }
-
-    } 
+    updateThisFilter(arrayParams);
 
 }
 
 // перерисовка фильтра бренда в зависимости от города и поставщика и категории
-function updateBrandFilter() {
-
-    // сохраняем параметры выбранного бренда во время нажатия кнопки
-    brandCheckId = brand_idEl.value;
-    brandCheckName = brand_idEl.querySelector('option[value="' + brand_idEl.value + '"]').innerText; 
-    console.log("перерисовка бренда", brandCheckName);
+function updateBrandFilter(isSaveIdElement) {
+    console.log("перерисовка категории");
 
     let paramsTemp = "";
 
@@ -276,30 +243,96 @@ function updateBrandFilter() {
     if (vendor_idEl.value.trim()) {paramsTemp += "&vendor_id=" + vendor_idEl.value.trim();}
     if (category_idEl.value.trim()) {paramsTemp += "&category_id=" + category_idEl.value.trim();}
 
-    // отберём все бренды, у которых есть товары, удовлетв условию
-    // и перерисуем фильтр брендов
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    arrayParams = { 'checkId': brand_idEl.value,
+                    'checkName': brand_idEl.querySelector('option[value="' + brand_idEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=brand_name:asc',
+                    'changeEl': brand_idEl,
+                    'idName': 'brand_id',
+                    'nameName': 'brand_name'
+                    }
+
+    // отберём все категории, у которых есть товары, удовлетв условию
+    // и перерисуем фильтр категорий
+    updateThisFilter(arrayParams);
+
+}
+
+
+// отрисовка фильтров
+function updateThisFilter(arrayParams) {
 
     // сделаем запрос с параметрами
-    let brandsListJSON = sendRequestGET(mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + isOffProduct + '&orderby=brand_name:asc');
-    let brandsList;
+    let elementsListJSON = sendRequestGET(arrayParams['url']);
+    let elementsList;
 
     // перерисовываем начинку фильтра
     // при этом если выбранная категория отсутствует в списке
-    // то он будет показан, но его не будет в списке для выбора
-    brand_idEl.innerHTML = `<option value="">Все</option>
-                            <option value="${brandCheckId}" selected hidden>${brandCheckName}</option>`
-
-    if (brandsListJSON) {
-        brandsList = JSON.parse(brandsListJSON);
-                                     
-        for (let i = 0; i < brandsList.length; i++) {
-            brand_idEl.innerHTML += `<option value="${brandsList[i]['brand_id']}">${brandsList[i]['brand_name']}</option>`
+    // 1. при isSaveIdElement он будет показан, но его не будет в списке для выбора (нажатие на применить, пагинацию, сортировку)
+    if (arrayParams['isSaveIdElement'] == 'saveIdEl') {
+        arrayParams['changeEl'].innerHTML = `<option value="">Все</option>
+                                            <option value="${arrayParams['checkId']}" selected hidden>${arrayParams['checkName']}</option>`
+                               
+        if (elementsListJSON) {
+            elementsList = JSON.parse(elementsListJSON);   
+            for (let i = 0; i < elementsList.length; i++) {
+               arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`
+            }
         }
 
+    // 2. при notSaveIdElement  (нажатие на фильтр, от которого зависят дургие фильтры)   
+    } else if (arrayParams['isSaveIdElement'] == 'notSaveIdEl' ){
+        // 2.1 если старого эл-та нет в списке из запроса (или == ''), то фильтр сбросится на Все и старого выбранного элемента не будет вообще
+        // 2.2 если старый эл-т в списке из запроса, то фильтр он и будет выбранным элементом
+        if(arrayParams['checkId'] == '') {
+           arrayParams['changeEl'].innerHTML = `<option value="" selected>Все</option>`
+            if (elementsListJSON) {
+                elementsList = JSON.parse(elementsListJSON);          
+                for (let i = 0; i < elementsList.length; i++) {
+                   arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`
+                }
+            }
+
+        } else {
+           arrayParams['changeEl'].innerHTML = `<option value="">Все</option>`
+            if (elementsListJSON) {
+                elementsList = JSON.parse(elementsListJSON);  
+                let elementIn = 0;     
+                for (let i = 0; i < elementsList.length; i++) {
+                    if (elementsList[i][arrayParams['idName']] == arrayParams['checkId']) {
+                        arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}" selected>${elementsList[i][arrayParams['nameName']]}</option>`;  
+                        elementIn++; 
+                    } else {
+                        arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`;
+                    }
+                }
+                if (elementIn<=0) {
+                   arrayParams['changeEl'].innerHTML += `<option value="" selected hidden>Все</option>`
+                }
+            }
+        }
     } 
 
 }
 
+
+// прослушка элементов для перерисовки фильтров
+city_idEl.addEventListener('change', ()=>{
+    // при смене города перерисуем поставщиков, категории и бренды
+    updateVendorFilter('notSaveIdEl'); 
+    updateCategoryFilter('notSaveIdEl'); 
+    updateBrandFilter('notSaveIdEl'); 
+})
+vendor_idEl.addEventListener('change', ()=>{
+    // при смене поставщика перерисуем категории и бренды
+    updateCategoryFilter('notSaveIdEl'); 
+    updateBrandFilter('notSaveIdEl'); 
+})
+category_idEl.addEventListener('change', ()=>{
+    // при смене категории перерисуем бренды  
+    updateBrandFilter('notSaveIdEl'); 
+})
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ДАННЫХ В ОТВЕТЕ ---------- */
 function changeData() {
 
@@ -962,3 +995,4 @@ function checkboxChangedProductConfirm(id) {
     startRenderPage();
 
 }
+
