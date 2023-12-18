@@ -167,9 +167,20 @@ if($role !== 1) {
                     <div>Поставщик</div> 
                     <select id="vendor" name="vendor" value="" required>
                     <?php
-                        //запрашиваем данные по поставщикам из БД
-                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0');
-                        $dataV = json_decode($dataJsonV, true);
+                    
+                        $dataV = [];
+                        //если в гет-параметре еще не задан город
+                        if (!isset($_GET['vendor_city'])) {
+    
+                            //запрашиваем данные по поставщикам из БД
+                            $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0');
+                            $dataV = json_decode($dataJsonV, true);
+    
+                        } else {
+                            //запрашиваем данные по поставщикам из БД с учетом города
+                            $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&city_name=' . $_GET['vendor_city']);
+                            $dataV = json_decode($dataJsonV, true);
+                        }
 
                         //если поставщик не был задан, устанавливаем в селекте выбранное значение "все"
                         if (!isset($_GET['vendor_name'])) {
