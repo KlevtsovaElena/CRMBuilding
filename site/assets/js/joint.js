@@ -69,7 +69,7 @@ function sortChange() {
 
     //если задан город
     if (citySel) {
-        if (section_name == 'admin-vendors') {
+        if (section_name == 'admin-vendors' || section_name == 'admin-wholesalers') {
             filters += '&city_name=' + citySel;
         } else {
             filters += '&vendor_city=' + citySel;

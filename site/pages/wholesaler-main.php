@@ -238,7 +238,12 @@ if($role !== 3) {
                         $data = json_decode($dataJson, true); 
                         
                         //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-                        $totalEntries = $data['count'];
+                        $dataJsonN = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . '&orderby=' . $_GET['orderby'] . $params);
+                        $dataN = json_decode($dataJsonN, true); 
+                        $totalEntries = $dataN['count'];
+                        //и об общем кол-ве страниц
+                        $totalPages = ceil((int)$dataN['count'] / $limit);
+
                         $data = $data['products'];
                         
                         //print_r($data);
@@ -253,7 +258,12 @@ if($role !== 3) {
                             $dataJson = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . '&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true); 
                             //сразу записываем в переменную общее кол-во элементов для вывода внизу таблицы
-                            $totalEntries = $data['count'];
+                            $dataJsonN = file_get_contents($nginxUrl . '/api/analytics/get-count-with-products-sales-by-period-for-wholesaler.php?wholesaler_id=' . $profile['id'] . '&orderby=' . $_GET['orderby'] . $params);
+                            $dataN = json_decode($dataJsonN, true); 
+                            $totalEntries = $dataN['count'];
+                            //и об общем кол-ве страниц
+                            $totalPages = ceil((int)$dataN['count'] / $limit);
+
                             $data = $data['products'];
 
                             //print_r($data);
