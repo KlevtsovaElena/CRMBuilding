@@ -237,8 +237,8 @@ function editWholesaler1(id) {
         sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', objPrice);
     }
      
-    // перезагрузим страницу
-    window.location.href = window.location.href;
+    // переход обратно на странницу списка поставщиков с прежними параметрами
+    returnPageListWholesalers();
 }
 
 // удаление оптовика админом
@@ -271,12 +271,18 @@ function deleteWholesalerFromEditForm(id) {
 
     alert("Оптовик удалён");
 
+
+    // переход обратно на странницу списка оптовиков с прежними параметрами
+    returnPageListWholesalers();
+    
+}
+
+function returnPageListWholesalers() {
     // получим гет параметры страницы без id
     let paramsArr = window.location.href.split('?')[1].split('&');
     paramsArr.splice(0, 1);
     let params = paramsArr.join('&');
 
-    // переход обратно на странницу списка оптовиков с прежними параметрами
     window.location.href = mainUrl + '/pages/admin-wholesalers.php?' + params;
-    
+
 }

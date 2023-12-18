@@ -107,8 +107,8 @@ function editProduct(role) {
     // получаем ответ с сервера
     alert("Данные изменены");
 
-    // перезагрузим страницу
-    window.location.href = window.location.href;
+    // перебросимся на страницу списка товаров
+    returnPageListProducts();
 }
 
 /* ---------- ВАЛИДАЦИЯ ФОРМЫ РЕДАКТИРОВАНИЯ ТОВАРОВ ---------- */
@@ -292,6 +292,12 @@ function deleteProductFromEditForm(id) {
 
     alert("Товар удалён");
 
+    returnPageListProducts();
+
+
+}
+
+function returnPageListProducts() {
     // получим гет параметры страницы без id
     let paramsArr = window.location.href.split('?')[1].split('&');
     paramsArr.splice(0, 1);
@@ -299,8 +305,10 @@ function deleteProductFromEditForm(id) {
 
     // переход обратно на странницу списка товаров с прежними параметрами
     if (window.location.href.includes('vendor-edit-product')) {
+        alert('переходим на '+ mainUrl + '/pages/vendor-list-products.php?' + params)
         window.location.href = mainUrl + '/pages/vendor-list-products.php?' + params;
     } else if (window.location.href.includes('admin-edit-product')) {
+        alert('переходим на '+ mainUrl + '/pages/admin-list-products.php?' + params)
         window.location.href = mainUrl + '/pages/admin-list-products.php?' + params;
     }
 }

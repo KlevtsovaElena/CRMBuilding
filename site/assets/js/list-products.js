@@ -1056,3 +1056,13 @@ function updateFiltersForMassChangePrice() {
     updateCategoryFilter(categoryIdMasschange);
     updateBrandFilter(categoryIdMasschange, brandIdMasschange);
 }
+
+// отслеживание изменения категории в фильтре
+categoryIdMasschange.addEventListener('change', ()=>{
+    updateBrandFilter(categoryIdMasschange, brandIdMasschange);
+})
+
+
+category_idEl.addEventListener('change', ()=> {
+    updateBrandFilter(category_idEl, brand_idEl);
+})
