@@ -74,28 +74,28 @@ if($role !== 1) {
                         $dataV = json_decode($dataJsonV, true);
 
                         //если город не был задан, устанавливаем в селекте выбранное значение "все"
-                        if (!isset($_GET['city_name'])) {
+                        if (!isset($_GET['city_id'])) {
                             
                         ?>
                             <option value="" <?= 'selected' ?> >все</option>
                             <?php for ($v = 0; $v < count($dataV); $v++) { ?>
-                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                                <option value="<?= $dataV[$v]['id'] ?>"><?= $dataV[$v]['name'] ?></option>
                             <?php }
                         //если город уже задан в гет-параметрах, выводим его
                         } else {
-                            $city = $_GET['city_name']; 
+                            $city = $_GET['city_id']; 
                             ?>
 
                             <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
                             <?php 
                             for ($v = 0; $v < count($dataV); $v++) { 
-                                if($city == $dataV[$v]['name']) {?>
+                                if($city == $dataV[$v]['id']) {?>
                                 
-                                <option value="<?= $dataV[$v]['name'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
+                                <option value="<?= $dataV[$v]['id'] ?>" <?= 'selected' ?>><?= $dataV[$v]['name'] ?></option>
                             <?php 
                                 } else { ?>
                                     
-                                <option value="<?= $dataV[$v]['name'] ?>"><?= $dataV[$v]['name'] ?></option>
+                                <option value="<?= $dataV[$v]['id'] ?>"><?= $dataV[$v]['name'] ?></option>
                             <?php 
                                 }
                             ?>
@@ -159,15 +159,15 @@ if($role !== 1) {
         $params = '';
 
         //если заданы гет-параметры города, собираем в переменную
-        if (isset($_GET['city_name'])) {
-            $params = $params . '&city_name=' . $_GET['city_name'];
+        if (isset($_GET['city_id'])) {
+            $params = $params . '&city_id=' . $_GET['city_id'];
         } ?>
 
 
 
         <!-- таблица поставщиков -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-vendors"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-city-select="<?php if (isset($_GET['city_name'])) { echo $_GET['city_name']; } ?>">
+            <table id="list-orders" data-section="admin-vendors"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-city-select="<?php if (isset($_GET['city_id'])) { echo $_GET['city_id']; } ?>">
 
                 <thead>
                     <tr role="row">
