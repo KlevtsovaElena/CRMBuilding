@@ -44,7 +44,7 @@ function logIn() {
     }
 
     // иначе, соберём данные для отправки
-    let params = "email=" + login.value.trim() + "&password=" + pass.value.trim() + "&deleted=0&is_active=1";
+    let params = "email=" + login.value.trim() + "&password=" + pass.value.trim();
     
     //получаем ответ
     let jsonResponse = sendRequestFormUrlPOST(mainUrl + "/api/authorization/login.php", params);
