@@ -305,10 +305,8 @@ function returnPageListProducts() {
 
     // переход обратно на странницу списка товаров с прежними параметрами
     if (window.location.href.includes('vendor-edit-product')) {
-        alert('переходим на '+ mainUrl + '/pages/vendor-list-products.php?' + params)
         window.location.href = mainUrl + '/pages/vendor-list-products.php?' + params;
     } else if (window.location.href.includes('admin-edit-product')) {
-        alert('переходим на '+ mainUrl + '/pages/admin-list-products.php?' + params)
         window.location.href = mainUrl + '/pages/admin-list-products.php?' + params;
     }
 }

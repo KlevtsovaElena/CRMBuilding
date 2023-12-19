@@ -131,7 +131,7 @@ function getFilters() {
     params = "";
 
     // перерисуем фильтры
-    updateFilters();
+    updateFilters('saveIdEl');
 
     // проверим значение бренда, категории и поиска
     // проверяем на наличие данных, если есть, то нормализуем (если надо)
@@ -158,82 +158,113 @@ function getFilters() {
 
 /* ---------- ПЕРЕРИСОВКА ФИЛЬТРОВ ---------- */
 // запуск перерисовки фильтров updateFilters();
-function updateFilters() {
+function updateFilters(isSaveIdElement) {
 
-    updateCategoryFilter(category_idEl);
+    updateCategoryFilter(category_idEl, isSaveIdElement);
 
-    updateBrandFilter(category_idEl, brand_idEl);
+    updateBrandFilter(category_idEl, brand_idEl, isSaveIdElement);
 }
 
-
-
 // перерисовка фильтра категории
-function updateCategoryFilter(categoryEl) {
+function updateCategoryFilter(categoryEl, isSaveIdElement) {
+
+    console.log("перерисовка категории");
 
     // сохраняем параметры выбранной категории во время нажатия кнопки
-    categoryCheckId = categoryEl.value;
-    categoryCheckName = categoryEl.querySelector('option[value="' + categoryEl.value + '"]').innerText; 
-    console.log("перерисовка категории", categoryCheckName);
+    arrayParams = { 'checkId': categoryEl.value,
+                    'checkName': categoryEl.querySelector('option[value="' + categoryEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + '&orderby=category_name:asc',
+                    'changeEl': categoryEl,
+                    'idName': 'category_id',
+                    'nameName': 'category_name'
+                    }
 
     // отберём все категории, у которых есть товары, удовлетв условию
     // и перерисуем фильтр категорий
-
-    // сделаем запрос с параметрами
-    let categoriesListJSON = sendRequestGET(mainUrl + '/api/categories/get-uniq-categories-by-products.php?' + urlStaticString + '&orderby=category_name:asc');
-    let categoriesList;
-
-    // перерисовываем начинку фильтра
-    // при этом если выбранная категория отсутствует в списке
-    // то она будет показана, но её не будет в списке для выбора
-    categoryEl.innerHTML = `<option value="">Все</option>
-                            <option value="${categoryCheckId}" selected hidden>${categoryCheckName}</option>`
-
-    if (categoriesListJSON) {
-        categoriesList = JSON.parse(categoriesListJSON);
-                                  
-        for (let i = 0; i < categoriesList.length; i++) {
-            categoryEl.innerHTML += `<option value="${categoriesList[i]['category_id']}">${categoriesList[i]['category_name']}</option>`
-        }
-
-    } 
+    updateThisFilter(arrayParams);
 
 }
 
 // перерисовка фильтра бренда в зависимости категории
-function updateBrandFilter(categoryEl, brandEl) {
+function updateBrandFilter(categoryEl, brandEl, isSaveIdElement) {
 
-    // сохраняем параметры выбранного бренда во время нажатия кнопки
-    brandCheckId = brandEl.value;
-    brandCheckName = brandEl.querySelector('option[value="' + brandEl.value + '"]').innerText; 
-    console.log("перерисовка бренда", brandCheckName);
+    console.log("перерисовка бренда");
 
     let paramsTemp = "";
 
     if (categoryEl.value.trim()) {paramsTemp += "&category_id=" + categoryEl.value.trim();}
 
-    // отберём все бренды, у которых есть товары, удовлетв условию
-    // и перерисуем фильтр брендов
+    // сохраняем параметры выбранной категории во время нажатия кнопки
+    arrayParams = { 'checkId': brandEl.value,
+                    'checkName': brandEl.querySelector('option[value="' + brandEl.value + '"]').innerText,
+                    'isSaveIdElement': isSaveIdElement,
+                    'url': mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + '&orderby=brand_name:asc',
+                    'changeEl': brandEl,
+                    'idName': 'brand_id',
+                    'nameName': 'brand_name'
+                    }
+
+    updateThisFilter(arrayParams);
+}
+
+
+// отрисовка фильтров
+function updateThisFilter(arrayParams) {
 
     // сделаем запрос с параметрами
-    let brandsListJSON = sendRequestGET(mainUrl + '/api/brands/get-uniq-brands-by-products.php?' + urlStaticString + paramsTemp + '&orderby=brand_name:asc');
-    let brandsList;
+    let elementsListJSON = sendRequestGET(arrayParams['url']);
+    let elementsList;
 
     // перерисовываем начинку фильтра
     // при этом если выбранная категория отсутствует в списке
-    // то он будет показан, но его не будет в списке для выбора
-    brandEl.innerHTML = `<option value="">Все</option>
-                            <option value="${brandCheckId}" selected hidden>${brandCheckName}</option>`
-
-    if (brandsListJSON) {
-        brandsList = JSON.parse(brandsListJSON);
-                                     
-        for (let i = 0; i < brandsList.length; i++) {
-            brandEl.innerHTML += `<option value="${brandsList[i]['brand_id']}">${brandsList[i]['brand_name']}</option>`
+    // 1. при isSaveIdElement он будет показан, но его не будет в списке для выбора (нажатие на применить, пагинацию, сортировку)
+    if (arrayParams['isSaveIdElement'] == 'saveIdEl') {
+        arrayParams['changeEl'].innerHTML = `<option value="">Все</option>
+                                            <option value="${arrayParams['checkId']}" selected hidden>${arrayParams['checkName']}</option>`
+                               
+        if (elementsListJSON) {
+            elementsList = JSON.parse(elementsListJSON);   
+            for (let i = 0; i < elementsList.length; i++) {
+               arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`
+            }
         }
 
+    // 2. при notSaveIdElement  (нажатие на фильтр, от которого зависят дургие фильтры)   
+    } else if (arrayParams['isSaveIdElement'] == 'notSaveIdEl' ){
+        // 2.1 если старого эл-та нет в списке из запроса (или == ''), то фильтр сбросится на Все и старого выбранного элемента не будет вообще
+        // 2.2 если старый эл-т в списке из запроса, то фильтр он и будет выбранным элементом
+        if(arrayParams['checkId'] == '') {
+           arrayParams['changeEl'].innerHTML = `<option value="" selected>Все</option>`
+            if (elementsListJSON) {
+                elementsList = JSON.parse(elementsListJSON);          
+                for (let i = 0; i < elementsList.length; i++) {
+                   arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`
+                }
+            }
+
+        } else {
+           arrayParams['changeEl'].innerHTML = `<option value="">Все</option>`
+            if (elementsListJSON) {
+                elementsList = JSON.parse(elementsListJSON);  
+                let elementIn = 0;     
+                for (let i = 0; i < elementsList.length; i++) {
+                    if (elementsList[i][arrayParams['idName']] == arrayParams['checkId']) {
+                        arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}" selected>${elementsList[i][arrayParams['nameName']]}</option>`;  
+                        elementIn++; 
+                    } else {
+                        arrayParams['changeEl'].innerHTML += `<option value="${elementsList[i][arrayParams['idName']]}">${elementsList[i][arrayParams['nameName']]}</option>`;
+                    }
+                }
+                if (elementIn<=0) {
+                   arrayParams['changeEl'].innerHTML += `<option value="" selected hidden>Все</option>`
+                }
+            }
+        }
     } 
 
 }
+
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ДАННЫХ В ОТВЕТЕ ---------- */
 function changeData() {
 
@@ -1053,16 +1084,16 @@ masschangePriceCase.addEventListener('change', () => {
 
 // функция отрисовки фильтров в окне Массовое изменение цен
 function updateFiltersForMassChangePrice() {
-    updateCategoryFilter(categoryIdMasschange);
-    updateBrandFilter(categoryIdMasschange, brandIdMasschange);
+    updateCategoryFilter(categoryIdMasschange, 'notSaveIdEl');
+    updateBrandFilter(categoryIdMasschange, brandIdMasschange, 'notSaveIdEl');
 }
 
 // отслеживание изменения категории в фильтре
 categoryIdMasschange.addEventListener('change', ()=>{
-    updateBrandFilter(categoryIdMasschange, brandIdMasschange);
+    updateBrandFilter(categoryIdMasschange, brandIdMasschange, 'notSaveIdEl');
 })
 
 
 category_idEl.addEventListener('change', ()=> {
-    updateBrandFilter(category_idEl, brand_idEl);
+    updateBrandFilter(category_idEl, brand_idEl, 'notSaveIdEl');
 })
