@@ -879,7 +879,7 @@ function checkboxChangedProductActive(id) {
         });
 
         //отправляем уведомление админу о том, что товары стали неактивными
-        notifyAdminInactiveGoods();
+        // notifyAdminInactiveGoods();
     }
 
     // отправим запрос на изменение 

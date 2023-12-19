@@ -55,7 +55,7 @@ func main() {
 	for range time.Tick(time.Second * 1) {
 
 		// определим когда запустить проверку подтверждения цен
-		// сейчас
+		// время сейчас
 		timeNow := time.Now()
 		// время проверки
 		nextTimeToStart := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), hour, minute, 0, 0, time.Local)
@@ -77,7 +77,6 @@ func main() {
 
 		// получим всех Поставщиков активных, неудалённых и с активным городом
 		vendorsAll := getAllVendors()
-		fmt.Println(vendorsAll)
 
 		// получим данные админа
 		admin := getAdmin()
@@ -90,7 +89,7 @@ func main() {
 
 		if vendorsAll != nil {
 
-			// с каким временем будем сравнивать (с 9:00) в юникс
+			// с каким временем будем сравнивать (с 9:00 по Ташкенту) в юникс
 			beginIntervalTime := nextTimeToStart.Add(time.Hour * -1).Unix()
 
 			for _, vendor := range vendorsAll {
@@ -99,6 +98,7 @@ func main() {
 
 				message := ""
 
+				// если поставщик нажал кнопку раньше, чем 9.00, то сбросим его подтверждение цен
 				if vendor.TimePriceConfirm < beginIntervalTime {
 
 					// price_confirmed=0 этого поставщика
@@ -120,7 +120,7 @@ func main() {
 func sendTelegramMessage(message string, chatId int) bool {
 
 	var response SendMessageResponseT
-fmt.Println(chatId)
+
 	requestStr := "https://api.telegram.org/bot" + botToken + "/sendMessage?chat_id=" + strconv.Itoa(chatId) + "&text=" + message
 	resp, err := http.Get(requestStr)
 
@@ -132,7 +132,7 @@ fmt.Println(chatId)
 	data, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		fmt.Println("Произошла ошибка при обработке полученных данных от телеграм. (отправка сообщения): " + err.Error())
+		fmt.Println("Произошла ошибка при обработке полученных данных от телеграм (отправка сообщения): " + err.Error())
 	}
 
 	json.Unmarshal(data, &response)
