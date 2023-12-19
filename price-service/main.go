@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -68,7 +69,7 @@ func main() {
 // функция отправки сообщения в канал
 func makeGoodsList() {
 
-	var link string = ""
+	var hashtags string = ""
 
 	fmt.Println("makeGoodsList")
 	// Создаем GET-запрос
@@ -86,9 +87,10 @@ func makeGoodsList() {
 
 		fmt.Println("enter in categories")
 
-		var caption string = "<b>#" + category.CategoryName + "</b>"
+		var caption string = "<b>" + category.CategoryName + "</b>"
 		var product_photo string
-		var link string = "<b>#" + category.CategoryName + "</b>"
+		var hashtag string = url.QueryEscape("<b>#" + strings.ReplaceAll(category.CategoryName, " ", "") + "</b>")
+		hashtags += url.QueryEscape("<b>#" + strings.ReplaceAll(category.CategoryName, " ", "") + "</b>\n")
 
 		// Создаем GET-запрос
 		resp, err := http.Get("http://" + link + "/api/products.php?category_id=" + strconv.Itoa(category.ID))
@@ -104,18 +106,22 @@ func makeGoodsList() {
 
 			fmt.Println("enter in products")
 
-			caption += url.QueryEscape("\n<u>" + product.Name + " - " + strconv.Itoa(product.Price) + "</u>\n")
+			caption += url.QueryEscape("\n<u>" + product.Name + " - " + strconv.Itoa(product.Price) + "сум</u>\n")
 			product_photo = product.Photo
 
 		}
 
-		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + link + "&photo=" + domen + product_photo + "&parse_mode=HTML"
+		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + hashtag + "&photo=" + domen + product_photo + "&parse_mode=HTML"
 
 		fmt.Println(product_photo)
 
 		sendMessage(apiURL)
 
 	}
+
+	fmt.Println(hashtags)
+	var url string = "https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + url.QueryEscape(channelName) + "&text=" + hashtags + "&parse_mode=HTML"
+	sendMessage(url)
 
 }
 
