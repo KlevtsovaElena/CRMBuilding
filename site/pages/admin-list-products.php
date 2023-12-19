@@ -370,7 +370,7 @@ if (count($_GET) !== 0) {
     <!-- шаблон строки таблицы Сум -->
     <template id="template-body-table-uzs">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
+        <tr ${is_title} role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}"  off-in-bot=${offInBot}>
             
             <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>
@@ -405,7 +405,7 @@ if (count($_GET) !== 0) {
      <!-- шаблон строки таблицы Доллар -->
     <template id="template-body-table-dollar">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
+        <tr ${is_title} role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm}">
             
             <td>${city_name}</td>
             <td><a href="admin-edit-vendor.php?id=${vendor_id}">${vendor_name}</a></td>

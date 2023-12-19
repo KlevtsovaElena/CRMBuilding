@@ -306,7 +306,7 @@ if (count($_GET) !== 0) {
     <!-- шаблон таблицы -->
     <template id="template-body-table">
         
-        <tr role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm_product}">
+        <tr  ${is_title} role="row" class="list-products__row" product-id="${id}" is-active="${is_active}" is-confirm="${is_confirm_product}" off-in-bot=${offInBot}>
             
             <td class="list-products_name"><a href="javascript: editProduct(${id})"><img src="${photo}" /><strong>${name}</strong></td>
             <td>${category_id}</td>

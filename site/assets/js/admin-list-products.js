@@ -427,6 +427,22 @@ function renderListProducts(totalProducts) {
             checkedConfirm = '';
         }
 
+        let offInBot;
+        let isTitle = '';
+        if(totalProducts['products'][i]['is_confirm'] == '0' || totalProducts['products'][i]['is_active'] == '0' || 
+            totalProducts['products'][i]['price_confirmed'] == '0' || totalProducts['products'][i]['vendor_active'] == '0' || totalProducts['products'][i]['city_active'] == '0') {
+            offInBot = '1';
+
+            if (totalProducts['products'][i]['is_active'] == '0') {isTitle += 'Товар отключён поставщиком';}
+            if (totalProducts['products'][i]['vendor_active'] == '0') {isTitle += 'Поставщик отключён';}
+            if (totalProducts['products'][i]['city_active'] == '0') {isTitle += ' Город отключён';}
+            if (totalProducts['products'][i]['price_confirmed'] == '0') {isTitle += ' Поставщик не подтвердил цены';}
+            if (totalProducts['products'][i]['is_confirm'] == '0') {isTitle += ' Товар не одобрен админом';}
+
+            console.log(isTitle);
+        } else {
+            offInBot = '0';
+        }
         if (totalProducts['products'][i]['vendor_currency_dollar'] == "0") {
             //  для сумовых поставщиков
             containerListProducts.innerHTML += tmplRowProduct   .replace('${id}', totalProducts['products'][i]['id'])
@@ -451,7 +467,10 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
                                                                 .replace('${max_price_format}', totalProducts['products'][i]['max_price'].toLocaleString('ru'))
                                                                 .replace('${checked-confirm}', checkedConfirm)
-                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm'])
+                                                                .replace('${offInBot}', offInBot)
+                                                                .replace('${is_title}', "title='" + isTitle + "'")
+                                                                ;
                                                                 
         
         } else if (totalProducts['products'][i]['vendor_currency_dollar'] == "1"){
@@ -489,7 +508,10 @@ function renderListProducts(totalProducts) {
                                                                 .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
                                                                 .replace('${max_price_dollar_format}', totalProducts['products'][i]['max_price_dollar'].toLocaleString('ru'))
                                                                 .replace('${checked-confirm}', checkedConfirm)
-                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm']);
+                                                                .replace('${is_confirm}', totalProducts['products'][i]['is_confirm'])
+                                                                .replace('${offInBot}', offInBot)
+                                                                .replace('${is_title}', "title='" + isTitle + "'")
+                                                                ;
  
         }
 
