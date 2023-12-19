@@ -1202,7 +1202,9 @@ function notifyAdminInactiveGoods() {
 }
 
 //функция изменения фильтра Поставщиков при выборе в фильтре Города
-function cityChanged(city_id) {
+function cityChanged(e) {
+
+    let city_id = e.options[e.selectedIndex].value;
 
     console.log(city_id);
 

@@ -137,7 +137,7 @@ if($role !== 1) {
             <!-- фильтрация по городу -->
             <div class="d-iblock">
                 <div>Город</div> 
-                <select id="city" name="city" value="" required>
+                <select id="city" name="city" value="" required onchange="cityChanged(this)">
                 <?php
                     //запрашиваем данные по городам из БД
                     $dataJsonV = file_get_contents($nginxUrl . '/api/cities.php?is_active=1&deleted=0');
@@ -147,25 +147,25 @@ if($role !== 1) {
                     if (!isset($_GET['city_id'])) {
                         
                     ?>
-                        <option value="" <?= 'selected' ?> onclick="cityChanged('')">все</option>
+                        <option value="" <?= 'selected' ?> >все</option>
                         <?php for ($v = 0; $v < count($dataV); $v++) { ?>
-                            <option value="<?= $dataV[$v]['id'] ?>" onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <option value="<?= $dataV[$v]['id'] ?>"><?= $dataV[$v]['name'] ?></option>
                         <?php }
                     //если город уже задан в гет-параметрах, выводим его
                     } else {
                         $city = $_GET['city_id']; 
                         ?>
 
-                        <option value="" <?php if($city == 'all') { echo 'selected'; } ?> onclick="cityChanged('')">все</option>
+                        <option value="" <?php if($city == 'all') { echo 'selected'; } ?> >все</option>
                         <?php 
                         for ($v = 0; $v < count($dataV); $v++) { 
                             if($city == $dataV[$v]['id']) {?>
                             
-                            <option value="<?= $dataV[$v]['id'] ?>" <?= 'selected' ?> onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <option value="<?= $dataV[$v]['id'] ?>" <?= 'selected' ?> ><?= $dataV[$v]['name'] ?></option>
                         <?php 
                             } else { ?>
                                 
-                            <option value="<?= $dataV[$v]['id'] ?>" onclick="cityChanged(<?= $dataV[$v]['id'] ?>)"><?= $dataV[$v]['name'] ?></option>
+                            <option value="<?= $dataV[$v]['id'] ?>" ><?= $dataV[$v]['name'] ?></option>
                         <?php 
                             }
                         ?>
