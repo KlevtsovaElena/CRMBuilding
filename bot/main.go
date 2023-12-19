@@ -184,8 +184,8 @@ type Settings struct {
 // структура товара
 type Product struct {
 	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name_language"`
+	Description string `json:"description_language"`
 	Photo       string `json:"photo"`
 	Price       int    `json:"price"`
 	MaxPrice    int    `json:"max_price"`
@@ -245,7 +245,7 @@ var languages = map[string]map[string]string{
 		"by_chat":                                "Написать в чате",
 		"choose_way":                             "Выберите удобный способ связи",
 		"go_to_chat":                             "Перейти в чат",
-		"send_your_number":                       "Введите свой номер телефона в формате +998 00 000 00 00 без '+' и пробелов",
+		"send_your_number":                       "Введите свой номер телефона в формате +998 00 000 00 00 без пробелов",
 	},
 	"uzbek": {
 		"change_number":                          "Raqamni o’zgartirish",
@@ -298,7 +298,7 @@ var languages = map[string]map[string]string{
 		"by_chat":                                "Chatga yozish",
 		"choose_way":                             "Qulay bo’lgan aloqa usulini tanlang",
 		"go_to_chat":                             "Chatga o’tish",
-		"send_your_number":                       "Telefon raqamingizni +998 00 000 00 00 formatda kiriting, '+' siz va bo’shliqlarsiz",
+		"send_your_number":                       "Telefon raqamingizni +998 00 000 00 00 formatda kiriting, siz bo’shliqlarsiz",
 	},
 	"uzbekcha": {
 		"change_number":                          "Рақамни ўзгартириш",
@@ -351,7 +351,7 @@ var languages = map[string]map[string]string{
 		"by_chat":                                "Чатга ёзиш",
 		"choose_way":                             "Қулай бўлган алоқа усулини танланг",
 		"go_to_chat":                             "Чатга ўтиш",
-		"send_your_number":                       "Телефон рақамингизни +998 00 000 00 00 форматда киритинг, «+» сиз ва бўшлиқларсиз",
+		"send_your_number":                       "Телефон рақамингизни +998 00 000 00 00 форматда киритинг, сиз бўшлиқларсиз",
 	},
 }
 
@@ -825,23 +825,25 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				sendPost(requestBody, "http://"+link+"/api/customers.php")
 			} else if strings.Contains(text, "998") {
-				if len(text) == 12 {
-					user.PhoneNumber = text
+				resultString := strings.ReplaceAll(text, "+", "")
+				if len(resultString) == 12 {
+					user.PhoneNumber = resultString
 					usersDB[chatId] = user
 					// формируем json и отправляем данные пользователя на бэк
 					requestBody := `{"phone":"` + usersDB[chatId].PhoneNumber + `", "tg_id":` + strconv.Itoa(chatId) + `}`
 					fmt.Println(requestBody)
 
 					sendPost(requestBody, "http://"+link+"/api/customers.php")
+					sendMessage(chatId, url.QueryEscape("Номер телефона сменён успешно\n Новый номер: "+text), nil)
 				} else {
 					sendMessage(chatId, "Вы ввели телефон в неправильном формате. Попробуйте ещё раз", nil)
 					break
 				}
 
-			} else {
-				sendMessage(chatId, "Вы ввели телефон в неправильном формате. Попробуйте ещё раз", nil)
-				break
-			}
+			} // else {
+			// 	sendMessage(chatId, "Вы ввели телефон в неправильном формате. Попробуйте ещё раз", nil)
+			// 	break
+			// }
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -1854,25 +1856,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				"inline_keyboard": buttons,
 			}
 
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/settings.php?name=phone")
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
+			// // Создаем GET-запрос
+			// resp, err := http.Get("http://" + link + "/api/settings.php?name=phone")
+			// if err != nil {
+			// 	log.Fatal("Ошибка при выполнении запроса:", err)
+			// }
+			// defer resp.Body.Close()
 
-			var settings []Settings
-			err = json.NewDecoder(resp.Body).Decode(&settings)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, setting := range settings {
-
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, setting.Value, inlineKeyboard)
-			}
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, url.QueryEscape("+998903726322"), inlineKeyboard)
 
 			user := usersDB[chatId]
 			user.Step = 4
@@ -1883,7 +1875,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		if button == "withСhat" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": "https://arzongo.uz"}},
 				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
@@ -1892,7 +1883,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["go_to_chat"]+" 💬", inlineKeyboard)
+			sendMessage(chatId, "@stroybotuz_admin", inlineKeyboard)
 
 			user := usersDB[chatId]
 			user.Step = 4
@@ -2061,8 +2052,36 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс при нажатии на кнопку изменить телефон
 		if button == "number" {
 
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["send_your_number"]), nil)
+			buttons := [][]map[string]interface{}{
+				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+			}
+
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			// Создаем GET-запрос
+			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+			if err != nil {
+				log.Fatal("Ошибка при выполнении запроса:", err)
+			}
+			defer resp.Body.Close()
+
+			var userdetails []UserDetails
+			err = json.NewDecoder(resp.Body).Decode(&userdetails)
+			if err != nil {
+				log.Fatal("Ошибка при декодировании JSON:", err)
+			}
+
+			// Используем полученные данные и подставляем их в кнопки
+			for _, userdetail := range userdetails {
+
+				phoneText := url.QueryEscape("\nВаш текущий номер телефона: " + userdetail.Phone)
+
+				// Отправляем сообщение с клавиатурой и перезаписываем шаг
+				sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["send_your_number"])+phoneText, inlineKeyboard)
+
+			}
 
 			user := usersDB[chatId]
 			user.Step = 4
