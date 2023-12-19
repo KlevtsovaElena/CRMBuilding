@@ -360,6 +360,17 @@ function renderListProducts(totalProducts) {
             isConfirmProduct = '<span title="товар на рассмотрении у Администратора"><svg  fill="#d2323d" width="20px" height="20px" viewBox="0 0 128 128" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon points="82.4,40 64,58.3 45.6,40 40,45.6 58.3,64 40,82.4 45.6,88 64,69.7 82.4,88 88,82.4 69.7,64 88,45.6 "></polygon> <path d="M1,127h126V1H1V127z M9,9h110v110H9V9z"></path> </g> </g></svg></span>';
         }
 
+        let offInBot;
+        let isTitle = '';
+        if(totalProducts['products'][i]['is_confirm'] == '0' || totalProducts['products'][i]['is_active'] == '0' || totalProducts['products'][i]['price_confirmed'] == '0') {
+            offInBot = '1';
+            if (totalProducts['products'][i]['is_active'] == '0') {isTitle += 'Вы отключили товар';}
+            if (totalProducts['products'][i]['price_confirmed'] == '0') {isTitle += ' Вы не подтвердили цены';}
+            if (totalProducts['products'][i]['is_confirm'] == '0') {isTitle += ' Товар не одобрен админом';}
+        } else {
+            offInBot = '0';
+        }
+
         containerListProducts.innerHTML += tmplRowProduct.replace('${article}', totalProducts['products'][i]['article'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
@@ -402,6 +413,8 @@ function renderListProducts(totalProducts) {
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
                                                         .replace('${id}', totalProducts['products'][i]['id'])
                                                         .replace('${quantity_available}', totalProducts['products'][i]['quantity_available'])
+                                                        .replace('${offInBot}', offInBot)
+                                                        .replace('${is_title}', "title='" + isTitle + "'")
                                                         ;
     
         // если totalProducts['products'][i]['max_price'] меньше, чем totalProducts['products'][i]['price'], то выделим цены красным
