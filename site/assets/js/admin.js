@@ -541,12 +541,12 @@ function applyInOrders() {
 
     //если задан поставщик
     if (vendorSel) {
-        filters += '&vendor_name=' + vendorSel;
+        filters += '&vendor_id=' + vendorSel;
     }
 
     //если задан город
     if (citySel) {
-        filters += '&vendor_city=' + citySel;
+        filters += '&city_id=' + citySel;
     }
 
     //если задан статус
@@ -669,12 +669,12 @@ function applyInMain() {
 
     //если задан поставщик
     if (vendorSel) {
-        filters += '&vendor_name=' + vendorSel;
+        filters += '&vendor_id=' + vendorSel;
     }
 
     //если задан город
     if (citySel) {
-        filters += '&vendor_city=' + citySel;
+        filters += '&city_id=' + citySel;
     }
 
     //если задан поиск
@@ -866,7 +866,7 @@ function applyInVendors(section_name) {
 
     //если задан город
     if (citySel) {
-        filters += '&city_name=' + citySel;
+        filters += '&city_id=' + citySel;
     }
 
     // получим значение атрибута data-page, содержащего номер текущей страницы
@@ -1202,7 +1202,9 @@ function notifyAdminInactiveGoods() {
 }
 
 //функция изменения фильтра Поставщиков при выборе в фильтре Города
-function cityChanged(city_id) {
+function cityChanged(e) {
+
+    let city_id = e.options[e.selectedIndex].value;
 
     console.log(city_id);
 
@@ -1225,7 +1227,7 @@ function cityChanged(city_id) {
             children.push(document.createElement('option'));
             //console.log(children);
             //наполняем каждый созданный элемент данными из бд
-            children[i].value = data[i]['name'];
+            children[i].value = data[i]['id'];
             children[i].innerHTML = data[i]['name'];
         }
 
@@ -1270,7 +1272,7 @@ function cityChanged(city_id) {
         children.push(document.createElement('option'));
         //console.log(children);
         //наполняем каждый созданный элемент данными из бд
-        children[i].value = data[i]['name'];
+        children[i].value = data[i]['id'];
         children[i].innerHTML = data[i]['name'];
     }
 

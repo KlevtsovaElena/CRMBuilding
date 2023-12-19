@@ -64,16 +64,17 @@ function sortChange() {
 
     //если задан поставщик
     if (dataVendor) {
-        filters += '&vendor_name=' + dataVendor;
+        filters += '&vendor_id=' + dataVendor;
     }
 
     //если задан город
     if (citySel) {
-        if (section_name == 'admin-vendors' || section_name == 'admin-wholesalers') {
-            filters += '&city_name=' + citySel;
-        } else {
-            filters += '&vendor_city=' + citySel;
-        }
+        filters += '&city_id=' + citySel;
+        // if (section_name == 'admin-vendors' || section_name == 'admin-wholesalers') {
+        //     filters += '&city_name=' + citySel;
+        // } else {
+        //     filters += '&vendor_city=' + citySel;
+        // }
     }
 
     //если задан статус

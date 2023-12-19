@@ -53,6 +53,7 @@ class OrderVendorRepository extends BaseRepository
                                     %s';
 
     const GET_SALES_BY_PERIOD = 'SELECT v.`id` as `vendor_id`,
+                                    c.`id` as `city_id`,
                                     c.`name` as `vendor_city`,
                                     v.`name` as `vendor_name`,
                                     ov.`products` as `vendor_products`,
@@ -90,6 +91,7 @@ class OrderVendorRepository extends BaseRepository
 
     private static array $orderVedorsByPeriodAssociation = [
         'vendor_id' => 'v.id',
+        'city_id' => 'c.id',
         'vendor_city' => 'c.name',
         'vendor_name' => 'v.name',
         'vendor_products' => 'ov.products',

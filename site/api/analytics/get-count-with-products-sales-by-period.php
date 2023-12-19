@@ -28,6 +28,7 @@ class GetProductsSalesByPeriodController extends BaseController
             if (!isset($orderVendorsWithProductData[$orderVendor['vendor_id']])) {
                 $orderVendorsWithProductData[$orderVendor['vendor_id']] = [
                     'vendor_id' => $orderVendor['vendor_id'],
+                    'city_id' => $orderVendor['city_id'],
                     'vendor_city' => $orderVendor['vendor_city'],
                     'vendor_name' => $orderVendor['vendor_name'],
                     'products' => []
@@ -67,6 +68,7 @@ class GetProductsSalesByPeriodController extends BaseController
             foreach ($orderVendorsWithProductDataItem['products'] as $orderVendorsWithProductDataItemProduct) {
                 $result[] = [
                     'vendor_id' => $orderVendorsWithProductDataItem['vendor_id'],
+                    'city_id' => $orderVendorsWithProductDataItem['city_id'],
                     'vendor_city' => $orderVendorsWithProductDataItem['vendor_city'],
                     'vendor_name' => $orderVendorsWithProductDataItem['vendor_name'],
                     'name' => $orderVendorsWithProductDataItemProduct['name'],
