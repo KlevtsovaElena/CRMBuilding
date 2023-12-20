@@ -15,6 +15,8 @@ const email = formAddVendor.querySelector('#email');
 // const percent = formAddVendor.querySelector('#percent');
 const is_active = formAddVendor.querySelector('#is_active');
 let phoneNumber = "";
+//массив для категорий
+const categories = formAddVendor.querySelectorAll('.category');
 
 
 // подтверждение цены инфа
@@ -88,6 +90,7 @@ function addWholesaler() {
     //категории
     //вынимаем данные по категориям в 2 индексных массива
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
     let checkboxesChecked = []; // массив для id категорий
     let categoriesNames = []; // массив для названий категорий
     for (let i = 0; i< checkboxes.length; i++) {
@@ -187,6 +190,38 @@ function validationAddVendor() {
             item.classList.remove('error');
             errorInfoContainer.innerText = "";
             errorInfoContainer.classList.add('d-none');
+        }
+
+        //отдельная проверка для категорий
+        //console.log(categories);
+
+        let checkboxesChecked = []; // массив для всех отмеченных категорий
+        for (let i = 0; i < categories.length; i++) {
+            if (categories[i].checked) {
+                checkboxesChecked.push(categories[i].value);
+            }
+        }
+    
+        //проверяем кол-во отмеченных категорий
+        let categoriesChecked = checkboxesChecked.length;
+
+        //если ни одной не выбрано, вешаем ошибку
+        if (!categoriesChecked) {
+            const errorInfoContainer = document.querySelector('.cat');
+            for (let k = 0; k < categories.length; k++) {
+                categories[k].classList.add('error');   
+                errorInfoContainer.innerText = "Выберите как минимум одну категорию из списка!";
+                errorInfoContainer.classList.remove('d-none');
+                hasError = true; 
+            }
+        //если выбрана минимум одна, снимаем предупреждения
+        } else {
+            const errorInfoContainer = document.querySelector('.cat');
+            for (let k = 0; k < categories.length; k++) {
+                categories[k].classList.remove('error');   
+                errorInfoContainer.innerText = "";
+                errorInfoContainer.classList.add('d-none');
+            }
         }
     
     })

@@ -92,6 +92,7 @@ if($role !== 1) {
             <!-- категории -->
             <div class="form-add-vendor__item">
                 <p>Категории</p>
+                <div class="error-info cat d-none"></div>
 
                 <?php 
                     $categoriesJson = file_get_contents($nginxUrl . "/api/categories.php?deleted=0");
@@ -104,7 +105,6 @@ if($role !== 1) {
                         </label>
                     <?php }; ?>
                 
-                <div class="error-info d-none"></div>
             </div>
 
             <br>
