@@ -24,6 +24,7 @@
             $get['is_confirm'] = '1';
             $get['vendor_deleted'] = '0';
             $get['vendor_active'] = '1';
+            $get['price_confirmed'] = '1';
             $get['city_deleted'] = '0';
             $get['city_active'] = '1';
             $get['orderby'] = 'category_name:asc';
