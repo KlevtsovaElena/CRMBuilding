@@ -194,7 +194,7 @@ type Product struct {
 
 // словарь с переводом на разные языки
 var languages = map[string]map[string]string{
-	"ru": {
+	"1": {
 		"change_number":                          "Изменить номер",
 		"change_city":                            "Изменить город",
 		"change_language":                        "Изменить язык",
@@ -246,8 +246,12 @@ var languages = map[string]map[string]string{
 		"choose_way":                             "Выберите удобный способ связи",
 		"go_to_chat":                             "Перейти в чат",
 		"send_your_number":                       "Введите свой номер телефона в формате +998 00 000 00 00 без пробелов",
+		"current_number":                         "Ваш текущий номер телефона: ",
+		"incorrect_number_format":                "Вы ввели телефон в неправильном формате. Повторите попытку",
+		"succesfully_changed_number":             "Номер телефона успешно изменен",
+		"new_number":                             "Новый номер: ",
 	},
-	"uzbek": {
+	"2": {
 		"change_number":                          "Raqamni o’zgartirish",
 		"change_city":                            "Shaharni o’zgartirish",
 		"change_language":                        "Tilni o’zgartirish",
@@ -299,8 +303,12 @@ var languages = map[string]map[string]string{
 		"choose_way":                             "Qulay bo’lgan aloqa usulini tanlang",
 		"go_to_chat":                             "Chatga o’tish",
 		"send_your_number":                       "Telefon raqamingizni +998 00 000 00 00 formatda kiriting, siz bo’shliqlarsiz",
+		"current_number":                         "Joriy telefon raqamingiz: ",
+		"incorrect_number_format":                "Siz telefonni noto’g’ri formatda kiritdingiz. Qayta urinib ko’ring",
+		"succesfully_changed_number":             "Telefon raqami muvaffaqiyatli o’zgartirildi",
+		"new_number":                             "Yangi raqam: ",
 	},
-	"uzbekcha": {
+	"3": {
 		"change_number":                          "Рақамни ўзгартириш",
 		"change_city":                            "Шаҳарни ўзгартириш",
 		"change_language":                        "Тилни ўзгартириш",
@@ -352,6 +360,10 @@ var languages = map[string]map[string]string{
 		"choose_way":                             "Қулай бўлган алоқа усулини танланг",
 		"go_to_chat":                             "Чатга ўтиш",
 		"send_your_number":                       "Телефон рақамингизни +998 00 000 00 00 форматда киритинг, сиз бўшлиқларсиз",
+		"current_number":                         "Жорий телефон рақамингиз: ",
+		"incorrect_number_format":                "Сиз телефонни нотўғри форматда киритдингиз. Қайта уриниб кўринг",
+		"succesfully_changed_number":             "Телефон рақами муваффақиятли ўзгартирилди",
+		"new_number":                             "Янги рақам: ",
 	},
 }
 
@@ -637,9 +649,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				//собираем объект клавиатуры для выбора языка
 				buttons := [][]map[string]interface{}{
-					{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
-					{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbek"}},
-					{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzbekcha"}},
+					{{"text": "Русский 🇷🇺", "callback_data": "1"}},
+					{{"text": "O'zbekcha 🇺🇿", "callback_data": "2"}},
+					{{"text": "Ўзбекча 🇺🇿", "callback_data": "3"}},
 				}
 
 				inlineKeyboard := map[string]interface{}{
@@ -658,7 +670,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				user.Step = 4
 				usersDB[chatId] = user
 
-				if button == "ru" || button == "uzbek" || button == "uzbekcha" {
+				if button == "1" || button == "2" || button == "3" {
 					user.Language = button
 					usersDB[chatId] = user
 				}
@@ -814,10 +826,10 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user := usersDB[chatId]
 			user.Step = 4
 
-			if button == "ru" || button == "uzbek" || button == "uzbekcha" {
+			if button == "1" || button == "2" || button == "3" {
 				user.Language = button
 				usersDB[chatId] = user
-			} else if button != "ru" && text == "" {
+			} else if button != "1" && text == "" {
 				fmt.Println("FIRST")
 				// формируем json и отправляем данные пользователя на бэк
 				requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
@@ -834,9 +846,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					fmt.Println(requestBody)
 
 					sendPost(requestBody, "http://"+link+"/api/customers.php")
-					sendMessage(chatId, url.QueryEscape("Номер телефона сменён успешно\n Новый номер: "+text), nil)
+					sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["succesfully_changed_number"]+"\n"+languages[usersDB[chatId].Language]["new_number"]+text), nil)
 				} else {
-					sendMessage(chatId, "Вы ввели телефон в неправильном формате. Попробуйте ещё раз", nil)
+					sendMessage(chatId, languages[usersDB[chatId].Language]["incorrect_number_format"], nil)
 					break
 				}
 
@@ -1003,6 +1015,26 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			user.Step = 6
 			if button != "backToBrands" {
 				user.Category_id = button
+				// Создаем GET-запрос
+				resp, err := http.Get("http://" + link + "/api/categories.php?id=" + button)
+				if err != nil {
+					log.Fatal("Ошибка при выполнении запроса:", err)
+				}
+				defer resp.Body.Close()
+
+				var categories []Category
+				err = json.NewDecoder(resp.Body).Decode(&categories)
+
+				// Используем полученные данные и подставляем их в кнопки
+				for _, category := range categories {
+					// button := []map[string]interface{}{
+					// 	{
+					// 		"text":          category.CategoryName,
+					// 		"callback_data": category.ID,
+					// 	},
+					// }
+					sendMessage(chatId, "Вы выбрали: "+category.CategoryName, nil)
+				}
 			}
 			usersDB[chatId] = user
 			buttons := [][]map[string]interface{}{}
@@ -1052,6 +1084,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_brand"]+" 👇", inlineKeyboard)
+
 			user.Step += 1
 			usersDB[chatId] = user
 			break
@@ -1992,9 +2025,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			//собираем объект клавиатуры для выбора языка
 			buttons := [][]map[string]interface{}{
-				{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
-				{{"text": "O'zbekcha 🇺🇿", "callback_data": "uzbek"}},
-				{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzbekcha"}},
+				{{"text": "Русский 🇷🇺", "callback_data": "1"}},
+				{{"text": "O'zbekcha 🇺🇿", "callback_data": "2"}},
+				{{"text": "Ўзбекча 🇺🇿", "callback_data": "3"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2076,7 +2109,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
-				phoneText := url.QueryEscape("\nВаш текущий номер телефона: " + userdetail.Phone)
+				phoneText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["current_number"] + userdetail.Phone)
 
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
 				sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["send_your_number"])+phoneText, inlineKeyboard)
