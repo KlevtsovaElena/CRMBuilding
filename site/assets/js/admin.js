@@ -1210,53 +1210,27 @@ function cityChanged(e) {
 
     //если передана пустота, перерисовываем всех поставщиков в опциях и прерываем функцию
     if (!city_id) {
-        //собираем новый массив, где поставщики отфильтрованы по городу
-        let dataJson = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?&deleted=0');
-        let data = JSON.parse(dataJson);
 
-        //достаем основную строку селекта
-        let select = document.getElementById('vendor');
+        //собираем ссылку на эндпойнт со всеми поставщиками
+        let link = mainUrl + '/api/vendors/get-with-details.php?deleted=0&is_active=1';
 
-        //удаляем все опции
-        select.innerHTML = '';
-        
-        //создаем пустой массив для обновленных опций
-        let children = [];
-        for (let i = 0; i < data.length; i++) {
-            //заполняем его свежесозданными элементами типа "option"
-            children.push(document.createElement('option'));
-            //console.log(children);
-            //наполняем каждый созданный элемент данными из бд
-            children[i].value = data[i]['id'];
-            children[i].innerHTML = data[i]['name'];
-        }
-
-        //создаем опцию "все"
-        let optionAll = document.createElement('option');
-        optionAll.value = '';
-        optionAll.innerHTML = 'все';
-
-        //вставляем ее в начало пересобранного массива опций, если опций > 1
-        if (children.length > 1) {
-            children.unshift(optionAll);
-        }
-
-        //console.log(children);
-
-        //вешаем готовый массив под селектом
-        for (let k = 0; k < children.length; k++) {
-            select.append(children[k]);
-        }
-
-        select.selectedIndex = 0;
-
-        console.log(data);
+        connectedFilter(link);
 
         return;
     }
 
-    //собираем новый массив, где поставщики отфильтрованы по городу
-    let dataJson = sendRequestGET(mainUrl + '/api/vendors/get-with-details.php?&deleted=0&city_id=' + city_id);
+    //собираем ссылку на эндпойнт с фильтрацией поставщиков по выбранному городу
+    let link = mainUrl + '/api/vendors/get-with-details.php?deleted=0&is_active=1&city_id=' + city_id;
+
+    connectedFilter(link);
+
+}
+
+//функция взаимосвязанного фильтра
+function connectedFilter(link) {
+
+    //собираем новый массив элементов
+    let dataJson = sendRequestGET(link);
     let data = JSON.parse(dataJson);
 
     //достаем основную строку селекта
@@ -1296,7 +1270,6 @@ function cityChanged(e) {
     select.selectedIndex = 0;
 
     console.log(data);
-
 }
 
 //записываем в куки локальный часовой пояс
