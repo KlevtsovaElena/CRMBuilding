@@ -134,7 +134,8 @@ if($role !== 1) {
                 <input type="search" id="search" name="search" value="" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
                 <button onclick="applyInVendors('admin-wholesalers')" class="btn btn-ok d-iblock">Применить</button>
-                <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+                <!-- кнопка сброса фильтров -->
+                <!-- <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button> -->
 
             </div>
 

@@ -7,8 +7,10 @@ if($role !== 1) {
 ?>
 
 <?php 
+// ЗАДАЧА 23
     // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
     $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+// ЗАДАЧА 23
 
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
@@ -20,7 +22,7 @@ if($role !== 1) {
     $scriptsSrc = [
         "<script src='./../assets/js/main.js'></script>",
         "<script src='./../assets/js/joint.js'></script>",
-        "<script src='./../assets/js/admin.js'></script>"
+        "<script src='./../assets/js/adminTest.js'></script>"
     ];
 ?>
 
@@ -358,7 +360,9 @@ if($role !== 1) {
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">  
-            
+       
+        
+<!-- // ЗАДАЧА 23 -->
         <!-- ЛЕНА. Дополнила, чтобы ПЕРЕД нажатием на переключение страничек в адресной строке сначала отобразились гет-параметры
             тк они сохраняются в локалсторадж из Адресной строки. И если там старые значения, то новые гет-параметры будут затираться гет-параметрами из ЛС при загрузке-->
 
@@ -392,6 +396,9 @@ if($role !== 1) {
         <div class="page-status">стр <span class="current-page"><?= $currentPage ?></span> из <span class="total-page"><?= $totalPages ?></span></div>
     </section>
     <?php } ?>
+<!-- // ЗАДАЧА 23 -->
+
+
 
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
