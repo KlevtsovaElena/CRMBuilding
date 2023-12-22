@@ -1315,3 +1315,46 @@ function confirmProductsVendor(id, nameVendor) {
     }
 
 }
+
+// При переключении страничек сначала перезаписываем гет-параметра в адресной строке, а только потом перезагружаем
+function switchPageAndSaveGetParamsInLS(getParams) {
+    //передаем в адресную строку изменения, чтобы сразу их видеть
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage + getParams);
+
+    // перезагрузим страницу
+    window.location.href = mainUrl + window.location.pathname + getParams; 
+}
+
+
+// тк в этом js обрабатывается не одна страница, то придётся отбирать, для каких страниц нужно сохранять фильтрацию при переходе на др страницы
+// и отрисовывать позицию скролла из локалсторадж
+// это можно делать только для тех страниц, у которых в .php вначале указан  $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+// здесь достаточно указать через || названия страниц
+if(window.location.pathname == '/pages/admin-vendors.php') {
+    // передвинем скролл
+    changePositionScroll();
+
+    /* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+    window.addEventListener('unload', ()=> {
+        saveGetParamsInLS(window.location.search);
+    })
+
+}
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
+// найдём кнопку Сбросить
+let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+
+// повесим на неё функцию по клику
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
+
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage);
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
