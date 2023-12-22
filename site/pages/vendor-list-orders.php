@@ -7,6 +7,9 @@ if($role !== 2) {
 ?>
 
 <?php 
+    // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
+    $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+    
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -85,6 +88,8 @@ if($role !== 2) {
                         <lable>Архивные</lable>
                     </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
 
                 </div>
             </section>
@@ -282,6 +287,8 @@ if (count($_GET) !== 0) {
                         <lable>Архивные</lable>
                     </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
 
                 </div>
             </section>

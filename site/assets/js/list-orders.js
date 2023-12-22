@@ -78,7 +78,8 @@ let ordersJson;
 // заполним страницу данными
 startRenderPage();
 
-
+// передвинем скролл
+changePositionScroll();
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
 function startRenderPage() {
 
@@ -599,3 +600,22 @@ function changeCountNewOrders() {
     }
 
 }
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
+// найдём кнопку Сбросить
+let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+
+// повесим на неё функцию по клику
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
+    history.replaceState(history.length, null, 'vendor-list-orders.php');
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
+
+
+/* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+window.addEventListener('unload', ()=> {
+    saveGetParamsInLS(window.location.search);
+})

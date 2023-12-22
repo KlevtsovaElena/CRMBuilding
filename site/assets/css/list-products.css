@@ -382,7 +382,7 @@ td:nth-last-child(1) {
 }
 /* /modalbox */
 
-@media(max-width: 1420px) {
+@media(max-width: 1560px) {
     .filters-container-flex {
         flex-wrap: wrap;
     }
