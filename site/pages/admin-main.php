@@ -261,7 +261,7 @@ if($role !== 1) {
             <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
             <button onclick="applyInMain()" class="btn btn-ok d-iblock">Применить</button>
             <!-- кнопка сброса фильтров -->
-            <!-- <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button> -->
+            <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
 
         </div>
 

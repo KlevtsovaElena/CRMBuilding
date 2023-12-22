@@ -1315,3 +1315,31 @@ function confirmProductsVendor(id, nameVendor) {
     }
 
 }
+
+
+
+// ЗАДАЧА23
+/* ---------- СБРОС ФИЛЬТРА ---------- */
+// ДЛЯ ВСЕХ КРОМЕ ТЕХ СТРАНИЦ, КОТОРЫЕ В admin.php
+
+// найдём кнопку Сбросить
+let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+
+// повесим на неё функцию по клику
+if (window.location.pathname !== '/pages/admin.php') {
+    btnRemoveFilters.addEventListener('click', () => {
+        // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
+    
+        // получим только название странички (/pages/name.php  -> /name.php)
+        let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+        history.replaceState(history.length, null, namePage);
+    
+        // удалим из ЛС элемент с ключом адреса страницы (например, /pages/vendor-list-products.php)
+        // localStorage.removeItem(window.location.pathname);
+    
+        // перезагрузим страницу с пустыми параметрами
+        window.location.replace(window.location.origin + window.location.pathname);
+    })
+}
+
+// ЗАДАЧА23
