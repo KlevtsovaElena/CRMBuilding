@@ -194,7 +194,7 @@ type Product struct {
 
 // словарь с переводом на разные языки
 var languages = map[string]map[string]string{
-	"1": {
+	"ru": {
 		"change_number":                          "Изменить номер",
 		"change_city":                            "Изменить город",
 		"change_language":                        "Изменить язык",
@@ -251,7 +251,7 @@ var languages = map[string]map[string]string{
 		"succesfully_changed_number":             "Номер телефона успешно изменен",
 		"new_number":                             "Новый номер: ",
 	},
-	"2": {
+	"uz": {
 		"change_number":                          "Raqamni o’zgartirish",
 		"change_city":                            "Shaharni o’zgartirish",
 		"change_language":                        "Tilni o’zgartirish",
@@ -308,7 +308,7 @@ var languages = map[string]map[string]string{
 		"succesfully_changed_number":             "Telefon raqami muvaffaqiyatli o’zgartirildi",
 		"new_number":                             "Yangi raqam: ",
 	},
-	"3": {
+	"uzkcha": {
 		"change_number":                          "Рақамни ўзгартириш",
 		"change_city":                            "Шаҳарни ўзгартириш",
 		"change_language":                        "Тилни ўзгартириш",
@@ -649,9 +649,9 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 				//собираем объект клавиатуры для выбора языка
 				buttons := [][]map[string]interface{}{
-					{{"text": "Русский 🇷🇺", "callback_data": "1"}},
-					{{"text": "O'zbekcha 🇺🇿", "callback_data": "2"}},
-					{{"text": "Ўзбекча 🇺🇿", "callback_data": "3"}},
+					{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
+					{{"text": "O'zbekcha 🇺🇿", "callback_data": "uz"}},
+					{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzkcha"}},
 				}
 
 				inlineKeyboard := map[string]interface{}{
@@ -670,7 +670,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				user.Step = 4
 				usersDB[chatId] = user
 
-				if button == "1" || button == "2" || button == "3" {
+				if button == "ru" || button == "uz" || button == "uzkcha" {
 					user.Language = button
 					usersDB[chatId] = user
 				}
@@ -750,7 +750,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["share_phone_number"], keyboard)
+			sendMessage(chatId, "Поделится номером телефона", keyboard)
 			user := usersDB[chatId]
 			user.Step += 1
 			user.Language = button
@@ -770,7 +770,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["unable_to_continue_without_phone"], inlineKeyboard)
+			sendMessage(chatId, "К сожалению вы не сможете пройти дальше, если не укажите номер телефона", inlineKeyboard)
 			user := usersDB[chatId]
 			user.Step -= 1
 			usersDB[chatId] = user
@@ -825,11 +825,12 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			user.Step = 4
+			user.City, _ = strconv.Atoi(button)
 
-			if button == "1" || button == "2" || button == "3" {
+			if button == "ru" || button == "uz" || button == "uzkcha" {
 				user.Language = button
 				usersDB[chatId] = user
-			} else if button != "1" && text == "" {
+			} else if button != "ru" && text == "" {
 				fmt.Println("FIRST")
 				// формируем json и отправляем данные пользователя на бэк
 				requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
@@ -959,7 +960,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php")
+			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city=" + strconv.Itoa(usersDB[chatId].City))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -985,7 +986,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 				button := []map[string]interface{}{
 					{
 						"text":          category.CategoryName,
-						"callback_data": category.ID,
+						"callback_data": category.CategoryName + " " + strconv.Itoa(category.ID),
 					},
 				}
 				buttons = append(buttons, button)
@@ -1013,33 +1014,18 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			user := usersDB[chatId]
 			user.Step = 6
+			// Разбиваем строку на две части по пробелу
+			parts := strings.Split(button, " ")
+			firstCategoryName := parts[0]
+			secondCategoryID := parts[1]
 			if button != "backToBrands" {
-				user.Category_id = button
-				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/categories.php?id=" + button)
-				if err != nil {
-					log.Fatal("Ошибка при выполнении запроса:", err)
-				}
-				defer resp.Body.Close()
-
-				var categories []Category
-				err = json.NewDecoder(resp.Body).Decode(&categories)
-
-				// Используем полученные данные и подставляем их в кнопки
-				for _, category := range categories {
-					// button := []map[string]interface{}{
-					// 	{
-					// 		"text":          category.CategoryName,
-					// 		"callback_data": category.ID,
-					// 	},
-					// }
-					sendMessage(chatId, "Вы выбрали: "+category.CategoryName, nil)
-				}
+				user.Category_id = secondCategoryID
+				sendMessage(chatId, "Вы выбрали: "+firstCategoryName, nil)
 			}
 			usersDB[chatId] = user
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + usersDB[chatId].Category_id)
+			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + usersDB[chatId].Category_id + "&city_id=" + strconv.Itoa(usersDB[chatId].City))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -1092,6 +1078,15 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// кейс для отображения выбранных товаров по фильтрам
 		case usersDB[chatId].Step == 7:
 
+			var chozen_language string = ""
+			if usersDB[chatId].Language == "ru" {
+				chozen_language = "1"
+			} else if usersDB[chatId].Language == "uz" {
+				chozen_language = "2"
+			} else {
+				chozen_language = "3"
+			}
+
 			// Создаем GET-запрос
 			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
 			if err != nil {
@@ -1109,7 +1104,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 			for _, userdetail := range userdetails {
 
 				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID))
+				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
