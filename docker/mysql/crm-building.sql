@@ -90,7 +90,7 @@ CREATE TABLE `customers` (
   `city_id` int unsigned NOT NULL,
   `tg_id` bigint unsigned NOT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `is_blocked` tinyint NOT NULL,
+  `is_blocked` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
