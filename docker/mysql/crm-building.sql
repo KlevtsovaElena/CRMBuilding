@@ -354,11 +354,12 @@ CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `settings` (`id`, `name`, `value`) VALUES
-(1,	'phone',	'89997776655');
+INSERT INTO `settings` (`id`, `name`, `value`, `first_name`) VALUES
+(1,	'phone',	'89997776655',	'Имя в телеграме');
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (
