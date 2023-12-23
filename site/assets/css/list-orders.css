@@ -55,9 +55,9 @@
     background-color: #009900;
 }
 
-/* статус не дозвонились */
+/* статус в доставке */
 .status5 {
-    background-color: #ff0000;
+    background-color: #333399;
 }
 
 .list-orders__row[archive='1'] {

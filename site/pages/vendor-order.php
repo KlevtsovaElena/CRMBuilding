@@ -63,7 +63,7 @@ if($role == 2) {
 
 
     <!-- таблица заказа -->
-    <section class="orders" data-id=<?= $data['id'] ?> >
+    <section class="orders" data-id=<?= $data['id'] ?> customer-tg-id="<?= $data['customer_tg_id'] ?>" >
         <table>
             
             <thead id="new-order" data-role="<?= $role ?>" data-client-latitude="<?= $data['order_location']['latitude'] ?>" data-client-longitude="<?= $data['order_location']['longitude'] ?>" data-tg-vendor-id="<?= $vendor_tg_id ?>">
@@ -115,9 +115,11 @@ if($role == 2) {
     <?php if(!isset($_GET['role']) || $_GET['role'] != 1) { ?>
     <!-- кнопки, на которые будет нажимать поставщик после просмотра заказа -->
     <section class="buttons">
+        <!-- добавим кнопку "В ДОСТАВКЕ" и скроем её -->
+        <button id="btn-in-delivery"  class="btn btn-ok d-iblock d-none" onclick="inDelivery()">В ДОСТАВКЕ</button>  
 
-        <!-- если статус заказа НЕ "завершен"-->
-        <?php if($data['status'] != 4) {
+        <!-- если статус заказа НЕ "завершен" и не "в доставке"-->
+        <?php if($data['status'] != 4 && $data['status'] != 5) {
 
             //и также НЕ "подтвержден"
             if($data['status'] != 2) {?>
@@ -138,14 +140,18 @@ if($role == 2) {
             <button id="btn-out-of-reach" class="btn btn-ok d-iblock" onclick="customerOutOfReach(<?= $data['customer_tg_id'] ?>)">НЕ ДОЗВОНИЛИСЬ</button>
         <?php } ?>
 
-        <!-- если статус заказа "подтвержден", будет видна кнопка "ПОДТВЕРДИТЬ ДОСТАВКУ" -->
+        <!-- если статус заказа "подтвержден", будет видна кнопка "ЗАКАЗ ДОСТАВЛЕН" -->
         <?php if ($data['status'] == 2) {?>
-            <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ПОДТВЕРДИТЬ ДОСТАВКУ</button>
+            <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ЗАКАЗ ДОСТАВЛЕН</button>
             <?php if($data['order_location']['latitude'] && $data['order_location']['longitude']) { ?>
                 <button id="send-location" class="btn btn-ok d-iblock" onclick="sendLocation(<?= $data['order_location']['latitude'] ?>, <?= $data['order_location']['longitude'] ?>, <?= $vendor_tg_id ?>)">ОТПРАВИТЬ СЕБЕ КООРДИНАТЫ</button>
             <?php }    
         } ?>
 
+        <?php if ($data['status'] == 5) {?>
+            <button id="btn-confirm-delivery"  class="btn btn-ok d-iblock" onclick="confirmDelivery()">ЗАКАЗ ДОСТАВЛЕН</button>
+            <button id="cancel-order" class="btn btn-ok d-iblock" onclick="cancelOrder()">ОТМЕНИТЬ ЗАКАЗ</button>
+        <?php } ?>
     </section>
     <?php } ?>
 

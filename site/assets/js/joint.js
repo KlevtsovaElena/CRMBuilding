@@ -79,7 +79,7 @@ function sortChange() {
 
     //если задан статус
     if (dataStatus) {
-        if (dataStatus == 5) {
+        if (dataStatus == 6) {
             filters += '&archive=1';
         } else {
             filters += '&status=' + dataStatus;
