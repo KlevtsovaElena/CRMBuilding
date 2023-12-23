@@ -28,14 +28,20 @@ class OrderVendorRepository extends BaseRepository
                                         ov.`order_id` as `order_id`,
                                         ov.`vendor_id` as `vendor_id`,
                                         v.`name` as `vendor_name`,
+                                        v.`city_id` as `vendor_city`,
                                         v.`coordinates` as `vendor_location`,
                                         v.`deleted` as `vendor_deleted`,
                                         cit.`name` as `vendor_city`,
                                         o.`order_date` as `order_date`,
                                         ov.`status` as `status`,
                                         ov.`archive` as `archive`,
+                                        c.`id` as `customer_id`,
+                                        c.`first_name` as `first_name`,
+                                        c.`last_name` as `last_name`,
                                         c.`phone` as `customer_phone`,
                                         c.`tg_id` as `customer_tg_id`,
+                                        c.`city_id` as `customer_city`,
+                                        c.`is_blocked` as `is_blocked`,
                                         o.`customer_id` as `customer_id`,
                                         o.`location` as `order_location`,
                                         ov.`products` as `products`,
@@ -69,19 +75,35 @@ class OrderVendorRepository extends BaseRepository
                                 AND v.`deleted` = 0 
                                 %s';
 
+    const GET_BY_CUSTOMER_ID = 'SELECT DISTINCT o.`id` as `order_id`, 
+                                    ov.`vendor_id`, 
+                                    v.`name` as `vendor_name`
+                                    FROM `orders` o
+                                    INNER JOIN `order_vendors` ov ON
+                                    o.`id` = ov.`order_id`
+                                    RIGHT JOIN `vendors` v ON
+                                    v.`id` = ov.`vendor_id`
+                                    WHERE o.`customer_id` = :customer_id';
+
     private static array $orderVendorsDetailsAssociation = [
         'id' => 'ov.id',
         'order_id' => 'ov.order_id',
         'vendor_id' => 'ov.vendor_id',
         'vendor_name' => 'v.name',
+        'vendor_city' => 'v.city_id',
         'vendor_location' => 'v.coordinates',
         'vendor_deleted' => 'v.deleted',
         'vendor_city' => 'cit.name',
         'order_date' => 'o.order_date',
         'status' => 'ov.status',
         'archive' => 'ov.archive',
+        'customer_id' => 'c.id',
+        'first_name' => 'c.first_name',
+        'last_name' => 'c.last_name',
         'customer_phone' => 'c.phone',
         'customer_tg_id' => 'c.tg_id',
+        'customer_city' => 'c.city_id',
+        'is_blocked' => 'c.is_blocked',
         'customer_id' => 'o.customer_id',
         'order_location' => 'o.location',
         'products' => 'ov.products',
@@ -273,5 +295,19 @@ class OrderVendorRepository extends BaseRepository
 
         return array_map([$this, 'mapWithDetails'], $statement->fetchAll());
     }
+
+    public function getOrderVendorByCustomerId(int $customerId): array
+    {
+        // Формируем результирующую строку запроса
+        $query = sprintf(static::GET_BY_CUSTOMER_ID, $this->getTableName());
+
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute([
+            'customer_id' => $customerId
+        ]);
+
+        return array_map([$this, 'map'], $statement->fetchAll());
+    }
+
 }
 ?>
