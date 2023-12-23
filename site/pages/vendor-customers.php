@@ -1,5 +1,5 @@
 <?php require('../handler/check-profile.php'); 
-if($role !== 1) {
+if($role !== 2) {
     setcookie('profile', '', -1, '/');
     header('Location: ' . $mainUrl . '/pages/login.php');
     exit(0);
@@ -34,9 +34,9 @@ if($role !== 1) {
         }
 
         //соберём данные для отображения в форме 
-        $dataJson = file_get_contents($nginxUrl . "/api/customers/get-with-details.php");
+        $dataJson = file_get_contents($nginxUrl . "/api/customers/get-with-order-vendors.php");
         $data = json_decode($dataJson, true); 
-        //print_r($data);
+        //var_dump($data);
 
         // $citiesJson = file_get_contents($nginxUrl . "/api/cities.php?deleted=0");
         // $cities = json_decode($citiesJson, true);
@@ -55,7 +55,10 @@ if($role !== 1) {
     ?>
 
         <!-- далее отрисовываем всю страницу -->
-        <p class="page-title">Клиенты</p>
+        <p class="page-title">КЛИЕНТЫ</p>
+
+        <!-- здесь храним id поставщика -->
+        <input type="hidden" id="vendor_id" name="vendor_id" value="<?= $vendor_id; ?>">
 
          <section class="form-filters">
             <div class="form-elements-container filters-container-flex">
@@ -181,7 +184,7 @@ if($role !== 1) {
                 <!-- поле поиска -->
                 <input type="search" id="search" name="search" value="<?php if (isset($_GET['search']) && $_GET['search']) { $word = explode(':', $_GET['search']); echo $word[1];} ?>" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
-                <button onclick="applyInCustomers('admin-customers')" class="btn btn-ok d-iblock">Применить</button>
+                <button onclick="applyInCustomers('vendor-customers')" class="btn btn-ok d-iblock">Применить</button>
             </div>
 
         </section>
@@ -219,7 +222,7 @@ if($role !== 1) {
 
         <!-- таблица клиентов -->
         <section class="orders">
-            <table id="list-orders" data-section="admin-customers"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-city-select="<?php if (isset($_GET['city_id'])) { echo $_GET['city_id']; } ?>">
+            <table id="list-orders" data-section="vendor-customers"  data-limit="<?php if (isset($_GET['limit'])) {?><?=$limit?><?php } else { ?><?=$limit?><?php } ?>" <?php if (isset($_GET['page'])) { ?> data-page="<?= $_GET['page'] ?>" <?php } else if (isset($_GET['search'])) { ?> data-search="<?= $_GET['search'] ?>" <?php } ?> data-city-select="<?php if (isset($_GET['city_id'])) { echo $_GET['city_id']; } ?>">
 
                 <thead>
                     <tr role="row">
@@ -244,12 +247,12 @@ if($role !== 1) {
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //соберём данные для отображения в форме 
-                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?limit=' . $limit . '&offset=' . $offset . $params);
+                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . '&offset=' . $offset . $params);
                         $data = json_decode($dataJson, true);
                         $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
                         //отдельно соберем информацию об общем кол-ве записей
-                        $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?limit=0'. $params);
+                        $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . $params);
                         $dataN = json_decode($dataJsonN, true);
                         $totalNumElements = count($dataN);
                         //и об общем кол-ве страниц
@@ -260,22 +263,25 @@ if($role !== 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?limit=' . $limit .  $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . $params);
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            //print_r($data);
+                            print_r($data);
+                            print_r($limit);
                             
                             //отдельно соберем информацию об общем кол-ве записей
-                            $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?limit=0'. $params);
+                            $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . $params);
                             $dataN = json_decode($dataJsonN, true);
                             $totalNumElements = count($dataN);
                             //и об общем кол-ве страниц
                             $totalPages = ceil(count($dataN) / $limit);
+                            //print_r($dataN);
+                            //print_r($params);
                         }
                     }
                     //если активирован поиск
                     if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents($nginxUrl . "/api/customers/get-with-details.php?search=" . $_GET['search'] . $params);
+                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&search=' . $_GET['search'] . $params);
                         $data = json_decode($dataJson, true);
                         //print_r($data);
                         //отрисовываем список элементов, которые совпадают с поисковым запросом
@@ -296,13 +302,13 @@ if($role !== 1) {
                     //если мы НЕ на первой странице
                     if(isset($_GET['page']) && $_GET['page'] > 1) {
                         //соберём данные для отображения в форме 
-                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
+                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&offset=' . $offset .'&limit=' . $limit . '&orderby=' . $_GET['orderby'] . $params);
                         $data = json_decode($dataJson, true); 
                         //print_r($data);
                         $num = $offset + 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
 
                         //отдельно соберем информацию об общем кол-ве записей
-                        $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?orderby=' . $_GET['orderby'] . $params);
+                        $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&orderby=' . $_GET['orderby'] . $params);
                         $dataN = json_decode($dataJsonN, true);
                         $totalNumElements = count($dataN);
                         //и об общем кол-ве страниц
@@ -313,22 +319,25 @@ if($role !== 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . "/api/customers/get-with-details.php?limit=" . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
+                            print_r($data);
+                            print_r($_GET['orderby']);
 
                             //отдельно соберем информацию об общем кол-ве записей
-                            $dataJsonN = file_get_contents($nginxUrl . "/api/customers/get-with-details.php?orderby=" . $_GET['orderby'] . $params);
+                            $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&orderby=' . $_GET['orderby'] . $params);
                             $dataN = json_decode($dataJsonN, true);
                             $totalNumElements = count($dataN);
                             //и об общем кол-ве страниц
                             $totalPages = ceil(count($dataN) / $limit);
+                            //print_r($dataN);
                         }
                     }
 
                     //если активирован поиск
                     if(isset($_GET['search'])) {
-                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-details.php?orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $params);
+                        $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&orderby=' . $_GET['orderby'] . '&search=' . $_GET['search'] . $params);
                         $data = json_decode($dataJson, true);
                         //print_r($data);
                         //если по данному поисковому запросу записей нет, записываем в переменную 0

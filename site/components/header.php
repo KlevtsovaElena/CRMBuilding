@@ -215,33 +215,6 @@
         <nav class="menu-left" >
 
             <ul class="menu-left__items">
-                <!-- <li class="menu-left__item" data-page-name = "/index.php">
-                    <a href="/index.php" class="menu-left__item-link">
-                        <svg fill="#ced4da" class="fill" viewBox="0 2 34 34" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke-width="0.00036">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g id="SVGRepo_iconCarrier"> <title>house-solid</title> <path class="clr-i-solid clr-i-solid-path-1" d="M33,19a1,1,0,0,1-.71-.29L18,4.41,3.71,18.71a1,1,0,0,1-1.41-1.41l15-15a1,1,0,0,1,1.41,0l15,15A1,1,0,0,1,33,19Z"/>
-                            <path class="clr-i-solid clr-i-solid-path-2" d="M18,7.79,6,19.83V32a2,2,0,0,0,2,2h7V24h6V34h7a2,2,0,0,0,2-2V19.76Z"/> <rect x="0" y="0" width="36" height="36" fill-opacity="0"/> </g> 
-                        </svg>
-                        <span id="header-main" data-vendor="">Главная</span>
-                    </a>
-                </li> -->
-                <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-add-product.php">
-                    <a href="./../pages/vendor-add-product.php" class="menu-left__item-link">
-                        <svg stroke="#ced4da" viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </g> </g>
-                            </svg>
-                        <span>Добавить товар</span>
-                    </a>
-                </li> -->
-                <!-- <li class="menu-left__item" data-page-name = "/pages/vendor-finances.php">
-                    <a href="./../pages/vendor-finances.php" class="menu-left__item-link">
-                    <svg class="fill" viewBox="2 7 28 18" stroke="#ced4da"><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;} .st1{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:3;} .st2{fill:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;} .st3{fill:none;} </style> <rect x="3" y="8" class="st0" width="22" height="12"></rect> <path class="st0" d="M3,16c2.2,0,4,1.8,4,4v4h22V12h-4c-2.2,0-4-1.8-4-4"></path> <circle class="st0" cx="14" cy="14" r="3"></circle> <path class="st0" d="M7,8c0,2.2-1.8,4-4,4"></path> <path class="st0" d="M25,16c-2.2,0-4,1.8-4,4"></path> </g></svg>
-                        <span>Финансы</span>
-                    </a>
-                </li> -->
                 <li class="menu-left__item" data-page-name = "/pages/vendor-my-info.php">
                     <a href="./../pages/vendor-my-info.php" class="menu-left__item-link">
                         <svg class="fill" viewBox="5 5 38 38" xmlns="http://www.w3.org/2000/svg" fill="#ced4da">
@@ -279,6 +252,17 @@
                             <g id="SVGRepo_iconCarrier"><path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
                         </svg>
                         <span>Товары</span>
+                    </a>
+                </li>
+                <li class="menu-left__item"   data-page-name = "/pages/vendor-customers.php">
+                    <a href="./../pages/vendor-customers.php" class="menu-left__item-link">
+                        <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
+                            <title>Клиенты</title>    
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                            <g id="SVGRepo_iconCarrier"><path d="M0 26.016v-20q0-2.496 1.76-4.256t4.256-1.76h20q2.464 0 4.224 1.76t1.76 4.256v20q0 2.496-1.76 4.224t-4.224 1.76h-20q-2.496 0-4.256-1.76t-1.76-4.224zM4 26.016q0 0.832 0.576 1.408t1.44 0.576h20q0.8 0 1.408-0.576t0.576-1.408v-20q0-0.832-0.576-1.408t-1.408-0.608h-20q-0.832 0-1.44 0.608t-0.576 1.408v20zM8 24v-4h4v4h-4zM8 18.016v-4h4v4h-4zM8 12v-4h4v4h-4zM14.016 24v-4h9.984v4h-9.984zM14.016 18.016v-4h9.984v4h-9.984zM14.016 12v-4h9.984v4h-9.984z"/> </g>
+                        </svg>
+                        <span>Клиенты</span>
                     </a>
                 </li>
 
