@@ -62,6 +62,13 @@ class OrderVendorsController extends BaseController
                     }
                 }
             }
+
+            // если меняем статус на В доставке
+            // то надо отправить уведомление клиенту
+            if (isset($post['status']) && $post['status'] == 5 && isset($post['chat_id'])) {
+                $message = 'Ваш заказ находится в доставке';
+                file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id=' . urlencode($post['chat_id']) . '&text=' . $message);
+            }
             return;
         }
 

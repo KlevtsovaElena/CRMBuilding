@@ -12,6 +12,18 @@ link = mainUrl + '/api/ordervendors.php';
 //достаем из атрибута роль
 let role = document.getElementById('new-order').getAttribute('data-role');
 
+// кнопка В доставке
+let btnInDelivery = document.getElementById('btn-in-delivery');
+// эту кнопку НЕ показываем, если статус НОВЫЙ, ПРОСМОТРЕННЫЙ, В ДОСТАВКЕ, ДОСТАВЛЕН, ОТМЕНЁН
+// показываем, когда статус ПОДТВЕРЖДЁН
+if(role == 2 && status == 2) {
+    btnInDelivery.classList.remove('d-none');
+}
+
+// chat_id клиента
+let customerTgId = document.querySelector('[customer-tg-id]').getAttribute('customer-tg-id');
+console.log(customerTgId);
+
 //отслеживаем открытие страницы с заказом, чтобы поменять в БД статус заказа на "Просмотрен", если заказ новый и если его открыл ПОСТАВЩИК
 if (status == 0 && role == 2) {
 
@@ -133,6 +145,9 @@ function confirmOrder() {
     //возвращение на страницу всех заказов
     // backToAllOrders();
 
+    // показываем кнопку В доставке
+    btnInDelivery.classList.remove('d-none');
+
 }
 
 //функция для подтверждения доставки поставщиком
@@ -213,6 +228,25 @@ function sendLocation(latitude, longitude, id) {
     console.log('локация отправлена');
 
 }
+
+// функция для изменения статуса на В Доставке
+function inDelivery() {
+    //статус в таблице order_vendors меняется на 5 - В доставке
+    let obj = JSON.stringify({
+        'id': id,
+        'status':  5,
+        'chat_id': customerTgId
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+    // на сервере ещё уйдёт оповещение клиента, что заказ в доставке
+
+    //возвращение на страницу всех заказов
+    backToAllOrders();
+}
+
 
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

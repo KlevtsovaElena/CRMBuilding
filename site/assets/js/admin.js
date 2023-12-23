@@ -564,7 +564,7 @@ function applyInOrders() {
     //если задан статус
     if (statusSel) {
         //если выбраны только заказы "В архиве"
-        if(statusSel == 5) {
+        if(statusSel == 6) {
             filters += '&archive=1';
             //сразу на фронте активируем чекбокс
             archiveCheck.checked;
@@ -578,7 +578,7 @@ function applyInOrders() {
             } else {
                 filters += '&archive=0';
             }
-        //если выбраны заказы 0-4
+        //если выбраны заказы 0-5
         } else {
             //если отмечен чекбокс с архивными записями, выводим заказы с архивными
             if (archiveChecked()) {
