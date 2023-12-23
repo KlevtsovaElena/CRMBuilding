@@ -1299,7 +1299,7 @@ function notifyAdminInactiveGoods() {
 
     console.log('уведомление отправлено');
     
-    alert('Уведомление отправлено админу');
+    //alert('Уведомление отправлено админу');
 
 }
 
@@ -1377,44 +1377,62 @@ function connectedFilter(link) {
 //функция блокировки клиентов
 function checkboxCustomerBlocked(id) {
 
-        //выдаем поп-ап с подтверждением действия
-        let isChecked = window.confirm('Вы действительно хотите изменить статус этого клиента?');
+    //выдаем поп-ап с подтверждением действия
+    let isChecked = window.confirm('Вы действительно хотите изменить статус этого клиента?');
 
-        if(!isChecked) {
-            console.log("не менять");
-            //чтобы визуально не менялась галочка
-            if(event.target.checked) {
-                event.target.checked = false;
-            } else {
-                event.target.checked = true;
-            }
-            return;
-        }
-    
-        //если при нажатии чекбокс активировн
-        if (event.target.checked) {
-    
-            //собираем параметры для передачи в бд
-            obj = JSON.stringify({
-                'id': id,
-                'is_blocked': 1
-            });
-    
-        //если при нажатии чекбокс деактивирован
+    if(!isChecked) {
+        console.log("не менять");
+        //чтобы визуально не менялась галочка
+        if(event.target.checked) {
+            event.target.checked = false;
         } else {
-    
-            obj = JSON.stringify({
-                'id': id,
-                'is_blocked': 0
-            });
+            event.target.checked = true;
         }
-    
-        console.log(obj);
-    
-        let link = mainUrl + '/api/customers.php';
-    
-        //передаем на сервер в пост-запросе
-        sendRequestPOST(link, obj);
+        return;
+    }
+
+    //если при нажатии чекбокс активировн
+    if (event.target.checked) {
+
+        //собираем параметры для передачи в бд
+        obj = JSON.stringify({
+            'id': id,
+            'is_blocked': 1
+        });
+
+        //отправляем уведомление клиенту
+        //собираем ссылку на нужный эндпойнт
+        let link2 = mainUrl + '/api/notification/telegram-send-customer-is-blocked.php';
+
+        //формируем параметры для передачи в апишку
+        let obj2 = JSON.stringify({
+            "customer_id" : id
+        });
+
+        //передаем параметры на сервер в пост-запросе
+        sendRequestPOST(link2, obj2);
+
+        console.log('уведомление отправлено');
+        
+        alert('Клиенту отправлено уведомление об ограничении доступа к боту');
+
+
+    //если при нажатии чекбокс деактивирован
+    } else {
+
+        obj = JSON.stringify({
+            'id': id,
+            'is_blocked': 0
+        });
+    }
+
+    console.log(obj);
+
+    let link = mainUrl + '/api/customers.php';
+
+    //передаем на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
 }
 
 //записываем в куки локальный часовой пояс
