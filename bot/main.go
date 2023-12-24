@@ -960,7 +960,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city=" + strconv.Itoa(usersDB[chatId].City))
+			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city_id=" + strconv.Itoa(usersDB[chatId].City))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
