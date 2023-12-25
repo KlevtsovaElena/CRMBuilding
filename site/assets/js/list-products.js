@@ -602,9 +602,6 @@ function deleteProduct() {
     // делаем запрос на удаление товара по id
     sendRequestPOST(mainUrl + '/api/products.php', obj);
 
-    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + productId);
-
-
     // заполним страницу данными
     startRenderPage(priceConfirmed);
 
@@ -804,16 +801,30 @@ function saveChangePrice(currency_dollar, rate) {
         obj['is_confirm'] = 0;
         let objJson = JSON.stringify(obj);
 
-        // отправка запроса на запись (изменение цены)
-        sendRequestPOST(mainUrl + '/api/products.php', objJson);
-
-        // отправим запрос на изменение статуса подтверждения цен поставщика
-        // (при любом изменении цены поставщику устанавливаем подверждение цен в 0)
-        // let objVendor = JSON.stringify({
-        //     'id': vendor_id,
-        //     'price_confirmed':  0
-        // });
-        // sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
+        // передаём данные на сервер
+        let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', objJson);
+        let isSuccess;
+        // провeрим, что вернулось с сервера success:true || success:false
+        try {
+            // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+            isSuccess  = JSON.parse(isSuccessJson);
+        } catch(e) {
+            alert ('Ошибка! Попробуйте позже!');
+            return;
+        }
+        // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+        // иначе - Товар изменён, и если изменял не админ, и менялась цена, то оповещаем админа в телеграмм
+        if (!isSuccess.success) {
+            // если распарсили и получили success : false, то Ошибка
+            alert('Ошибка!');
+            return;
+        } else {
+            // если распарсили и получили success : true, то всё записалось в базу
+            // оповещение админа с ссылкой неутверждённых товаров, если товар активен
+            if (rowProduct.getAttribute('is-active') == '1'){
+                notifyAdminInactiveGoods();
+            }
+        }
 
         // перерисовка страницы
         startRenderPage(priceConfirmed);
@@ -1031,19 +1042,26 @@ function massChangePriceClick() {
     }
 
     // выбранные характеристики изменяемого товара
-    let categoryIdMasschangeOption = categoryIdMasschange.querySelectorAll('option');
-
-    let brandIdMasschangeOption = brandIdMasschange.querySelectorAll('option');
-
+    let categoryName = categoryIdMasschange.querySelector("option[value='" + categoryIdMasschange.value +"']").innerText;
+    console.log(categoryName);
+    let brandName = brandIdMasschange.querySelector("option[value='" + brandIdMasschange.value + "']").innerText;
+    console.log(brandName);
     if (categoryIdMasschange.value && brandIdMasschange.value) {
+
         obj['products_kind'] = 'category_id=' + categoryIdMasschange.value +';brand_id=' + brandIdMasschange.value;
-        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText + " и бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+        console.log(obj['products_kind']);
+        dataProductsKind = "категории " + categoryName + " и бренда " + brandName;
+
     } else if (categoryIdMasschange.value) {
         obj['products_kind'] = 'category_id=' + categoryIdMasschange.value;
-        dataProductsKind = "категории " + categoryIdMasschangeOption[categoryIdMasschange.value].innerText;
+        console.log(obj['products_kind']);
+        dataProductsKind = "категории " + categoryName;
+
     } else if (brandIdMasschange.value) {
         obj['products_kind'] = 'brand_id=' + brandIdMasschange.value;
-        dataProductsKind = "бренда " + brandIdMasschangeOption[brandIdMasschange.value].innerText;
+        console.log(obj['products_kind']);
+        dataProductsKind = "бренда " + brandName;
+
     } 
 
     obj['vendor_id'] = vendor_id;
@@ -1082,6 +1100,10 @@ function massChangePriceClick() {
     } else {
         modalMassChangePrice.classList.add('d-none');
         alert(result.message);
+        if(result.count > 0) {
+            // отправляем оповещение админу о том, что нужно одобрить товары в том случае, если цены на товары были изменены
+            notifyAdminInactiveGoods();
+        }
     }
 
     // перезагрузим страницу

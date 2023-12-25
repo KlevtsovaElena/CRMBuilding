@@ -32,11 +32,35 @@
 
             if (isset($post['id']))
             {
-                $this->productRepository->updateById($post);
+                try {
+                    $this->productRepository->updateById($post);
+                    echo json_encode([
+                        "success" => true
+                    ]);
+    
+                } catch (PDOException $e) {
+                    echo json_encode([
+                        "success" => false
+                    ]); 
+                    return;
+                } 
                 return;
             }
 
-            $this->productRepository->add($post);
+
+            try {
+                $this->productRepository->add($post);
+                echo json_encode([
+                    "success" => true
+                ]);
+
+            } catch (PDOException $e) {
+                echo json_encode([
+                    "success" => false
+                ]); 
+                return;
+            } 
+
         }
 
         protected function onDelete()

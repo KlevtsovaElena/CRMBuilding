@@ -127,3 +127,22 @@ itemNav.forEach( item => {
     }
 })
 
+
+//функция оповещения админа о неутвержденных товарах
+function notifyAdminInactiveGoods() {
+
+    //ссылка на страницу с неодобренными товарами, которую передадим в пост-запросе
+    let text = mainUrl + '/pages/admin-list-products.php?off_product=0&is_confirm=0&limit=10&offset=0';
+
+    //собираем ссылку на нужный эндпойнт
+    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+
+    //формируем параметры для передачи в апишку
+    let obj = JSON.stringify({
+        "text" : text
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
+
+}

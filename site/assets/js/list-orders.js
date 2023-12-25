@@ -6,7 +6,8 @@ let orderStatus = {
     "1": "Просмотрен",
     "2": "Подтверждён",
     "3": "Отменён",
-    "4": "Доставлен"
+    "4": "Доставлен",
+    "5": "В доставке"
 }
 
 // найдём шаблон и контейнер для отрисовки заказов
@@ -344,7 +345,9 @@ function renderListOrders(orders) {
                                                         .replace('${distance}',  distance)
                                                         .replace('${archive}', orders['orders'][i]['archive'])
                                                         .replace('${archive_status}', archiveStatus)
-                                                        .replace('${archive_text}', archiveText);
+                                                        .replace('${archive_text}', archiveText)
+                                                        .replace('${customer_tg_id}', orders['orders'][i]['customer_tg_id'])
+                                                        ;
                                                         
         
     }  
@@ -565,6 +568,15 @@ function saveChangeOrder() {
     obj['id'] = idOrder;
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
     obj['with_debt_recalc'] = true;
+
+    if(changeOrderSelect.value.split('=')[1] == '5') {
+        // если статус = 5 (в доставке, добавим в передаваемые данные chat_id)
+        let customerTgId = rowOrder.getAttribute('customer-tg-id')
+        console.log(customerTgId);
+        obj['chat_id'] = customerTgId;
+    }
+
+
     let objJson = JSON.stringify(obj);
 
     console.log(obj);

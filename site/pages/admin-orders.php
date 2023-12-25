@@ -226,7 +226,9 @@ if($role !== 1) {
                             2 => 'Подтверждён',
                             3 => 'Отменён',
                             4 => 'Доставлен',
-                            5 => 'В архиве'
+                            5 => 'В доставке',
+                            6 => 'В архиве'
+
                         );
 
                         $statusSel = '';
@@ -237,12 +239,12 @@ if($role !== 1) {
                             <option value="all" <?= 'selected' ?> >все</option>
                             
                         <?php 
-                        //если статус в гет-параметрах задан статус 5 "В архиве", выводим его
+                        //если статус в гет-параметрах задан статус 6 "В архиве", выводим его
                         } elseif (isset($_GET['archive']) && $_GET['archive'] == 1) {
-                            $statusSel = 5; ?>
+                            $statusSel = 6; ?>
                             <option value="all">все</option>
                         <?php
-                        //если задан статус 0-4 
+                        //если задан статус 0-5 
                         } elseif (isset($_GET['status'])) {
                             $statusSel = $_GET['status']; ?>
                             <option value="all">все</option>
@@ -521,6 +523,9 @@ if($role !== 1) {
                                 if($data[$i]['status'] == 4) {
                                     $status = 'Завершен';
                                 } 
+                                if($data[$i]['status'] == 5) {
+                                    $status = 'В доставке';
+                                }
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
                             <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>" <?php if($data[$i]['archive'] == 1) { echo 'archive="1"';} ?>>

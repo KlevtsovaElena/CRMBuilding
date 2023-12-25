@@ -90,36 +90,37 @@ CREATE TABLE `customers` (
   `city_id` int unsigned NOT NULL,
   `tg_id` bigint unsigned NOT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `is_blocked` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`) VALUES
-(5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch'),
-(21,	'Timon',	'Decathlon',	'79672772550',	1,	223054377,	'timondecathlon'),
-(22,	'S',	'R',	'998903480305',	1,	601131024,	'skidkabor'),
-(23,	'GsmServer™',	'',	'998981282810',	1,	197583494,	'unlockservers'),
-(25,	'Леночка',	'',	'79060685310',	3,	1752911328,	'KlevtsovaEV'),
-(27,	'Игорь',	'',	'79152032125',	1,	5677540667,	'LogunovIgor'),
-(28,	'Лол',	'',	'998777777777',	2,	892205925,	'rodionaka'),
-(29,	'Catherine',	'',	'79854377397',	3,	443133309,	'cazerine_hg'),
-(30,	'Skidkabuy_Admin',	'',	'998977608888',	3,	5515948675,	'skidkabuy_admin'),
-(31,	'Машъал',	'Маматкулов',	'998946847020',	2,	1669936,	'umdcam'),
-(32,	'zafar',	'',	'998949471027',	1,	5310841263,	''),
-(33,	'FARHAD',	'',	'998901762607',	1,	64449190,	''),
-(34,	'Nastya',	'',	'998008889999',	4,	299855596,	'anvikse'),
-(35,	'iLLbeBack',	'',	'',	1,	4327064,	'Bumbusik'),
-(36,	'Candy',	'Key',	'998933540322',	1,	6184975087,	'candycey'),
-(37,	'Mrs',	'',	'79262832982',	3,	1415183995,	''),
-(38,	'Na',	'',	'998903498558',	3,	1959569,	'bravosmm'),
-(39,	'......',	'',	'',	1,	6237608066,	''),
-(40,	'iPad 7',	'',	'998903726322',	1,	6451636866,	''),
-(41,	'',	'',	'',	3,	34404845,	'Miraziz_Xadichabegim'),
-(42,	'A.',	'N.',	'',	3,	302995860,	''),
-(43,	'Olimjon',	'Isomov',	'',	3,	769918709,	'isamovolim'),
-(44,	'ЭЛЁР',	'',	'998915882002',	3,	1232585433,	''),
-(45,	'Olesik',	'',	'79036616687',	3,	1061474542,	'Olesik_404'),
-(46,	'Мася Че',	'',	'79175577254',	3,	1638101427,	''),
-(47,	'Andrei',	'Tokaiskii',	'998970098250',	1,	479734807,	'');
+INSERT INTO `customers` (`id`, `first_name`, `last_name`, `phone`, `city_id`, `tg_id`, `tg_username`, `is_blocked`) VALUES
+(5,	'Uchken',	NULL,	'1007545645',	5,	32432533464,	'uch',	0),
+(21,	'Timon',	'Decathlon',	'79672772550',	1,	223054377,	'timondecathlon',	0),
+(22,	'S',	'R',	'998903480305',	1,	601131024,	'skidkabor',	0),
+(23,	'GsmServer™',	'',	'998981282810',	1,	197583494,	'unlockservers',	0),
+(25,	'Леночка',	'',	'79060685310',	3,	1752911328,	'KlevtsovaEV',	0),
+(27,	'Игорь',	'',	'79152032125',	1,	5677540667,	'LogunovIgor',	0),
+(28,	'Лол',	'',	'998777777777',	2,	892205925,	'rodionaka',	0),
+(29,	'Catherine',	'',	'79854377397',	3,	443133309,	'cazerine_hg',	0),
+(30,	'Skidkabuy_Admin',	'',	'998977608888',	3,	5515948675,	'skidkabuy_admin',	0),
+(31,	'Машъал',	'Маматкулов',	'998946847020',	2,	1669936,	'umdcam',	0),
+(32,	'zafar',	'',	'998949471027',	1,	5310841263,	'',	0),
+(33,	'FARHAD',	'',	'998901762607',	1,	64449190,	'',	0),
+(34,	'Nastya',	'',	'998008889999',	4,	299855596,	'anvikse',	0),
+(35,	'iLLbeBack',	'',	'',	1,	4327064,	'Bumbusik',	0),
+(36,	'Candy',	'Key',	'998933540322',	1,	6184975087,	'candycey',	0),
+(37,	'Mrs',	'',	'79262832982',	3,	1415183995,	'',	0),
+(38,	'Na',	'',	'998903498558',	3,	1959569,	'bravosmm',	0),
+(39,	'......',	'',	'',	1,	6237608066,	'',	0),
+(40,	'iPad 7',	'',	'998903726322',	1,	6451636866,	'',	0),
+(41,	'',	'',	'',	3,	34404845,	'Miraziz_Xadichabegim',	0),
+(42,	'A.',	'N.',	'',	3,	302995860,	'',	0),
+(43,	'Olimjon',	'Isomov',	'',	3,	769918709,	'isamovolim',	0),
+(44,	'ЭЛЁР',	'',	'998915882002',	3,	1232585433,	'',	0),
+(45,	'Olesik',	'',	'79036616687',	3,	1061474542,	'Olesik_404',	0),
+(46,	'Мася Че',	'',	'79175577254',	3,	1638101427,	'',	0),
+(47,	'Andrei',	'Tokaiskii',	'998970098250',	1,	479734807,	'',	0);
 
 DROP TABLE IF EXISTS `order_vendors`;
 CREATE TABLE `order_vendors` (
@@ -353,11 +354,12 @@ CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `settings` (`id`, `name`, `value`) VALUES
-(1,	'phone',	'89997776655');
+INSERT INTO `settings` (`id`, `name`, `value`, `first_name`) VALUES
+(1,	'phone',	'89997776655',	'Имя в телеграме');
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (

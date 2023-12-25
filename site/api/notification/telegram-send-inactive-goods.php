@@ -23,13 +23,13 @@ class TelegramSendLocationController extends BaseController
             $admin = $this->vendorRepository->get([
                 'role' => 1
             ]);
-            //print_r($admin);
+            // print_r($admin);
 
             try {
                 DbContext::getConnection()->beginTransaction();
                 // достаем чат id админа из vendors, исходя из полученных выше данных
                 $chat_id = $admin[0]->tg_id;
-                //print_r($chat_id);
+                // print_r($chat_id);
 
                 \DbContext::getConnection()->commit();
             } catch (Exception $e) {
@@ -47,9 +47,15 @@ class TelegramSendLocationController extends BaseController
             return;
         }
         
-        //отправляем админу ссылку на неактивные товары через бота
-        file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id='. urlencode($chat_id) . 
-        '&parse_mode=HTML&text=' . 'Следующие товары больше не активны: ' . urlencode($post['text']));
+        try{
+            //отправляем админу ссылку на неактивные товары через бота
+            file_get_contents('https://api.telegram.org/bot'.$_ENV['BOT_TOKEN'].'/sendMessage?chat_id='. urlencode($chat_id) . 
+            '&text=' . 'Следующие товары ожидают одобрение: %0A' .  urlencode($post['text']));
+            
+        } catch (Exception $e) {
+            echo $e;
+        }
+         
     }
 }
 
