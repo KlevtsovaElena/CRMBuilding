@@ -93,7 +93,7 @@ if($role !== 2) {
                     <!-- показывать неактивные -->
                     <div class="active-check">
                         <div >
-                            <input type="checkbox" id="active-check" name="active-check" checked value="">
+                            <input type="checkbox" id="active-check" name="active-check" value="is_active=1">
                         </div>
                         <lable>Неактивные</lable>
                     </div>

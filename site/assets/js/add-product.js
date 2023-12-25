@@ -93,19 +93,31 @@ function addProduct(role) {
 
 
     // передаём данные на сервер
-    sendRequestPOST(mainUrl + '/api/products.php', obj);
+    let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+    let isSuccess;
+    // провeрим, что вернулось с сервера success:true || success:false
+    try {
+        // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+        isSuccess  = JSON.parse(isSuccessJson);
+    } catch(e) {
+        alert ('Ошибка! Попробуйте позже!');
+        return;
+    }
+    // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+    // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
+    if (!isSuccess.success) {
+        // если распарсили и получили success : false, то Ошибка
+        alert('Ошибка!');
+        return;
+    } else {
+        // если распарсили и получили success : true, то всё записалось в базу
+        // оповещение админа с ссылкой неутверждённых товаров
+        if (role !== 1) {
+            notifyAdminInactiveGoods();
+        }
+        alert("Товар добавлен");
+    }
 
-    // если товар добавляет поставщик, а не админ, то поставщика переводим в 0 до подтверждения цен
-    // if (role == 2) {
-    //     // отправим запрос на изменение статуса подтверждения цен поставщика
-    //     let objVendor = JSON.stringify({
-    //         'id': vendor_id.value,
-    //         'price_confirmed':  0
-    //     });
-    //     sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-    // }
-
-    alert("Данные отправлены");
     // перезагрузим страницу
     window.location.href = window.location.href;
 }
