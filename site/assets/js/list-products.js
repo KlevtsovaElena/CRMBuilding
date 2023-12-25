@@ -1137,7 +1137,7 @@ category_idEl.addEventListener('change', ()=> {
 
 /* ---------- СБРОС ФИЛЬТРА ---------- */
 // найдём кнопку Сбросить
-let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+// let btnRemoveFilters = document.getElementById('btn-cancel-filters');
 
 // повесим на неё функцию по клику
 btnRemoveFilters.addEventListener('click', () => {
