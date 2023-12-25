@@ -1277,31 +1277,31 @@ function changeTagName(el, newTagName) {
   }
 
 
-//функция оповещения админа о неутвержденных товарах
-function notifyAdminInactiveGoods() {
+// //функция оповещения админа о неутвержденных товарах
+// function notifyAdminInactiveGoods() {
 
-    //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
-    //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
-    //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
-    //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
-    let text = 'https://qna.habr.com/q/518740';
+//     //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
+//     //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+//     //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
+//     //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
+//     let text = 'https://qna.habr.com/q/518740';
 
-    //собираем ссылку на нужный эндпойнт
-    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+//     //собираем ссылку на нужный эндпойнт
+//     let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
 
-    //формируем параметры для передачи в апишку
-    let obj = JSON.stringify({
-        "text" : text
-    });
+//     //формируем параметры для передачи в апишку
+//     let obj = JSON.stringify({
+//         "text" : text
+//     });
 
-    //передаем параметры на сервер в пост-запросе
-    sendRequestPOST(link, obj);
+//     //передаем параметры на сервер в пост-запросе
+//     sendRequestPOST(link, obj);
 
-    console.log('уведомление отправлено');
+//     console.log('уведомление отправлено');
     
-    //alert('Уведомление отправлено админу');
+//     //alert('Уведомление отправлено админу');
 
-}
+// }
 
 //функция изменения фильтра Поставщиков при выборе в фильтре Города
 function cityChanged(e) {

@@ -101,7 +101,6 @@ class ProductRepository extends BaseRepository
                                         p.is_confirm = 0 
                                     WHERE v.`id` = :vendor_id 
                                         AND v.`currency_dollar` = 1'; // Только если у вендора установлена валюта в долларах
-
     const UPDATE_CONFIRM_PRODUCTS_BY_VENDOR = 'UPDATE products p
                                                SET p.is_confirm = 1
                                                WHERE p.`vendor_id` = %s
@@ -112,7 +111,9 @@ class ProductRepository extends BaseRepository
     const UPDATE_PRICE_MASS_BY_VENDOR = 'UPDATE products p
                                         SET p.is_confirm = 0, %s
                                          %s';
-
+    const COUNT_PRICE_MASS_BY_VENDOR = 'SELECT COUNT(*) as `count`
+                                        FROM  products p 
+                                        %s';
     const COUNT_NOT_CONFIRM_PRODUCT_BY_VENDOR = 'SELECT COUNT(*) as `count`
                                                     FROM products p   
                                                     WHERE p.`vendor_id` = %s
@@ -632,6 +633,17 @@ class ProductRepository extends BaseRepository
         $query = sprintf(static::UPDATE_PRICE_MASS_BY_VENDOR, $inputParams['set_string'], $inputParams['where_string']);
         $statement = \DbContext::getConnection()->prepare($query);
         $statement->execute();
+    }
+
+    public function getCountPriceMassChange(array $inputParams)
+    {
+        $query = sprintf(static::COUNT_PRICE_MASS_BY_VENDOR, $inputParams['where_string']);
+        $statement = \DbContext::getConnection()->prepare($query);
+        $statement->execute();
+        if (!$data = $statement->fetch())
+        return 0;
+
+        return $data['count'];
     }
 
     public function updateConfirmProductByVendor(array $inputParams) 

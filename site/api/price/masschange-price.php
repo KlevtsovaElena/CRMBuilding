@@ -65,10 +65,14 @@ class ChangePriceMassController extends BaseController
         
         // сделаем запрос на изменение цен
         try {
+            // сначала посчитаем сколько товаров соотвествуют условиям
+            $count = $this->productRepository->getCountPriceMassChange($post);
+
             $this->productRepository->updatePriceMassByVendor($post);
             echo json_encode([
                 "success" => true,
-                "message" => 'Запрос выполнен!'
+                "message" => 'Запрос выполнен!',
+                "count" => $count
             ],
             JSON_UNESCAPED_UNICODE);
         } catch (PDOException $e) {
