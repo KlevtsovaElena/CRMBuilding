@@ -310,6 +310,9 @@ if($role !== 1) {
                 
                 <!-- кнопка, активирующая фильтры на странице и поиск -->
                 <button onclick="applyInOrders()" class="btn btn-ok d-iblock">Применить</button>
+                <!-- кнопка сброса фильтров -->
+                <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
             </div>
 
         </section>

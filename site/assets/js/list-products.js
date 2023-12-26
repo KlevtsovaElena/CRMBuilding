@@ -73,6 +73,8 @@ startRenderPage(priceConfirmedEl.getAttribute('confirm-price'));
 // отрисуем фильтры в окне массового изменения цен
 updateFiltersForMassChangePrice();
 
+// передвинем скролл
+changePositionScroll();
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
 function startRenderPage(priceConfirmed) {
 
@@ -1131,4 +1133,23 @@ categoryIdMasschange.addEventListener('change', ()=>{
 
 category_idEl.addEventListener('change', ()=> {
     updateBrandFilter(category_idEl, brand_idEl, 'notSaveIdEl');
+})
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
+// найдём кнопку Сбросить
+// let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+
+// повесим на неё функцию по клику
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
+    history.replaceState(history.length, null, 'vendor-list-products.php');
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
+
+
+/* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+window.addEventListener('unload', ()=> {
+    saveGetParamsInLS(window.location.search);
 })

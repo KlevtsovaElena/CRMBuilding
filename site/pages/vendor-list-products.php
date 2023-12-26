@@ -7,6 +7,9 @@ if($role !== 2) {
 ?>
 
 <?php 
+    // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
+    $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+    
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -103,7 +106,7 @@ if($role !== 2) {
                     <?php if($profile['currency_dollar'] == '0') { ?>
                        <button id="btn-masschange-price" class="btn btn-ok d-iblock">Массовое изменение цен</button>
                     <?php } ?>
-                    
+                    <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
                     
                 </div>
 
@@ -264,6 +267,7 @@ if (count($_GET) !== 0) {
             <?php if($profile['currency_dollar'] == '0') { ?>
                        <button id="btn-masschange-price" class="btn btn-ok d-iblock">Массовое изменение цен</button>
             <?php } ?>
+            <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
             
         </div>
     </section>

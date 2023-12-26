@@ -447,13 +447,6 @@ function apply(section_name, filters) {
 
             document.location.href = mainUrl + '/pages/admin-wholesalers.php?limit=all&search=name:' +  searchQuery.trim() + filters;
 
-        } else if (section_name == 'admin-customers') {
-
-            //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-customers.php?limit=all&search=first_name:' + searchQuery.trim() + filters);
-
-            document.location.href = mainUrl + '/pages/admin-customers.php?limit=all&search=first_name:' +  searchQuery.trim() + filters;
-
         } else {
 
             let key = document.querySelector('.page-title').getAttribute('data-name');
@@ -463,7 +456,9 @@ function apply(section_name, filters) {
 
             document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
         }
-     
+
+        
+        
     } else {
 
         //если мы на странице admin-vendors
@@ -481,13 +476,6 @@ function apply(section_name, filters) {
             history.replaceState(history.length, null, 'admin-wholesalers.php?limit=' + limit.value + filters);
 
             document.location.href = mainUrl + '/pages/admin-wholesalers.php?limit=' + limit.value + filters;
-
-        } else if (section_name == 'admin-customers') {
-
-            //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-customers.php?limit=' + limit.value + filters);
-
-            document.location.href = mainUrl + '/pages/admin-customers.php?limit=' + limit.value + filters;
 
         } else {
 
@@ -564,7 +552,7 @@ function applyInOrders() {
     //если задан статус
     if (statusSel) {
         //если выбраны только заказы "В архиве"
-        if(statusSel == 6) {
+        if(statusSel == 5) {
             filters += '&archive=1';
             //сразу на фронте активируем чекбокс
             archiveCheck.checked;
@@ -578,7 +566,7 @@ function applyInOrders() {
             } else {
                 filters += '&archive=0';
             }
-        //если выбраны заказы 0-5
+        //если выбраны заказы 0-4
         } else {
             //если отмечен чекбокс с архивными записями, выводим заказы с архивными
             if (archiveChecked()) {
@@ -937,96 +925,6 @@ function applyInVendors(section_name) {
 
 }
 
-//функция при нажатии на кнопку "Применить" для admin-vendors!!!
-function applyInCustomers(section_name) {
-
-    console.log(limit.value);
-
-    //лимит задан всегда, поэтому проверяем только наличие поискового запроса
-    //получим введенное в поиск значение
-    let searchQuery = document.getElementById('search').value;
-    let dataSearch = searchQuery.trim();
-
-    // получим значение атрибута data-sort
-    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
-    console.log(allTitlesElems);
-
-    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
-    let dataSort = '';
-    //переменная для ключа, соответствующего названию сортируемого поля в БД
-    let key = '';
-
-    //в цикле вынимаем эти два элемента
-    for (let i = 0; i < allTitlesElems.length; i++) {
-        if (allTitlesElems[i].getAttribute('data-sort')) {
-            //вынимаем заданное значение ключа
-            dataSort = allTitlesElems[i].getAttribute('data-sort');
-            console.log(dataSort);
-            //вынимаем ключ
-            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
-            console.log(key);
-        }
-    }
-
-    //собираем фильтры (город)
-    let filters = '';
-
-    // получим значение атрибута data-page, содержащего номер текущей страницы
-    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
-    console.log(dataPage);
-
-    //если активировано значение asc
-    if (dataSort && dataSort === "asc") {
-        
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/'+ section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
-        }
-    //если активировано значение desc
-    } else if (dataSort === "desc") {
-
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
-        }
-    } else if (!dataSort) {
-        apply(section_name, filters);
-    }
-
-}
-
 //функция по чекбоксам со статусом города
 function checkboxChangedCity(id) {
 
@@ -1277,31 +1175,31 @@ function changeTagName(el, newTagName) {
   }
 
 
-// //функция оповещения админа о неутвержденных товарах
-// function notifyAdminInactiveGoods() {
+//функция оповещения админа о неутвержденных товарах
+function notifyAdminInactiveGoods() {
 
-//     //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
-//     //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
-//     //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
-//     //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
-//     let text = 'https://qna.habr.com/q/518740';
+    //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
+    //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
+    let text = 'https://qna.habr.com/q/518740';
 
-//     //собираем ссылку на нужный эндпойнт
-//     let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+    //собираем ссылку на нужный эндпойнт
+    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
 
-//     //формируем параметры для передачи в апишку
-//     let obj = JSON.stringify({
-//         "text" : text
-//     });
+    //формируем параметры для передачи в апишку
+    let obj = JSON.stringify({
+        "text" : text
+    });
 
-//     //передаем параметры на сервер в пост-запросе
-//     sendRequestPOST(link, obj);
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
 
-//     console.log('уведомление отправлено');
+    console.log('уведомление отправлено');
     
-//     //alert('Уведомление отправлено админу');
+    alert('Уведомление отправлено админу');
 
-// }
+}
 
 //функция изменения фильтра Поставщиков при выборе в фильтре Города
 function cityChanged(e) {
@@ -1374,67 +1272,6 @@ function connectedFilter(link) {
     console.log(data);
 }
 
-//функция блокировки клиентов
-function checkboxCustomerBlocked(id) {
-
-    //выдаем поп-ап с подтверждением действия
-    let isChecked = window.confirm('Вы действительно хотите изменить статус этого клиента?');
-
-    if(!isChecked) {
-        console.log("не менять");
-        //чтобы визуально не менялась галочка
-        if(event.target.checked) {
-            event.target.checked = false;
-        } else {
-            event.target.checked = true;
-        }
-        return;
-    }
-
-    //если при нажатии чекбокс активировн
-    if (event.target.checked) {
-
-        //собираем параметры для передачи в бд
-        obj = JSON.stringify({
-            'id': id,
-            'is_blocked': 1
-        });
-
-        //отправляем уведомление клиенту
-        //собираем ссылку на нужный эндпойнт
-        let link2 = mainUrl + '/api/notification/telegram-send-customer-is-blocked.php';
-
-        //формируем параметры для передачи в апишку
-        let obj2 = JSON.stringify({
-            "customer_id" : id
-        });
-
-        //передаем параметры на сервер в пост-запросе
-        sendRequestPOST(link2, obj2);
-
-        console.log('уведомление отправлено');
-        
-        alert('Клиенту отправлено уведомление об ограничении доступа к боту');
-
-
-    //если при нажатии чекбокс деактивирован
-    } else {
-
-        obj = JSON.stringify({
-            'id': id,
-            'is_blocked': 0
-        });
-    }
-
-    console.log(obj);
-
-    let link = mainUrl + '/api/customers.php';
-
-    //передаем на сервер в пост-запросе
-    sendRequestPOST(link, obj);
-
-}
-
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 document.cookie = 'time_zone=' + timeZone;
@@ -1481,28 +1318,48 @@ function confirmProductsVendor(id, nameVendor) {
 
 
 
-// ЗАДАЧА23
-/* ---------- СБРОС ФИЛЬТРА ---------- */
-// ДЛЯ ВСЕХ КРОМЕ ТЕХ СТРАНИЦ, КОТОРЫЕ В admin.php
 
+// ЗАДАЧА23
+// При переключении страничек сначала перезаписываем гет-параметра в адресной строке, а только потом перезагружаем
+function switchPageAndSaveGetParamsInLS(getParams) {
+    //передаем в адресную строку изменения, чтобы сразу их видеть
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage + getParams);
+
+    // перезагрузим страницу
+    window.location.href = mainUrl + window.location.pathname + getParams; 
+}
+
+
+// тк в этом js обрабатывается не одна страница, то придётся отбирать, для каких страниц нужно сохранять фильтрацию при переходе на др страницы
+// и отрисовывать позицию скролла из локалсторадж
+// это можно делать только для тех страниц, у которых в .php вначале указан  $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+// здесь достаточно указать через || названия страниц
+if(window.location.pathname == '/pages/admin-vendors.php') {
+    // передвинем скролл
+    changePositionScroll();
+
+    /* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+    window.addEventListener('unload', ()=> {
+        saveGetParamsInLS(window.location.search);
+    })
+
+}
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
 // найдём кнопку Сбросить
 let btnRemoveFilters = document.getElementById('btn-cancel-filters');
 
 // повесим на неё функцию по клику
-if (window.location.pathname !== '/pages/admin.php') {
-    btnRemoveFilters.addEventListener('click', () => {
-        // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
-    
-        // получим только название странички (/pages/name.php  -> /name.php)
-        let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
-        history.replaceState(history.length, null, namePage);
-    
-        // удалим из ЛС элемент с ключом адреса страницы (например, /pages/vendor-list-products.php)
-        // localStorage.removeItem(window.location.pathname);
-    
-        // перезагрузим страницу с пустыми параметрами
-        window.location.replace(window.location.origin + window.location.pathname);
-    })
-}
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
 
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage);
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
 // ЗАДАЧА23
