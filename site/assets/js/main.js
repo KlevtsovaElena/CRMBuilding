@@ -29,6 +29,17 @@ function sendRequestPOST(url, params) {
 
 }
 
+//функция для отправки запросов POST json`ном
+function sendRequestTruePOST(url, params) {
+
+    let requestObj = new XMLHttpRequest();
+    requestObj.open('POST', url, true);
+    requestObj.setRequestHeader('Content-Type', 'application/json');
+    requestObj.send(params);
+    return requestObj.responseText;
+
+}
+
 //функция для отправки запросов POST
 function sendRequestFormUrlPOST(url, params){
 
@@ -129,6 +140,7 @@ itemNav.forEach( item => {
 
 
 //функция оповещения админа о неутвержденных товарах
+// сделаем true , чтобы не ждать ответ с сервера и не зависала страница sendRequestTruePOST
 function notifyAdminInactiveGoods() {
 
     //ссылка на страницу с неодобренными товарами, которую передадим в пост-запросе
@@ -143,6 +155,6 @@ function notifyAdminInactiveGoods() {
     });
 
     //передаем параметры на сервер в пост-запросе
-    sendRequestPOST(link, obj);
+    sendRequestTruePOST(link, obj);
 
 }
