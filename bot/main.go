@@ -524,6 +524,7 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 	mesIdInline := messageInline.CallbackQuery.Message.MessageID
 
 	isProvider := false
+	blocked := 0
 	hashString := ""
 
 	// Проверяем, есть ли параметр после "/start"
@@ -540,30 +541,6 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		}
 	}
 
-	//есть ли юзер
-	_, exist := usersDB[chatId]
-	if !exist {
-		user := UserT{}
-		user.ID = chatId
-		user.FirstName = firstName
-		user.LastName = lastName
-		user.Username = username
-		user.Tg_id = chatId
-		user.PhoneNumber = phone
-		user.City, _ = strconv.Atoi(button)
-		user.Cart = make(map[int]int)
-		user.IsProvider = isProvider
-		user.Hash = hashString
-		user.Step = 1
-
-		usersDB[chatId] = user
-
-	}
-
-	file, _ := os.Create("db.json")
-	jsonString, _ := json.Marshal(usersDB)
-	file.Write(jsonString)
-
 	// Создаем GET-запрос
 	resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
 	if err != nil {
@@ -577,77 +554,110 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 		// Используем полученные данные
 		for _, user := range userInfo {
 			if user.Blocked == 1 {
-				continue
+				user := usersDB[chatId]
+				user.Blocked = 1
+				usersDB[chatId] = user
+			} else {
+				user := usersDB[chatId]
+				user.Blocked = 0
+				usersDB[chatId] = user
 			}
 		}
-	} else {
+	}
 
-		if usersDB[chatId].IsProvider {
+	//есть ли юзер
+	_, exist := usersDB[chatId]
+	if !exist {
+		user := UserT{}
+		user.ID = chatId
+		user.FirstName = firstName
+		user.LastName = lastName
+		user.Username = username
+		user.Tg_id = chatId
+		user.PhoneNumber = phone
+		user.City, _ = strconv.Atoi(button)
+		user.Cart = make(map[int]int)
+		user.IsProvider = isProvider
+		user.Blocked = blocked
+		user.Hash = hashString
+		user.Step = 1
 
-			switch {
+		usersDB[chatId] = user
 
-			case usersDB[chatId].Step == 1:
+	}
 
-				requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
+	file, _ := os.Create("db.json")
+	jsonString, _ := json.Marshal(usersDB)
+	file.Write(jsonString)
 
-				response, _ := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+	if usersDB[chatId].IsProvider {
 
-				// Используйте переменную response для обработки ответа
-				fmt.Println("Ответ сервера:", string(response))
+		switch {
 
-				//посмотреть данные
-				fmt.Println(string(response))
+		case usersDB[chatId].Step == 1:
 
-				//парсим данные из json
-				var serverResr ServerResponce
-				json.Unmarshal(response, &serverResr)
+			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
 
-				status := serverResr.OK
-				payLoad := serverResr.PayLoad
-				serverMessage := serverResr.Error
+			response, _ := sendPost(requestBody, "http://"+link+"/api/vendors.php")
 
-				if status {
+			// Используйте переменную response для обработки ответа
+			fmt.Println("Ответ сервера:", string(response))
 
-					sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
-					user := usersDB[chatId]
-					user.Vendor_id = payLoad
-					user.Step += 1
-					usersDB[chatId] = user
+			//посмотреть данные
+			fmt.Println(string(response))
 
-				} else if serverMessage == "Поставщик с таким telegram id уже зарегистрирован" {
+			//парсим данные из json
+			var serverResr ServerResponce
+			json.Unmarshal(response, &serverResr)
 
-					sendMessage(chatId, serverMessage, nil)
+			status := serverResr.OK
+			payLoad := serverResr.PayLoad
+			serverMessage := serverResr.Error
 
-				} else {
+			if status {
 
-					sendMessage(chatId, serverMessage, nil)
-
-				}
-
-			case usersDB[chatId].Step == 2:
-
-				sendMessage(chatId, "Локация вашего склада записана", nil)
-
-				coordinates := Coordinates{
-					Latitude:  latitude,
-					Longitude: longitude,
-				}
-
-				jsonCoordinates, _ := json.Marshal(coordinates)
-
-				requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
-				fmt.Println(requestBody)
-
-				sendPost(requestBody, "http://"+link+"/api/vendors.php")
-
+				sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
 				user := usersDB[chatId]
-				user.Step = 1
+				user.Vendor_id = payLoad
+				user.Step += 1
 				usersDB[chatId] = user
-				break
+
+			} else if serverMessage == "Поставщик с таким telegram id уже зарегистрирован" {
+
+				sendMessage(chatId, serverMessage, nil)
+
+			} else {
+
+				sendMessage(chatId, serverMessage, nil)
 
 			}
 
-		} else {
+		case usersDB[chatId].Step == 2:
+
+			sendMessage(chatId, "Локация вашего склада записана", nil)
+
+			coordinates := Coordinates{
+				Latitude:  latitude,
+				Longitude: longitude,
+			}
+
+			jsonCoordinates, _ := json.Marshal(coordinates)
+
+			requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
+			fmt.Println(requestBody)
+
+			sendPost(requestBody, "http://"+link+"/api/vendors.php")
+
+			user := usersDB[chatId]
+			user.Step = 1
+			usersDB[chatId] = user
+			break
+
+		}
+
+	} else {
+		if usersDB[chatId].Blocked != 1 {
+
 			switch {
 			// кейс для начального сообщения для пользователя
 			case text == "/start" || usersDB[chatId].Step == 1:
