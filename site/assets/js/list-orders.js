@@ -6,7 +6,8 @@ let orderStatus = {
     "1": "Просмотрен",
     "2": "Подтверждён",
     "3": "Отменён",
-    "4": "Доставлен"
+    "4": "Доставлен",
+    "5": "В доставке"
 }
 
 // найдём шаблон и контейнер для отрисовки заказов
@@ -78,7 +79,8 @@ let ordersJson;
 // заполним страницу данными
 startRenderPage();
 
-
+// передвинем скролл
+changePositionScroll();
 /* ---------- НАБОР ФУНКЦИЙ ДЛЯ ОТРИСОВКИ СТРАНИЦЫ---------- */
 function startRenderPage() {
 
@@ -343,7 +345,9 @@ function renderListOrders(orders) {
                                                         .replace('${distance}',  distance)
                                                         .replace('${archive}', orders['orders'][i]['archive'])
                                                         .replace('${archive_status}', archiveStatus)
-                                                        .replace('${archive_text}', archiveText);
+                                                        .replace('${archive_text}', archiveText)
+                                                        .replace('${customer_tg_id}', orders['orders'][i]['customer_tg_id'])
+                                                        ;
                                                         
         
     }  
@@ -564,6 +568,15 @@ function saveChangeOrder() {
     obj['id'] = idOrder;
     obj[changeOrderSelect.value.split('=')[0]] = changeOrderSelect.value.split('=')[1];
     obj['with_debt_recalc'] = true;
+
+    if(changeOrderSelect.value.split('=')[1] == '5') {
+        // если статус = 5 (в доставке, добавим в передаваемые данные chat_id)
+        let customerTgId = rowOrder.getAttribute('customer-tg-id')
+        console.log(customerTgId);
+        obj['chat_id'] = customerTgId;
+    }
+
+
     let objJson = JSON.stringify(obj);
 
     console.log(obj);
@@ -599,3 +612,22 @@ function changeCountNewOrders() {
     }
 
 }
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
+// найдём кнопку Сбросить
+let btnRemoveFilters = document.getElementById('btn-cancel-filters');
+
+// повесим на неё функцию по клику
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
+    history.replaceState(history.length, null, 'vendor-list-orders.php');
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
+
+
+/* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+window.addEventListener('unload', ()=> {
+    saveGetParamsInLS(window.location.search);
+})

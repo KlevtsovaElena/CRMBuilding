@@ -7,6 +7,9 @@ if($role !== 2) {
 ?>
 
 <?php 
+    // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
+    $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+    
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -59,6 +62,7 @@ if($role !== 2) {
                             <option value="1">Просмотрен</option>
                             <option value="2">Подтверждён</option>
                             <option value="3">Отменён</option>
+                            <option value="5">В доставке</option>
                             <option value="4">Доставлен</option>
                             <option value="archive=1">Только архивные</option>
 
@@ -85,6 +89,8 @@ if($role !== 2) {
                         <lable>Архивные</lable>
                     </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
 
                 </div>
             </section>
@@ -214,6 +220,7 @@ if (count($_GET) !== 0) {
                                 <option value="1">Просмотрен</option>
                                 <option value="2">Подтверждён</option>
                                 <option value="3">Отменён</option>
+                                <option value="5">В доставке</option>
                                 <option value="4">Доставлен</option>
                                 <option value="archive=1">Только архивные</option>
 
@@ -227,6 +234,7 @@ if (count($_GET) !== 0) {
                                 <option value="1"  <?php if ($_GET['status'] == 1) {echo 'selected';} ?> >Просмотрен</option>
                                 <option value="2"  <?php if ($_GET['status'] == 2) {echo 'selected';} ?> >Подтверждён</option>
                                 <option value="3"  <?php if ($_GET['status'] == 3) {echo 'selected';} ?> >Отменён</option>
+                                <option value="5"  <?php if ($_GET['status'] == 5) {echo 'selected';} ?> >В доставке</option>
                                 <option value="4"  <?php if ($_GET['status'] == 4) {echo 'selected';} ?> >Доставлен</option>
                                 <option value="archive=1">Только архивные</option>
 
@@ -239,6 +247,7 @@ if (count($_GET) !== 0) {
                                 <option value="1">Просмотрен</option>
                                 <option value="2">Подтверждён</option>
                                 <option value="3">Отменён</option>
+                                <option value="5">В доставке</option>
                                 <option value="4">Доставлен</option>
                                 <option value="archive=1" <?php if ($_GET['archive'] == '1') {echo 'selected';} ?>>Только архивные</option>
 
@@ -282,6 +291,8 @@ if (count($_GET) !== 0) {
                         <lable>Архивные</lable>
                     </div>
                     <button class="btn btn-ok d-iblock">Применить</button>
+                    <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
 
                 </div>
             </section>
@@ -325,7 +336,7 @@ if (count($_GET) !== 0) {
             <!-- шаблон таблицы -->
             <template id="template-body-table">
 
-                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}" archive="${archive}">
+                    <tr role="row" class="list-orders__row row-status${status}" order-id="${id}" archive="${archive}" customer-tg-id="${customer_tg_id}" >
 
                         <td class="ta-center"><a href="javascript: showOrder(${id})"><strong>${order_id}</strong></a></td>
                         <td class="ta-center">${order_date}</td>
@@ -337,6 +348,7 @@ if (count($_GET) !== 0) {
                                     <option value="status=1">Просмотрен</option>
                                     <option value="status=2">Подтверждён</option>
                                     <option value="status=3">Отменён</option>
+                                    <option value="status=5">В доставке</option>
                                     <option value="status=4">Доставлен</option>
                                     <option value="${archive_status}">${archive_text}</option>
 

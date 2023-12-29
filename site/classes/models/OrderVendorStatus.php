@@ -8,6 +8,7 @@ namespace models;
         case Confirmed = 2;
         case Canceled = 3;
         case Delivered = 4;
+        case InDelivery = 5;
     }
 
 ?>

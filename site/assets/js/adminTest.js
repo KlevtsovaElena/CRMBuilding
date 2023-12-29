@@ -447,13 +447,6 @@ function apply(section_name, filters) {
 
             document.location.href = mainUrl + '/pages/admin-wholesalers.php?limit=all&search=name:' +  searchQuery.trim() + filters;
 
-        } else if (section_name == 'admin-customers') {
-
-            //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-customers.php?limit=all&search=first_name:' + searchQuery.trim() + filters);
-
-            document.location.href = mainUrl + '/pages/admin-customers.php?limit=all&search=first_name:' +  searchQuery.trim() + filters;
-
         } else {
 
             let key = document.querySelector('.page-title').getAttribute('data-name');
@@ -463,7 +456,9 @@ function apply(section_name, filters) {
 
             document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
         }
-     
+
+        
+        
     } else {
 
         //если мы на странице admin-vendors
@@ -481,13 +476,6 @@ function apply(section_name, filters) {
             history.replaceState(history.length, null, 'admin-wholesalers.php?limit=' + limit.value + filters);
 
             document.location.href = mainUrl + '/pages/admin-wholesalers.php?limit=' + limit.value + filters;
-
-        } else if (section_name == 'admin-customers') {
-
-            //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-customers.php?limit=' + limit.value + filters);
-
-            document.location.href = mainUrl + '/pages/admin-customers.php?limit=' + limit.value + filters;
 
         } else {
 
@@ -564,7 +552,7 @@ function applyInOrders() {
     //если задан статус
     if (statusSel) {
         //если выбраны только заказы "В архиве"
-        if(statusSel == 6) {
+        if(statusSel == 5) {
             filters += '&archive=1';
             //сразу на фронте активируем чекбокс
             archiveCheck.checked;
@@ -578,7 +566,7 @@ function applyInOrders() {
             } else {
                 filters += '&archive=0';
             }
-        //если выбраны заказы 0-5
+        //если выбраны заказы 0-4
         } else {
             //если отмечен чекбокс с архивными записями, выводим заказы с архивными
             if (archiveChecked()) {
@@ -937,96 +925,6 @@ function applyInVendors(section_name) {
 
 }
 
-//функция при нажатии на кнопку "Применить" для admin-vendors!!!
-function applyInCustomers(section_name) {
-
-    console.log(limit.value);
-
-    //лимит задан всегда, поэтому проверяем только наличие поискового запроса
-    //получим введенное в поиск значение
-    let searchQuery = document.getElementById('search').value;
-    let dataSearch = searchQuery.trim();
-
-    // получим значение атрибута data-sort
-    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
-    console.log(allTitlesElems);
-
-    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
-    let dataSort = '';
-    //переменная для ключа, соответствующего названию сортируемого поля в БД
-    let key = '';
-
-    //в цикле вынимаем эти два элемента
-    for (let i = 0; i < allTitlesElems.length; i++) {
-        if (allTitlesElems[i].getAttribute('data-sort')) {
-            //вынимаем заданное значение ключа
-            dataSort = allTitlesElems[i].getAttribute('data-sort');
-            console.log(dataSort);
-            //вынимаем ключ
-            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
-            console.log(key);
-        }
-    }
-
-    //собираем фильтры (город)
-    let filters = '';
-
-    // получим значение атрибута data-page, содержащего номер текущей страницы
-    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
-    console.log(dataPage);
-
-    //если активировано значение asc
-    if (dataSort && dataSort === "asc") {
-        
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/'+ section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
-        }
-    //если активировано значение desc
-    } else if (dataSort === "desc") {
-
-        //передаем его в адресную строку как гет-параметр
-        //вносим изменение в адресную строку страницы
-        //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
-        //если в гет-параметрах нет ни поиска, ни страницы
-        if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть поиск, но не страница
-        } else if (dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть страница, но не поиск
-        } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
-        //если в гет-параметрах уже есть и страница, и поиск
-        } else if (dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
-        }
-    } else if (!dataSort) {
-        apply(section_name, filters);
-    }
-
-}
-
 //функция по чекбоксам со статусом города
 function checkboxChangedCity(id) {
 
@@ -1277,31 +1175,31 @@ function changeTagName(el, newTagName) {
   }
 
 
-// //функция оповещения админа о неутвержденных товарах
-// function notifyAdminInactiveGoods() {
+//функция оповещения админа о неутвержденных товарах
+function notifyAdminInactiveGoods() {
 
-//     //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
-//     //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
-//     //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
-//     //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
-//     let text = 'https://qna.habr.com/q/518740';
+    //ссылка на страницу с неактивными товарами, которую передадим в пост-запросе
+    //let text = mainUrl + '/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://arzongo.uz/pages/admin-list-products.php?deleted=0&is_active=0';
+    //let text = 'https://www.multitran.com/m.exe?ll1=1&ll2=2&s=tinsel&l2=2';
+    let text = 'https://qna.habr.com/q/518740';
 
-//     //собираем ссылку на нужный эндпойнт
-//     let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+    //собираем ссылку на нужный эндпойнт
+    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
 
-//     //формируем параметры для передачи в апишку
-//     let obj = JSON.stringify({
-//         "text" : text
-//     });
+    //формируем параметры для передачи в апишку
+    let obj = JSON.stringify({
+        "text" : text
+    });
 
-//     //передаем параметры на сервер в пост-запросе
-//     sendRequestPOST(link, obj);
+    //передаем параметры на сервер в пост-запросе
+    sendRequestPOST(link, obj);
 
-//     console.log('уведомление отправлено');
+    console.log('уведомление отправлено');
     
-//     //alert('Уведомление отправлено админу');
+    alert('Уведомление отправлено админу');
 
-// }
+}
 
 //функция изменения фильтра Поставщиков при выборе в фильтре Города
 function cityChanged(e) {
@@ -1374,67 +1272,6 @@ function connectedFilter(link) {
     console.log(data);
 }
 
-//функция блокировки клиентов
-function checkboxCustomerBlocked(id) {
-
-    //выдаем поп-ап с подтверждением действия
-    let isChecked = window.confirm('Вы действительно хотите изменить статус этого клиента?');
-
-    if(!isChecked) {
-        console.log("не менять");
-        //чтобы визуально не менялась галочка
-        if(event.target.checked) {
-            event.target.checked = false;
-        } else {
-            event.target.checked = true;
-        }
-        return;
-    }
-
-    //если при нажатии чекбокс активировн
-    if (event.target.checked) {
-
-        //собираем параметры для передачи в бд
-        obj = JSON.stringify({
-            'id': id,
-            'is_blocked': 1
-        });
-
-        //отправляем уведомление клиенту
-        //собираем ссылку на нужный эндпойнт
-        let link2 = mainUrl + '/api/notification/telegram-send-customer-is-blocked.php';
-
-        //формируем параметры для передачи в апишку
-        let obj2 = JSON.stringify({
-            "customer_id" : id
-        });
-
-        //передаем параметры на сервер в пост-запросе
-        sendRequestPOST(link2, obj2);
-
-        console.log('уведомление отправлено');
-        
-        alert('Клиенту отправлено уведомление об ограничении доступа к боту');
-
-
-    //если при нажатии чекбокс деактивирован
-    } else {
-
-        obj = JSON.stringify({
-            'id': id,
-            'is_blocked': 0
-        });
-    }
-
-    console.log(obj);
-
-    let link = mainUrl + '/api/customers.php';
-
-    //передаем на сервер в пост-запросе
-    sendRequestPOST(link, obj);
-
-}
-
 //записываем в куки локальный часовой пояс
 let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 document.cookie = 'time_zone=' + timeZone;
@@ -1479,325 +1316,50 @@ function confirmProductsVendor(id, nameVendor) {
 
 }
 
-function addGoodsToCentralVendor() {
-
-    let dataJson1 = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?vendor_id=13');
-    let data1 = JSON.parse(dataJson1);
-
-    if(data1) {
-        return;
-    }
-
-    //добавить все неповторяющиеся (?) товары Центральному поставщику
-    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1');
-    let data = JSON.parse(dataJson);
-
-    // const thirdArray = [];
-    
-    // for (const element of data) {
-    // if (!data1.includes(element['name'])) {
-    //     thirdArray.push(element);
-    // }
-    // }
-    
-    // for (const element of data1) {
-    // if (!data.includes(element['name'])) {
-    //     thirdArray.push(element);
-    // }
-    // }
-    
-    // console.log(thirdArray);
-    // return;
-
-    for (let k = 0; k < data.length; k++) {
-        let obj = JSON.stringify({
-            'vendor_id': 13,
-            'name': data[k]['name'],
-            'name2': data[k]['name2'],
-            'name3': data[k]['name3'],
-            'brand_id': data[k]['brand_id'],
-            'category_id': data[k]['category_id'],
-            'description': data[k]['description'],
-            'description2': data[k]['description2'],
-            'description3': data[k]['description3'],
-            'article': data[k]['article'],
-            'quantity_available': data[k]['quantity_available'],
-            'price': data[k]['price'],
-            'price_dollar': data[k]['price_dollar'],
-            'max_price': data[k]['max_price'],
-            'max_price_dollar': data[k]['max_price_dollar'],
-            'unit_id': data[k]['unit_id'],
-            'deleted': data[k]['deleted'],
-            'is_active': data[k]['is_active'],
-            'is_confirm': data[k]['is_confirm'],
-            'photo': data[k]['photo']
-        });
-
-        // передаём данные на сервер
-        let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
-        let isSuccess;
-        // провeрим, что вернулось с сервера success:true || success:false
-        try {
-            // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
-            isSuccess  = JSON.parse(isSuccessJson);
-        } catch(e) {
-            alert ('Ошибка! Попробуйте позже!');
-            return;
-        }
-        // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
-        // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
-        if (!isSuccess.success) {
-            // если распарсили и получили success : false, то Ошибка
-            alert('Ошибка!');
-            return;
-        } else {
-            // если распарсили и получили success : true, то всё записалось в базу
-            // оповещение админа с ссылкой неутверждённых товаров
-            //alert("Товар добавлен");
-        }
-    }
-}
-
-function renderAllVendorGoods(vendor_id) {
-
-    addGoodsToCentralVendor();
-
-    //даем видимость блоку с затемнением
-    document.querySelector('.dark-background').classList.remove('d-none');
-
-    //даем видимость блоку с таблицей
-    document.getElementById('modal-container').classList.remove('d-none');
-
-    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1&vendor_id=13');
-    let data = JSON.parse(dataJson);
-    console.log(data);
-
-    let template = document.getElementById('product-row').innerHTML;
-
-    let container = document.getElementById('container');
-
-    container.innerHTML = '';
-
-    for (let i = 0; i <data.length; i++) {
-        container.innerHTML += template.replace('${photo}', data[i]['photo'])
-                                        .replace('${name}', (data[i]['name']?data[i]['name']:(data[i]['name2']?data[i]['name2']:(data[i]['name3']?data[i]['name3']:''))))
-                                        .replace('${category}', data[i]['category_name'])
-                                        .replace('${brand}', data[i]['brand_name'])
-                                        .replace('${price_format}', data[i]['price'])
-                                        .replace('${id}', data[i]['id'])
-                                        .replace('${vendor_id}', vendor_id)
-    }
-}
-
-function confirmGoods() {
-
-    //достаем id данного поставщика, которому добавляем товары
-    let vendor_id = document.querySelector('.vendor-data').getAttribute('data-vendor');
-    console.log('vendor_id:' + vendor_id);
-
-    //проверка на то, чтобы был отмечен хотя бы один товар
-    //собираем айдишники всех выбранных товаров
-    let checkboxes = document.querySelectorAll('.checkbox-product');
-
-    let checkedGoods = [];
-    for (let i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-            checkedGoods.push(checkboxes[i].getAttribute('data-id'));
-        }
-    }
-    console.log(checkedGoods);
-
-    hasError = false;
-
-    //проверяем кол-во отмеченных товаров
-    //если только 1
-    let itemsChecked;
-    if (typeof checkedGoods == 'number') {
-        itemsChecked = 1;
-    } else {
-        itemsChecked = checkedGoods.length;
-    }
-
-    console.log(typeof itemsChecked);
-
-    let checkboxesAll = document.querySelectorAll('.checkbox-product');
-
-    //если ни одной не выбрано, вешаем ошибку
-    if (!itemsChecked) {
-        const errorInfoContainer = document.querySelector('.error-info');
-        for (let l = 0; l < checkboxesAll.length; l++) {
-            checkboxesAll[l].classList.add('error');   
-            errorInfoContainer.innerText = "Выберите, пожалуйста, как минимум один товар из списка!";
-            errorInfoContainer.classList.remove('d-none');
-        }
-            hasError = true;
-    //если выбрана минимум одна, снимаем предупреждения
-    } else {
-        const errorInfoContainer = document.querySelector('.error-info');
-        for (let l = 0; l < checkboxesAll.length; l++) {
-            checkboxesAll[l].classList.remove('error');   
-            errorInfoContainer.innerText = "";
-            errorInfoContainer.classList.add('d-none');
-        }
-    }
-    if (hasError) {
-        return;
-    }
-
-    //если выбран только 1 товар
-    if (itemsChecked === 1) {
-        let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?id=' + checkedGoods);
-        let data = JSON.parse(dataJson);
-        console.log(data);
-
-        for (let k = 0; k < data.length; k++) {
-            let obj = JSON.stringify({
-                'vendor_id': vendor_id,
-                'name':  data[k]['name'],
-                'name2':  data[k]['name2'],
-                'name3':  data[k]['name3'],
-                'brand_id': data[k]['brand_id'],
-                'category_id': data[k]['category_id'],
-                'description': data[k]['description'],
-                'description2': data[k]['description2'],
-                'description3': data[k]['description3'],
-                'article': data[k]['article'],
-                'quantity_available': data[k]['quantity_available'],
-                'price': data[k]['price'],
-                'price_dollar': data[k]['price_dollar'],
-                'max_price': data[k]['max_price'],
-                'max_price_dollar': data[k]['max_price_dollar'],
-                'unit_id': data[k]['unit_id'],
-                'deleted': data[k]['deleted'],
-                'is_active': data[k]['is_active'],
-                'is_confirm': data[k]['is_confirm'],
-                'photo': data[k]['photo']
-            });
-
-        // передаём данные на сервер
-        let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
-        let isSuccess;
-            // провeрим, что вернулось с сервера success:true || success:false
-            try {
-                // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
-                isSuccess  = JSON.parse(isSuccessJson);
-            } catch(e) {
-                alert ('Ошибка! Попробуйте позже!');
-                return;
-            }
-            // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
-            // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
-            if (!isSuccess.success) {
-                // если распарсили и получили success : false, то Ошибка
-                alert('Ошибка!');
-                return;
-            } else {
-                // если распарсили и получили success : true, то всё записалось в базу
-                // оповещение админа с ссылкой неутверждённых товаров
-                //alert("Товар добавлен");
-            }
-        }
-    //если выбранных товаров больше 1
-    } else {
-
-        for (let m = 0; m < checkedGoods.length; m++) {
-            let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?id=' + checkedGoods[m]);
-            let data = JSON.parse(dataJson);
-            console.log(data);
-    
-            for (let k = 0; k < data.length; k++) {
-                let obj = JSON.stringify({
-                    'vendor_id': vendor_id,
-                    'name':  data[k]['name'],
-                    'name2':  data[k]['name2'],
-                    'name3':  data[k]['name3'],
-                    'brand_id': data[k]['brand_id'],
-                    'category_id': data[k]['category_id'],
-                    'description': data[k]['description'],
-                    'description2': data[k]['description2'],
-                    'description3': data[k]['description3'],
-                    'article': data[k]['article'],
-                    'quantity_available': data[k]['quantity_available'],
-                    'price': data[k]['price'],
-                    'price_dollar': data[k]['price_dollar'],
-                    'max_price': data[k]['max_price'],
-                    'max_price_dollar': data[k]['max_price_dollar'],
-                    'unit_id': data[k]['unit_id'],
-                    'deleted': data[k]['deleted'],
-                    'is_active': data[k]['is_active'],
-                    'is_confirm': data[k]['is_confirm'],
-                    'photo': data[k]['photo']
-                });
-    
-            // передаём данные на сервер
-            let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
-            let isSuccess;
-                // провeрим, что вернулось с сервера success:true || success:false
-                try {
-                    // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
-                    isSuccess  = JSON.parse(isSuccessJson);
-                } catch(e) {
-                    alert ('Ошибка! Попробуйте позже!');
-                    return;
-                }
-                // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
-                // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
-                if (!isSuccess.success) {
-                    // если распарсили и получили success : false, то Ошибка
-                    alert('Ошибка!');
-                    return;
-                } else {
-                    // если распарсили и получили success : true, то всё записалось в базу
-                    // оповещение админа с ссылкой неутверждённых товаров
-                    //alert("Товар добавлен");
-                }
-            }
-        }
-    }
-
-    //убираем видимость блока с затемнением
-    document.querySelector('.dark-background').classList.add('d-none');
-
-    //закрываем модальное окно с выбором товаров
-    document.getElementById('modal-container').classList.add('d-none');
-
-}
-
-function cancelChoice() {
-
-    //убираем видимость блока с затемнением
-    document.querySelector('.dark-background').classList.add('d-none');
-
-    //закрываем модальное окно с выбором товаров
-    document.getElementById('modal-container').classList.add('d-none');
-
-}
-
 
 
 
 // ЗАДАЧА23
-/* ---------- СБРОС ФИЛЬТРА ---------- */
-// ДЛЯ ВСЕХ КРОМЕ ТЕХ СТРАНИЦ, КОТОРЫЕ В admin.php
+// При переключении страничек сначала перезаписываем гет-параметра в адресной строке, а только потом перезагружаем
+function switchPageAndSaveGetParamsInLS(getParams) {
+    //передаем в адресную строку изменения, чтобы сразу их видеть
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage + getParams);
 
+    // перезагрузим страницу
+    window.location.href = mainUrl + window.location.pathname + getParams; 
+}
+
+
+// тк в этом js обрабатывается не одна страница, то придётся отбирать, для каких страниц нужно сохранять фильтрацию при переходе на др страницы
+// и отрисовывать позицию скролла из локалсторадж
+// это можно делать только для тех страниц, у которых в .php вначале указан  $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+// здесь достаточно указать через || названия страниц
+if(window.location.pathname == '/pages/admin-vendors.php') {
+    // передвинем скролл
+    changePositionScroll();
+
+    /* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+    window.addEventListener('unload', ()=> {
+        saveGetParamsInLS(window.location.search);
+    })
+
+}
+
+/* ---------- СБРОС ФИЛЬТРА ---------- */
 // найдём кнопку Сбросить
 let btnRemoveFilters = document.getElementById('btn-cancel-filters');
 
 // повесим на неё функцию по клику
-if (window.location.pathname !== '/pages/admin.php') {
-    btnRemoveFilters.addEventListener('click', () => {
-        // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
-    
-        // получим только название странички (/pages/name.php  -> /name.php)
-        let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
-        history.replaceState(history.length, null, namePage);
-    
-        // удалим из ЛС элемент с ключом адреса страницы (например, /pages/vendor-list-products.php)
-        // localStorage.removeItem(window.location.pathname);
-    
-        // перезагрузим страницу с пустыми параметрами
-        window.location.replace(window.location.origin + window.location.pathname);
-    })
-}
+btnRemoveFilters.addEventListener('click', () => {
+    // сначала удалим из адресной строки гет-параметры, чтобы при перезагрузки они не сохранились в ЛС и не зациклилось
 
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage);
+
+    // теперь сбрасываем фильтры и перезагружаем страницу с пустыми гет
+    removeGetParamsInLS(window.location.pathname)
+})
 // ЗАДАЧА23

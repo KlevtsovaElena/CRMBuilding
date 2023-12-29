@@ -592,3 +592,8 @@ th {
 .middle-el {
     max-width: 102px;
 }
+
+.border-neutral {
+    border: solid 2px var(--border-form-elem);
+    padding: 14px;
+}

@@ -33,9 +33,33 @@ if(rateEl) {
             'price_confirmed': 0
         })
     
+
         // передаём данные на сервер
-        sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', obj);
-        
+        let isSuccessJson = sendRequestPOST(mainUrl + '/api/price/change-price-rate.php', obj);
+        let isSuccess;
+        // провeрим, что вернулось с сервера success:true || success:false
+        try {
+            // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+            isSuccess  = JSON.parse(isSuccessJson);
+        } catch(e) {
+            alert ('Ошибка! Попробуйте позже!');
+            return;
+        }
+        // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+        // иначе - Товар изменён, и если изменял не админ, и менялась цена, то оповещаем админа в телеграмм
+        if (!isSuccess.success) {
+            // если распарсили и получили success : false, то Ошибка
+            alert('Ошибка!');
+            return;
+        } else {
+            // если распарсили и получили success : true, то всё записалось в базу
+            // оповещение админа с ссылкой неутверждённых товаров
+            if (isSuccess.count > 0) {
+                notifyAdminInactiveGoods();
+            }
+            alert("Курс изменён");
+        }
+   
         window.location.href = window.location.href;
     })
 }

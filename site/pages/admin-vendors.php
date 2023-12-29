@@ -56,6 +56,44 @@ if($role !== 1) {
     ?>
 
         <!-- далее отрисовываем всю страницу -->
+        <div class="dark-background d-none"></div>
+
+        <div id="modal-container" class="modal-container d-none">
+            <h1>Выберите товары</h1>
+
+            <table id="list-products">
+
+                <thead>
+                    <tr role="row">
+
+                        <th class="no-pseudo">Наименование</th>
+                        <th class="no-pseudo">Категория</th>
+                        <th class="no-pseudo">Бренд</th>
+                        <th class="no-pseudo"></th>
+                        
+                    </tr>
+                </thead>
+
+                <tbody id="container" class="list-products__body container">
+                    <!-- контент таблицы из шаблона -->
+                </tbody>
+
+            </table>
+            <p class="error-info d-none"></p>
+            <br>
+
+            <button onclick="confirmGoods()" class="btn btn-ok d-iblock">Подтвердить выбор</button>
+            <button onclick="cancelChoice()" class="btn btn-neutral">Отмена</button>
+        </div>
+
+        <!-- <div class="modal">
+            Выберите товары
+            <div id="container" class="container">
+
+            </div>
+            <button onclick="confirm()" class="btn btn-ok d-iblock">Подтвердить</button>
+        </div> -->
+
         <p class="page-title">Поставщики</p>
 
         
@@ -134,6 +172,9 @@ if($role !== 1) {
                 <input type="search" id="search" name="search" value="" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
                 <button onclick="applyInVendors('admin-vendors')" class="btn btn-ok d-iblock">Применить</button>
+                <!-- кнопка сброса фильтров -->
+                <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
+
             </div>
 
         </section>
@@ -179,6 +220,7 @@ if($role !== 1) {
                         <th class="cell-title" data-id="status" data-sort="<?php if ($sortBy == 'status')  {echo $mark; } ?>">Статус</th>
                         <th class="cell-title" data-id="phone" data-sort="<?php if ($sortBy == 'phone')  {echo $mark; } ?>">Телефон</th>
                         <th class="cell-title" data-id="email" data-sort="<?php if ($sortBy == 'email')  {echo $mark; } ?>">Email</th>
+                        <th></th>
                         <th data-id="confirmed">Подтвердил</th>
                         <th class="ta-center">Утвердить товары</th>
                         <th class="cell-title" data-id="debt"  data-sort="<?php if ($sortBy == 'debt')  {echo $mark; } ?>">Должен</th>
@@ -310,7 +352,7 @@ if($role !== 1) {
                                 }
                                 ?>
                             <!-- вносим в атрибуты общее кол-во страниц и текущую страницу для js -->
-                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>">
+                            <tr id="pages-info" role="row" class="list-orders__row" data-pages="<?= $totalPages ?>" data-current-page="<?= $currentPage ?>" data-vendor="<?= $data[$i]['id'] ?>">
                                 <td class="ta-center"><a href="#"><strong><?= $num++; ?></strong></a></td>
                                 <td><?= $data[$i]['city_name'] ?></td>
                                 <td><a href="javascript: editVendor(<?= $data[$i]['id'] ?>)"><?= $data[$i]['name'] ?></a></td>
@@ -323,6 +365,13 @@ if($role !== 1) {
                                     </a> 
                                 </td>
                                 <td><?= $data[$i]['email'] ?> </td>
+                                <td>
+                                <div>
+                                    <?php if ($data[$i]['id'] != 13) { ?>
+                                        <button class="btn-ok btn-product-confirm" onclick="renderAllVendorGoods(<?= $data[$i]['id'] ?>)">Добавить товары из шаблона</button>
+                                    <?php } ?>
+                                </div>
+                                </td>
                                 <td class="checkbox-cell ta-center">
                                     <input type="checkbox" onclick="checkboxChangedVendorPrice(<?= $data[$i]['id'] ?>)" <?php if ($data[$i]["price_confirmed"] == 1) {?> checked <?php } ?>>
                                 </td>
@@ -348,6 +397,20 @@ if($role !== 1) {
         <!-- внизу таблицы выдаем общее количество записей -->
         <div class="info-table">Всего записей: <?= $totalNumElements ?></div>
     </section>
+
+    <template id="product-row">
+            
+        <tr>
+            <td class="list-products_name"><img class="mini-photo" src="${photo}" /><strong>${name}</strong></td>
+            <td>${category}</td>
+            <td>${brand}</td>
+            <td class="multiple-checkbox">
+                <input type="checkbox" class="checkbox-product" data-id="${id}">               
+            </td>
+        </tr>
+        <div class="vendor-data d-none" data-vendor="${vendor_id}"></div>
+        
+    </template>
 
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>

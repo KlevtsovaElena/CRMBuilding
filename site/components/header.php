@@ -15,6 +15,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <?php
+        // если есть переменная isCheckGetParams, то на этой странице надо делать проверку сохранения фильтрации в локал сторадж
+        // поэтому прописывается подключение js-файла до загрузки контента
+        // на той странице, где это требуется пишем     $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+        if (isset($isCheckGetParams)) {
+            echo $isCheckGetParams;
+        } 
+
+        // здесь в цикле прописываем подключение всех необходимых файлов css
         for ($i = 0; $i < count($styleSrc); $i++) {
             echo $styleSrc[$i];
         }; 

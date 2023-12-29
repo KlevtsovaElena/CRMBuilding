@@ -90,7 +90,7 @@ CREATE TABLE `customers` (
   `city_id` int unsigned NOT NULL,
   `tg_id` bigint unsigned NOT NULL,
   `tg_username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `is_blocked` tinyint NOT NULL,
+  `is_blocked` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -354,11 +354,12 @@ CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `settings` (`id`, `name`, `value`) VALUES
-(1,	'phone',	'89997776655');
+INSERT INTO `settings` (`id`, `name`, `value`, `first_name`) VALUES
+(1,	'phone',	'89997776655',	'Имя в телеграме');
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (
@@ -416,6 +417,7 @@ INSERT INTO `vendors` (`id`, `name`, `city_id`, `phone`, `email`, `tg_username`,
 (9,	'test',	1,	'79999999999',	'test@bk.ru',	NULL,	NULL,	NULL,	2,	10,	100,	'',	1692882849,	'hag730ZITTgZ6',	'crzMepLxVp3UA',	'',	1,	0,	1,	0,	1,	NULL,	1703071591),
 (10,	'Сирожиддин',	3,	'998907100666',	'sirojbekshodmonov@gmail.com',	NULL,	NULL,	NULL,	2,	3,	0,	'',	1695118166,	'haLElwpeMtx1I',	'crsva418npIw6',	'toBur8jXOiv6',	1,	0,	1,	0,	1,	NULL,	1703071593),
 (11,	'Оптовик 1',	2,	'998876006809',	'sdndfnb@fb.ru',	NULL,	NULL,	NULL,	3,	2,	500,	'',	1701310809,	'hairMjVdU9JXc',	'crR76rgNfytk',	'',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"4\": \"Грунтовка\"}',	0),
-(12,	'Оптовик 2',	3,	'998465467688',	'sdndfnb@djg.ru',	NULL,	NULL,	NULL,	3,	1,	0,	'',	1701389901,	'hae9gWFPPuJ6',	'crAQDBLYhT9w',	'totbqfyxs93Z',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"8\": \"Плиточный клей\", \"9\": \"Наливной пол и Гидроизоляция\"}',	0);
+(12,	'Оптовик 2',	3,	'998465467688',	'sdndfnb@djg.ru',	NULL,	NULL,	NULL,	3,	1,	0,	'',	1701389901,	'hae9gWFPPuJ6',	'crAQDBLYhT9w',	'totbqfyxs93Z',	1,	0,	1,	0,	1,	'{\"1\": \"Гипсокартон\", \"3\": \"Шпаклевка\", \"8\": \"Плиточный клей\", \"9\": \"Наливной пол и Гидроизоляция\"}',	0),
+(13,	'Центральный поставщик',	1,	NULL,	'email1@mail.com',	NULL,	NULL,	NULL,	2,	0,	0,	'Поставщик-шаблон, к которому добавляются все товары, которые можно быстро копировать для добавления другим поставщикам',	1689507890,	NULL,	NULL,	NULL,	0,	0,	1,	0,	1,	NULL,	0);
 
 -- 2023-12-20 11:26:58

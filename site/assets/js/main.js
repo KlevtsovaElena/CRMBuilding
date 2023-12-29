@@ -29,6 +29,17 @@ function sendRequestPOST(url, params) {
 
 }
 
+//функция для отправки запросов POST json`ном
+function sendRequestTruePOST(url, params) {
+
+    let requestObj = new XMLHttpRequest();
+    requestObj.open('POST', url, true);
+    requestObj.setRequestHeader('Content-Type', 'application/json');
+    requestObj.send(params);
+    return requestObj.responseText;
+
+}
+
 //функция для отправки запросов POST
 function sendRequestFormUrlPOST(url, params){
 
@@ -127,3 +138,23 @@ itemNav.forEach( item => {
     }
 })
 
+
+//функция оповещения админа о неутвержденных товарах
+// сделаем true , чтобы не ждать ответ с сервера и не зависала страница sendRequestTruePOST
+function notifyAdminInactiveGoods() {
+
+    //ссылка на страницу с неодобренными товарами, которую передадим в пост-запросе
+    let text = mainUrl + '/pages/admin-list-products.php?off_product=0&is_confirm=0&limit=10&offset=0';
+
+    //собираем ссылку на нужный эндпойнт
+    let link = mainUrl + '/api/notification/telegram-send-inactive-goods.php';
+
+    //формируем параметры для передачи в апишку
+    let obj = JSON.stringify({
+        "text" : text
+    });
+
+    //передаем параметры на сервер в пост-запросе
+    sendRequestTruePOST(link, obj);
+
+}

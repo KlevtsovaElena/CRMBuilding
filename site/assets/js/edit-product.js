@@ -77,9 +77,11 @@ function editProduct(role) {
 
     // утверждён ли продукт?
     // если товар изменяет поставщик (именно цену), а не админ, то этот товар переводим в 0 до утверждения админом (поле is_confirm)
+    let isPriceChange = false; // маркер оповещать ли админа об изменении цены = отправлен на одобрение
     if (role !== 1) {
         if (!(price.value == priceOld && max_price.value == maxPriceOld)) {  
             obj['is_confirm'] = 0;
+            isPriceChange = true;
         }
     } else {
         obj['is_confirm'] = formAddProduct.querySelector('#is_confirm').value;;
@@ -88,24 +90,32 @@ function editProduct(role) {
     obj = JSON.stringify(obj);
 
     console.log(obj);
+
     // передаём данные на сервер
-    sendRequestPOST(mainUrl + '/api/products.php', obj);
-
-    // если товар изменяет поставщик, а не админ, то проверяем менял ли он цену
-    // и если да, то поставщика переводим в 0 до подтверждения цен
-    // if (role == 2) {
-    //     if (!(price.value == priceOld && max_price.value == maxPriceOld)) {        
-    //         // отправим запрос на изменение статуса подтверждения цен поставщика
-    //         let objVendor = JSON.stringify({
-    //             'id': vendor_id.value,
-    //             'price_confirmed':  0
-    //         });
-    //         sendRequestPOST(mainUrl + '/api/vendors.php', objVendor);
-    //     }
-    // }
-
-    // получаем ответ с сервера
-    alert("Данные изменены");
+    let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+    let isSuccess;
+    // провeрим, что вернулось с сервера success:true || success:false
+    try {
+        // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+        isSuccess  = JSON.parse(isSuccessJson);
+    } catch(e) {
+        alert ('Ошибка! Попробуйте позже!');
+        return;
+    }
+    // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+    // иначе - Товар изменён, и если изменял не админ, и менялась цена, то оповещаем админа в телеграмм
+    if (!isSuccess.success) {
+        // если распарсили и получили success : false, то Ошибка
+        alert('Ошибка!');
+        return;
+    } else {
+        // если распарсили и получили success : true, то всё записалось в базу
+        // оповещение админа с ссылкой неутверждённых товаров
+        if (role !== 1 && isPriceChange == true && is_active.value == '1') {
+            notifyAdminInactiveGoods();
+        }
+        alert("Товар изменён");
+    }
 
     // перебросимся на страницу списка товаров
     returnPageListProducts();
@@ -283,17 +293,30 @@ function deleteProductFromEditForm(id) {
         'deleted':  1
     });
 
-    // делаем запрос на удаление товара по id
-    sendRequestPOST(mainUrl + '/api/products.php', obj);
 
-
-    // делаем запрос на удаление товара по id
-    // sendRequestDELETE(mainUrl + '/api/products.php?id=' + id);
-
-    alert("Товар удалён");
+    // передаём данные на сервер
+    let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+    let isSuccess;
+    // провeрим, что вернулось с сервера success:true || success:false
+    try {
+        // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+        isSuccess  = JSON.parse(isSuccessJson);
+    } catch(e) {
+        alert ('Ошибка! Попробуйте позже!');
+        return;
+    }
+    // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+    // иначе - Товар удалён
+    if (!isSuccess.success) {
+        // если распарсили и получили success : false, то Ошибка
+        alert('Ошибка!');
+        return;
+    } else {
+        // если распарсили и получили success : true, то всё записалось в базу
+        alert("Товар удалён");
+    }
 
     returnPageListProducts();
-
 
 }
 
