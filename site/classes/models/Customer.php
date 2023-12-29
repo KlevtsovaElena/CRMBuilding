@@ -10,6 +10,6 @@
         public int $city_id;
         public int $tg_id;
         public string $tg_username;
-        public ?int $is_blocked;
+        public int $is_blocked;
     }
 ?>

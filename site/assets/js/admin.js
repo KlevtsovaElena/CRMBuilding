@@ -1479,6 +1479,301 @@ function confirmProductsVendor(id, nameVendor) {
 
 }
 
+function addGoodsToCentralVendor() {
+
+    let dataJson1 = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?vendor_id=13');
+    let data1 = JSON.parse(dataJson1);
+
+    if(data1) {
+        return;
+    }
+
+    //добавить все неповторяющиеся (?) товары Центральному поставщику
+    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1');
+    let data = JSON.parse(dataJson);
+
+    // const thirdArray = [];
+    
+    // for (const element of data) {
+    // if (!data1.includes(element['name'])) {
+    //     thirdArray.push(element);
+    // }
+    // }
+    
+    // for (const element of data1) {
+    // if (!data.includes(element['name'])) {
+    //     thirdArray.push(element);
+    // }
+    // }
+    
+    // console.log(thirdArray);
+    // return;
+
+    for (let k = 0; k < data.length; k++) {
+        let obj = JSON.stringify({
+            'vendor_id': 13,
+            'name': data[k]['name'],
+            'name2': data[k]['name2'],
+            'name3': data[k]['name3'],
+            'brand_id': data[k]['brand_id'],
+            'category_id': data[k]['category_id'],
+            'description': data[k]['description'],
+            'description2': data[k]['description2'],
+            'description3': data[k]['description3'],
+            'article': data[k]['article'],
+            'quantity_available': data[k]['quantity_available'],
+            'price': data[k]['price'],
+            'price_dollar': data[k]['price_dollar'],
+            'max_price': data[k]['max_price'],
+            'max_price_dollar': data[k]['max_price_dollar'],
+            'unit_id': data[k]['unit_id'],
+            'deleted': data[k]['deleted'],
+            'is_active': data[k]['is_active'],
+            'is_confirm': data[k]['is_confirm'],
+            'photo': data[k]['photo']
+        });
+
+        // передаём данные на сервер
+        let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+        let isSuccess;
+        // провeрим, что вернулось с сервера success:true || success:false
+        try {
+            // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+            isSuccess  = JSON.parse(isSuccessJson);
+        } catch(e) {
+            alert ('Ошибка! Попробуйте позже!');
+            return;
+        }
+        // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+        // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
+        if (!isSuccess.success) {
+            // если распарсили и получили success : false, то Ошибка
+            alert('Ошибка!');
+            return;
+        } else {
+            // если распарсили и получили success : true, то всё записалось в базу
+            // оповещение админа с ссылкой неутверждённых товаров
+            //alert("Товар добавлен");
+        }
+    }
+}
+
+function renderAllVendorGoods(vendor_id) {
+
+    addGoodsToCentralVendor();
+
+    //даем видимость блоку с затемнением
+    document.querySelector('.dark-background').classList.remove('d-none');
+
+    //даем видимость блоку с таблицей
+    document.getElementById('modal-container').classList.remove('d-none');
+
+    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1&vendor_id=13');
+    let data = JSON.parse(dataJson);
+    console.log(data);
+
+    let template = document.getElementById('product-row').innerHTML;
+
+    let container = document.getElementById('container');
+
+    container.innerHTML = '';
+
+    for (let i = 0; i <data.length; i++) {
+        container.innerHTML += template.replace('${photo}', data[i]['photo'])
+                                        .replace('${name}', (data[i]['name']?data[i]['name']:(data[i]['name2']?data[i]['name2']:(data[i]['name3']?data[i]['name3']:''))))
+                                        .replace('${category}', data[i]['category_name'])
+                                        .replace('${brand}', data[i]['brand_name'])
+                                        .replace('${price_format}', data[i]['price'])
+                                        .replace('${id}', data[i]['id'])
+                                        .replace('${vendor_id}', vendor_id)
+    }
+}
+
+function confirmGoods() {
+
+    //достаем id данного поставщика, которому добавляем товары
+    let vendor_id = document.querySelector('.vendor-data').getAttribute('data-vendor');
+    console.log('vendor_id:' + vendor_id);
+
+    //проверка на то, чтобы был отмечен хотя бы один товар
+    //собираем айдишники всех выбранных товаров
+    let checkboxes = document.querySelectorAll('.checkbox-product');
+
+    let checkedGoods = [];
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            checkedGoods.push(checkboxes[i].getAttribute('data-id'));
+        }
+    }
+    console.log(checkedGoods);
+
+    hasError = false;
+
+    //проверяем кол-во отмеченных товаров
+    //если только 1
+    let itemsChecked;
+    if (typeof checkedGoods == 'number') {
+        itemsChecked = 1;
+    } else {
+        itemsChecked = checkedGoods.length;
+    }
+
+    console.log(typeof itemsChecked);
+
+    let checkboxesAll = document.querySelectorAll('.checkbox-product');
+
+    //если ни одной не выбрано, вешаем ошибку
+    if (!itemsChecked) {
+        const errorInfoContainer = document.querySelector('.error-info');
+        for (let l = 0; l < checkboxesAll.length; l++) {
+            checkboxesAll[l].classList.add('error');   
+            errorInfoContainer.innerText = "Выберите, пожалуйста, как минимум один товар из списка!";
+            errorInfoContainer.classList.remove('d-none');
+        }
+            hasError = true;
+    //если выбрана минимум одна, снимаем предупреждения
+    } else {
+        const errorInfoContainer = document.querySelector('.error-info');
+        for (let l = 0; l < checkboxesAll.length; l++) {
+            checkboxesAll[l].classList.remove('error');   
+            errorInfoContainer.innerText = "";
+            errorInfoContainer.classList.add('d-none');
+        }
+    }
+    if (hasError) {
+        return;
+    }
+
+    //если выбран только 1 товар
+    if (itemsChecked === 1) {
+        let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?id=' + checkedGoods);
+        let data = JSON.parse(dataJson);
+        console.log(data);
+
+        for (let k = 0; k < data.length; k++) {
+            let obj = JSON.stringify({
+                'vendor_id': vendor_id,
+                'name':  data[k]['name'],
+                'name2':  data[k]['name2'],
+                'name3':  data[k]['name3'],
+                'brand_id': data[k]['brand_id'],
+                'category_id': data[k]['category_id'],
+                'description': data[k]['description'],
+                'description2': data[k]['description2'],
+                'description3': data[k]['description3'],
+                'article': data[k]['article'],
+                'quantity_available': data[k]['quantity_available'],
+                'price': data[k]['price'],
+                'price_dollar': data[k]['price_dollar'],
+                'max_price': data[k]['max_price'],
+                'max_price_dollar': data[k]['max_price_dollar'],
+                'unit_id': data[k]['unit_id'],
+                'deleted': data[k]['deleted'],
+                'is_active': data[k]['is_active'],
+                'is_confirm': data[k]['is_confirm'],
+                'photo': data[k]['photo']
+            });
+
+        // передаём данные на сервер
+        let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+        let isSuccess;
+            // провeрим, что вернулось с сервера success:true || success:false
+            try {
+                // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+                isSuccess  = JSON.parse(isSuccessJson);
+            } catch(e) {
+                alert ('Ошибка! Попробуйте позже!');
+                return;
+            }
+            // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+            // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
+            if (!isSuccess.success) {
+                // если распарсили и получили success : false, то Ошибка
+                alert('Ошибка!');
+                return;
+            } else {
+                // если распарсили и получили success : true, то всё записалось в базу
+                // оповещение админа с ссылкой неутверждённых товаров
+                //alert("Товар добавлен");
+            }
+        }
+    //если выбранных товаров больше 1
+    } else {
+
+        for (let m = 0; m < checkedGoods.length; m++) {
+            let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?id=' + checkedGoods[m]);
+            let data = JSON.parse(dataJson);
+            console.log(data);
+    
+            for (let k = 0; k < data.length; k++) {
+                let obj = JSON.stringify({
+                    'vendor_id': vendor_id,
+                    'name':  data[k]['name'],
+                    'name2':  data[k]['name2'],
+                    'name3':  data[k]['name3'],
+                    'brand_id': data[k]['brand_id'],
+                    'category_id': data[k]['category_id'],
+                    'description': data[k]['description'],
+                    'description2': data[k]['description2'],
+                    'description3': data[k]['description3'],
+                    'article': data[k]['article'],
+                    'quantity_available': data[k]['quantity_available'],
+                    'price': data[k]['price'],
+                    'price_dollar': data[k]['price_dollar'],
+                    'max_price': data[k]['max_price'],
+                    'max_price_dollar': data[k]['max_price_dollar'],
+                    'unit_id': data[k]['unit_id'],
+                    'deleted': data[k]['deleted'],
+                    'is_active': data[k]['is_active'],
+                    'is_confirm': data[k]['is_confirm'],
+                    'photo': data[k]['photo']
+                });
+    
+            // передаём данные на сервер
+            let isSuccessJson = sendRequestPOST(mainUrl + '/api/products.php', obj);
+            let isSuccess;
+                // провeрим, что вернулось с сервера success:true || success:false
+                try {
+                    // попробуем распарсить json, если там какой-то текст=ошибка, то распарсить не получится
+                    isSuccess  = JSON.parse(isSuccessJson);
+                } catch(e) {
+                    alert ('Ошибка! Попробуйте позже!');
+                    return;
+                }
+                // если запрос не выполнен , то показываем alert с ошибкой и не перезагружаем страницу
+                // иначе - Товар добавлен, и если добавлял не админ, то оповещаем его в телеграмм
+                if (!isSuccess.success) {
+                    // если распарсили и получили success : false, то Ошибка
+                    alert('Ошибка!');
+                    return;
+                } else {
+                    // если распарсили и получили success : true, то всё записалось в базу
+                    // оповещение админа с ссылкой неутверждённых товаров
+                    //alert("Товар добавлен");
+                }
+            }
+        }
+    }
+
+    //убираем видимость блока с затемнением
+    document.querySelector('.dark-background').classList.add('d-none');
+
+    //закрываем модальное окно с выбором товаров
+    document.getElementById('modal-container').classList.add('d-none');
+
+}
+
+function cancelChoice() {
+
+    //убираем видимость блока с затемнением
+    document.querySelector('.dark-background').classList.add('d-none');
+
+    //закрываем модальное окно с выбором товаров
+    document.getElementById('modal-container').classList.add('d-none');
+
+}
+
+
 
 
 // ЗАДАЧА23
