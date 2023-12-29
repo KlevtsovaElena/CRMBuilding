@@ -207,7 +207,7 @@ function validationAddVendor() {
 
         //если ни одной не выбрано, вешаем ошибку
         if (!categoriesChecked) {
-            const errorInfoContainer = document.querySelector('.cat');
+            const errorInfoContainer = document.querySelector('.error-info');
             for (let k = 0; k < categories.length; k++) {
                 categories[k].classList.add('error');   
                 errorInfoContainer.innerText = "Выберите как минимум одну категорию из списка!";
@@ -216,7 +216,7 @@ function validationAddVendor() {
             }
         //если выбрана минимум одна, снимаем предупреждения
         } else {
-            const errorInfoContainer = document.querySelector('.cat');
+            const errorInfoContainer = document.querySelector('.error-info');
             for (let k = 0; k < categories.length; k++) {
                 categories[k].classList.remove('error');   
                 errorInfoContainer.innerText = "";
