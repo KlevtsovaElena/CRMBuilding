@@ -156,31 +156,6 @@ if($role !== 2) {
                     </select>
                 </div> -->
 
-                <!-- выбор кол-ва отображаемых записей на странице -->
-                <div class="d-iblock">Показывать по
-                    <select id="limit" name="limit" value="" required>
-                    <?php
-                        //если лимит не был задан
-                        if (!isset($_GET['limit'])) {
-                        ?>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <!-- если задан поиск, лимит переключается на "все" -->
-                            <option value="all" <?php if (isset($_GET['search'])) {echo 'selected';} ?> >все</option>
-                        <?php
-                        //если лимит уже задан
-                        } else {
-                            $limit = $_GET['limit'];
-                            ?>
-                            <option value="10" <?php if ($_GET['limit'] == 10) {echo 'selected';} ?> >10</option>
-                            <option value="20" <?php if ($_GET['limit'] == 20) {echo 'selected';} ?> >20</option>
-                            <option value="50" <?php if ($_GET['limit'] == 50) {echo 'selected';} ?> >50</option>
-                            <option value="all" <?php if ($_GET['limit'] == 'all' || isset($_GET['search'])) {echo 'selected';} ?> >все</option>
-                        <?php }
-                        ?> 
-                    </select>
-                </div>
                 <!-- поле поиска -->
                 <input type="search" id="search" name="search" value="<?php if (isset($_GET['search']) && $_GET['search']) { $word = explode(':', $_GET['search']); echo $word[1];} ?>" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
@@ -198,12 +173,12 @@ if($role !== 2) {
             } 
         //если лимит не выбран, задаем дефолтное значение
         } else {
-            $limit = 10;
+            //$limit = 10;
         }
 
         //считаем и записываем в переменные общее кол-во страниц и оффсет
-        $totalPages = ceil(count($data) / $limit);
-        $offset = ($currentPage - 1) * $limit;
+        //$totalPages = ceil(count($data) / $limit);
+        //$offset = ($currentPage - 1) * $limit;
         $totalNumElements = count($data); 
 
         //собираем в отдельную переменную фильтры
@@ -263,18 +238,19 @@ if($role !== 2) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . $params);
+                            // $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . $params);
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            print_r($data);
-                            print_r($limit);
+                            //print_r($data);
+                            //print_r($limit);
                             
                             //отдельно соберем информацию об общем кол-ве записей
                             $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . $params);
                             $dataN = json_decode($dataJsonN, true);
                             $totalNumElements = count($dataN);
                             //и об общем кол-ве страниц
-                            $totalPages = ceil(count($dataN) / $limit);
+                            //$totalPages = ceil(count($dataN) / $limit);
                             //print_r($dataN);
                             //print_r($params);
                         }
@@ -312,25 +288,26 @@ if($role !== 2) {
                         $dataN = json_decode($dataJsonN, true);
                         $totalNumElements = count($dataN);
                         //и об общем кол-ве страниц
-                        $totalPages = ceil(count($dataN) / $limit);
+                        //$totalPages = ceil(count($dataN) / $limit);
 
                     //если мы на первой странице
                     } elseif(!isset($_GET['page']) || $_GET['page'] == 1) {
                         //и поиск не активирован
                         if (!isset($_GET['search'])) {
                             //соберём данные для отображения в форме 
-                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                            // $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&limit=' . $limit . '&offset=0&orderby=' . $_GET['orderby'] . $params);
+                            $dataJson = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&offset=0&orderby=' . $_GET['orderby'] . $params);
                             $data = json_decode($dataJson, true);
                             $num = 1; //переменная для отображения порядкового номера (чтобы не было пропусков, т.к. некоторые id "удалены")
-                            print_r($data);
-                            print_r($_GET['orderby']);
+                            //print_r($data);
+                            //print_r($_GET['orderby']);
 
                             //отдельно соберем информацию об общем кол-ве записей
                             $dataJsonN = file_get_contents($nginxUrl . '/api/customers/get-with-order-vendors.php?vendor_id='. $vendor_id . '&orderby=' . $_GET['orderby'] . $params);
                             $dataN = json_decode($dataJsonN, true);
                             $totalNumElements = count($dataN);
                             //и об общем кол-ве страниц
-                            $totalPages = ceil(count($dataN) / $limit);
+                            //$totalPages = ceil(count($dataN) / $limit);
                             //print_r($dataN);
                         }
                     }
@@ -393,7 +370,7 @@ if($role !== 2) {
     </section>
 
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
-    <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
+    <!-- <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
             <a <?php if($currentPage > 1) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?>"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
@@ -407,8 +384,36 @@ if($role !== 2) {
         </div>
         <div class="page-status">стр <span class="current-page"><?= $currentPage ?></span> из <span class="total-page"><?= $totalPages ?></span></div>
     </section>
-    <?php } ?>
+    <?php } ?> -->
 
 <!-- подключим футер -->
 <?php include('./../components/footer.php'); ?>
+
+
+
+<!-- выбор кол-ва отображаемых записей на странице -->
+<!-- <div class="d-iblock">Показывать по
+                    <select id="limit" name="limit" value="" required> -->
+                    <?php
+                        //если лимит не был задан
+                        if (!isset($_GET['limit'])) {
+                        ?>
+                            <!-- <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option> -->
+                            <!-- если задан поиск, лимит переключается на "все" -->
+                            <!-- <option value="all" <?php if (isset($_GET['search'])) {echo 'selected';} ?> >все</option> -->
+                        <?php
+                        //если лимит уже задан
+                        } else {
+                            $limit = $_GET['limit'];
+                            ?>
+                            <!-- <option value="10" <?php if ($_GET['limit'] == 10) {echo 'selected';} ?> >10</option>
+                            <option value="20" <?php if ($_GET['limit'] == 20) {echo 'selected';} ?> >20</option>
+                            <option value="50" <?php if ($_GET['limit'] == 50) {echo 'selected';} ?> >50</option>
+                            <option value="all" <?php if ($_GET['limit'] == 'all' || isset($_GET['search'])) {echo 'selected';} ?> >все</option> -->
+                        <?php }
+                        ?> 
+                    <!-- </select>
+                </div> -->
 
