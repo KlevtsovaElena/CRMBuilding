@@ -57,6 +57,7 @@
                     'vendor_id' => $ordersVendorItem['vendor_id'],
                     'vendor_name' => $ordersVendorItem['vendor_name'],
                     'vendor_location' => $ordersVendorItem['vendor_location'],
+                    'city_id' => $ordersVendorItem['city_id'],
                     'vendor_city' => $ordersVendorItem['vendor_city'],
                     'vendor_deleted' => $ordersVendorItem['vendor_deleted'],
                     'order_date' => $ordersVendorItem['order_date'],

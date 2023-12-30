@@ -186,12 +186,12 @@ if($role !== 1) {
                     if (!isset($_GET['city_id'])) {
 
                         //запрашиваем данные по поставщикам из БД
-                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0');
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&is_active=1&city_deleted=0');
                         $dataV = json_decode($dataJsonV, true);
 
                     } else {
                         //запрашиваем данные по поставщикам из БД с учетом города
-                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&city_deleted=0&city_id=' . $_GET['city_id']);
+                        $dataJsonV = file_get_contents($nginxUrl . '/api/vendors/get-with-details.php?deleted=0&is_active=1&city_deleted=0&city_id=' . $_GET['city_id']);
                         $dataV = json_decode($dataJsonV, true);
                     }
 

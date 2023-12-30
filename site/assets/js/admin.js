@@ -490,11 +490,9 @@ function apply(section_name, filters) {
         } else if (section_name == 'admin-customers') {
 
             //вносим изменение в адресную строку страницы
-            // history.replaceState(history.length, null, 'admin-customers.php?' + limit.value + filters);
-            history.replaceState(history.length, null, 'admin-customers.php?' + filters);
+            history.replaceState(history.length, null, 'admin-customers.php?' + limit.value + filters);
 
-            // document.location.href = mainUrl + '/pages/admin-customers.php?limit=' + limit.value + filters;
-            document.location.href = mainUrl + '/pages/admin-customers.php?' + filters;
+            document.location.href = mainUrl + '/pages/admin-customers.php?limit=' + limit.value + filters;
 
         } else if (section_name == 'vendor-customers') {
 
@@ -521,14 +519,14 @@ function applyInOrders() {
 
     console.log(limit.value);
 
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
     //лимит задан всегда, поэтому проверяем наличие поискового запроса и другие селекты
     //получим селект "поставщик"
     let vendorSel = document.getElementById('vendor').querySelectorAll('option:checked')[0].value;
     console.log(vendorSel);
-
-    //получим селект "город"
-    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
-    console.log(citySel);
 
     //получим селект "статус"
     let statusSel = document.getElementById('status').querySelectorAll('option:checked')[0].value;
@@ -854,8 +852,81 @@ function applyInWholesalerMain() {
 
 }
 
-//функция при нажатии на кнопку "Применить" для admin-vendors!!!
+//функция при нажатии на кнопку "Применить" для admin-vendors (переделанная из orders)!!!
 function applyInVendors(section_name) {
+
+    console.log(limit.value);
+
+    //получим селект "город"
+    let citySel = document.getElementById('city').querySelectorAll('option:checked')[0].value;
+    console.log(citySel);
+
+    //лимит задан всегда, поэтому проверяем наличие поискового запроса и другие селекты
+
+    //получим введенное в поиск значение
+    let searchQuery = document.getElementById('search').value;
+    let dataSearch = searchQuery.trim();
+
+    //собираем фильтры (дата + поиск + селекты)
+    let filters = '';
+
+    //если задан поиск
+    if (dataSearch) {
+        limit.value = 'all';
+        filters += '&search=name:' + dataSearch;
+    } 
+
+    //если задан город
+    if (citySel) {
+        filters += '&city_id=' + citySel;
+    }
+    
+    //alert(filters);
+
+    //собираем сортировку
+    // получим значение атрибута data-sort
+    let allTitlesElems = document.getElementById('list-orders').querySelectorAll('.cell-title');
+
+    //переменная для значения ключа (asc или desc), которое активировано нажатим на стрелку вверх или вниз в названии колонки
+    let dataSort = '';
+    //переменная для ключа, соответствующего названию сортируемого поля в БД
+    let key = '';
+
+    //в цикле вынимаем эти два элемента
+    for (let i = 0; i < allTitlesElems.length; i++) {
+        if (allTitlesElems[i].getAttribute('data-sort')) {
+            //вынимаем заданное значение ключа
+            dataSort = allTitlesElems[i].getAttribute('data-sort');
+            console.log(dataSort);
+            //вынимаем ключ
+            key = document.getElementById('list-orders').querySelectorAll('.cell-title')[i].getAttribute('data-id');
+            console.log(key);
+        }
+    }
+    
+    // получим значение атрибута data-page, содержащего номер текущей страницы
+    let dataPage = document.getElementById('list-orders').getAttribute('data-page');
+    console.log(dataPage);
+
+    let sorting = '';
+
+    //если активировано значение asc
+    if (dataSort && dataSort === "asc") {
+        sorting += '&orderby=' + key + ':asc';
+    //если активировано значение desc
+    } else if (dataSort === "desc") {
+        sorting += '&orderby=' + key + ':desc';
+    }
+
+    //вносим изменение в адресную строку страницы
+    history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + filters + sorting);
+
+    document.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + filters + sorting;
+
+}
+
+//функция при нажатии на кнопку "Применить" для admin-vendors!!! (старая)
+function applyInVendors1(section_name) {
 
     console.log(limit.value);
 
@@ -956,7 +1027,12 @@ function applyInVendors(section_name) {
 //функция при нажатии на кнопку "Применить" для admin-customers!!!
 function applyInCustomers(section_name) {
 
-    //console.log(limit.value);
+    if (section_name == 'admin-customers') {
+        console.log(limit.value);
+    } else {
+        limit = 0;
+        limit.value = '';
+    }
 
     //лимит задан всегда, поэтому проверяем только наличие поискового запроса
     //получим введенное в поиск значение
@@ -999,15 +1075,15 @@ function applyInCustomers(section_name) {
         //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
         //если в гет-параметрах нет ни поиска, ни страницы
         if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?orderby=' + key + ':asc' + filters);
-            window.location.href = mainUrl + '/pages/'+ section_name + '.php?orderby=' + key + ':asc' + filters;
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters);
+            window.location.href = mainUrl + '/pages/'+ section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть поиск, но не страница
         } else if (dataSearch && !dataPage) {
             history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters);
             window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть страница, но не поиск
         } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?page=' + dataPage + '&orderby=' + key + ':asc' + filters);
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters);
             window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':asc' + filters;
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
@@ -1022,16 +1098,16 @@ function applyInCustomers(section_name) {
         //но сначала проверяем, какие ДРУГИЕ гет-параметры уже переданы
         //если в гет-параметрах нет ни поиска, ни страницы
         if (!dataSearch && !dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?&orderby=' + key + ':desc' + filters;
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть поиск, но не страница
         } else if (dataSearch && !dataPage) {
             history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters);
             window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=all&search=first_name:' + dataSearch + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть страница, но не поиск
         } else if (!dataSearch && dataPage) {
-            history.replaceState(history.length, null, section_name + '.php?page=' + dataPage + '&orderby=' + key + ':desc' + filters);
-            window.location.href = mainUrl + '/pages/' + section_name + '.php?page=' + dataPage + '&orderby=' + key + ':desc' + filters;
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);
+            window.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters;
         //если в гет-параметрах уже есть и страница, и поиск
         } else if (dataSearch && dataPage) {
             history.replaceState(history.length, null, section_name + '.php?limit=all&search=first_name:' + dataSearch + '&page=' + dataPage + '&orderby=' + key + ':desc' + filters);

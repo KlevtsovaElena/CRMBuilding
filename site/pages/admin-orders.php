@@ -270,7 +270,7 @@ if($role !== 1) {
                 <!-- поле поиска -->
                 <div class="d-iblock">
                     <div>Поиск</div>
-                    <input type="search" id="search" name="search" value="" placeholder="№заказа" class="middle-input">
+                    <input type="search" id="search" name="search" value="<?php if (isset($_GET['search']) && $_GET['search']) { $word = explode(':', $_GET['search']); echo $word[1];} ?>" placeholder="№заказа" class="middle-input">
                 </div>
 
                 <!-- фильтрация по кол-ву отображаемых элементов на странице -->
