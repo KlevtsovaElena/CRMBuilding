@@ -764,13 +764,13 @@ func processMessage(message MessageT, messageInline MessageInlineT) {
 					"keyboard": [][]map[string]interface{}{
 						{
 							{
-								"text":            languages[usersDB[chatId].Language]["yes"],
+								"text":            "Да",
 								"request_contact": true,
 							},
 						},
 						{
 							{
-								"text": languages[usersDB[chatId].Language]["no"],
+								"text": "Нет",
 							},
 						},
 					},
