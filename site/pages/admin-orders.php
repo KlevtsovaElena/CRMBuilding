@@ -7,6 +7,8 @@ if($role !== 1) {
 ?>
 
 <?php 
+    // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
+    $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -303,7 +305,7 @@ if($role !== 1) {
                 <!-- чекбокс для архивных заказов -->
                 <div class="archive-check">
                     <div>
-                        <input type="checkbox" id="archive" name="archive" onclick="archiveChecked()" value="" <?php if (isset($_GET['archived']) || isset($_GET['archive']) && $_GET['archive'] == 1) { echo 'checked'; } ?>>
+                        <input type="checkbox" id="archive" name="archive" onclick="archiveChecked()" value="" <?php if (isset($_GET['archived']) || (isset($_GET['archive']) && $_GET['archive'] == 1)) { echo 'checked'; } ?>>
                     </div>
                     <lable>С архивными</lable>
                 </div>
@@ -394,7 +396,7 @@ if($role !== 1) {
                     if (isset($_GET['archive'])) {
                         $params = $params . '&archive=' . $_GET['archive'];
                     } else if (isset($_GET['archived'])) {
-                        true;
+                        $params = $params . '&archived';
                     } else {
                         $params = $params . '&archive=0';
                     }
@@ -566,16 +568,34 @@ if($role !== 1) {
         <div class="info-table">Всего записей: <?= $totalEntries ?></div>
     </section>
 
+        <!-- Сначала собираем новые гет-параметры по аналогии с тем, что в href -->
+        <?php if($currentPage > 1) { 
+            $getParamsPrev = "?limit=" . $limit . "&page=" . $currentPage - 1; 
+            if(isset($_GET['orderby'])) {
+                $getParamsPrev .= "&orderby=" . $_GET['orderby'];
+            } 
+            $getParamsPrev .= $params; 
+        } ?>
+        <?php if($currentPage != $totalPages) {
+            $getParamsNext = "?limit=" . $limit . "&page=" . $currentPage + 1; 
+            if(isset($_GET['orderby'])) {
+                $getParamsNext .= "&orderby=" . $_GET['orderby'];
+            } 
+            $getParamsNext .= $params; 
+        } ?>
+
     <!-- если НЕ одна страница и НЕ задан поиск, показываем внизу пагинацию -->
     <?php if($totalPages > 1 && !isset($_GET['search'])) { ?>
     <section class="pagination-wrapper">
         <div class="page-switch">                 
-            <a <?php if($currentPage > 1) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
+            <!-- <a <?php if($currentPage > 1) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage - 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > -->
+            <a <?php if($currentPage > 1) { ?> href="javascript: switchPageAndSaveGetParamsInLS('<?= $getParamsPrev ?>')"<?php } ?> class="page-switch__prev" <?php if($currentPage <= 1) { ?>  disabled <?php } ?> > 
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
             
             <span class="current-page"><?= $currentPage ?></span>
-            <a <?php if($currentPage != $totalPages) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>"<?php } ?> class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
+            <!-- <a <?php if($currentPage != $totalPages) { ?> href="?limit=<?= $limit ?>&page=<?= $currentPage + 1; ?><?php if(isset($_GET['orderby'])) {?>&orderby=<?= $_GET['orderby'] ?><?php } ?><?= $params ?><?php if (isset($_GET['archived'])) { echo '&archived'; } ?>"<?php } ?> class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> > -->
+            <a <?php if($currentPage != $totalPages) { ?> href="javascript: switchPageAndSaveGetParamsInLS('<?= $getParamsNext ?>')"<?php } ?> class="page-switch__next"  <?php if($currentPage == $totalPages) { ?>  disabled <?php } ?> >
                 <svg  class="fill" viewBox="0 8 23 16" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>down</title> <path d="M11.125 16.313l7.688-7.688 3.594 3.719-11.094 11.063-11.313-11.313 3.5-3.531z"></path> </g></svg>
             </a>
         </div>

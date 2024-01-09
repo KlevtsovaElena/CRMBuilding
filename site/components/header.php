@@ -138,8 +138,8 @@
                         <span>Товары</span>
                     </a>
                 </li>
-                <li class="menu-left__item"   data-page-name = "/pages/admin.php?section=cities">
-                    <a href="./../pages/admin.php?section=cities" class="menu-left__item-link">
+                <li class="menu-left__item"   data-page-name = "/pages/admin-cities.php">
+                    <a href="./../pages/admin-cities.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <title>Города</title> 
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -149,8 +149,8 @@
                         <span>Города</span>
                     </a>
                 </li>
-                <li class="menu-left__item"  data-page-name = "/pages/admin.php?section=categories">
-                    <a href="./../pages/admin.php?section=categories" class="menu-left__item-link">
+                <li class="menu-left__item"  data-page-name = "/pages/admin-categories.php">
+                    <a href="./../pages/admin-categories.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <title>Категории</title> 
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -160,8 +160,8 @@
                         <span>Категории</span>
                     </a>
                 </li>
-                <li class="menu-left__item"   data-page-name = "/pages/admin.php?section=brands">
-                    <a href="./../pages/admin.php?section=brands" class="menu-left__item-link">
+                <li class="menu-left__item"   data-page-name = "/pages/admin-brands.php">
+                    <a href="./../pages/admin-brands.php" class="menu-left__item-link">
                         <svg fill="#ced4da" class="fill" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ced4da">
                             <title>Бренды</title>
                             <g id="SVGRepo_bgCarrier" stroke-width="0"/>

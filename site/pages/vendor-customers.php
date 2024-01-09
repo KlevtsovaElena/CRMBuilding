@@ -7,6 +7,8 @@ if($role !== 2) {
 ?>
 
 <?php 
+    // подключим файл для проверки страницы во время загрузки на наличие сохраненных фильтров
+    $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
     // собираем массив из подключаемых файлов css и js
     $styleSrc = [
         "<link rel='stylesheet' href='./../assets/css/base.css'>",
@@ -160,6 +162,7 @@ if($role !== 2) {
                 <input type="search" id="search" name="search" value="<?php if (isset($_GET['search']) && $_GET['search']) { $word = explode(':', $_GET['search']); echo $word[1];} ?>" placeholder="Поиск но названию">
                 <!-- кнопка, активирующая выбранный лимит записей на странице и поиск -->
                 <button onclick="applyInCustomers('vendor-customers')" class="btn btn-ok d-iblock">Применить</button>
+                <button id="btn-cancel-filters" class="btn btn-neutral border-neutral d-iblock">Сбросить</button>
             </div>
 
         </section>
@@ -364,6 +367,19 @@ if($role !== 2) {
             </tbody>
 
         </table>
+
+        <!-- Сначала собираем новые гет-параметры по аналогии с тем, что в href -->
+        <!-- <?php 
+        $params = '';
+        
+        if($currentPage > 1) { 
+            $getParamsPrev = "?limit=" . $limit . "&page=" . $currentPage - 1; 
+            $getParamsPrev .= $params; 
+        } ?>
+        <?php if($currentPage != $totalPages) {
+            $getParamsNext = "?limit=" . $limit . "&page=" . $currentPage + 1; 
+            $getParamsNext .= $params; 
+        } ?> -->
 
         <!-- внизу таблицы выдаем общее количество записей -->
         <div class="info-table">Всего записей: <?= $totalNumElements ?></div>

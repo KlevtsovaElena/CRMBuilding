@@ -9,9 +9,10 @@ checkPageKeyInLS()
 /* ---------- ПРОВЕРКА НАЛИЧИЯ ГЕТ-ПАРАМЕТРОВ В lOCALSTORAGE ДЛЯ ТЕКУЩЕЙ СТРАНИЦЫ---------- */
 // проверка и при необходимостти перезагрузка
 function checkPageKeyInLS() {
-
+    console.log(localStorage.getItem(window.location.pathname));
     // если в ЛС есть элемент с ключом=адрес страницы без гет-параметров (/pages/admin-list-products.php)
     if(localStorage.getItem(window.location.pathname)) {
+        console.log(localStorage.getItem(window.location.pathname));
         // достанем значение-строку по ключу, преобразуя в объект
         let valueAsObject = JSON.parse(localStorage.getItem(window.location.pathname));
 

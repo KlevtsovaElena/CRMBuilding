@@ -48,9 +48,9 @@ function addNew(section_name) {
         let lastPage = document.getElementById('pages-info').getAttribute('data-pages');
 
         //передаем в адресную строку изменения, чтобы сразу их видеть
-        history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&page=' + lastPage);
+        history.replaceState(history.length, null, 'admin-' + section_name + '.php?limit=' + limit.value + '&page=' + lastPage);
 
-        document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value +  '&page=' + lastPage;
+        document.location.href = mainUrl + '/pages/admin-' + section_name + '.php?limit=' + limit.value +  '&page=' + lastPage;
     }
     
 }
@@ -273,6 +273,8 @@ function save(id, uneditedValue, section_name) {
             link = mainUrl + '/api/'+ section_name + '.php';
 
             // соберём json для передачи на сервер
+            let obj;
+
             //для категорий
             if(section_name == 'categories') {
                 obj = JSON.stringify({
@@ -369,12 +371,7 @@ function deleteOne(section_name, id) {
     //для удаления поставщиков персональная апишка, чтобы вместе с поставщиком скрывались его товары
     if (section_name == 'admin-vendors' || section_name == 'admin-wholesalers') {
         link = mainUrl + '/api/vendors/delete-vendor-with-products.php';
-    } else {
-        link = mainUrl + '/api/'+ section_name + '.php';
-    }
-    
 
-    if (section_name == 'admin-vendors' || section_name == 'admin-wholesalers') {
         // соберём json для передачи на сервер
         obj = JSON.stringify({
             'id': id,
@@ -382,6 +379,8 @@ function deleteOne(section_name, id) {
             'is_active': 0
         });
     } else {
+        link = mainUrl + '/api/'+ section_name + '.php';
+
         // соберём json для передачи на сервер
         obj = JSON.stringify({
             'id': id,
@@ -409,9 +408,9 @@ function deleteOne(section_name, id) {
         document.location.href = mainUrl + '/pages/admin-wholesalers.php?limit=' + limit.value + '&page=' + currentPage;
     } else {
         //передаем в адресную строку изменения, чтобы сразу их видеть на последней странице
-        history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&page=' + currentPage);
+        history.replaceState(history.length, null, 'admin-' + section_name + '.php?limit=' + limit.value + '&page=' + currentPage);
 
-        document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value +  '&page=' + currentPage;
+        document.location.href = mainUrl + '/pages/admin-' + section_name + '.php?limit=' + limit.value +  '&page=' + currentPage;
     }
 
 
@@ -464,9 +463,9 @@ function apply(section_name, filters) {
             let key = document.querySelector('.page-title').getAttribute('data-name');
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim());
 
-            document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
+            document.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value + '&search=' + key + ':' + searchQuery.trim();
         }
      
     } else {
@@ -490,7 +489,7 @@ function apply(section_name, filters) {
         } else if (section_name == 'admin-customers') {
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin-customers.php?' + limit.value + filters);
+            history.replaceState(history.length, null, 'admin-customers.php?limit=' + limit.value + filters);
 
             document.location.href = mainUrl + '/pages/admin-customers.php?limit=' + limit.value + filters;
 
@@ -506,9 +505,9 @@ function apply(section_name, filters) {
         } else {
 
             //вносим изменение в адресную строку страницы
-            history.replaceState(history.length, null, 'admin.php?section=' + section_name + '&limit=' + limit.value);
+            history.replaceState(history.length, null, section_name + '.php?limit=' + limit.value);
 
-            document.location.href = mainUrl + '/pages/admin.php?section=' + section_name + '&limit=' + limit.value;
+            document.location.href = mainUrl + '/pages/' + section_name + '.php?limit=' + limit.value;
         }
     }
 
@@ -1869,6 +1868,34 @@ function cancelChoice() {
 
 
 // ЗАДАЧА23
+
+// При переключении страничек сначала перезаписываем гет-параметра в адресной строке, а только потом перезагружаем
+function switchPageAndSaveGetParamsInLS(getParams) {
+    //передаем в адресную строку изменения, чтобы сразу их видеть
+    // получим только название странички (/pages/name.php  -> /name.php)
+    let namePage = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+    history.replaceState(history.length, null, namePage + getParams);
+
+    // перезагрузим страницу
+    window.location.href = mainUrl + window.location.pathname + getParams; 
+}
+
+
+// тк в этом js обрабатывается не одна страница, то придётся отбирать, для каких страниц нужно сохранять фильтрацию при переходе на др страницы
+// и отрисовывать позицию скролла из локалсторадж
+// это можно делать только для тех страниц, у которых в .php вначале указан  $isCheckGetParams = '<script src="./../assets/js/local-storage-check.js"></script>';
+// здесь достаточно указать через || названия страниц
+if(window.location.pathname == '/pages/admin-vendors.php' || window.location.pathname == '/pages/admin-cities.php' || window.location.pathname == '/pages/admin-categories.php' || window.location.pathname == '/pages/admin-brands.php' || window.location.pathname == '/pages/admin-categories.php' || window.location.pathname == '/pages/admin-brands.php' || window.location.pathname == '/pages/admin-main.php' || window.location.pathname == '/pages/admin-categories.php' || window.location.pathname == '/pages/admin-brands.php' || window.location.pathname == '/pages/admin-orders.php' || window.location.pathname == '/pages/admin-wholesalers.php' || window.location.pathname == '/pages/admin-customers.php' || window.location.pathname == '/pages/vendor-customers.php' || window.location.pathname == '/pages/wholesaler-main.php') {
+    // передвинем скролл
+    changePositionScroll();
+
+    /* ---------- СОХРАНЕНИЕ ГЕТ-ПАРАМЕТРОВ И СКРОЛЛА ПРИ УХОДЕ СО СТРАНИЦЫ ---------- */
+    window.addEventListener('unload', ()=> {
+        saveGetParamsInLS(window.location.search);
+    })
+
+}
+
 /* ---------- СБРОС ФИЛЬТРА ---------- */
 // ДЛЯ ВСЕХ КРОМЕ ТЕХ СТРАНИЦ, КОТОРЫЕ В admin.php
 
