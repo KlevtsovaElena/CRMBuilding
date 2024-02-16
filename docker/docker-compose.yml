@@ -65,7 +65,8 @@ services:
     volumes:
       - ./../bot/:/app/
     ports:
-      - 5001:8080
+      - "5001:8080"
+      - "5002:80"
     restart: always
 
   currency-service:
@@ -83,6 +84,8 @@ services:
       telegram_channel: ${TELEGRAM_CHANEL}
       TZ: "Europe/Moscow"
     restart: always
+    ports:
+      - "5003:80"
 
   price-service:
     build:
@@ -96,6 +99,8 @@ services:
       bot_token: ${PRICE_BOT_TOKEN}
       telegram_channel: ${TELEGRAM_PRICE_CHANEL}
     restart: always
+    ports:
+      - "5004:80"
 
   notification-service:
     build:
@@ -109,6 +114,8 @@ services:
       bot_token: ${BOT_TOKEN}
       server_uri: ${SERVER_URI}
       api_link: ${API_LINK}
+    ports:
+      - "5005:80"
 
   confirm-price-service:
     build:
@@ -122,3 +129,5 @@ services:
       bot_token: ${BOT_TOKEN}
       api_link: ${API_LINK}
     restart: always
+    ports:
+      - "5006:80"

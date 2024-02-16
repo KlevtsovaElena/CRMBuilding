@@ -77,6 +77,15 @@ type SendMessageResponseT struct {
 }
 
 func main() {
+
+	//запуск сервера для проверки
+	go func() {
+		http.HandleFunc("/health/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("success"))
+		})
+		http.ListenAndServe(":80", nil)
+	}()
+
 	validateEnvVariables()
 
 	for range time.Tick(time.Second * 10) {

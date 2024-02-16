@@ -46,6 +46,14 @@ var link string = os.Getenv("API_LINK")
 // основная функция для проверки на начало отсылки
 func main() {
 
+	//запуск сервера для проверки
+	go func() {
+		http.HandleFunc("/health/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("success"))
+		})
+		http.ListenAndServe(":80", nil)
+	}()
+
 	//цикл для проверки времени
 	for range time.Tick(time.Second * 1) {
 

@@ -12,14 +12,14 @@ import (
 )
 
 type Vendor struct {
-	ID             		int    `json:"id"`
-	Name           		string `json:"name"`
-	TgID           		int    `json:"tg_id"`
-	Role           		int    `json:"role"`
-	CityName        	string `json:"city_name"`
-	Deleted       		int    `json:"deleted"`
-	PriceConfirmed 		int    `json:"price_confirmed"`
-	TimePriceConfirm    int64  `json:"time_price_confirm"`
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	TgID             int    `json:"tg_id"`
+	Role             int    `json:"role"`
+	CityName         string `json:"city_name"`
+	Deleted          int    `json:"deleted"`
+	PriceConfirmed   int    `json:"price_confirmed"`
+	TimePriceConfirm int64  `json:"time_price_confirm"`
 }
 
 type SendMessageResponseT struct {
@@ -51,7 +51,15 @@ var hour int = 5
 var minute int = 0
 
 func main() {
-	
+
+	//запуск сервера для проверки
+	go func() {
+		http.HandleFunc("/health/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("success"))
+		})
+		http.ListenAndServe(":80", nil)
+	}()
+
 	for range time.Tick(time.Second * 1) {
 
 		// определим когда запустить проверку подтверждения цен
@@ -83,7 +91,7 @@ func main() {
 		adminChatId := admin[0].TgID
 
 		// если поставщики есть:
-		// 1. у каждого проверим время подтверждения, оно должно быть позже 8:59 (Узбекистан +5) текущего дня 
+		// 1. у каждого проверим время подтверждения, оно должно быть позже 8:59 (Узбекистан +5) текущего дня
 		// 2. если это не так, то price_confirmed=0 этого поставщика
 		// 3. отправляем уведомление Админу, что этот поставщик не подтвердил цены в период 9:00-10:00
 
@@ -106,9 +114,9 @@ func main() {
 
 					// отправляем уведомление Админу, что этот поставщик не подтвердил цены в период 9:00-10:00
 					message = "Поставщик " + vendor.Name + ", город " + vendor.CityName + " не подтвердил цены в 10:00"
-					
+
 					sendTelegramMessage(message, adminChatId)
-				} 
+				}
 			}
 		}
 
@@ -167,7 +175,7 @@ func getAllVendors() []Vendor {
 
 	// разнесём по полям в переменную типа Vendor
 	json.Unmarshal(data, &vendors)
-	
+
 	return vendors
 }
 
@@ -193,7 +201,7 @@ func getAdmin() []Vendor {
 
 	// разнесём по полям в переменную типа Vendor
 	json.Unmarshal(data, &admin)
-	
+
 	return admin
 }
 
@@ -203,4 +211,3 @@ func changePriceConfirm(vendor Vendor) {
 	r := bytes.NewReader(data)
 	http.Post("http://"+apiLink+"/api/vendors.php", "application/json", r)
 }
-
