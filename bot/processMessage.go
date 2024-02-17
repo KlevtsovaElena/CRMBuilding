@@ -19,6 +19,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 	//определение текста или кнопки клавиатуры
 	text := message.Message.Text
+	fmt.Println(text)
 	chatId := 0
 	if messageInline.CallbackQuery.From.ID == 0 {
 		chatId = message.Message.From.ID
