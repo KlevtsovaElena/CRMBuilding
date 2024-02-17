@@ -25,6 +25,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	} else {
 		chatId = messageInline.CallbackQuery.From.ID
 	}
+	sendMessage(chatId, "Бот работает", nil)
 
 	firstName := message.Message.From.FirstName
 	lastName := message.Message.From.LastName
