@@ -1,4 +1,4 @@
-package main
+package common
 
 // структура для приходящих сообщений и обычных кнопок
 type ResponseT struct {

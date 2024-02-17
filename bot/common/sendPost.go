@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 )
 
 // функция для отправки POST запроса
-func sendPost(requestBody string, url string) ([]byte, error) {
+func SendPost(requestBody string, url string) ([]byte, error) {
 	// Создаем новый POST-запрос
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
 	if err != nil {
