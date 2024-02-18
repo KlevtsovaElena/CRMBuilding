@@ -138,20 +138,6 @@ type ServerResponce struct {
 	Error   string `json:"error"`
 }
 
-// структура заказа
-type Order struct {
-	CustomerID  int                    `json:"customer_id"`
-	OrderDate   int64                  `json:"order_date"`
-	Products    map[int]int            `json:"products"`
-	Coordinates map[string]interface{} `json:"coordinates"`
-}
-
-// структура корзины в заказе
-type OrderItem struct {
-	ProductID int
-	Quantity  int
-}
-
 // структура геопозиции
 type Coordinates struct {
 	Latitude  float64 `json:"latitude"`
@@ -174,12 +160,6 @@ type Category struct {
 type Brand struct {
 	ID        int    `json:"id"`
 	BrandName string `json:"brand_name"`
-}
-
-type Settings struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Value string `json:"value"`
 }
 
 // структура товара
@@ -388,14 +368,23 @@ func main() {
 		http.ListenAndServe(":80", nil)
 	}()
 
+	//для блокировки доступа к массиву с юзерами
+	var mutex sync.Mutex
+
 	//достаем юзеров из кэша при перезапуске контейнера
-	getUsers()
+	getUsers(&mutex)
+
+	fmt.Println(usersDB)
+
+	//сохраняем данные о юзерах в кэщ после проверки всех сообщений
+	go func() {
+		for range time.Tick(time.Second * 10) {
+			saveUsers(&mutex)
+		}
+	}()
 
 	//обнуление последнего id сообщения
 	lastMessage := 0
-
-	//для блокировки доступа к массиву с юзерами
-	var mutex sync.Mutex
 
 	//цикл для проверки на наличие новых сообщений
 	for range time.Tick(time.Second * 1) {
@@ -416,6 +405,8 @@ func main() {
 
 		//считаем количество новых сообщений
 		number := len(responseObj.Result)
+
+		//fmt.Println("number of messages in bot", number)
 
 		//если сообщений нет - то дальше код не выполняем
 		if number < 1 {
@@ -438,24 +429,27 @@ func main() {
 		//запоминаем update_id  последнего сообщения
 		lastMessage = responseObj.Result[number-1].UpdateID + 1
 
-		//сохраняем данные о юзерах в кэщ после проверки всех сообщений
-		saveUsers()
+		//fmt.Println("number of last message", lastMessage)
 
 	}
 }
 
 /////////////////////////////////////////
 
-func getUsers() {
+func getUsers(mutex *sync.Mutex) {
 	//считываем из бд при включении
 	dataFile, _ := ioutil.ReadFile("db.json")
+	mutex.Lock()
 	json.Unmarshal(dataFile, &usersDB)
+	mutex.Unlock()
 }
 
-func saveUsers() {
+func saveUsers(mutex *sync.Mutex) {
 	file, _ := os.Create("db.json")
 	defer file.Close()
+	mutex.Lock()
 	jsonString, _ := json.Marshal(usersDB)
+	mutex.Unlock()
 	file.Write(jsonString)
 }
 
