@@ -599,7 +599,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	//проверяем на блокировку
 	blocked := userIsBlocked(&user)
 	if blocked {
-		sendMessage(user.ID, "Вы заблокированы", nil)
+		sendMessage(chatId, "Вы заблокированы", nil)
 		return
 	}
 
