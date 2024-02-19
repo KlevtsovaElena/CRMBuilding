@@ -508,6 +508,7 @@ func userIsBlocked(user *UserT) bool {
 	defer resp.Body.Close()
 
 	var userInfo []UserT
+	fmt.Println(userInfo)
 	err = json.NewDecoder(resp.Body).Decode(&userInfo)
 	if err == nil {
 		// Используем полученные данные
@@ -597,8 +598,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	}
 
 	//проверяем на блокировку
-	blocked := userIsBlocked(&user)
-	if blocked {
+	if userIsBlocked(&user) {
 		sendMessage(chatId, "Вы заблокированы", nil)
 		return
 	}
