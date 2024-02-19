@@ -657,7 +657,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			if status {
 
 				sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
-				user := usersDB[chatId]
 				user.Vendor_id = payLoad
 				user.Step += 1
 				usersDB[chatId] = user
@@ -674,7 +673,10 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		case usersDB[chatId].Step == 2:
 
-			sendMessage(chatId, "Локация вашего склада записана", nil)
+			if latitude < 1 || longitude < 1 {
+				sendMessage(chatId, "Отправьте локацию склада", nil)
+				break
+			}
 
 			coordinates := Coordinates{
 				Latitude:  latitude,
@@ -686,13 +688,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
 			fmt.Println(requestBody)
 
-			sendPost(requestBody, "http://"+link+"/api/vendors.php")
+			_, err := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+			if err != nil {
+				sendMessage(chatId, "Что-то пошло не так - попробуйте еще раз", nil)
+				break
+			}
 
-			user := usersDB[chatId]
-			user.Step = 1
+			user.Step = 3
 			usersDB[chatId] = user
-			break
 
+			sendMessage(chatId, "Локация вашего склада записана", nil)
 		}
 
 		//если
@@ -701,7 +706,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		switch {
 
 		// кейс для начального сообщения для пользователя
-		case text == "/start" || usersDB[chatId].Step == 1:
+		case user.Step == 1:
 
 			// Создаем GET-запрос
 			resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
@@ -713,9 +718,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			var personExist []UserT
 			err = json.NewDecoder(resp.Body).Decode(&personExist)
 			if err != nil {
-				user := usersDB[chatId]
-				user.Step = 1
-				usersDB[chatId] = user
 
 				//собираем объект клавиатуры для выбора языка
 				buttons := [][]map[string]interface{}{
@@ -734,9 +736,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				//следующий шаг
 				user.Step += 1
 				usersDB[chatId] = user
-				break
 			} else {
-				user := usersDB[chatId]
 				user.Step = 4
 				usersDB[chatId] = user
 
@@ -798,7 +798,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 		// кейс для получения номера телефона
-		case usersDB[chatId].Step == 2 || button == "backToPhone":
+		case user.Step == 2 || button == "backToPhone":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -821,14 +821,12 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "Поделится номером телефона", keyboard)
-			user := usersDB[chatId]
 			user.Step += 1
 			user.Language = button
 			usersDB[chatId] = user
-			break
 
 		// кейс для обработки отказа от отправки телефона
-		case usersDB[chatId].Step == 3 && text == "Нет":
+		case user.Step == 3 && text == "Нет":
 
 			// создаём объект клавиатуры
 			buttons := [][]map[string]interface{}{
@@ -847,9 +845,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			break
 
 		// кейс для вывода городов для выбора
-		case usersDB[chatId].Step == 3:
+		case user.Step == 3:
 
-			user := usersDB[chatId]
 			user.PhoneNumber = phone
 			user.Username = username
 			usersDB[chatId] = user
@@ -891,7 +888,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			break
 
 		// кейс для вывода меню пользователю и запись или обновление пользователя в бд
-		case usersDB[chatId].Step == 4:
+		case user.Step == 4:
 
 			user := usersDB[chatId]
 			user.Step = 4
@@ -1023,7 +1020,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			break
 
 		// кейс для вывода категорий товаров на выбор
-		case (usersDB[chatId].Step == 5 && text == languages[usersDB[chatId].Language]["order"]+" 🛍") || (button == "backToGoods"):
+		case (user.Step == 5 && text == languages[usersDB[chatId].Language]["order"]+" 🛍") || (button == "backToGoods"):
 
 			user := usersDB[chatId]
 			user.Step = 5
@@ -1080,7 +1077,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			break
 
 		// кейс для вывода брендов товаров для пользователя
-		case usersDB[chatId].Step == 6 || button == "backToBrands":
+		case user.Step == 6 || button == "backToBrands":
 
 			user := usersDB[chatId]
 			user.Step = 6
@@ -1451,9 +1448,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			break
 
 		// кейс для вывода сообщения о заказе и его отправка на бекенд
-		case usersDB[chatId].Step == 11:
-
-			user := usersDB[chatId]
+		case user.Step == 11:
 
 			// Создаем GET-запрос
 			res, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
@@ -1990,7 +1985,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		}
 
 		// кейс при нажатии на кнопку настройки
-		if text == languages[usersDB[chatId].Language]["settings"]+" ⚙️" || button == "backToSettings" {
+		if strings.Contains(text, "⚙️") || button == "backToSettings" {
 
 			user := usersDB[chatId]
 			// обнуляем корзину
