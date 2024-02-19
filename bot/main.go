@@ -501,7 +501,9 @@ func sendPost(requestBody string, url string) ([]byte, error) {
 func userIsBlocked(user *UserT) bool {
 
 	// Создаем GET-запрос
-	resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(user.ID))
+	url := "http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(user.ID)
+	fmt.Println(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal("Ошибка при выполнении запроса:", err)
 	}
@@ -596,6 +598,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	} else {
 		user = usersDB[chatId]
 	}
+
+	fmt.Println(user)
 
 	//проверяем на блокировку
 	if userIsBlocked(&user) {
