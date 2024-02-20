@@ -5,7 +5,14 @@ console.log("Файл main.js подключен");
 // вместо http://localhost используем везде mainUrl
 // для сервера меняем http://localhost на актуальное значение
 
-let mainUrl = "http://localhost";
+var protocol = window.location.protocol;
+
+// Получение хоста текущего URL (например, 'example.com' или 'example.com:8080')
+var host = window.location.host;
+
+let mainUrl = protocol + "//" + host;
+
+console.log(mainUrl)
 
 /* ****** Функции для отправки запросов и получения апишки ****** */
 
