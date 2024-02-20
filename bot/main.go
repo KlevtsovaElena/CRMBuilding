@@ -111,7 +111,7 @@ type UserT struct {
 	Tg_id       int         `json:"tg_id"`
 	PhoneNumber string      `json:"phone"`
 	City        int         `json:"city_id"`
-	Blocked     int         `json:"blocked"`
+	Blocked     int         `json:"is_blocked"`
 	Cart        map[int]int `json:"cart"`
 	Category_id string      `json:"category_id"`
 	Hash        string      `json:"hash_string"`
@@ -502,22 +502,23 @@ func userIsBlocked(user *UserT) bool {
 
 	// Создаем GET-запрос
 	url := "http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(user.ID)
-	fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal("Ошибка при выполнении запроса:", err)
 	}
+	jsonData, _ := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
 	var userInfo []UserT
-	fmt.Println(userInfo)
-	err = json.NewDecoder(resp.Body).Decode(&userInfo)
-	if err == nil {
-		// Используем полученные данные
-		for _, item := range userInfo {
-			if item.Blocked == 1 {
-				return true
-			}
+	err = json.Unmarshal(jsonData, &userInfo)
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+
+	// Используем полученные данные
+	for _, item := range userInfo {
+		if item.Blocked == 1 {
+			return true
 		}
 	}
 
@@ -566,7 +567,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	} else {
 		chatId = messageInline.CallbackQuery.From.ID
 	}
-	sendMessage(chatId, "Бот работает", nil)
+	//sendMessage(chatId, "Бот работает", nil)
 
 	firstName := message.Message.From.FirstName
 	lastName := message.Message.From.LastName
@@ -599,10 +600,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		user = usersDB[chatId]
 	}
 
-	fmt.Println(user)
-
 	//проверяем на блокировку
-	if userIsBlocked(&user) {
+	if user.Step > 4 && userIsBlocked(&user) {
 		sendMessage(chatId, "Вы заблокированы", nil)
 		return
 	}
@@ -612,16 +611,13 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	if strings.HasPrefix(text, "/start ") {
 		// Извлекаем значение параметра
 		paramValue := strings.TrimPrefix(text, "/start ")
-
 		// Проверяем значение параметра
 		if strings.Contains(paramValue, "provider") {
-
 			hashString := strings.SplitN(text, "_", 2)[1]
 			if hashString != "" {
 				user.IsProvider = true
 				user.Hash = hashString
 			}
-
 		}
 	}
 
@@ -642,7 +638,9 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
 
-			response, _ := sendPost(requestBody, "http://"+link+"/api/vendors.php")
+			url := "http://" + link + "/api/vendors.php"
+			fmt.Println(url)
+			response, _ := sendPost(requestBody, url)
 
 			// Используйте переменную response для обработки ответа
 			fmt.Println("Ответ сервера:", string(response))
