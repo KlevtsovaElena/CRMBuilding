@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -354,9 +353,6 @@ var token string = os.Getenv("BOT_TOKEN")
 var link string = os.Getenv("API_LINK")
 var domen string = os.Getenv("SERVER_URI")
 
-// данные всеx пользователей
-var usersDB = make(map[int]UserT)
-
 // главная функция работы бота
 func main() {
 
@@ -370,18 +366,6 @@ func main() {
 
 	//для блокировки доступа к массиву с юзерами
 	var mutex sync.Mutex
-
-	//достаем юзеров из кэша при перезапуске контейнера
-	getUsers(&mutex)
-
-	fmt.Println(usersDB)
-
-	//сохраняем данные о юзерах в кэщ после проверки всех сообщений
-	go func() {
-		for range time.Tick(time.Second * 10) {
-			saveUsers(&mutex)
-		}
-	}()
 
 	//обнуление последнего id сообщения
 	lastMessage := 0
@@ -429,28 +413,7 @@ func main() {
 		//запоминаем update_id  последнего сообщения
 		lastMessage = responseObj.Result[number-1].UpdateID + 1
 
-		//fmt.Println("number of last message", lastMessage)
-
 	}
-}
-
-/////////////////////////////////////////
-
-func getUsers(mutex *sync.Mutex) {
-	//считываем из бд при включении
-	dataFile, _ := ioutil.ReadFile("db.json")
-	mutex.Lock()
-	json.Unmarshal(dataFile, &usersDB)
-	mutex.Unlock()
-}
-
-func saveUsers(mutex *sync.Mutex) {
-	file, _ := os.Create("db.json")
-	defer file.Close()
-	mutex.Lock()
-	jsonString, _ := json.Marshal(usersDB)
-	mutex.Unlock()
-	file.Write(jsonString)
 }
 
 // получение новых сообщений вы боте
@@ -498,10 +461,10 @@ func sendPost(requestBody string, url string) ([]byte, error) {
 	}
 }
 
-func userIsBlocked(user *UserT) bool {
+func getUserInfoDB(user *UserT, chatId int) {
 
 	// Создаем GET-запрос
-	url := "http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(user.ID)
+	url := "http://" + link + "/api/users.php?tg_id=" + strconv.Itoa(chatId)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal("Ошибка при выполнении запроса:", err)
@@ -509,20 +472,23 @@ func userIsBlocked(user *UserT) bool {
 	jsonData, _ := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	var userInfo []UserT
-	err = json.Unmarshal(jsonData, &userInfo)
+	err = json.Unmarshal(jsonData, &user)
 	if err != nil {
 		log.Fatal("Ошибка при выполнении запроса:", err)
 	}
 
-	// Используем полученные данные
-	for _, item := range userInfo {
-		if item.Blocked == 1 {
-			return true
-		}
-	}
+	fmt.Println("пошли получать инфо про юзера в самом начале")
+}
 
-	return false
+func setUserInfoDB(user *UserT) {
+	url := "http://" + link + "/api/customers.php"
+	requestBody, _ := json.Marshal(user)
+	fmt.Println("то что отправили на сервенр", string(requestBody))
+	response, err := sendPost(string(requestBody), url)
+	fmt.Println("то что получили с сервера", string(response))
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
 }
 
 // функция для отправки сообщения пользователю
@@ -562,64 +528,65 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	text := message.Message.Text
 	fmt.Println(text)
 	chatId := 0
+	username := ""
 	if messageInline.CallbackQuery.From.ID == 0 {
 		chatId = message.Message.From.ID
+		username = message.Message.From.Username
 	} else {
 		chatId = messageInline.CallbackQuery.From.ID
+		username = messageInline.CallbackQuery.From.Username
 	}
 	//sendMessage(chatId, "Бот работает", nil)
-
-	firstName := message.Message.From.FirstName
-	lastName := message.Message.From.LastName
+	//firstName := message.Message.From.FirstName
+	//lastName := message.Message.From.LastName
 	phone := message.Message.Contact.PhoneNumber
 	latitude := message.Message.Location.Latitude
 	longitude := message.Message.Location.Longitude
-	username := message.Message.From.Username
+
 	button := messageInline.CallbackQuery.Data
 	id := messageInline.CallbackQuery.From.ID
 	mesIdInline := messageInline.CallbackQuery.Message.MessageID
 
-	//начинаем работать с общим ресурсом и блокируем его до конца работы с ним
-	mutex.Lock()
-	defer mutex.Unlock()
-	//есть ли юзер
+	//юзер есть всегда
 	var user UserT
-	_, exist := usersDB[chatId]
-	if !exist {
-		user.ID = chatId
-		user.FirstName = firstName
-		user.LastName = lastName
-		user.Username = username
-		user.Tg_id = chatId
-		user.PhoneNumber = phone
-		user.City, _ = strconv.Atoi(button)
-		user.Cart = make(map[int]int)
-		user.Step = 1
-		usersDB[chatId] = user
-	} else {
-		user = usersDB[chatId]
-	}
+	user.PhoneNumber = phone
+	user.City, _ = strconv.Atoi(button)
+	user.Cart = make(map[int]int)
+	user.Step = 1
 
-	//проверяем на блокировку
-	if user.Step > 4 && userIsBlocked(&user) {
+	//идем смотреть юзера в базе - сначала в таблице юзеров по id_tg
+	getUserInfoDB(&user, chatId)
+	fmt.Println(user)
+
+	if user.Blocked == 1 {
 		sendMessage(chatId, "Вы заблокированы", nil)
 		return
 	}
 
-	//определение роли юзера и его доступа
-	// Проверяем, есть ли параметр после "/start"
-	if strings.HasPrefix(text, "/start ") {
-		// Извлекаем значение параметра
-		paramValue := strings.TrimPrefix(text, "/start ")
-		// Проверяем значение параметра
-		if strings.Contains(paramValue, "provider") {
-			hashString := strings.SplitN(text, "_", 2)[1]
-			if hashString != "" {
-				user.IsProvider = true
-				user.Hash = hashString
+	user.Tg_id = chatId
+	user.Username = username
+
+	//только если юзера еще не существует по tg_id
+	if user.ID == 0 {
+		fmt.Println("начинаем решгать провайдера")
+		//определяем ПОСТАВЩИК ИЛИ НЕТ
+		// Проверяем, есть ли параметр после "/start"
+		if strings.HasPrefix(text, "/start ") {
+			// Извлекаем значение параметра
+			paramValue := strings.TrimPrefix(text, "/start ")
+			// Проверяем значение параметра
+			if strings.Contains(paramValue, "provider") {
+				hashString := strings.SplitN(text, "_", 2)[1]
+				if hashString != "" {
+					user.IsProvider = true
+					user.Hash = hashString
+					fmt.Println("Этот чувак провайдер")
+				}
 			}
 		}
 	}
+
+	//определение роли юзера и его доступа
 
 	////////
 	////////
@@ -630,78 +597,61 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	///////
 
 	//если написал поставщик
-	if usersDB[chatId].IsProvider {
+	if user.IsProvider {
+
+		fmt.Println("работаем с провайдером")
 
 		switch {
 
-		case usersDB[chatId].Step == 1:
+		case user.Step == 1:
 
-			requestBody := `{"tg_username": "` + usersDB[chatId].Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + usersDB[chatId].Hash + `"}`
-
+			//отправляем POST запрос для привязывания нового вендора к созданной в базе строке
+			requestBody := `{"tg_username": "` + user.Username + `", "tg_id":"` + strconv.Itoa(chatId) + `", "hash_string":"` + user.Hash + `"}`
 			url := "http://" + link + "/api/vendors.php"
-			fmt.Println(url)
 			response, _ := sendPost(requestBody, url)
-
-			// Используйте переменную response для обработки ответа
-			fmt.Println("Ответ сервера:", string(response))
-
-			//посмотреть данные
-			fmt.Println(string(response))
 
 			//парсим данные из json
 			var serverResr ServerResponce
 			json.Unmarshal(response, &serverResr)
 
 			status := serverResr.OK
-			payLoad := serverResr.PayLoad
+			//payLoad := serverResr.PayLoad
 			serverMessage := serverResr.Error
 
 			if status {
-
 				sendMessage(chatId, "Здравствуйте, отправьте местоположение склада, выбрав его на карте", nil)
-				user.Vendor_id = payLoad
-				user.Step += 1
-				usersDB[chatId] = user
-
 			} else if serverMessage == "Поставщик с таким telegram id уже зарегистрирован" {
-
 				sendMessage(chatId, serverMessage, nil)
-
 			} else {
-
 				sendMessage(chatId, serverMessage, nil)
-
 			}
 
-		case usersDB[chatId].Step == 2:
+		//если уже зарегистрировали то ждем локацию склада
+		case user.Step == 2:
 
+			//если отправил не местоположение
 			if latitude < 1 || longitude < 1 {
-				sendMessage(chatId, "Отправьте локацию склада", nil)
+				sendMessage(chatId, "Отправьте локацию склада потому что это не то", nil)
 				break
 			}
-
 			coordinates := Coordinates{
 				Latitude:  latitude,
 				Longitude: longitude,
 			}
-
 			jsonCoordinates, _ := json.Marshal(coordinates)
 
-			requestBody := `{"id": "` + strconv.Itoa(usersDB[chatId].Vendor_id) + `", "coordinates":` + string(jsonCoordinates) + `, "hash_string":"` + usersDB[chatId].Hash + `"}`
-			fmt.Println(requestBody)
-
+			//отправляем POST запрос к АПИ /api/vendors на запись координат для этого клиента
+			requestBody := `{"id":"` + strconv.Itoa(user.ID) + `","coordinates":` + string(jsonCoordinates) + `,"step":3}`
 			_, err := sendPost(requestBody, "http://"+link+"/api/vendors.php")
 			if err != nil {
 				sendMessage(chatId, "Что-то пошло не так - попробуйте еще раз", nil)
 				break
 			}
-
-			user.Step = 3
-			usersDB[chatId] = user
-
 			sendMessage(chatId, "Локация вашего склада записана", nil)
+		//если все сделали то просто говорим что вы уже успешно зарегались
+		case user.Step == 3:
+			sendMessage(chatId, "Вы успешно внесли все данные", nil)
 		}
-
 		//если
 	} else {
 
@@ -710,94 +660,26 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		// кейс для начального сообщения для пользователя
 		case user.Step == 1:
 
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
+			fmt.Println("шаг 1 регаем юзера")
+
+			//собираем объект клавиатуры для выбора языка
+			buttons := [][]map[string]interface{}{
+				{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
+				{{"text": "O'zbekcha 🇺🇿", "callback_data": "uz"}},
+				{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzkcha"}},
 			}
-			defer resp.Body.Close()
 
-			var personExist []UserT
-			err = json.NewDecoder(resp.Body).Decode(&personExist)
-			if err != nil {
-
-				//собираем объект клавиатуры для выбора языка
-				buttons := [][]map[string]interface{}{
-					{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
-					{{"text": "O'zbekcha 🇺🇿", "callback_data": "uz"}},
-					{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzkcha"}},
-				}
-
-				inlineKeyboard := map[string]interface{}{
-					"inline_keyboard": buttons,
-				}
-
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык 👇", inlineKeyboard)
-
-				//следующий шаг
-				user.Step += 1
-				usersDB[chatId] = user
-			} else {
-				user.Step = 4
-				usersDB[chatId] = user
-
-				if button == "ru" || button == "uz" || button == "uzkcha" {
-					user.Language = button
-					usersDB[chatId] = user
-				}
-
-				// формируем json и отправляем данные пользователя на бэк
-				requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
-				fmt.Println(requestBody)
-
-				sendPost(requestBody, "http://"+link+"/api/customers.php")
-
-				// Создаем объект клавиатуры
-				keyboard := map[string]interface{}{
-					"keyboard": [][]map[string]interface{}{
-						{{"text": languages[usersDB[chatId].Language]["order"] + " 🛍"}},
-
-						{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + " 💹"},
-							{"text": languages[usersDB[chatId].Language]["settings"] + " ⚙️"},
-						},
-						{{"text": languages[usersDB[chatId].Language]["my_orders"] + " 📕"},
-							{"text": languages[usersDB[chatId].Language]["current_prices"] + " 📈"},
-						},
-						{{"text": languages[usersDB[chatId].Language]["contact"] + " 📞"},
-							{"text": languages[usersDB[chatId].Language]["cart"] + " 🗑"},
-						},
-					},
-					"resize_keyboard":   true,
-					"one_time_keyboard": false,
-				}
-
-				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
-				if err != nil {
-					log.Fatal("Ошибка при выполнении запроса:", err)
-				}
-				defer resp.Body.Close()
-
-				var userdetails []UserDetails
-				err = json.NewDecoder(resp.Body).Decode(&userdetails)
-				if err != nil {
-					log.Fatal("Ошибка при декодировании JSON:", err)
-				}
-
-				// Используем полученные данные и подставляем их в кнопки
-				for _, userdetail := range userdetails {
-
-					menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
-					// Отправляем сообщение с клавиатурой и перезаписываем шаг
-					sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
-
-				}
-
-				user.Step += 1
-				usersDB[chatId] = user
-				break
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
 			}
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык 👇", inlineKeyboard)
+
+			user.Step = 2
+
+			// Создаем пользователя в базе
+			setUserInfoDB(&user)
 
 		// кейс для получения номера телефона
 		case user.Step == 2 || button == "backToPhone":
@@ -811,11 +693,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 							"request_contact": true,
 						},
 					},
-					{
-						{
-							"text": "Нет",
-						},
-					},
 				},
 				"resize_keyboard":   true,
 				"one_time_keyboard": true,
@@ -825,33 +702,22 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			sendMessage(chatId, "Поделится номером телефона", keyboard)
 			user.Step += 1
 			user.Language = button
-			usersDB[chatId] = user
-
-		// кейс для обработки отказа от отправки телефона
-		case user.Step == 3 && text == "Нет":
-
-			// создаём объект клавиатуры
-			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToPhone"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "К сожалению вы не сможете пройти дальше, если не укажите номер телефона", inlineKeyboard)
-			user := usersDB[chatId]
-			user.Step -= 1
-			usersDB[chatId] = user
-			break
+			setUserInfoDB(&user)
 
 		// кейс для вывода городов для выбора
 		case user.Step == 3:
 
+			fmt.Println("Ввел телефон автоматом")
+
+			if phone == "" {
+				break
+			}
+
 			user.PhoneNumber = phone
-			user.Username = username
-			usersDB[chatId] = user
+			user.Step += 1
+			setUserInfoDB(&user)
+
+			fmt.Println("Получили телефон и выводим города")
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
@@ -884,111 +750,56 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_your_city"]+" 👇", inlineKeyboard)
-			user.Step += 1
-			usersDB[chatId] = user
-			break
+			sendMessage(chatId, languages[user.Language]["choose_your_city"]+" 👇", inlineKeyboard)
 
 		// кейс для вывода меню пользователю и запись или обновление пользователя в бд
 		case user.Step == 4:
 
-			user := usersDB[chatId]
-			user.Step = 4
+			if button == "" {
+				break
+			}
+
 			user.City, _ = strconv.Atoi(button)
-
-			if button == "ru" || button == "uz" || button == "uzkcha" {
-				user.Language = button
-				usersDB[chatId] = user
-			} else if button != "ru" && text == "" {
-				fmt.Println("FIRST")
-				// формируем json и отправляем данные пользователя на бэк
-				requestBody := `{"first_name":"` + usersDB[chatId].FirstName + `", "last_name":"` + usersDB[chatId].LastName + `", "phone":"` + usersDB[chatId].PhoneNumber + `", "city_id":` + button + `, "tg_username":"` + usersDB[chatId].Username + `", "tg_id":` + strconv.Itoa(chatId) + `}`
-				fmt.Println(requestBody)
-
-				sendPost(requestBody, "http://"+link+"/api/customers.php")
-			} else if strings.Contains(text, "998") {
-				resultString := strings.ReplaceAll(text, "+", "")
-				if len(resultString) == 12 {
-					user.PhoneNumber = resultString
-					usersDB[chatId] = user
-					// формируем json и отправляем данные пользователя на бэк
-					requestBody := `{"phone":"` + usersDB[chatId].PhoneNumber + `", "tg_id":` + strconv.Itoa(chatId) + `}`
-					fmt.Println(requestBody)
-
-					sendPost(requestBody, "http://"+link+"/api/customers.php")
-					sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["succesfully_changed_number"]+"\n"+languages[usersDB[chatId].Language]["new_number"]+text), nil)
-				} else {
-					sendMessage(chatId, languages[usersDB[chatId].Language]["incorrect_number_format"], nil)
-					break
-				}
-
-			} // else {
-			// 	sendMessage(chatId, "Вы ввели телефон в неправильном формате. Попробуйте ещё раз", nil)
-			// 	break
-			// }
+			user.Step += 1
+			setUserInfoDB(&user)
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
-					{{"text": languages[usersDB[chatId].Language]["order"] + " 🛍"}},
+					{{"text": languages[user.Language]["order"] + " 🛍"}},
 
-					{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + " 💹"},
-						{"text": languages[usersDB[chatId].Language]["settings"] + " ⚙️"},
+					{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
+						{"text": languages[user.Language]["settings"] + " ⚙️"},
 					},
-					{{"text": languages[usersDB[chatId].Language]["my_orders"] + " 📕"},
-						{"text": languages[usersDB[chatId].Language]["current_prices"] + " 📈"},
+					{{"text": languages[user.Language]["my_orders"] + " 📕"},
+						{"text": languages[user.Language]["current_prices"] + " 📈"},
 					},
-					{{"text": languages[usersDB[chatId].Language]["contact"] + " 📞"},
-						{"text": languages[usersDB[chatId].Language]["cart"] + " 🗑"},
+					{{"text": languages[user.Language]["contact"] + " 📞"},
+						{"text": languages[user.Language]["cart"] + " 🗑"},
 					},
 				},
 				"resize_keyboard":   true,
 				"one_time_keyboard": false,
 			}
 
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var userdetails []UserDetails
-			err = json.NewDecoder(resp.Body).Decode(&userdetails)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, userdetail := range userdetails {
-
-				menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
-
-			}
-
-			user.Step += 1
-			usersDB[chatId] = user
-			break
+			sendMessage(chatId, languages[user.Language]["main_menu"], keyboard)
 
 		// кейс для возращения пользователя в меню
 		case button == "backToMenu":
-			user := usersDB[chatId]
 			user.Step = 4
 
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
-					{{"text": languages[usersDB[chatId].Language]["order"] + " 🛍"}},
+					{{"text": languages[user.Language]["order"] + " 🛍"}},
 
-					{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + " 💹"},
-						{"text": languages[usersDB[chatId].Language]["settings"] + " ⚙️"},
+					{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
+						{"text": languages[user.Language]["settings"] + " ⚙️"},
 					},
-					{{"text": languages[usersDB[chatId].Language]["my_orders"] + " 📕"},
-						{"text": languages[usersDB[chatId].Language]["current_prices"] + " 📈"},
+					{{"text": languages[user.Language]["my_orders"] + " 📕"},
+						{"text": languages[user.Language]["current_prices"] + " 📈"},
 					},
-					{{"text": languages[usersDB[chatId].Language]["contact"] + " 📞"},
-						{"text": languages[usersDB[chatId].Language]["cart"] + " 🗑"},
+					{{"text": languages[user.Language]["contact"] + " 📞"},
+						{"text": languages[user.Language]["cart"] + " 🗑"},
 					},
 				},
 				"resize_keyboard":   true,
@@ -1011,25 +822,20 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
-				menuText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": ")
+				menuText := url.QueryEscape("\n" + languages[user.Language]["your_city"] + ": ")
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
+				sendMessage(chatId, languages[user.Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
 
 			}
 
 			user.Step += 1
-			usersDB[chatId] = user
-			break
 
 		// кейс для вывода категорий товаров на выбор
-		case (user.Step == 5 && text == languages[usersDB[chatId].Language]["order"]+" 🛍") || (button == "backToGoods"):
-
-			user := usersDB[chatId]
-			user.Step = 5
+		case (user.Step == 5 && text == languages[user.Language]["order"]+" 🛍") || (button == "backToGoods"):
 
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city_id=" + strconv.Itoa(usersDB[chatId].City))
+			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city_id=" + strconv.Itoa(user.City))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -1040,14 +846,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			if err != nil {
 
 				buttons := [][]map[string]interface{}{
-					{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+					{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 				}
 
 				inlineKeyboard := map[string]interface{}{
 					"inline_keyboard": buttons,
 				}
 
-				sendMessage(chatId, languages[usersDB[chatId].Language]["no_products_for_your_request"], inlineKeyboard)
+				sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -1062,7 +868,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 			buttons = append(buttons, []map[string]interface{}{
 				{
-					"text":          languages[usersDB[chatId].Language]["back"] + " 🔙",
+					"text":          languages[user.Language]["back"] + " 🔙",
 					"callback_data": "backToMenu",
 				},
 			})
@@ -1073,16 +879,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_material"]+" 👇", inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["choose_material"]+" 👇", inlineKeyboard)
+
 			user.Step += 1
-			usersDB[chatId] = user
-			break
+			setUserInfoDB(&user)
 
 		// кейс для вывода брендов товаров для пользователя
 		case user.Step == 6 || button == "backToBrands":
 
-			user := usersDB[chatId]
-			user.Step = 6
 			// Разбиваем строку на две части по пробелу
 			parts := strings.Split(button, " ")
 			firstCategoryName := parts[0]
@@ -1091,10 +895,9 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				user.Category_id = secondCategoryID
 				sendMessage(chatId, "Вы выбрали: "+firstCategoryName, nil)
 			}
-			usersDB[chatId] = user
 			buttons := [][]map[string]interface{}{}
 			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + usersDB[chatId].Category_id + "&city_id=" + strconv.Itoa(usersDB[chatId].City))
+			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + user.Category_id + "&city_id=" + strconv.Itoa(user.City))
 			if err != nil {
 				log.Fatal("Ошибка при выполнении запроса:", err)
 			}
@@ -1105,14 +908,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			if err != nil {
 
 				buttons := [][]map[string]interface{}{
-					{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+					{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 				}
 
 				inlineKeyboard := map[string]interface{}{
 					"inline_keyboard": buttons,
 				}
 
-				sendMessage(chatId, languages[usersDB[chatId].Language]["no_products_for_your_request"], inlineKeyboard)
+				sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
 			}
 
 			// Используем полученные данные и подставляем их в кнопки
@@ -1127,7 +930,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 			buttons = append(buttons, []map[string]interface{}{
 				{
-					"text":          languages[usersDB[chatId].Language]["back"] + " 🔙",
+					"text":          languages[user.Language]["back"] + " 🔙",
 					"callback_data": "backToGoods",
 				},
 			})
@@ -1138,19 +941,18 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_brand"]+" 👇", inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["choose_brand"]+" 👇", inlineKeyboard)
 
 			user.Step += 1
-			usersDB[chatId] = user
-			break
+			setUserInfoDB(&user)
 
 		// кейс для отображения выбранных товаров по фильтрам
-		case usersDB[chatId].Step == 7:
+		case user.Step == 7:
 
 			var chozen_language string = ""
-			if usersDB[chatId].Language == "ru" {
+			if user.Language == "ru" {
 				chozen_language = "1"
-			} else if usersDB[chatId].Language == "uz" {
+			} else if user.Language == "uz" {
 				chozen_language = "2"
 			} else {
 				chozen_language = "3"
@@ -1173,7 +975,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			for _, userdetail := range userdetails {
 
 				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + usersDB[chatId].Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
+				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + user.Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
 				if err != nil {
 					log.Fatal("Ошибка при выполнении запроса:", err)
 				}
@@ -1193,10 +995,10 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
-							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
 						},
-						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1210,7 +1012,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					fmt.Println(product.Photo)
 
 					//создание запроса
-					caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + languages[usersDB[chatId].Language]["market_price"] + "\n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\n" + languages[usersDB[chatId].Language]["bot_price"] + "\n<b>" + strconv.Itoa(product.Price) + " сум</b>")
+					caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + languages[user.Language]["market_price"] + "\n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\n" + languages[user.Language]["bot_price"] + "\n<b>" + strconv.Itoa(product.Price) + " сум</b>")
 					apiURL := ""
 
 					if strings.Contains(product.Photo, "http") {
@@ -1256,21 +1058,18 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// перезаписываем шаг
-			user := usersDB[chatId]
 			user.Step += 1
-			usersDB[chatId] = user
-			break
+			setUserInfoDB(&user)
 
 		// кейс для отображения корзины покупателя
-		case usersDB[chatId].Step == 8 && button == "goToCart" || text == languages[usersDB[chatId].Language]["cart"]+" 🗑":
+		case user.Step == 8 && button == "goToCart" || text == languages[user.Language]["cart"]+" 🗑":
 
-			user := usersDB[chatId]
 			finalPrice := 0
 			user.Step = 8
 			benefit := 0
 			marketPrice := 0
 			cartText := ""
-			for ID := range usersDB[chatId].Cart {
+			for ID := range user.Cart {
 
 				fmt.Println(ID)
 				// Создаем GET-запрос
@@ -1287,21 +1086,21 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					return
 				}
 
-				cartText += product.Name + "\n" + strconv.Itoa(usersDB[chatId].Cart[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(usersDB[chatId].Cart[ID]*product.Price) + " сум\n"
-				finalPrice += product.Price * usersDB[chatId].Cart[ID]
-				marketPrice += product.MaxPrice * usersDB[chatId].Cart[ID]
-				benefit += product.MaxPrice*usersDB[chatId].Cart[ID] - product.Price*usersDB[chatId].Cart[ID]
+				cartText += product.Name + "\n" + strconv.Itoa(user.Cart[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(user.Cart[ID]*product.Price) + " сум\n"
+				finalPrice += product.Price * user.Cart[ID]
+				marketPrice += product.MaxPrice * user.Cart[ID]
+				benefit += product.MaxPrice*user.Cart[ID] - product.Price*user.Cart[ID]
 
 			}
 
 			//если человек переходит в корзину из главного меню
-			if text == languages[usersDB[chatId].Language]["cart"]+" 🗑" {
+			if text == languages[user.Language]["cart"]+" 🗑" {
 
 				// если товаров нет
 				if finalPrice == 0 {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
 					// Создаем объект инлайн клавиатуры
@@ -1309,15 +1108,15 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						"inline_keyboard": buttons,
 					}
 
-					sendMessage(chatId, languages[usersDB[chatId].Language]["empty_cart"], inlineKeyboard)
+					sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
 				} else {
 
 					buttons := [][]map[string]interface{}{
 
-						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
-						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+						{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+						{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
-						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
 					// Создаем объект инлайн клавиатуры
@@ -1326,7 +1125,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					}
 
 					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape(languages[usersDB[chatId].Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[usersDB[chatId].Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
 					finalText := encodedCartText + encodedText
 
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
@@ -1341,7 +1140,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				if finalPrice == 0 {
 
 					buttons := [][]map[string]interface{}{
-						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 					}
 
 					// Создаем объект инлайн клавиатуры
@@ -1349,16 +1148,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						"inline_keyboard": buttons,
 					}
 
-					sendMessage(chatId, languages[usersDB[chatId].Language]["empty_cart"], inlineKeyboard)
+					sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
 
 				} else {
 
 					buttons := [][]map[string]interface{}{
 
-						{{"text": languages[usersDB[chatId].Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
-						{{"text": languages[usersDB[chatId].Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+						{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+						{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
-						{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 					}
 
 					// Создаем объект инлайн клавиатуры
@@ -1367,7 +1166,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					}
 
 					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape(languages[usersDB[chatId].Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[usersDB[chatId].Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[usersDB[chatId].Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+					encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
 					finalText := encodedCartText + encodedText
 
 					// Отправляем сообщение с клавиатурой и перезаписываем шаг
@@ -1376,14 +1175,13 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			user.Step += 1
-			usersDB[chatId] = user
 			break
 
 		// кейс для покупки выбранных товаров пользователем
-		case usersDB[chatId].Step == 9 && button == "buy":
+		case user.Step == 9 && button == "buy":
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["order_to_your_address"], "callback_data": "myAdress"}},
-				{{"text": languages[usersDB[chatId].Language]["order_to_another_address"], "callback_data": "anotherAdress"}},
+				{{"text": languages[user.Language]["order_to_your_address"], "callback_data": "myAdress"}},
+				{{"text": languages[user.Language]["order_to_another_address"], "callback_data": "anotherAdress"}},
 			}
 
 			// Создаем объект инлайн клавиатуры
@@ -1392,27 +1190,25 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["specify_convenient_address"], inlineKeyboard)
-			user := usersDB[chatId]
+			sendMessage(chatId, languages[user.Language]["specify_convenient_address"], inlineKeyboard)
 			user.Step += 1
-			usersDB[chatId] = user
 			break
 
 		// кейс при нажатии на указание своего адреса
-		case usersDB[chatId].Step == 10 && button == "myAdress":
+		case user.Step == 10 && button == "myAdress":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
 					{
 						{
-							"text":             languages[usersDB[chatId].Language]["yes"],
+							"text":             languages[user.Language]["yes"],
 							"request_location": true,
 						},
 					},
 					{
 						{
-							"text": languages[usersDB[chatId].Language]["no"],
+							"text": languages[user.Language]["no"],
 						},
 					},
 				},
@@ -1421,20 +1217,18 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["share_location"], keyboard)
-			user := usersDB[chatId]
+			sendMessage(chatId, languages[user.Language]["share_location"], keyboard)
 			user.Step += 1
-			usersDB[chatId] = user
 			break
 
 		// кейс при нажатии на указание другого адреса
-		case usersDB[chatId].Step == 10 && button == "anotherAdress":
+		case user.Step == 10 && button == "anotherAdress":
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
 					{
 						{
-							"text": languages[usersDB[chatId].Language]["decline"],
+							"text": languages[user.Language]["decline"],
 						},
 					},
 				},
@@ -1443,10 +1237,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["send_required_geoposition_via_telegram"], keyboard)
-			user := usersDB[chatId]
+			sendMessage(chatId, languages[user.Language]["send_required_geoposition_via_telegram"], keyboard)
 			user.Step += 1
-			usersDB[chatId] = user
 			break
 
 		// кейс для вывода сообщения о заказе и его отправка на бекенд
@@ -1490,16 +1282,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 							// Создаем объект клавиатуры
 							keyboard := map[string]interface{}{
 								"keyboard": [][]map[string]interface{}{
-									{{"text": languages[usersDB[chatId].Language]["order"] + " 🛍"}},
+									{{"text": languages[user.Language]["order"] + " 🛍"}},
 
-									{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + " 💹"},
-										{"text": languages[usersDB[chatId].Language]["settings"] + " ⚙️"},
+									{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
+										{"text": languages[user.Language]["settings"] + " ⚙️"},
 									},
-									{{"text": languages[usersDB[chatId].Language]["my_orders"] + " 📕"},
-										{"text": languages[usersDB[chatId].Language]["current_prices"] + " 📈"},
+									{{"text": languages[user.Language]["my_orders"] + " 📕"},
+										{"text": languages[user.Language]["current_prices"] + " 📈"},
 									},
-									{{"text": languages[usersDB[chatId].Language]["contact"] + " 📞"},
-										{"text": languages[usersDB[chatId].Language]["cart"] + " 🗑"},
+									{{"text": languages[user.Language]["contact"] + " 📞"},
+										{"text": languages[user.Language]["cart"] + " 🗑"},
 									},
 								},
 								"resize_keyboard":   true,
@@ -1508,12 +1300,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 							// обнуляем корзину
 							user.Cart = map[int]int{}
-							errorText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["your_city"] + ": " + userdetail.CityName + "\n" + languages[usersDB[chatId].Language]["product_location_city"] + ": " + product.CityName + "\n" + languages[usersDB[chatId].Language]["cant_order_these_products"] + " 🙏")
+							errorText := url.QueryEscape("\n" + languages[user.Language]["your_city"] + ": " + userdetail.CityName + "\n" + languages[user.Language]["product_location_city"] + ": " + product.CityName + "\n" + languages[user.Language]["cant_order_these_products"] + " 🙏")
 							// Отправляем сообщение с клавиатурой и перезаписываем шаг
-							sendMessage(chatId, languages[usersDB[chatId].Language]["main_menu"]+errorText, keyboard)
+							sendMessage(chatId, languages[user.Language]["main_menu"]+errorText, keyboard)
 
 							user.Step = 5
-							usersDB[chatId] = user
 							break
 						} else {
 							time := time.Now().Unix()
@@ -1521,7 +1312,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 								Latitude:  latitude,
 								Longitude: longitude,
 							}
-							jsonProducts, _ := json.Marshal(usersDB[chatId].Cart)
+							jsonProducts, _ := json.Marshal(user.Cart)
 							jsonCoordinates, _ := json.Marshal(coordinates)
 
 							// Создаем GET-запрос
@@ -1549,16 +1340,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 							// Создаем объект клавиатуры
 							keyboard := map[string]interface{}{
 								"keyboard": [][]map[string]interface{}{
-									{{"text": languages[usersDB[chatId].Language]["order"] + " 🛍"}},
+									{{"text": languages[user.Language]["order"] + " 🛍"}},
 
-									{{"text": languages[usersDB[chatId].Language]["current_exchange_rate"] + " 💹"},
-										{"text": languages[usersDB[chatId].Language]["settings"] + " ⚙️"},
+									{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
+										{"text": languages[user.Language]["settings"] + " ⚙️"},
 									},
-									{{"text": languages[usersDB[chatId].Language]["my_orders"] + " 📕"},
-										{"text": languages[usersDB[chatId].Language]["current_prices"] + " 📈"},
+									{{"text": languages[user.Language]["my_orders"] + " 📕"},
+										{"text": languages[user.Language]["current_prices"] + " 📈"},
 									},
-									{{"text": languages[usersDB[chatId].Language]["contact"] + " 📞"},
-										{"text": languages[usersDB[chatId].Language]["cart"] + " 🗑"},
+									{{"text": languages[user.Language]["contact"] + " 📞"},
+										{"text": languages[user.Language]["cart"] + " 🗑"},
 									},
 								},
 								"resize_keyboard":   true,
@@ -1569,9 +1360,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 							user.Cart = map[int]int{}
 
 							// Отправляем сообщение с клавиатурой и перезаписываем шаг
-							sendMessage(chatId, languages[usersDB[chatId].Language]["thank_you_for_choosing_stroybot"], keyboard)
+							sendMessage(chatId, languages[user.Language]["thank_you_for_choosing_stroybot"], keyboard)
 							user.Step = 5
-							usersDB[chatId] = user
 							break
 						}
 					}
@@ -1582,7 +1372,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс при нажатии на + в карточке товара
 		if strings.SplitN(button, ":", 2)[0] == "addone" {
-			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 1
@@ -1593,21 +1382,20 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				if ID == productID {
 					// Если товар найден, увеличиваем его количество
 					user.Cart[ID] += quantity
-					usersDB[chatId] = user
 					found = true
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
+							{"text": strconv.Itoa(user.Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1625,14 +1413,13 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			// Если товара с таким id нет в карте, добавляем его
 			if !found {
-				user := usersDB[chatId]
+
 				// Проверяем, инициализирована ли карта `Cart`
-				if usersDB[chatId].Cart == nil {
+				if user.Cart == nil {
 					user.Cart = make(map[int]int)
 				}
 
 				user.Cart[productID] = quantity
-				usersDB[chatId] = user
 
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
@@ -1643,10 +1430,10 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+					{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 				}
 
 				// Создаем объект клавиатуры
@@ -1664,7 +1451,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс при нажатии на + в карточке товара
 		if strings.SplitN(button, ":", 2)[0] == "add" {
-			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 10
@@ -1675,21 +1461,20 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				if ID == productID {
 					// Если товар найден, увеличиваем его количество
 					user.Cart[ID] += quantity
-					usersDB[chatId] = user
 					found = true
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(ID)},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": "quantity"},
+							{"text": strconv.Itoa(user.Cart[ID]), "callback_data": "quantity"},
 							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(ID)},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
-						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					// создаём объект клавиатуры
@@ -1707,14 +1492,12 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			// Если товара с таким id нет в карте, добавляем его
 			if !found {
-				user := usersDB[chatId]
 				// Проверяем, инициализирована ли карта `Cart`
-				if usersDB[chatId].Cart == nil {
+				if user.Cart == nil {
 					user.Cart = make(map[int]int)
 				}
 
 				user.Cart[productID] = quantity
-				usersDB[chatId] = user
 
 				// Создаем новую инлайн клавиатуру с обновленным числом
 				buttons := [][]map[string]interface{}{
@@ -1725,10 +1508,10 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
-					{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+					{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 				}
 
 				// Создаем объект клавиатуры
@@ -1746,12 +1529,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс для - в карточке товаров
 		if strings.SplitN(button, ":", 2)[0] == "minus" {
-			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 10
 
-			for ID := range usersDB[chatId].Cart {
+			for ID := range user.Cart {
 				if ID == productID {
 					// Если товар найден, уменьшаем его количество
 					if user.Cart[ID] <= quantity {
@@ -1759,20 +1541,19 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					} else {
 						user.Cart[ID] -= quantity
 					}
-					usersDB[chatId] = user
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
+							{"text": strconv.Itoa(user.Cart[ID]), "callback_data": quantity},
 							{"text": "➕ 1", "callback_data": "addone:" + productStr},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
-						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					inlineKeyboard := map[string]interface{}{
@@ -1782,8 +1563,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 					http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-					if usersDB[chatId].Cart[productID] == 0 {
-						delete(usersDB[chatId].Cart, productID)
+					if user.Cart[productID] == 0 {
+						delete(user.Cart, productID)
 					}
 					break
 				}
@@ -1792,12 +1573,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс для - в карточке товаров
 		if strings.SplitN(button, ":", 2)[0] == "minusone" {
-			user := usersDB[chatId]
 			productStr := strings.Split(button, ":")[1]
 			productID, _ := strconv.Atoi(productStr)
 			quantity := 1
 
-			for ID := range usersDB[chatId].Cart {
+			for ID := range user.Cart {
 				if ID == productID {
 					// Если товар найден, уменьшаем его количество
 					if user.Cart[ID] <= quantity {
@@ -1805,20 +1585,19 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					} else {
 						user.Cart[ID] -= quantity
 					}
-					usersDB[chatId] = user
 					// Создаем новую инлайн клавиатуру с обновленным числом
 					buttons := [][]map[string]interface{}{
 						{
 							{"text": "➖ 1", "callback_data": "minusone:" + productStr},
-							{"text": strconv.Itoa(usersDB[chatId].Cart[ID]), "callback_data": quantity},
+							{"text": strconv.Itoa(user.Cart[ID]), "callback_data": quantity},
 							{"text": "➕ 1", "callback_data": "addone:" + productStr},
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
-						{{"text": languages[usersDB[chatId].Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
 					}
 
 					inlineKeyboard := map[string]interface{}{
@@ -1828,8 +1607,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
 
 					http.Get(host + token + "/editMessageReplyMarkup?chat_id=" + strconv.Itoa(id) + "&message_id=" + strconv.Itoa(mesIdInline) + "&reply_markup=" + string(inlineKeyboardJSON))
-					if usersDB[chatId].Cart[productID] == 0 {
-						delete(usersDB[chatId].Cart, productID)
+					if user.Cart[productID] == 0 {
+						delete(user.Cart, productID)
 					}
 					break
 				}
@@ -1838,18 +1617,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		if button == "dropCart" {
 
-			user := usersDB[chatId]
 			// обнуляем корзину
 			user.Cart = map[int]int{}
-			usersDB[chatId] = user
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["dropped_cart"], nil)
+			sendMessage(chatId, languages[user.Language]["dropped_cart"], nil)
 
 		}
 
 		// кейс при нажатии на кнопку актуальные цены
-		if text == languages[usersDB[chatId].Language]["current_prices"]+" 📈" {
+		if text == languages[user.Language]["current_prices"]+" 📈" {
 
 			channelURL := "t.me/stroy_bot_prices"
 
@@ -1866,8 +1643,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": channelURL}},
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["go_to"] + " 🌐", "url": channelURL}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1875,11 +1652,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["current_prices"]+" "+formattedTime, inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["current_prices"]+" "+formattedTime, inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку актуальный курс
-		if text == languages[usersDB[chatId].Language]["current_exchange_rate"]+" 💹" {
+		if text == languages[user.Language]["current_exchange_rate"]+" 💹" {
 
 			channelURL := "t.me/stroybotchannel2"
 
@@ -1896,8 +1673,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			formattedTime := currentTime.Format("01-02-2006 15:04:05")
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["go_to"] + " 🌐", "url": channelURL}},
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["go_to"] + " 🌐", "url": channelURL}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1905,14 +1682,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["current_exchange_rate"]+" "+formattedTime, inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["current_exchange_rate"]+" "+formattedTime, inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку мои заказы
-		if text == languages[usersDB[chatId].Language]["my_orders"]+" 📕" {
+		if text == languages[user.Language]["my_orders"]+" 📕" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1920,16 +1697,16 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["my_orders"], inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["my_orders"], inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку связаться
-		if text == languages[usersDB[chatId].Language]["contact"]+" 📞" {
+		if text == languages[user.Language]["contact"]+" 📞" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["by_phone"] + " 📲", "callback_data": "withPhone"}},
-				{{"text": languages[usersDB[chatId].Language]["by_chat"] + " 💬", "callback_data": "withСhat"}},
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["by_phone"] + " 📲", "callback_data": "withPhone"}},
+				{{"text": languages[user.Language]["by_chat"] + " 💬", "callback_data": "withСhat"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1937,14 +1714,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_way"]+" 👇", inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["choose_way"]+" 👇", inlineKeyboard)
 
 		}
 
 		if button == "withPhone" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1961,16 +1738,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, url.QueryEscape("+998903726322"), inlineKeyboard)
 
-			user := usersDB[chatId]
 			user.Step = 4
-			usersDB[chatId] = user
 
 		}
 
 		if button == "withСhat" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1980,36 +1755,32 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, "@stroybotuz_admin", inlineKeyboard)
 
-			user := usersDB[chatId]
 			user.Step = 4
-			usersDB[chatId] = user
 
 		}
 
 		// кейс при нажатии на кнопку настройки
 		if strings.Contains(text, "⚙️") || button == "backToSettings" {
 
-			user := usersDB[chatId]
 			// обнуляем корзину
 			user.Cart = map[int]int{}
-			usersDB[chatId] = user
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["change_number"], "callback_data": "number"},
-					{"text": languages[usersDB[chatId].Language]["change_city"], "callback_data": "city"}},
+				{{"text": languages[user.Language]["change_number"], "callback_data": "number"},
+					{"text": languages[user.Language]["change_city"], "callback_data": "city"}},
 
-				{{"text": languages[usersDB[chatId].Language]["change_language"], "callback_data": "language"},
-					{"text": languages[usersDB[chatId].Language]["public_offer"], "callback_data": "oferta"}},
+				{{"text": languages[user.Language]["change_language"], "callback_data": "language"},
+					{"text": languages[user.Language]["public_offer"], "callback_data": "oferta"}},
 
-				{{"text": languages[usersDB[chatId].Language]["information"], "callback_data": "info"},
-					{"text": languages[usersDB[chatId].Language]["become_partner"], "callback_data": "partnership"}},
+				{{"text": languages[user.Language]["information"], "callback_data": "info"},
+					{"text": languages[user.Language]["become_partner"], "callback_data": "partnership"}},
 
-				{{"text": languages[usersDB[chatId].Language]["feedback"], "callback_data": "book"}},
+				{{"text": languages[user.Language]["feedback"], "callback_data": "book"}},
 			}
 
 			buttons = append(buttons, []map[string]interface{}{
 				{
-					"text":          languages[usersDB[chatId].Language]["back"] + " 🔙",
+					"text":          languages[user.Language]["back"] + " 🔙",
 					"callback_data": "backToMenu",
 				},
 			})
@@ -2019,14 +1790,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["settings"]+" ⚙️", inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["settings"]+" ⚙️", inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку справка
 		if button == "info" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2041,7 +1812,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "partnership" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2049,14 +1820,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["become_partner"], inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["become_partner"], inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку обратная связь
 		if button == "book" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2064,14 +1835,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["feedback"], inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["feedback"], inlineKeyboard)
 		}
 
 		// кейс при нажатии на кнопку оферта
 		if button == "oferta" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2097,11 +1868,9 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_language"]+" 👇", inlineKeyboard)
+			sendMessage(chatId, languages[user.Language]["choose_language"]+" 👇", inlineKeyboard)
 
-			user := usersDB[chatId]
 			user.Step = 4
-			usersDB[chatId] = user
 
 		}
 
@@ -2138,17 +1907,17 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[usersDB[chatId].Language]["choose_your_city"]+" 👇", inlineKeyboard)
-			user := usersDB[chatId]
+			sendMessage(chatId, languages[user.Language]["choose_your_city"]+" 👇", inlineKeyboard)
+
 			user.Step = 4
-			usersDB[chatId] = user
+
 		}
 
 		// кейс при нажатии на кнопку изменить телефон
 		if button == "number" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[usersDB[chatId].Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -2171,16 +1940,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Используем полученные данные и подставляем их в кнопки
 			for _, userdetail := range userdetails {
 
-				phoneText := url.QueryEscape("\n" + languages[usersDB[chatId].Language]["current_number"] + userdetail.Phone)
+				phoneText := url.QueryEscape("\n" + languages[user.Language]["current_number"] + userdetail.Phone)
 
 				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, url.QueryEscape(languages[usersDB[chatId].Language]["send_your_number"])+phoneText, inlineKeyboard)
+				sendMessage(chatId, url.QueryEscape(languages[user.Language]["send_your_number"])+phoneText, inlineKeyboard)
 
 			}
 
-			user := usersDB[chatId]
 			user.Step = 4
-			usersDB[chatId] = user
 		}
 
 	}

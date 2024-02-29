@@ -26,63 +26,36 @@ class VendorsController extends BaseController
     {
         $post = json_decode(file_get_contents('php://input'), true);
 
-        // редактирование по id
+        $db = \DbContext::getConnection();
+
+        // если передали id то редактирование по id
         if (isset($post['id'])) {
+
             $this->vendorRepository->updateById($post);
+            if (isset($post['step']) && isset($post['id'])) {
+                $db->query("UPDATE vendors SET step = " . (int)$post['step'] ." WHERE id = " . (int)$post['id'] );
+            }
             return;
         }
 
-        // редактирование по hash (tg_id и очистка хэша)
+        // привязка нового вендора по hash (tg_id и очистка хэша)
         if (isset($post['hash_string'])) {
-            try {
-                if (isset($post['tg_id'])) {
-                    $vendorsWithEmail = $this->vendorRepository->get([
-                        'tg_id' => $post['tg_id']
-                    ]);
 
-                    if ($vendorsWithEmail != null && count($vendorsWithEmail) > 0)
-                    {
-                        $response = [
-                            'ok' => false,
-                            'error' => 'Поставщик с таким telegram id уже зарегистрирован.'
-                        ];
+            $sql = "UPDATE vendors SET
+                                               tg_id = " . $post['tg_id'] . ",
+                                               tg_username = '" . $post['tg_username'] . "',
+                                               step = 2
+                                           WHERE hash_string = '" . $post['hash_string'] . "'";
 
-                        echo json_encode($response);
-                        return;
-                    }
-                }
+            $db->query($sql);
 
-                $response = [
-                    'ok' => false,
-                    'error' => 'Приглашение недействительно.'
-                ];
+            $response = [
+                'ok' => true,
+                'payload' => $db->lastInsertId()
+            ];
 
-                DbContext::getConnection()->beginTransaction();
-                $this->vendorRepository->updateByHash($post);
-                $vendors = $this->vendorRepository->get([
-                    'hash_string' => $post['hash_string']
-                ]);
-
-                if ($vendors != null && count($vendors) > 0) {
-                    $this->vendorRepository->updateById([
-                        'id' => $vendors[0]->id,
-                        'hash_string' => null
-                    ]);
-
-                    $response = [
-                        'ok' => true,
-                        'payLoad' => $vendors[0]->id
-                    ];
-                }
-
-                \DbContext::getConnection()->commit();
-
-                echo json_encode($response);
-                return;
-            } catch (Exception $e) {
-                \DbContext::getConnection()->rollBack();
-                die($e);
-            }
+            echo json_encode($response);
+            return;
         }
 
         if (!isset($post['email'])) {
@@ -90,7 +63,7 @@ class VendorsController extends BaseController
                 'error' => 'Необходимо заполнить поле email.'
             ];
 
-            echo json_encode($response);
+            echo json_encode($response, JSON_UNESCAPED_UNICODE);
             return;
         }
 
