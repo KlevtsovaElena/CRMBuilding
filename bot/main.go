@@ -520,6 +520,420 @@ func sendMessage(chatId int, text string, keyboard map[string]interface{}) {
 	fmt.Println(response)
 }
 
+func showKeyboardLanguage(chatId int) {
+	buttons := [][]map[string]interface{}{
+		{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
+		{{"text": "O'zbekcha 🇺🇿", "callback_data": "uz"}},
+		{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzkcha"}},
+	}
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": buttons,
+	}
+	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+	sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык 👇", inlineKeyboard)
+}
+
+func showKeyboardPhone(chatId int) {
+	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+	keyboard := map[string]interface{}{
+		"keyboard": [][]map[string]interface{}{
+			{
+				{
+					"text":            "Да",
+					"request_contact": true,
+				},
+			},
+		},
+		"resize_keyboard":   true,
+		"one_time_keyboard": true,
+	}
+	sendMessage(chatId, "Поделится номером телефона", keyboard)
+}
+
+func showKeyboardCities(chatId int, user UserT) {
+	buttons := [][]map[string]interface{}{}
+	// Создаем GET-запрос
+	resp, err := http.Get("http://" + link + "/api/cities.php?deleted=0&is_active=1")
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+	defer resp.Body.Close()
+
+	var cities []City
+	err = json.NewDecoder(resp.Body).Decode(&cities)
+	if err != nil {
+		log.Fatal("Ошибка при декодировании JSON:", err)
+	}
+	// Используем полученные данные и подставляем их в кнопки
+	for _, city := range cities {
+		button := []map[string]interface{}{
+			{
+				"text":          city.Name,
+				"callback_data": city.ID,
+			},
+		}
+		buttons = append(buttons, button)
+	}
+	// создаём объект клавиатуры
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": buttons,
+	}
+
+	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+	sendMessage(chatId, languages[user.Language]["choose_your_city"]+" 👇", inlineKeyboard)
+}
+
+func setUserStepDB(step int, user *UserT) {
+	user.Step = step
+	setUserInfoDB(user)
+}
+
+func showKeyboardMainMenu(chatId int, user UserT) {
+	// Создаем объект клавиатуры
+	keyboard := map[string]interface{}{
+		"keyboard": [][]map[string]interface{}{
+			{{"text": languages[user.Language]["order"] + " 🛍"}},
+
+			{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
+				{"text": languages[user.Language]["settings"] + " ⚙️"},
+			},
+			{{"text": languages[user.Language]["my_orders"] + " 📕"},
+				{"text": languages[user.Language]["current_prices"] + " 📈"},
+			},
+			{{"text": languages[user.Language]["contact"] + " 📞"},
+				{"text": languages[user.Language]["cart"] + " 🗑"},
+			},
+		},
+		"resize_keyboard":   true,
+		"one_time_keyboard": false,
+	}
+
+	sendMessage(chatId, languages[user.Language]["main_menu"], keyboard)
+}
+
+func showKeyboardCategories(chatId int, user UserT) {
+	buttons := [][]map[string]interface{}{}
+	// Создаем GET-запрос
+	resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city_id=" + strconv.Itoa(user.City))
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+	defer resp.Body.Close()
+
+	var categories []Category
+	err = json.NewDecoder(resp.Body).Decode(&categories)
+	if err != nil {
+
+		buttons := [][]map[string]interface{}{
+			{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+		}
+
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
+		}
+
+		sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
+	}
+
+	// Используем полученные данные и подставляем их в кнопки
+	for _, category := range categories {
+		button := []map[string]interface{}{
+			{
+				"text":          category.CategoryName,
+				"callback_data": category.CategoryName + " " + strconv.Itoa(category.ID),
+			},
+		}
+		buttons = append(buttons, button)
+	}
+	buttons = append(buttons, []map[string]interface{}{
+		{
+			"text":          languages[user.Language]["back"] + " 🔙",
+			"callback_data": "backToMenu",
+		},
+	})
+
+	// создаём объект клавиатуры
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": buttons,
+	}
+
+	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+	sendMessage(chatId, languages[user.Language]["choose_material"]+" 👇", inlineKeyboard)
+}
+
+func showKeyboardBrands(chatId int, user UserT) {
+	buttons := [][]map[string]interface{}{}
+	// Создаем GET-запрос
+	resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + user.Category_id + "&city_id=" + strconv.Itoa(user.City))
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+	defer resp.Body.Close()
+
+	var brands []Brand
+	err = json.NewDecoder(resp.Body).Decode(&brands)
+	if err != nil {
+
+		buttons := [][]map[string]interface{}{
+			{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+		}
+
+		inlineKeyboard := map[string]interface{}{
+			"inline_keyboard": buttons,
+		}
+
+		sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
+	}
+
+	// Используем полученные данные и подставляем их в кнопки
+	for _, brand := range brands {
+		button := []map[string]interface{}{
+			{
+				"text":          brand.BrandName,
+				"callback_data": brand.ID,
+			},
+		}
+		buttons = append(buttons, button)
+	}
+	buttons = append(buttons, []map[string]interface{}{
+		{
+			"text":          languages[user.Language]["back"] + " 🔙",
+			"callback_data": "backToGoods",
+		},
+	})
+
+	//создаём объект клавиатуры
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": buttons,
+	}
+
+	// Отправляем сообщение с клавиатурой и перезаписываем шаг
+	sendMessage(chatId, languages[user.Language]["choose_brand"]+" 👇", inlineKeyboard)
+}
+
+func showKeyboardGoods(chatId int, user UserT, button string) {
+
+	var chozen_language string = ""
+	if user.Language == "ru" {
+		chozen_language = "1"
+	} else if user.Language == "uz" {
+		chozen_language = "2"
+	} else {
+		chozen_language = "3"
+	}
+
+	// Создаем GET-запрос
+	resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+	defer resp.Body.Close()
+
+	var userdetails []UserDetails
+	err = json.NewDecoder(resp.Body).Decode(&userdetails)
+	if err != nil {
+		log.Fatal("Ошибка при декодировании JSON:", err)
+	}
+
+	// Используем полученные данные и подставляем их в кнопки
+	for _, userdetail := range userdetails {
+
+		// Создаем GET-запрос
+		resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + user.Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
+		if err != nil {
+			log.Fatal("Ошибка при выполнении запроса:", err)
+		}
+		defer resp.Body.Close()
+
+		var products []Product
+		err = json.NewDecoder(resp.Body).Decode(&products)
+
+		// Используем полученные данные
+		for _, product := range products {
+			// Создаем объект инлайн клавиатуры
+			buttons := [][]map[string]interface{}{
+				{
+					{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(product.ID)},
+					{"text": "0", "callback_data": "quantity"},
+					{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(product.ID)},
+				},
+				{
+					{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
+					{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+					{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
+				},
+				{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
+			}
+
+			// создаём объект клавиатуры
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			// кодируем клавиатуру в json
+			inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
+
+			fmt.Println(product.Photo)
+
+			//создание запроса
+			caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + languages[user.Language]["market_price"] + "\n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\n" + languages[user.Language]["bot_price"] + "\n<b>" + strconv.Itoa(product.Price) + " сум</b>")
+			apiURL := ""
+
+			if strings.Contains(product.Photo, "http") {
+				apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(chatId) + "&caption=" + caption + "&photo=" + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
+			} else {
+				apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(chatId) + "&caption=" + caption + "&photo=" + domen + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
+			}
+
+			fmt.Println(domen)
+			requestURL, err := url.Parse(apiURL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Создание HTTP GET-запроса с параметрами
+			request, err := http.NewRequest("GET", requestURL.String(), nil)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Отправка запроса
+			client := &http.Client{}
+			response, err := client.Do(request)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer response.Body.Close()
+
+			// Чтение ответа
+			responseData, err := io.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Вывод конечной ссылки запроса
+			finalURL := request.URL.String()
+			fmt.Println("Final URL:", finalURL)
+
+			// Вывод ответа от сервера
+			fmt.Println("Response:", string(responseData))
+		}
+
+	}
+}
+
+func showKeyboardCart(chatId int, user UserT, text string) {
+	finalPrice := 0
+	user.Step = 8
+	benefit := 0
+	marketPrice := 0
+	cartText := ""
+	for ID := range user.Cart {
+
+		fmt.Println(ID)
+		// Создаем GET-запрос
+		resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
+		if err != nil {
+			log.Fatal("Ошибка при выполнении запроса:", err)
+		}
+		defer resp.Body.Close()
+
+		var product Product
+		err = json.NewDecoder(resp.Body).Decode(&product)
+		if err != nil {
+			fmt.Println("Ошибка при декодировании JSON:", err)
+			return
+		}
+
+		cartText += product.Name + "\n" + strconv.Itoa(user.Cart[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(user.Cart[ID]*product.Price) + " сум\n"
+		finalPrice += product.Price * user.Cart[ID]
+		marketPrice += product.MaxPrice * user.Cart[ID]
+		benefit += product.MaxPrice*user.Cart[ID] - product.Price*user.Cart[ID]
+
+	}
+
+	//если человек переходит в корзину из главного меню
+	if strings.Contains(text, "🗑") {
+
+		// если товаров нет
+		if finalPrice == 0 {
+
+			buttons := [][]map[string]interface{}{
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+			}
+
+			// Создаем объект инлайн клавиатуры
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
+		} else {
+
+			buttons := [][]map[string]interface{}{
+
+				{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+				{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+			}
+
+			// Создаем объект инлайн клавиатуры
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			encodedCartText := url.QueryEscape(cartText)
+			encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+			finalText := encodedCartText + encodedText
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, finalText, inlineKeyboard)
+
+		}
+
+		// если пользователь смотрит коризину после списка товаров
+	} else {
+
+		// если товаров нет
+		if finalPrice == 0 {
+
+			buttons := [][]map[string]interface{}{
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+			}
+
+			// Создаем объект инлайн клавиатуры
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
+
+		} else {
+
+			buttons := [][]map[string]interface{}{
+
+				{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
+				{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
+
+				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+			}
+
+			// Создаем объект инлайн клавиатуры
+			inlineKeyboard := map[string]interface{}{
+				"inline_keyboard": buttons,
+			}
+
+			encodedCartText := url.QueryEscape(cartText)
+			encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
+			finalText := encodedCartText + encodedText
+
+			// Отправляем сообщение с клавиатурой и перезаписываем шаг
+			sendMessage(chatId, finalText, inlineKeyboard)
+		}
+	}
+}
+
 func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.WaitGroup, mutex *sync.Mutex) {
 
 	defer wg.Done()
@@ -660,229 +1074,67 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		// кейс для начального сообщения для пользователя
 		case user.Step == 1:
 
-			fmt.Println("шаг 1 регаем юзера")
-
-			//собираем объект клавиатуры для выбора языка
-			buttons := [][]map[string]interface{}{
-				{{"text": "Русский 🇷🇺", "callback_data": "ru"}},
-				{{"text": "O'zbekcha 🇺🇿", "callback_data": "uz"}},
-				{{"text": "Ўзбекча 🇺🇿", "callback_data": "uzkcha"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Здравствуйте, добро пожаловать в Стройбот. Выберите язык 👇", inlineKeyboard)
-
-			user.Step = 2
+			showKeyboardLanguage(chatId)
 
 			// Создаем пользователя в базе
-			setUserInfoDB(&user)
+			setUserStepDB(2, &user)
 
 		// кейс для получения номера телефона
 		case user.Step == 2 || button == "backToPhone":
 
-			// Создаем объект клавиатуры
-			keyboard := map[string]interface{}{
-				"keyboard": [][]map[string]interface{}{
-					{
-						{
-							"text":            "Да",
-							"request_contact": true,
-						},
-					},
-				},
-				"resize_keyboard":   true,
-				"one_time_keyboard": true,
+			//если не ввел язык
+			if button == "" {
+				showKeyboardLanguage(chatId)
+				break
 			}
 
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, "Поделится номером телефона", keyboard)
-			user.Step += 1
+			showKeyboardPhone(chatId)
+
 			user.Language = button
-			setUserInfoDB(&user)
+			setUserStepDB(3, &user)
 
 		// кейс для вывода городов для выбора
 		case user.Step == 3:
 
-			fmt.Println("Ввел телефон автоматом")
-
 			if phone == "" {
+				showKeyboardPhone(chatId)
 				break
 			}
 
 			user.PhoneNumber = phone
-			user.Step += 1
-			setUserInfoDB(&user)
+			setUserStepDB(4, &user)
 
-			fmt.Println("Получили телефон и выводим города")
-
-			buttons := [][]map[string]interface{}{}
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/cities.php?deleted=0&is_active=1")
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var cities []City
-			err = json.NewDecoder(resp.Body).Decode(&cities)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, city := range cities {
-				button := []map[string]interface{}{
-					{
-						"text":          city.Name,
-						"callback_data": city.ID,
-					},
-				}
-				buttons = append(buttons, button)
-			}
-
-			// создаём объект клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[user.Language]["choose_your_city"]+" 👇", inlineKeyboard)
+			showKeyboardCities(chatId, user)
 
 		// кейс для вывода меню пользователю и запись или обновление пользователя в бд
 		case user.Step == 4:
 
 			if button == "" {
+				showKeyboardCities(chatId, user)
 				break
 			}
 
 			user.City, _ = strconv.Atoi(button)
-			user.Step += 1
-			setUserInfoDB(&user)
+			setUserStepDB(5, &user)
 
-			// Создаем объект клавиатуры
-			keyboard := map[string]interface{}{
-				"keyboard": [][]map[string]interface{}{
-					{{"text": languages[user.Language]["order"] + " 🛍"}},
+			showKeyboardMainMenu(chatId, user)
 
-					{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
-						{"text": languages[user.Language]["settings"] + " ⚙️"},
-					},
-					{{"text": languages[user.Language]["my_orders"] + " 📕"},
-						{"text": languages[user.Language]["current_prices"] + " 📈"},
-					},
-					{{"text": languages[user.Language]["contact"] + " 📞"},
-						{"text": languages[user.Language]["cart"] + " 🗑"},
-					},
-				},
-				"resize_keyboard":   true,
-				"one_time_keyboard": false,
-			}
+		case user.Step == 5:
 
-			sendMessage(chatId, languages[user.Language]["main_menu"], keyboard)
+			setUserStepDB(5, &user)
+			showKeyboardMainMenu(chatId, user)
 
 		// кейс для возращения пользователя в меню
 		case button == "backToMenu":
-			user.Step = 4
 
-			keyboard := map[string]interface{}{
-				"keyboard": [][]map[string]interface{}{
-					{{"text": languages[user.Language]["order"] + " 🛍"}},
+			setUserStepDB(5, &user)
 
-					{{"text": languages[user.Language]["current_exchange_rate"] + " 💹"},
-						{"text": languages[user.Language]["settings"] + " ⚙️"},
-					},
-					{{"text": languages[user.Language]["my_orders"] + " 📕"},
-						{"text": languages[user.Language]["current_prices"] + " 📈"},
-					},
-					{{"text": languages[user.Language]["contact"] + " 📞"},
-						{"text": languages[user.Language]["cart"] + " 🗑"},
-					},
-				},
-				"resize_keyboard":   true,
-				"one_time_keyboard": false,
-			}
-
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var userdetails []UserDetails
-			err = json.NewDecoder(resp.Body).Decode(&userdetails)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, userdetail := range userdetails {
-
-				menuText := url.QueryEscape("\n" + languages[user.Language]["your_city"] + ": ")
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, languages[user.Language]["main_menu"]+menuText+userdetail.CityName, keyboard)
-
-			}
-
-			user.Step += 1
+			showKeyboardMainMenu(chatId, user)
 
 		// кейс для вывода категорий товаров на выбор
-		case (user.Step == 5 && text == languages[user.Language]["order"]+" 🛍") || (button == "backToGoods"):
+		case (user.Step >= 5 && strings.Contains(text, "🛍")) || (button == "backToGoods"):
 
-			buttons := [][]map[string]interface{}{}
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/categories/get-all-by-exist-products.php?city_id=" + strconv.Itoa(user.City))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var categories []Category
-			err = json.NewDecoder(resp.Body).Decode(&categories)
-			if err != nil {
-
-				buttons := [][]map[string]interface{}{
-					{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
-				}
-
-				inlineKeyboard := map[string]interface{}{
-					"inline_keyboard": buttons,
-				}
-
-				sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, category := range categories {
-				button := []map[string]interface{}{
-					{
-						"text":          category.CategoryName,
-						"callback_data": category.CategoryName + " " + strconv.Itoa(category.ID),
-					},
-				}
-				buttons = append(buttons, button)
-			}
-			buttons = append(buttons, []map[string]interface{}{
-				{
-					"text":          languages[user.Language]["back"] + " 🔙",
-					"callback_data": "backToMenu",
-				},
-			})
-
-			// создаём объект клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[user.Language]["choose_material"]+" 👇", inlineKeyboard)
-
-			user.Step += 1
-			setUserInfoDB(&user)
+			showKeyboardCategories(chatId, user)
 
 		// кейс для вывода брендов товаров для пользователя
 		case user.Step == 6 || button == "backToBrands":
@@ -895,53 +1147,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				user.Category_id = secondCategoryID
 				sendMessage(chatId, "Вы выбрали: "+firstCategoryName, nil)
 			}
-			buttons := [][]map[string]interface{}{}
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/brands/get-by-category.php?category_id=" + user.Category_id + "&city_id=" + strconv.Itoa(user.City))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
 
-			var brands []Brand
-			err = json.NewDecoder(resp.Body).Decode(&brands)
-			if err != nil {
-
-				buttons := [][]map[string]interface{}{
-					{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
-				}
-
-				inlineKeyboard := map[string]interface{}{
-					"inline_keyboard": buttons,
-				}
-
-				sendMessage(chatId, languages[user.Language]["no_products_for_your_request"], inlineKeyboard)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, brand := range brands {
-				button := []map[string]interface{}{
-					{
-						"text":          brand.BrandName,
-						"callback_data": brand.ID,
-					},
-				}
-				buttons = append(buttons, button)
-			}
-			buttons = append(buttons, []map[string]interface{}{
-				{
-					"text":          languages[user.Language]["back"] + " 🔙",
-					"callback_data": "backToGoods",
-				},
-			})
-
-			//создаём объект клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[user.Language]["choose_brand"]+" 👇", inlineKeyboard)
+			showKeyboardBrands(chatId, user)
 
 			user.Step += 1
 			setUserInfoDB(&user)
@@ -949,248 +1156,34 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		// кейс для отображения выбранных товаров по фильтрам
 		case user.Step == 7:
 
-			var chozen_language string = ""
-			if user.Language == "ru" {
-				chozen_language = "1"
-			} else if user.Language == "uz" {
-				chozen_language = "2"
-			} else {
-				chozen_language = "3"
-			}
-
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var userdetails []UserDetails
-			err = json.NewDecoder(resp.Body).Decode(&userdetails)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, userdetail := range userdetails {
-
-				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + user.Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
-				if err != nil {
-					log.Fatal("Ошибка при выполнении запроса:", err)
-				}
-				defer resp.Body.Close()
-
-				var product []Product
-				err = json.NewDecoder(resp.Body).Decode(&product)
-
-				// Используем полученные данные
-				for _, product := range product {
-					// Создаем объект инлайн клавиатуры
-					buttons := [][]map[string]interface{}{
-						{
-							{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(product.ID)},
-							{"text": "0", "callback_data": "quantity"},
-							{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(product.ID)},
-						},
-						{
-							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
-							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
-							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
-						},
-						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
-					}
-
-					// создаём объект клавиатуры
-					inlineKeyboard := map[string]interface{}{
-						"inline_keyboard": buttons,
-					}
-
-					// кодируем клавиатуру в json
-					inlineKeyboardJSON, _ := json.Marshal(inlineKeyboard)
-
-					fmt.Println(product.Photo)
-
-					//создание запроса
-					caption := url.QueryEscape("<b><u>" + product.Name + "</u></b>\n" + languages[user.Language]["market_price"] + "\n<b>" + strconv.Itoa(product.MaxPrice) + " сум</b>\n" + languages[user.Language]["bot_price"] + "\n<b>" + strconv.Itoa(product.Price) + " сум</b>")
-					apiURL := ""
-
-					if strings.Contains(product.Photo, "http") {
-						apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
-					} else {
-						apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + strconv.Itoa(id) + "&caption=" + caption + "&photo=" + domen + product.Photo + "&parse_mode=HTML&reply_markup=" + string(inlineKeyboardJSON)
-					}
-
-					fmt.Println(domen)
-					requestURL, err := url.Parse(apiURL)
-					if err != nil {
-						log.Fatal(err)
-					}
-
-					// Создание HTTP GET-запроса с параметрами
-					request, err := http.NewRequest("GET", requestURL.String(), nil)
-					if err != nil {
-						log.Fatal(err)
-					}
-
-					// Отправка запроса
-					client := &http.Client{}
-					response, err := client.Do(request)
-					if err != nil {
-						log.Fatal(err)
-					}
-					defer response.Body.Close()
-
-					// Чтение ответа
-					responseData, err := io.ReadAll(response.Body)
-					if err != nil {
-						log.Fatal(err)
-					}
-
-					// Вывод конечной ссылки запроса
-					finalURL := request.URL.String()
-					fmt.Println("Final URL:", finalURL)
-
-					// Вывод ответа от сервера
-					fmt.Println("Response:", string(responseData))
-				}
-
-			}
+			showKeyboardGoods(chatId, user, button)
 
 			// перезаписываем шаг
 			user.Step += 1
 			setUserInfoDB(&user)
 
 		// кейс для отображения корзины покупателя
-		case user.Step == 8 && button == "goToCart" || text == languages[user.Language]["cart"]+" 🗑":
+		case user.Step == 8 && button == "goToCart" || strings.Contains(text, "🗑"):
 
-			finalPrice := 0
-			user.Step = 8
-			benefit := 0
-			marketPrice := 0
-			cartText := ""
-			for ID := range user.Cart {
-
-				fmt.Println(ID)
-				// Создаем GET-запрос
-				resp, err := http.Get("http://" + link + "/api/products.php?deleted=0&id=" + strconv.Itoa(ID))
-				if err != nil {
-					log.Fatal("Ошибка при выполнении запроса:", err)
-				}
-				defer resp.Body.Close()
-
-				var product Product
-				err = json.NewDecoder(resp.Body).Decode(&product)
-				if err != nil {
-					fmt.Println("Ошибка при декодировании JSON:", err)
-					return
-				}
-
-				cartText += product.Name + "\n" + strconv.Itoa(user.Cart[ID]) + " ✖️ " + strconv.Itoa(product.Price) + "сум/шт = " + strconv.Itoa(user.Cart[ID]*product.Price) + " сум\n"
-				finalPrice += product.Price * user.Cart[ID]
-				marketPrice += product.MaxPrice * user.Cart[ID]
-				benefit += product.MaxPrice*user.Cart[ID] - product.Price*user.Cart[ID]
-
-			}
-
-			//если человек переходит в корзину из главного меню
-			if text == languages[user.Language]["cart"]+" 🗑" {
-
-				// если товаров нет
-				if finalPrice == 0 {
-
-					buttons := [][]map[string]interface{}{
-						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
-					}
-
-					// Создаем объект инлайн клавиатуры
-					inlineKeyboard := map[string]interface{}{
-						"inline_keyboard": buttons,
-					}
-
-					sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
-				} else {
-
-					buttons := [][]map[string]interface{}{
-
-						{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
-						{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
-
-						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
-					}
-
-					// Создаем объект инлайн клавиатуры
-					inlineKeyboard := map[string]interface{}{
-						"inline_keyboard": buttons,
-					}
-
-					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
-					finalText := encodedCartText + encodedText
-
-					// Отправляем сообщение с клавиатурой и перезаписываем шаг
-					sendMessage(chatId, finalText, inlineKeyboard)
-
-				}
-
-				// если пользователь смотрит коризину после списка товаров
-			} else {
-
-				// если товаров нет
-				if finalPrice == 0 {
-
-					buttons := [][]map[string]interface{}{
-						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
-					}
-
-					// Создаем объект инлайн клавиатуры
-					inlineKeyboard := map[string]interface{}{
-						"inline_keyboard": buttons,
-					}
-
-					sendMessage(chatId, languages[user.Language]["empty_cart"], inlineKeyboard)
-
-				} else {
-
-					buttons := [][]map[string]interface{}{
-
-						{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
-						{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
-
-						{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
-					}
-
-					// Создаем объект инлайн клавиатуры
-					inlineKeyboard := map[string]interface{}{
-						"inline_keyboard": buttons,
-					}
-
-					encodedCartText := url.QueryEscape(cartText)
-					encodedText := url.QueryEscape(languages[user.Language]["average_market_price"]+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+"\n<s>"+strconv.Itoa(marketPrice)+"</s> cум\n"+languages[user.Language]["bot_total_price"]+"\n"+strconv.Itoa(finalPrice)+" сум\n"+languages[user.Language]["you_saved"]+"\n<b>"+strconv.Itoa(benefit)) + "</b> сум&parse_mode=HTML"
-					finalText := encodedCartText + encodedText
-
-					// Отправляем сообщение с клавиатурой и перезаписываем шаг
-					sendMessage(chatId, finalText, inlineKeyboard)
-				}
-			}
+			showKeyboardCart(chatId, user, text)
 
 			user.Step += 1
 			break
 
 		// кейс для покупки выбранных товаров пользователем
 		case user.Step == 9 && button == "buy":
+
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["order_to_your_address"], "callback_data": "myAdress"}},
 				{{"text": languages[user.Language]["order_to_another_address"], "callback_data": "anotherAdress"}},
 			}
-
 			// Создаем объект инлайн клавиатуры
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
 			}
-
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["specify_convenient_address"], inlineKeyboard)
+
 			user.Step += 1
 			break
 
@@ -1215,14 +1208,15 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				"resize_keyboard":   true,
 				"one_time_keyboard": true,
 			}
-
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["share_location"], keyboard)
+
 			user.Step += 1
 			break
 
 		// кейс при нажатии на указание другого адреса
 		case user.Step == 10 && button == "anotherAdress":
+
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
 				"keyboard": [][]map[string]interface{}{
@@ -1235,9 +1229,9 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				"resize_keyboard":   true,
 				"one_time_keyboard": true,
 			}
-
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["send_required_geoposition_via_telegram"], keyboard)
+
 			user.Step += 1
 			break
 
@@ -1355,12 +1349,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 								"resize_keyboard":   true,
 								"one_time_keyboard": false,
 							}
+							// Отправляем сообщение с клавиатурой и перезаписываем шаг
+							sendMessage(chatId, languages[user.Language]["thank_you_for_choosing_stroybot"], keyboard)
 
 							// обнуляем корзину
 							user.Cart = map[int]int{}
-
-							// Отправляем сообщение с клавиатурой и перезаписываем шаг
-							sendMessage(chatId, languages[user.Language]["thank_you_for_choosing_stroybot"], keyboard)
 							user.Step = 5
 							break
 						}
@@ -1616,17 +1609,15 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		}
 
 		if button == "dropCart" {
-
 			// обнуляем корзину
 			user.Cart = map[int]int{}
-
+			setUserInfoDB(&user)
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["dropped_cart"], nil)
-
 		}
 
 		// кейс при нажатии на кнопку актуальные цены
-		if text == languages[user.Language]["current_prices"]+" 📈" {
+		if strings.Contains(text, "📈") {
 
 			channelURL := "t.me/stroy_bot_prices"
 
@@ -1656,7 +1647,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		}
 
 		// кейс при нажатии на кнопку актуальный курс
-		if text == languages[user.Language]["current_exchange_rate"]+" 💹" {
+		if strings.Contains(text, "💹") {
 
 			channelURL := "t.me/stroybotchannel2"
 
@@ -1686,7 +1677,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		}
 
 		// кейс при нажатии на кнопку мои заказы
-		if text == languages[user.Language]["my_orders"]+" 📕" {
+		if strings.Contains(text, "📕") {
 
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
@@ -1701,7 +1692,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		}
 
 		// кейс при нажатии на кнопку связаться
-		if text == languages[user.Language]["contact"]+" 📞" {
+		if strings.Contains(text, "📞") {
 
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["by_phone"] + " 📲", "callback_data": "withPhone"}},
@@ -1855,62 +1846,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс при нажатии на кнопку язык
 		if button == "language" {
-
-			//собираем объект клавиатуры для выбора языка
-			buttons := [][]map[string]interface{}{
-				{{"text": "Русский 🇷🇺", "callback_data": "1"}},
-				{{"text": "O'zbekcha 🇺🇿", "callback_data": "2"}},
-				{{"text": "Ўзбекча 🇺🇿", "callback_data": "3"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[user.Language]["choose_language"]+" 👇", inlineKeyboard)
-
+			showKeyboardLanguage(chatId)
 			user.Step = 4
-
 		}
 
 		// кейс при нажатии на кнопку изменить город
 		if button == "city" {
-			buttons := [][]map[string]interface{}{}
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/cities.php?deleted=0&is_active=1")
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var cities []City
-			err = json.NewDecoder(resp.Body).Decode(&cities)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, city := range cities {
-				button := []map[string]interface{}{
-					{
-						"text":          city.Name,
-						"callback_data": city.ID,
-					},
-				}
-				buttons = append(buttons, button)
-			}
-
-			// создаём объект клавиатуры
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Отправляем сообщение с клавиатурой и перезаписываем шаг
-			sendMessage(chatId, languages[user.Language]["choose_your_city"]+" 👇", inlineKeyboard)
-
+			showKeyboardCities(chatId, user)
 			user.Step = 4
-
 		}
 
 		// кейс при нажатии на кнопку изменить телефон
