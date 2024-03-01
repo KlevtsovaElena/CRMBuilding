@@ -13,6 +13,8 @@ $result = $db->query("SELECT
                         phone,
                         is_blocked,
                         is_provider,
+                        category_id,
+                        brand_id,
                         language,
                         city_id
                         FROM customers
@@ -25,6 +27,8 @@ $result = $db->query("SELECT
                             phone,
                             is_blocked,
                             is_provider,
+                            category_id,
+                            brand_id,
                             language,
                             city_id
                         FROM vendors

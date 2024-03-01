@@ -36,6 +36,8 @@
                 $db = \DbContext::getConnection();
                 $db->query("UPDATE customers SET step = " . (int)$post['step']. " WHERE id = " . (int)$post['id']);
                 $db->query("UPDATE customers SET language = '" . $post['language'] ."' WHERE id = " . (int)$post['id']);
+                $db->query("UPDATE customers SET category_id = '" . $post['category_id'] ."' WHERE id = " . (int)$post['id']);
+                $db->query("UPDATE customers SET brand_id = '" . $post['brand_id'] ."' WHERE id = " . (int)$post['id']);
                 return;
             }
 

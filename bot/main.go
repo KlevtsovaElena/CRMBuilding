@@ -113,6 +113,7 @@ type UserT struct {
 	Blocked     int         `json:"is_blocked"`
 	Cart        map[int]int `json:"cart"`
 	Category_id string      `json:"category_id"`
+	Brand_id    string      `json:"brand_id"`
 	Hash        string      `json:"hash_string"`
 	Vendor_id   int         `json:"vendor_ids"`
 	Language    string      `json:"language"`
@@ -640,7 +641,7 @@ func showKeyboardCategories(chatId int, user UserT) {
 		button := []map[string]interface{}{
 			{
 				"text":          category.CategoryName,
-				"callback_data": category.CategoryName + " " + strconv.Itoa(category.ID),
+				"callback_data": category.CategoryName + " " + strconv.Itoa(category.ID) + " cat69",
 			},
 		}
 		buttons = append(buttons, button)
@@ -690,7 +691,7 @@ func showKeyboardBrands(chatId int, user UserT) {
 		button := []map[string]interface{}{
 			{
 				"text":          brand.BrandName,
-				"callback_data": brand.ID,
+				"callback_data": strconv.Itoa(brand.ID) + " bra69",
 			},
 		}
 		buttons = append(buttons, button)
@@ -739,7 +740,9 @@ func showKeyboardGoods(chatId int, user UserT, button string) {
 	for _, userdetail := range userdetails {
 
 		// Создаем GET-запрос
-		resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + user.Category_id + "&brand_id=" + button + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
+		brandParts := strings.Split(button, " ")
+		brandId := brandParts[0]
+		resp, err := http.Get("http://" + link + "/api/products/get-with-details-language.php?deleted=0&vendor_active=1&is_active=1&price_confirmed=1&is_confirm=1&vendor_deleted=0&category_id=" + user.Category_id + "&brand_id=" + brandId + "&city_id=" + strconv.Itoa(userdetail.CityID) + "&language=" + chozen_language)
 		if err != nil {
 			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
@@ -958,6 +961,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 	longitude := message.Message.Location.Longitude
 
 	button := messageInline.CallbackQuery.Data
+	fmt.Println(button)
 	id := messageInline.CallbackQuery.From.ID
 	mesIdInline := messageInline.CallbackQuery.Message.MessageID
 
@@ -1121,57 +1125,62 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		case user.Step == 5:
 
-			setUserStepDB(5, &user)
-			showKeyboardMainMenu(chatId, user)
-
-		// кейс для возращения пользователя в меню
-		case button == "backToMenu":
-
-			setUserStepDB(5, &user)
+			fmt.Println("на шаге 5")
 
 			showKeyboardMainMenu(chatId, user)
 
-		// кейс для вывода категорий товаров на выбор
-		case (user.Step >= 5 && strings.Contains(text, "🛍")) || (button == "backToGoods"):
-
-			showKeyboardCategories(chatId, user)
-
-		// кейс для вывода брендов товаров для пользователя
-		case user.Step == 6 || button == "backToBrands":
-
-			// Разбиваем строку на две части по пробелу
-			parts := strings.Split(button, " ")
-			firstCategoryName := parts[0]
-			secondCategoryID := parts[1]
-			if button != "backToBrands" {
-				user.Category_id = secondCategoryID
-				sendMessage(chatId, "Вы выбрали: "+firstCategoryName, nil)
+			if strings.Contains(text, "🛍") {
+				fmt.Println("показываем категории")
+				sendMessage(chatId, "выбирайте категория", nil)
+				showKeyboardCategories(chatId, user)
+				break
 			}
 
-			showKeyboardBrands(chatId, user)
+			if strings.Contains(button, " cat69") {
+				fmt.Println("показываем бренды")
+				// Разбиваем строку на две части по пробелу
+				parts := strings.Split(button, " ")
+				categoryName := parts[0]
+				categoryID := parts[1]
+				if button != "backToBrands" {
+					user.Category_id = categoryID
+					sendMessage(chatId, "Вы выбрали: "+categoryName, nil)
+					setUserInfoDB(&user)
+				}
 
-			user.Step += 1
+				showKeyboardBrands(chatId, user)
+				break
+			}
+
+			if strings.Contains(button, " bra69") {
+				fmt.Println("показываем товары")
+				showKeyboardGoods(chatId, user, button)
+				break
+			}
+
+			if text == "main menu" {
+				showKeyboardMainMenu(chatId, user)
+			}
+
+		// кейс для вывода брендов товаров для пользователя
+		case user.Step == 6:
+
+			user.Step = 7
 			setUserInfoDB(&user)
 
 		// кейс для отображения выбранных товаров по фильтрам
 		case user.Step == 7:
 
-			showKeyboardGoods(chatId, user, button)
-
-			// перезаписываем шаг
-			user.Step += 1
-			setUserInfoDB(&user)
-
 		// кейс для отображения корзины покупателя
-		case user.Step == 8 && button == "goToCart" || strings.Contains(text, "🗑"):
+		case user.Step == 7 && button == "goToCart" || strings.Contains(text, "🗑"):
 
 			showKeyboardCart(chatId, user, text)
 
-			user.Step += 1
-			break
+			user.Step = 8
+			setUserInfoDB(&user)
 
 		// кейс для покупки выбранных товаров пользователем
-		case user.Step == 9 && button == "buy":
+		case user.Step == 8 && button == "buy":
 
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["order_to_your_address"], "callback_data": "myAdress"}},
@@ -1184,11 +1193,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["specify_convenient_address"], inlineKeyboard)
 
-			user.Step += 1
-			break
+			user.Step = 9
+			setUserInfoDB(&user)
 
 		// кейс при нажатии на указание своего адреса
-		case user.Step == 10 && button == "myAdress":
+		case user.Step == 9 && button == "myAdress":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -1211,11 +1220,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["share_location"], keyboard)
 
-			user.Step += 1
-			break
+			user.Step = 10
+			setUserInfoDB(&user)
 
 		// кейс при нажатии на указание другого адреса
-		case user.Step == 10 && button == "anotherAdress":
+		case user.Step == 9 && button == "anotherAdress":
 
 			// Создаем объект клавиатуры
 			keyboard := map[string]interface{}{
@@ -1232,8 +1241,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			// Отправляем сообщение с клавиатурой и перезаписываем шаг
 			sendMessage(chatId, languages[user.Language]["send_required_geoposition_via_telegram"], keyboard)
 
-			user.Step += 1
-			break
+			user.Step = 10
+			setUserInfoDB(&user)
 
 		// кейс для вывода сообщения о заказе и его отправка на бекенд
 		case user.Step == 11:
@@ -1360,6 +1369,13 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					}
 				}
 			}
+
+			// кейс для возращения пользователя в меню
+		case button == "backToMenu":
+
+			setUserStepDB(5, &user)
+
+			showKeyboardMainMenu(chatId, user)
 
 		}
 
