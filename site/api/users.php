@@ -15,6 +15,8 @@ $result = $db->query("SELECT
                         is_provider,
                         category_id,
                         brand_id,
+                        cart,
+                        coordinates,
                         language,
                         city_id
                         FROM customers
@@ -29,6 +31,8 @@ $result = $db->query("SELECT
                             is_provider,
                             category_id,
                             brand_id,
+                            cart,
+                            coordinates,
                             language,
                             city_id
                         FROM vendors
@@ -42,6 +46,16 @@ if ($row == false) {
     $row = ['lol'=> 'kek'];
 } else {
     $row['is_provider'] = (bool) $row['is_provider'];
+    if ($row['cart'] != null && $row['cart'] !=  "[]") {
+        $row['cart'] = json_decode($row['cart'],true);
+    } else {
+        $row['cart'] = null;
+    }
+    if ($row['coordinates'] != null && $row['coordinates'] !=  "[]") {
+        $row['coordinates'] = json_decode($row['coordinates'],true);
+    } else {
+        $row['coordinates'] = null;
+    }
 }
 
 echo json_encode($row);

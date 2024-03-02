@@ -38,6 +38,8 @@
                 $db->query("UPDATE customers SET language = '" . $post['language'] ."' WHERE id = " . (int)$post['id']);
                 $db->query("UPDATE customers SET category_id = '" . $post['category_id'] ."' WHERE id = " . (int)$post['id']);
                 $db->query("UPDATE customers SET brand_id = '" . $post['brand_id'] ."' WHERE id = " . (int)$post['id']);
+                $db->query("UPDATE customers SET cart = '" . json_encode($post['cart']) ."' WHERE id = " . (int)$post['id']);
+                $db->query("UPDATE customers SET coordinates = '" . json_encode($post['coordinates']) ."' WHERE id = " . (int)$post['id']);
                 return;
             }
 
