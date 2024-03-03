@@ -185,7 +185,7 @@ var languages = map[string]map[string]string{
 		"become_partner":                         "Стать партнёром",
 		"back":                                   "Назад",
 		"main_menu":                              "Главное меню",
-		"order":                                  "Заказать",
+		"order":                                  "Каталог",
 		"my_orders":                              "Мои заказы",
 		"settings":                               "Настройки",
 		"contact":                                "Связаться",
@@ -647,12 +647,12 @@ func showKeyboardCategories(chatId int, user UserT) {
 		}
 		buttons = append(buttons, button)
 	}
-	buttons = append(buttons, []map[string]interface{}{
-		{
-			"text":          languages[user.Language]["back"] + " 🔙",
-			"callback_data": "backToMenu",
-		},
-	})
+	//buttons = append(buttons, []map[string]interface{}{
+	//	{
+	//		"text":          languages[user.Language]["back"] + " 🔙",
+	//		"callback_data": "backToMenu",
+	//	},
+	//})
 
 	// создаём объект клавиатуры
 	inlineKeyboard := map[string]interface{}{
@@ -677,7 +677,7 @@ func showKeyboardBrands(chatId int, user UserT) {
 	if err != nil {
 
 		buttons := [][]map[string]interface{}{
-			{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+			{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToCategories"}},
 		}
 
 		inlineKeyboard := map[string]interface{}{
@@ -699,8 +699,9 @@ func showKeyboardBrands(chatId int, user UserT) {
 	}
 	buttons = append(buttons, []map[string]interface{}{
 		{
-			"text":          languages[user.Language]["back"] + " 🔙",
-			"callback_data": "backToGoods",
+			//"text":          languages[user.Language]["back"] + "К категориям 🔙",
+			"text":          "К категориям 🔙",
+			"callback_data": "backToCategories",
 		},
 	})
 
@@ -755,15 +756,21 @@ func showKeyboardGoods(chatId int, user UserT, button string) {
 		// Используем полученные данные
 		for _, product := range products {
 			// Создаем объект инлайн клавиатуры
+			quantity := 0
+			_, exist := user.Cart[product.ID]
+			if exist {
+				quantity = user.Cart[product.ID]
+			}
 			buttons := [][]map[string]interface{}{
 				{
 					{"text": "➖ 1", "callback_data": "minusone:" + strconv.Itoa(product.ID)},
-					{"text": "0", "callback_data": "quantity"},
+					{"text": +quantity, "callback_data": "quantity"},
 					{"text": "➕ 1", "callback_data": "addone:" + strconv.Itoa(product.ID)},
 				},
 				{
 					{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(product.ID)},
-					{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+					//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+					{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 					{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(product.ID)},
 				},
 				{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -879,7 +886,7 @@ func showKeyboardCart(chatId int, user UserT, text string) {
 				{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
 				{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			// Создаем объект инлайн клавиатуры
@@ -920,7 +927,7 @@ func showKeyboardCart(chatId int, user UserT, text string) {
 				{{"text": languages[user.Language]["confirm_order"] + " ✅", "callback_data": "buy"}},
 				{{"text": languages[user.Language]["drop_cart"] + " ❌", "callback_data": "dropCart"}},
 
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToGoods"}},
 			}
 
 			// Создаем объект инлайн клавиатуры
@@ -1113,7 +1120,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				break
 			}
 
-			user.PhoneNumber = phone
+			user.PhoneNumber = strings.Replace(phone, "+", "", 1)
 			setUserStepDB(4, &user)
 
 			showKeyboardCities(chatId, user)
@@ -1133,21 +1140,21 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		case user.Step == 5:
 
-			fmt.Println("на шаге 5")
+			//fmt.Println("на шаге 5")
 
-			fmt.Println(user.Coordinates)
+			//fmt.Println(user.Coordinates)
 
-			showKeyboardMainMenu(chatId, user)
+			//showKeyboardMainMenu(chatId, user)
 
 			if strings.Contains(text, "🛍") {
-				fmt.Println("показываем категории")
+				//fmt.Println("показываем категории")
 				sendMessage(chatId, "выбирайте категория", nil)
 				showKeyboardCategories(chatId, user)
 				break
 			}
 
 			if strings.Contains(button, " cat69") {
-				fmt.Println("показываем бренды")
+				//fmt.Println("показываем бренды")
 				// Разбиваем строку на две части по пробелу
 				parts := strings.Split(button, " ")
 				categoryName := parts[0]
@@ -1163,13 +1170,23 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			if strings.Contains(button, " bra69") {
-				fmt.Println("показываем товары")
+				//fmt.Println("показываем товары")
 				showKeyboardGoods(chatId, user, button)
 				break
 			}
 
-			if text == "main menu" {
+			if text == "main menu" || button == "backToMenu" {
 				showKeyboardMainMenu(chatId, user)
+				break
+			}
+
+			if button == "backToCategories" {
+				showKeyboardCategories(chatId, user)
+				break
+			}
+
+			if button == "backToBrands" {
+				showKeyboardBrands(chatId, user)
 				break
 			}
 
@@ -1396,7 +1413,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
 						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -1435,7 +1453,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
 					{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -1477,7 +1496,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + strconv.Itoa(ID)},
-							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + strconv.Itoa(ID)},
 						},
 						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -1515,7 +1535,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 					},
 					{
 						{"text": "➖ 10", "callback_data": "minus:" + productStr},
-						{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+						{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 						{"text": "➕ 10", "callback_data": "add:" + productStr},
 					},
 					{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -1558,7 +1579,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
 						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},
@@ -1603,7 +1625,8 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 						},
 						{
 							{"text": "➖ 10", "callback_data": "minus:" + productStr},
-							{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							//{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToBrands"},
+							{"text": "К брендам 🔙", "callback_data": "backToBrands"},
 							{"text": "➕ 10", "callback_data": "add:" + productStr},
 						},
 						{{"text": languages[user.Language]["go_to_cart"] + " 🗑", "callback_data": "goToCart"}},

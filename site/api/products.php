@@ -19,9 +19,11 @@
         protected function onGet()
         {
             $result = $this->productRepository->get($_GET);
+            $resultArr = (array)$result;
+            $resultArr['name_language'] = $resultArr['name'];
             
             if ($result)
-                echo json_encode($result, JSON_UNESCAPED_UNICODE);
+                echo json_encode($resultArr, JSON_UNESCAPED_UNICODE);
         }
 
         protected function onPost()
