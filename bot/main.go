@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -945,6 +946,11 @@ func showKeyboardCart(chatId int, user UserT, text string) {
 	}
 }
 
+func isOnlyDigits(s string) bool {
+	// Регулярное выражение для проверки, что строка содержит только цифры
+	return regexp.MustCompile(`^\d+$`).MatchString(s)
+}
+
 func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.WaitGroup, mutex *sync.Mutex) {
 
 	defer wg.Done()
@@ -1135,16 +1141,11 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			user.City, _ = strconv.Atoi(button)
 			setUserStepDB(5, &user)
+			sendMessage(chatId, "Город успешно выбран", nil)
 
 			showKeyboardMainMenu(chatId, user)
 
 		case user.Step == 5:
-
-			//fmt.Println("на шаге 5")
-
-			//fmt.Println(user.Coordinates)
-
-			//showKeyboardMainMenu(chatId, user)
 
 			if strings.Contains(text, "🛍") {
 				//fmt.Println("показываем категории")
@@ -1154,7 +1155,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			if strings.Contains(button, " cat69") {
-				//fmt.Println("показываем бренды")
 				// Разбиваем строку на две части по пробелу
 				parts := strings.Split(button, " ")
 				categoryName := parts[0]
@@ -1173,6 +1173,21 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				//fmt.Println("показываем товары")
 				showKeyboardGoods(chatId, user, button)
 				break
+			}
+
+			//смена телефона
+			fmt.Println(len(text))
+			fmt.Println(len(strings.Replace(text, "+", "", 1)))
+			fmt.Println(strings.Replace(text, "+", "", 1))
+			if isOnlyDigits(strings.Replace(text, "+", "", 1)) && len(strings.Replace(text, "+", "", 1)) > 8 {
+				text = strings.Replace(text, "+", "", 1)
+				if len(text) == 12 {
+					user.PhoneNumber = text
+					setUserInfoDB(&user)
+					sendMessage(chatId, "Номер телефона успешно сохранен", nil)
+				} else {
+					showKeyboardChangeNumber(chatId, &user)
+				}
 			}
 
 			if text == "main menu" || button == "backToMenu" {
@@ -1667,7 +1682,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["go_to"] + " 🌐", "url": channelURL}},
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1697,7 +1712,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["go_to"] + " 🌐", "url": channelURL}},
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1712,7 +1727,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if strings.Contains(text, "📕") {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1729,7 +1744,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			buttons := [][]map[string]interface{}{
 				{{"text": languages[user.Language]["by_phone"] + " 📲", "callback_data": "withPhone"}},
 				{{"text": languages[user.Language]["by_chat"] + " 💬", "callback_data": "withСhat"}},
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1744,7 +1759,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "withPhone" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1768,7 +1783,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "withСhat" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToMenu"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1798,12 +1813,12 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				{{"text": languages[user.Language]["feedback"], "callback_data": "book"}},
 			}
 
-			buttons = append(buttons, []map[string]interface{}{
-				{
-					"text":          languages[user.Language]["back"] + " 🔙",
-					"callback_data": "backToMenu",
-				},
-			})
+			//buttons = append(buttons, []map[string]interface{}{
+			//	{
+			//		"text":          languages[user.Language]["back"] + " 🔙",
+			//		"callback_data": "backToMenu",
+			//	},
+			//})
 
 			inlineKeyboard := map[string]interface{}{
 				"inline_keyboard": buttons,
@@ -1817,7 +1832,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "info" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1832,7 +1847,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "partnership" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1847,7 +1862,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "book" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1862,7 +1877,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		if button == "oferta" {
 
 			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+				//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
 			}
 
 			inlineKeyboard := map[string]interface{}{
@@ -1880,46 +1895,52 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 
 		// кейс при нажатии на кнопку изменить город
 		if button == "city" {
+			setUserStepDB(4, &user)
 			showKeyboardCities(chatId, user)
-			user.Step = 4
+			// Создаем объект клавиатуры
+			emptyKeyboard := map[string]interface{}{
+				"remove_keyboard": true,
+			}
+			sendMessage(chatId, "Чтобы продолжить - выберите город", emptyKeyboard)
 		}
 
 		// кейс при нажатии на кнопку изменить телефон
 		if button == "number" {
-
-			buttons := [][]map[string]interface{}{
-				{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
-			}
-
-			inlineKeyboard := map[string]interface{}{
-				"inline_keyboard": buttons,
-			}
-
-			// Создаем GET-запрос
-			resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
-			if err != nil {
-				log.Fatal("Ошибка при выполнении запроса:", err)
-			}
-			defer resp.Body.Close()
-
-			var userdetails []UserDetails
-			err = json.NewDecoder(resp.Body).Decode(&userdetails)
-			if err != nil {
-				log.Fatal("Ошибка при декодировании JSON:", err)
-			}
-
-			// Используем полученные данные и подставляем их в кнопки
-			for _, userdetail := range userdetails {
-
-				phoneText := url.QueryEscape("\n" + languages[user.Language]["current_number"] + userdetail.Phone)
-
-				// Отправляем сообщение с клавиатурой и перезаписываем шаг
-				sendMessage(chatId, url.QueryEscape(languages[user.Language]["send_your_number"])+phoneText, inlineKeyboard)
-
-			}
-
-			user.Step = 4
+			showKeyboardChangeNumber(chatId, &user)
 		}
+
+	}
+}
+
+func showKeyboardChangeNumber(chatId int, user *UserT) {
+	buttons := [][]map[string]interface{}{
+		//{{"text": languages[user.Language]["back"] + " 🔙", "callback_data": "backToSettings"}},
+	}
+
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": buttons,
+	}
+
+	// Создаем GET-запрос
+	resp, err := http.Get("http://" + link + "/api/customers/get-with-details.php?tg_id=" + strconv.Itoa(chatId))
+	if err != nil {
+		log.Fatal("Ошибка при выполнении запроса:", err)
+	}
+	defer resp.Body.Close()
+
+	var userdetails []UserDetails
+	err = json.NewDecoder(resp.Body).Decode(&userdetails)
+	if err != nil {
+		log.Fatal("Ошибка при декодировании JSON:", err)
+	}
+
+	// Используем полученные данные и подставляем их в кнопки
+	for _, userdetail := range userdetails {
+
+		phoneText := url.QueryEscape("\n" + languages[user.Language]["current_number"] + userdetail.Phone)
+
+		// Отправляем сообщение с клавиатурой и перезаписываем шаг
+		sendMessage(chatId, url.QueryEscape(languages[user.Language]["send_your_number"])+phoneText, inlineKeyboard)
 
 	}
 }
