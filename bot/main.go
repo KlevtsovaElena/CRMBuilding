@@ -478,9 +478,13 @@ func getUserInfoDB(user *UserT, chatId int) {
 	jsonData, _ := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
+	if string(jsonData) == "" {
+		jsonData = []byte("[]")
+	}
+
 	err = json.Unmarshal(jsonData, &user)
 	if err != nil {
-		log.Fatal("Ошибка при выполнении запроса:", err)
+		log.Fatal("Ошибка при парсинге данных пользователя:", err)
 	}
 
 	fmt.Println("пошли получать инфо про юзера в самом начале")
