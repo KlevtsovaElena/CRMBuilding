@@ -69,65 +69,65 @@ services:
       - "5002:80"
     restart: always
 
-#  currency-service:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-currency-service
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./../currency-service/:/app/
-#    environment:
-#      task_start_hour: "7"
-#      task_start_minute: "30"
-#      bot_token: ${CURRENCY_BOT_TOKEN}
-#      telegram_channel: ${TELEGRAM_CHANEL}
-#      TZ: "Europe/Moscow"
-#    restart: always
-#    ports:
-#      - "5003:80"
-#
-#  price-service:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-price-service
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./../price-service/:/app/
-#    environment:
-#      bot_token: ${PRICE_BOT_TOKEN}
-#      telegram_channel: ${TELEGRAM_PRICE_CHANEL}
-#    restart: always
-#    ports:
-#      - "5004:80"
-#
-#  notification-service:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-notification-service
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./../notification-service/:/app/
-#    environment:
-#      bot_token: ${BOT_TOKEN}
-#      server_uri: ${SERVER_URI}
-#      api_link: ${API_LINK}
-#    ports:
-#      - "5005:80"
-#
-#  confirm-price-service:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-confirm-price-service
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./../confirm-price-service/:/app/
-#    environment:
-#      bot_token: ${BOT_TOKEN}
-#      api_link: ${API_LINK}
-#    restart: always
-#    ports:
-#      - "5006:80"
+  currency-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-currency-service
+    env_file:
+      - .env
+    volumes:
+      - ./../currency-service/:/app/
+    environment:
+      task_start_hour: "7"
+      task_start_minute: "30"
+      bot_token: ${CURRENCY_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_CHANEL}
+      TZ: "Europe/Moscow"
+    restart: always
+    ports:
+      - "5003:80"
+
+  price-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-price-service
+    env_file:
+      - .env
+    volumes:
+      - ./../price-service/:/app/
+    environment:
+      bot_token: ${PRICE_BOT_TOKEN}
+      telegram_channel: ${TELEGRAM_PRICE_CHANEL}
+    restart: always
+    ports:
+      - "5004:80"
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-notification-service
+    env_file:
+      - .env
+    volumes:
+      - ./../notification-service/:/app/
+    environment:
+      bot_token: ${BOT_TOKEN}
+      server_uri: ${SERVER_URI}
+      api_link: ${API_LINK}
+    ports:
+      - "5005:80"
+
+  confirm-price-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-confirm-price-service
+    env_file:
+      - .env
+    volumes:
+      - ./../confirm-price-service/:/app/
+    environment:
+      bot_token: ${BOT_TOKEN}
+      api_link: ${API_LINK}
+    restart: always
+    ports:
+      - "5006:80"

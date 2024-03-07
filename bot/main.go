@@ -233,6 +233,7 @@ var languages = map[string]map[string]string{
 		"incorrect_number_format":                "Вы ввели телефон в неправильном формате. Повторите попытку",
 		"succesfully_changed_number":             "Номер телефона успешно изменен",
 		"new_number":                             "Новый номер: ",
+		"language_changed":                       "Язык успешно изменен",
 	},
 	"uz": {
 		"change_number":                          "Raqamni o’zgartirish",
@@ -290,6 +291,7 @@ var languages = map[string]map[string]string{
 		"incorrect_number_format":                "Siz telefonni noto’g’ri formatda kiritdingiz. Qayta urinib ko’ring",
 		"succesfully_changed_number":             "Telefon raqami muvaffaqiyatli o’zgartirildi",
 		"new_number":                             "Yangi raqam: ",
+		"language_changed":                       "Язык успешно изменен UZ",
 	},
 	"uzkcha": {
 		"change_number":                          "Рақамни ўзгартириш",
@@ -347,6 +349,7 @@ var languages = map[string]map[string]string{
 		"incorrect_number_format":                "Сиз телефонни нотўғри форматда киритдингиз. Қайта уриниб кўринг",
 		"succesfully_changed_number":             "Телефон рақами муваффақиятли ўзгартирилди",
 		"new_number":                             "Янги рақам: ",
+		"language_changed":                       "Язык успешно изменен UZKCHA",
 	},
 }
 
@@ -1105,7 +1108,7 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			setUserStepDB(2, &user)
 
 		// кейс для получения номера телефона
-		case user.Step == 2 || button == "backToPhone":
+		case user.Step == 2:
 
 			//если не ввел язык
 			if button == "" {
@@ -1148,8 +1151,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 		case user.Step == 5:
 
 			if strings.Contains(text, "🛍") {
-				//fmt.Println("показываем категории")
-				sendMessage(chatId, "выбирайте категория", nil)
 				showKeyboardCategories(chatId, user)
 				break
 			}
@@ -1176,9 +1177,6 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 			}
 
 			//смена телефона
-			fmt.Println(len(text))
-			fmt.Println(len(strings.Replace(text, "+", "", 1)))
-			fmt.Println(strings.Replace(text, "+", "", 1))
 			if isOnlyDigits(strings.Replace(text, "+", "", 1)) && len(strings.Replace(text, "+", "", 1)) > 8 {
 				text = strings.Replace(text, "+", "", 1)
 				if len(text) == 12 {
@@ -1188,6 +1186,14 @@ func processMessage(message MessageT, messageInline MessageInlineT, wg *sync.Wai
 				} else {
 					showKeyboardChangeNumber(chatId, &user)
 				}
+			}
+
+			//если меняет язык
+			if button == "ru" || button == "uz" || button == "uzkcha" {
+				user.Language = button
+				setUserInfoDB(&user)
+				sendMessage(chatId, languages[user.Language]["language_changed"], nil)
+				showKeyboardMainMenu(chatId, user)
 			}
 
 			if text == "main menu" || button == "backToMenu" {

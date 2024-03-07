@@ -28,7 +28,7 @@
 
             $post = json_decode(file_get_contents('php://input'), true);
 
-            var_dump($post);
+            //var_dump($post);
 
             if (isset($post['id']) && $post['id'] != 0)
             {

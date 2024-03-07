@@ -1572,7 +1572,7 @@ function confirmProductsVendor(id, nameVendor) {
 
 function addGoodsToCentralVendor() {
 
-    let dataJson1 = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?vendor_id=13');
+    let dataJson1 = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?vendor_id=9');
     let data1 = JSON.parse(dataJson1);
 
     if(data1) {
@@ -1659,7 +1659,7 @@ function renderAllVendorGoods(vendor_id) {
     //даем видимость блоку с таблицей
     document.getElementById('modal-container').classList.remove('d-none');
 
-    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1&vendor_id=13');
+    let dataJson = sendRequestGET(mainUrl + '/api/products/get-with-details-for-list-products.php?deleted=0&is_active=1&vendor_id=9');
     let data = JSON.parse(dataJson);
     console.log(data);
 
