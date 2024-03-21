@@ -20,7 +20,7 @@
         {
             $result = $this->productRepository->get($_GET);
             $resultArr = (array)$result;
-            $resultArr['name_language'] = $resultArr['name'];
+            $resultArr['name_language'] = $resultArr['name'] ?? '';
             
             if ($result)
                 echo json_encode($resultArr, JSON_UNESCAPED_UNICODE);

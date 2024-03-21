@@ -55,21 +55,21 @@ func main() {
 	}()
 
 	//цикл для проверки времени
-	for range time.Tick(time.Second * 1) {
+	for range time.Tick(time.Second * 10) {
 
 		//создаём переменную настоящего времени
-		timeNow := time.Now()
+		//timeNow := time.Now()
 
 		//сравниваем текущее время (часы и минуты) и время рассылки
-		if strconv.Itoa(timeNow.Hour()+3) == planed_hour && strconv.Itoa(timeNow.Minute()) == planed_minute {
+		//if strconv.Itoa(timeNow.Hour()+3) == planed_hour && strconv.Itoa(timeNow.Minute()) == planed_minute {
 
-			//запускаем функцию отправки сообщения
-			makeGoodsList()
+		//запускаем функцию отправки сообщения
+		makeGoodsList()
 
-			//останавливаем функцию на минуту, чтобы не было спама
-			time.Sleep(60 * time.Second)
+		//останавливаем функцию на минуту, чтобы не было спама
+		//time.Sleep(60 * time.Second)
 
-		}
+		//}
 
 	}
 }
@@ -119,7 +119,12 @@ func makeGoodsList() {
 
 		}
 
-		apiURL := "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + hashtag + "&photo=" + domen + product_photo + "&parse_mode=HTML"
+		apiURL := ""
+		if strings.Contains(product_photo, "http") {
+			apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + hashtag + "&photo=" + product_photo + "&parse_mode=HTML"
+		} else {
+			apiURL = "https://api.telegram.org/bot" + token + "/sendPhoto?chat_id=" + url.QueryEscape(channelName) + "&caption=" + caption + hashtag + "&photo=" + domen + product_photo + "&parse_mode=HTML"
+		}
 
 		fmt.Println(product_photo)
 
