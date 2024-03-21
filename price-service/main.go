@@ -101,7 +101,9 @@ func makeGoodsList() {
 		hashtags += url.QueryEscape("<b>#" + strings.ReplaceAll(category.CategoryName, " ", "") + "</b>\n")
 
 		// Создаем GET-запрос
-		resp, err := http.Get("http://" + link + "/api/products.php?category_id=" + strconv.Itoa(category.ID))
+		urlGoods := "http://" + link + "/api/products.php?category_id=" + strconv.Itoa(category.ID)
+		fmt.Println(urlGoods)
+		resp, err := http.Get(urlGoods)
 		if err != nil {
 			log.Fatal("Ошибка при выполнении запроса:", err)
 		}
