@@ -109,8 +109,9 @@ func makeGoodsList() {
 		}
 		defer resp.Body.Close()
 
-		var products []Product
+		products := make(map[string]Product)
 		json.NewDecoder(resp.Body).Decode(&products)
+		fmt.Println(products)
 
 		for _, product := range products {
 
