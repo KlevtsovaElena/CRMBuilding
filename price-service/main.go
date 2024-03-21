@@ -96,7 +96,7 @@ func makeGoodsList() {
 		fmt.Println("enter in categories")
 
 		var caption string = "<b>" + category.CategoryName + "</b>"
-		var product_photo string
+		product_photo := ""
 		var hashtag string = url.QueryEscape("<b>#" + strings.ReplaceAll(category.CategoryName, " ", "") + "</b>")
 		hashtags += url.QueryEscape("<b>#" + strings.ReplaceAll(category.CategoryName, " ", "") + "</b>\n")
 
@@ -115,8 +115,10 @@ func makeGoodsList() {
 			fmt.Println("enter in products")
 
 			caption += url.QueryEscape("\n<u>" + product.Name + " - " + strconv.Itoa(product.Price) + "сум</u>\n")
-			product_photo = product.Photo
-
+			if product_photo == "" && product.Photo != "" {
+				product_photo = product.Photo
+			}
+			fmt.Println(product.Photo)
 		}
 
 		apiURL := ""
